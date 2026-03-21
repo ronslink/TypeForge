@@ -15,7 +15,8 @@
     "clean": "rm -rf .svelte-kit node_modules"
   },
   "dependencies": {
-    "@clerk/svelte": "^1.0.0"
+    "clerk-sveltekit": "^0.4.3",
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^4.8.0",
