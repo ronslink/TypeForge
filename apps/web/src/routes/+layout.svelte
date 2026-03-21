@@ -11,8 +11,6 @@
   let { children, data }: Props = $props();
 </script>
 
-<div class="min-h-screen bg-background">
-  <main>
-    {@render children()}
-  </main>
+<div class="min-h-screen bg-background text-on-background">
+  {@render children()}
 </div>
