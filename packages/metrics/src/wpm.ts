@@ -1,11 +1,15 @@
 /**
  * WPM (Words Per Minute) Calculator
+ * Real-time per-keystroke WPM calculation
  */
 
 import type { MetricsConfig, WPMResult, KeystrokeEvent } from './types.js';
 
 export class WPMCalculator {
   private config: MetricsConfig;
+  private startTime: number | null = null;
+  private correctChars: number = 0;
+  private uncorrectedErrors: number = 0;
 
   constructor(config: Partial<MetricsConfig> = {}) {
     this.config = {
@@ -18,7 +22,63 @@ export class WPMCalculator {
   }
 
   /**
-   * Calculate WPM from keystroke events
+   * Process a keystroke and update WPM calculations
+   * @param key - The KeyboardEvent.code of the key pressed
+   * @param correct - Whether the keystroke was correct
+   * @param timestamp - Unix timestamp in milliseconds
+   */
+  onKeystroke(key: string, correct: boolean, timestamp: number): void {
+    if (this.startTime === null) {
+      this.startTime = timestamp;
+    }
+
+    if (correct) {
+      this.correctChars++;
+    } else {
+      this.uncorrectedErrors++;
+    }
+  }
+
+  /**
+   * Get current WPM values
+   * @returns Object with netWPM and grossWPM
+   */
+  getWPM(): { netWPM: number; grossWPM: number } {
+    if (this.startTime === null) {
+      return { netWPM: 0, grossWPM: 0 };
+    }
+
+    const elapsedMs = Date.now() - this.startTime;
+    const elapsedMinutes = elapsedMs / 60000;
+
+    if (elapsedMinutes === 0) {
+      return { netWPM: 0, grossWPM: 0 };
+    }
+
+    // grossWPM = correctChars / 5 / minutesElapsed
+    const grossWPM = this.correctChars / this.config.wordLength / elapsedMinutes;
+
+    // netWPM = (correctChars - uncorrectedErrors) / 5 / minutesElapsed
+    const netNumerator = Math.max(0, this.correctChars - this.uncorrectedErrors);
+    const netWPM = netNumerator / this.config.wordLength / elapsedMinutes;
+
+    return {
+      netWPM: Math.round(netWPM * 10) / 10,
+      grossWPM: Math.round(grossWPM * 10) / 10,
+    };
+  }
+
+  /**
+   * Reset the calculator state
+   */
+  reset(): void {
+    this.startTime = null;
+    this.correctChars = 0;
+    this.uncorrectedErrors = 0;
+  }
+
+  /**
+   * Calculate WPM from keystroke events (legacy batch method)
    */
   calculate(events: KeystrokeEvent[], durationMs: number): WPMResult {
     const totalChars = this.countCharacters(events);

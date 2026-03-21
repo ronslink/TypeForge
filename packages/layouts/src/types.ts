@@ -48,3 +48,40 @@ export interface FingerAssignment {
   finger: Finger;
   keys: string[];
 }
+
+// ============================================================================
+// New Layout Types (Row-based)
+// ============================================================================
+
+/** Available layout names */
+export type LayoutName = 
+  | 'qwerty-us'
+  | 'azerty-fr'
+  | 'qwertz-de'
+  | 'dvorak'
+  | 'arabic'
+  | 'cyrillic';
+
+/** Key definition in row-based layout */
+export interface Key {
+  /** Key code (physical position, e.g., 'KeyA', 'Digit1') */
+  code: string;
+  /** Default character */
+  char: string;
+  /** Shift character */
+  charShift?: string;
+  /** Whether this key requires AltGr to access the character */
+  requiresAltGr?: boolean;
+}
+
+/** Row-based keyboard layout */
+export interface Layout {
+  /** Layout identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Language code (BCP-47) */
+  language: string;
+  /** Rows of keys (0 = number row, 1 = top alpha, 2 = home row, 3 = bottom alpha, 4 = space/modifiers) */
+  rows: Key[][];
+}

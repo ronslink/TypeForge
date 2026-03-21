@@ -1,12 +1,82 @@
 /**
  * Accuracy Calculator
+ * Real-time per-keystroke accuracy tracking with per-key error rates
  */
 
 import type { AccuracyResult, KeystrokeEvent } from './types.js';
 
+interface KeyStats {
+  total: number;
+  errors: number;
+}
+
 export class AccuracyCalculator {
+  private keyStats: Map<string, KeyStats> = new Map();
+  private totalKeystrokes: number = 0;
+  private totalErrors: number = 0;
+
   /**
-   * Calculate accuracy from keystroke events
+   * Process a keystroke and update accuracy tracking
+   * Uses KeyboardEvent.code for key identification
+   * @param code - The KeyboardEvent.code of the key pressed
+   * @param correct - Whether the keystroke was correct
+   */
+  onKeystroke(code: string, correct: boolean): void {
+    const stats = this.keyStats.get(code) || { total: 0, errors: 0 };
+    stats.total++;
+    if (!correct) {
+      stats.errors++;
+      this.totalErrors++;
+    }
+    this.keyStats.set(code, stats);
+    this.totalKeystrokes++;
+  }
+
+  /**
+   * Get overall accuracy percentage
+   * @returns Accuracy as a percentage (0-100)
+   */
+  getAccuracy(): number {
+    if (this.totalKeystrokes === 0) {
+      return 100;
+    }
+    const correct = this.totalKeystrokes - this.totalErrors;
+    return Math.round((correct / this.totalKeystrokes) * 10000) / 100;
+  }
+
+  /**
+   * Get accuracy for a specific key
+   * @param code - The KeyboardEvent.code of the key
+   * @returns Accuracy as a percentage (0-100), or null if key not tracked
+   */
+  getKeyAccuracy(code: string): number | null {
+    const stats = this.keyStats.get(code);
+    if (!stats || stats.total === 0) {
+      return null;
+    }
+    const correct = stats.total - stats.errors;
+    return Math.round((correct / stats.total) * 10000) / 100;
+  }
+
+  /**
+   * Get all per-key statistics
+   * @returns Map of key codes to their stats
+   */
+  getAllKeyStats(): Map<string, KeyStats> {
+    return new Map(this.keyStats);
+  }
+
+  /**
+   * Reset the accuracy tracker
+   */
+  reset(): void {
+    this.keyStats.clear();
+    this.totalKeystrokes = 0;
+    this.totalErrors = 0;
+  }
+
+  /**
+   * Calculate accuracy from keystroke events (legacy batch method)
    */
   calculate(events: KeystrokeEvent[]): AccuracyResult {
     const totalCharacters = events.length;
@@ -26,7 +96,7 @@ export class AccuracyCalculator {
   }
 
   /**
-   * Calculate accuracy per character
+   * Calculate accuracy per character (legacy batch method)
    */
   calculatePerCharacter(
     events: KeystrokeEvent[]
@@ -55,7 +125,7 @@ export class AccuracyCalculator {
   }
 
   /**
-   * Identify problem characters (below threshold)
+   * Identify problem characters (below threshold) (legacy batch method)
    */
   identifyProblemCharacters(
     events: KeystrokeEvent[],
@@ -77,3 +147,6 @@ export class AccuracyCalculator {
     return problems.sort((a, b) => a.accuracy - b.accuracy);
   }
 }
+
+// Export the new class name as AccuracyTracker for the new API
+export { AccuracyCalculator as AccuracyTracker };
