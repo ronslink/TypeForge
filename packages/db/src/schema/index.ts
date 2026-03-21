@@ -23,3 +23,6 @@ export * from './gamification.js';
 
 // Domain 7: Notifications & Audit
 export * from './notifications.js';
+
+// Domain 8: Compliance (GDPR, COPPA, FERPA, etc.)
+export * from './compliance.js';

@@ -1,12 +1,12 @@
 import { defineConfig } from 'drizzle-kit';
 
-// Base configuration for type generation
+// EU region configuration
 export default defineConfig({
   schema: './src/schema/index.ts',
-  out: './drizzle',
+  out: './drizzle/eu',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'postgresql://localhost:5432/typeforge',
+    url: process.env.DATABASE_URL_EU ?? 'postgresql://localhost:5432/typeforge_eu',
   },
   verbose: true,
   strict: true,

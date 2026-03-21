@@ -9,6 +9,21 @@ import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
 import { prettyJSON } from 'hono/pretty-json';
 
+// Middleware
+import { authMiddleware, requireAuth } from './middleware/auth.js';
+import { regionMiddleware } from './middleware/region.js';
+import { rateLimitMiddleware } from './middleware/ratelimit.js';
+
+// Routes
+import {
+  sessionsRoutes,
+  lessonsRoutes,
+  usersRoutes,
+  organisationsRoutes,
+  billingRoutes,
+  adminRoutes,
+} from './routes/index.js';
+
 // Environment bindings from wrangler.toml
 interface Env {
   HYPERDRIVE_EU: Hyperdrive;
@@ -24,22 +39,15 @@ interface Env {
   ENVIRONMENT: string;
 }
 
-// Regional context extracted from Clerk JWT or request headers
-interface RegionalContext {
-  userId: string;
-  homeRegion: 'EU' | 'US' | 'AF';
-  role: 'learner' | 'teacher' | 'org_admin' | 'platform_admin';
-}
-
 const app = new Hono<{ Bindings: Env }>();
 
-// Middleware
+// Global middleware
 app.use('*', logger());
 app.use('*', secureHeaders());
 app.use(
   '*',
   cors({
-    origin: ['https://typeforge.io', 'https://www.typeforge.io'],
+    origin: ['https://typeforge.io', 'https://www.typeforge.io', 'http://localhost:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -47,7 +55,16 @@ app.use(
 );
 app.use('*', prettyJSON());
 
-// Health check
+// Rate limiting
+app.use('/api/*', rateLimitMiddleware);
+
+// Authentication middleware
+app.use('/api/*', authMiddleware);
+
+// Regional database routing
+app.use('/api/*', regionMiddleware);
+
+// Health check (no auth required)
 app.get('/health', (c) => {
   return c.json({
     status: 'healthy',
@@ -57,73 +74,28 @@ app.get('/health', (c) => {
   });
 });
 
-// Regional routing middleware
-app.use('/api/*', async (c, next) => {
-  // Extract user context from Clerk JWT
-  const authHeader = c.req.header('Authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    // TODO: Validate JWT with Clerk and extract regional context
-    // For now, set a placeholder context
-    c.set('regionalContext', {
-      userId: 'placeholder',
-      homeRegion: 'EU' as const,
-      role: 'learner' as const,
-    });
-  }
-  await next();
-});
+// Mount API routes
+app.route('/api/v1/sessions', sessionsRoutes);
+app.route('/api/v1/lessons', lessonsRoutes);
+app.route('/api/v1/users', usersRoutes);
+app.route('/api/v1/organisations', organisationsRoutes);
+app.route('/api/v1/billing', billingRoutes);
+app.route('/api/v1/admin', adminRoutes);
 
-// API routes
-app.get('/api/v1/user', (c) => {
-  const ctx = c.get('regionalContext');
-  return c.json({ user: ctx });
-});
-
-// Typing session routes
-app.post('/api/v1/sessions', async (c) => {
-  // TODO: Create typing session
-  return c.json({ message: 'Session created' }, 201);
-});
-
-app.get('/api/v1/sessions/:id', async (c) => {
-  const id = c.req.param('id');
-  // TODO: Get session by ID
-  return c.json({ sessionId: id });
-});
-
-// Lesson routes
-app.get('/api/v1/lessons', async (c) => {
-  // TODO: List lessons based on user's language and level
-  return c.json({ lessons: [] });
-});
-
-app.get('/api/v1/lessons/:id', async (c) => {
-  const id = c.req.param('id');
-  // TODO: Get lesson by ID
-  return c.json({ lessonId: id });
-});
-
-// Metrics routes
-app.post('/api/v1/metrics', async (c) => {
-  const body = await c.req.json();
-  // TODO: Record typing metrics
-  return c.json({ recorded: true });
-});
-
-app.get('/api/v1/metrics/summary', async (c) => {
-  // TODO: Get user metrics summary
+// API version info
+app.get('/api/v1', (c) => {
   return c.json({
-    wpm: 0,
-    accuracy: 0,
-    streak: 0,
-    totalLessons: 0,
+    name: 'TypeForge API',
+    version: '1.0.0',
+    endpoints: {
+      sessions: '/api/v1/sessions',
+      lessons: '/api/v1/lessons',
+      users: '/api/v1/users',
+      organisations: '/api/v1/organisations',
+      billing: '/api/v1/billing',
+      admin: '/api/v1/admin',
+    },
   });
-});
-
-// Leaderboard routes
-app.get('/api/v1/leaderboard', async (c) => {
-  // TODO: Get leaderboard data
-  return c.json({ leaderboard: [] });
 });
 
 // 404 handler
@@ -134,11 +106,15 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('API Error:', err);
+  
+  const isDev = c.env.ENVIRONMENT === 'development';
+  
   return c.json(
     {
       error: 'Internal Server Error',
       code: 'INTERNAL_ERROR',
-      message: c.env.ENVIRONMENT === 'development' ? err.message : undefined,
+      message: isDev ? err.message : undefined,
+      stack: isDev ? err.stack : undefined,
     },
     500
   );

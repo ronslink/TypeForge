@@ -41,8 +41,8 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-// Audit logs table
-export const auditLogs = pgTable('audit_logs', {
+// System audit logs table (for application-level events)
+export const systemAuditLogs = pgTable('system_audit_logs', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   orgId: uuid('org_id').references(() => organisations.id, { onDelete: 'set null' }),
@@ -82,13 +82,13 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
-export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+export const systemAuditLogsRelations = relations(systemAuditLogs, ({ one }) => ({
   user: one(users, {
-    fields: [auditLogs.userId],
+    fields: [systemAuditLogs.userId],
     references: [users.id],
   }),
   org: one(organisations, {
-    fields: [auditLogs.orgId],
+    fields: [systemAuditLogs.orgId],
     references: [organisations.id],
   }),
 }));

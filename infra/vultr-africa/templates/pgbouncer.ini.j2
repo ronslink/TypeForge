@@ -1,0 +1,22 @@
+[databases]
+typeforge_af = host=127.0.0.1 port=5432 dbname=typeforge_af
+
+[pgbouncer]
+listen_port = 6432
+listen_addr = 0.0.0.0
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+pool_mode = transaction
+max_client_conn = 300
+default_pool_size = 20
+min_pool_size = 5
+reserve_pool_size = 5
+reserve_pool_timeout = 3
+server_idle_timeout = 300
+client_idle_timeout = 0
+client_login_timeout = 60
+log_connections = 1
+log_disconnections = 1
+log_pooler_errors = 1
+stats_period = 60
+admin_users = typeforge_admin
