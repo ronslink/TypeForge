@@ -11,7 +11,7 @@ import { prettyJSON } from 'hono/pretty-json';
 
 // Middleware
 import { authMiddleware, requireAuth } from './middleware/auth.js';
-import { regionMiddleware } from './middleware/region.js';
+import { regionalRoutingMiddleware } from './middleware/regional-routing.js';
 import { rateLimitMiddleware } from './middleware/ratelimit.js';
 
 // Routes
@@ -22,6 +22,7 @@ import {
   organisationsRoutes,
   billingRoutes,
   adminRoutes,
+  progressRoutes,
 } from './routes/index.js';
 
 // Environment bindings from wrangler.toml
@@ -49,7 +50,7 @@ app.use(
   cors({
     origin: ['https://typeforge.io', 'https://www.typeforge.io', 'http://localhost:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowHeaders: ['Content-Type', 'Authorization', 'x-region'],
     credentials: true,
   })
 );
@@ -61,8 +62,8 @@ app.use('/api/*', rateLimitMiddleware);
 // Authentication middleware
 app.use('/api/*', authMiddleware);
 
-// Regional database routing
-app.use('/api/*', regionMiddleware);
+// Regional database routing (new middleware)
+app.use('/api/*', regionalRoutingMiddleware);
 
 // Health check (no auth required)
 app.get('/health', (c) => {
@@ -77,6 +78,7 @@ app.get('/health', (c) => {
 // Mount API routes
 app.route('/api/v1/sessions', sessionsRoutes);
 app.route('/api/v1/lessons', lessonsRoutes);
+app.route('/api/v1/progress', progressRoutes);
 app.route('/api/v1/users', usersRoutes);
 app.route('/api/v1/organisations', organisationsRoutes);
 app.route('/api/v1/billing', billingRoutes);
@@ -90,6 +92,7 @@ app.get('/api/v1', (c) => {
     endpoints: {
       sessions: '/api/v1/sessions',
       lessons: '/api/v1/lessons',
+      progress: '/api/v1/progress',
       users: '/api/v1/users',
       organisations: '/api/v1/organisations',
       billing: '/api/v1/billing',
@@ -106,9 +109,9 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('API Error:', err);
-  
+
   const isDev = c.env.ENVIRONMENT === 'development';
-  
+
   return c.json(
     {
       error: 'Internal Server Error',
