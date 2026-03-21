@@ -1,0 +1,77 @@
+# TypeForge API — Cloudflare Worker Configuration
+# Hono runtime with Hyperdrive for PostgreSQL connectivity
+
+name = "typeforge-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-10"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (secrets managed via wrangler secret)
+[vars]
+ENVIRONMENT = "development"
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Hyperdrive bindings for regional PostgreSQL databases
+# These are created via: wrangler hyperdrive create typeforge-eu --connection-string="..."
+# [[hyperdrive]]
+# binding = "HYPERDRIVE_EU"
+# id = "hyperdrive-eu-id"
+# 
+# [[hyperdrive]]
+# binding = "HYPERDRIVE_US"
+# id = "hyperdrive-us-id"
+# 
+# [[hyperdrive]]
+# binding = "HYPERDRIVE_AF"
+# id = "hyperdrive-af-id"
+
+# D1 Database for edge-cached data
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "typeforge-edge"
+# database_id = "d1-database-id"
+
+# R2 Bucket for assets
+# [[r2_buckets]]
+# binding = "ASSETS"
+# bucket_name = "typeforge-assets"
+
+# Queue for background jobs
+# [[queues.producers]]
+# binding = "JOBS"
+# queue = "typeforge-jobs"
+
+# KV Namespace for caching
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "kv-namespace-id"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# Required secrets:
+# - CLERK_SECRET_KEY
+# - UPSTASH_REDIS_REST_URL
+# - UPSTASH_REDIS_REST_TOKEN
+
+# Production environment
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# Staging environment
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
+
+# Build settings
+[build]
+command = "pnpm build"
+
+# Limits
+[limits]
+cpu_ms = 50
+
+# Placement hints for regional routing
+[placement]
+mode = "smart"

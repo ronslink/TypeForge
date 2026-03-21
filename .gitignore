@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.output/
+.svelte-kit/
+.vercel/
+.wrangler/
+
+# Turbo cache
+.turbo/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.schema
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# E2E tests
+playwright-report/
+test-results/
+playwright/.cache/
+
+# Database
+*.db
+*.db-journal
+
+# Secrets (never commit)
+*.pem
+*.key
+secrets/
+.secrets/
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# Drizzle
+drizzle/meta/
+!drizzle/meta/.gitkeep
+
+# Temporary files
+tmp/
+temp/
+*.tmp

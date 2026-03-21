@@ -1,0 +1,43 @@
+{
+  "name": "@typeforge/assets",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./sounds": {
+      "types": "./src/sounds/index.ts",
+      "default": "./src/sounds/index.ts"
+    },
+    "./keyboards": {
+      "types": "./src/keyboards/index.ts",
+      "default": "./src/keyboards/index.ts"
+    },
+    "./images": {
+      "types": "./src/images/index.ts",
+      "default": "./src/images/index.ts"
+    }
+  },
+  "files": [
+    "src/**/*",
+    "static/**/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "clean": "rm -rf node_modules",
+    "optimize:svg": "svgo -f static/keyboards -o static/keyboards",
+    "optimize:audio": "node scripts/optimize-audio.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.17.12",
+    "svgo": "^3.3.2",
+    "typescript": "^5.7.3"
+  }
+}

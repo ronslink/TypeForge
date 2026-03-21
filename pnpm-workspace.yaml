@@ -1,0 +1,12 @@
+# TypeForge Monorepo Workspace Configuration
+# pnpm 9.x workspace definition
+
+packages:
+  # Applications
+  - "apps/*"
+  # Shared packages
+  - "packages/*"
+  # Infrastructure scripts (not published)
+  - "infra/*"
+  # Static assets (sounds, images, keyboards)
+  - "packages/assets"

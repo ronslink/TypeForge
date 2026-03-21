@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TYPEFORGE | Kinetic Foundry Typing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#ff9795",
+                        "on-primary": "#442c00",
+                        "on-surface": "#e1e2ea",
+                        "primary-fixed-dim": "#ffba44",
+                        "primary-container": "#f0a500",
+                        "on-secondary-container": "#004d3f",
+                        "on-primary-fixed": "#281800",
+                        "surface-container-low": "#191c21",
+                        "outline-variant": "#514533",
+                        "secondary-fixed-dim": "#38debb",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#92001b",
+                        "background": "#111319",
+                        "primary": "#ffc56c",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#614000",
+                        "inverse-primary": "#805600",
+                        "surface-dim": "#111319",
+                        "on-secondary-fixed-variant": "#005142",
+                        "surface-container-lowest": "#0b0e13",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#5ffbd6",
+                        "outline": "#9f8e79",
+                        "tertiary": "#ffc0bd",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "surface-container": "#1d2025",
+                        "on-secondary-fixed": "#002019",
+                        "secondary-container": "#00c7a5",
+                        "inverse-surface": "#e1e2ea",
+                        "on-primary-container": "#5f3f00",
+                        "surface-container-high": "#272a30",
+                        "on-surface-variant": "#d6c4ac",
+                        "on-tertiary-fixed": "#410007",
+                        "surface-tint": "#ffba44",
+                        "on-tertiary-container": "#91001b",
+                        "on-secondary": "#00382d",
+                        "on-background": "#e1e2ea",
+                        "surface-container-highest": "#32353b",
+                        "surface-variant": "#32353b",
+                        "inverse-on-surface": "#2e3036",
+                        "surface-bright": "#36393f",
+                        "tertiary-fixed": "#ffdad8",
+                        "on-tertiary": "#680010",
+                        "secondary": "#41e4c0",
+                        "primary-fixed": "#ffddaf",
+                        "surface": "#111319"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .notched-button {
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+        .grid-texture {
+            background-image: radial-gradient(circle, rgba(240, 165, 0, 0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .amber-glow {
+            box-shadow: 0 0 15px rgba(240, 165, 0, 0.2);
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(29, 32, 37, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Shell -->
+<nav class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl dark:bg-[#111319]/60">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-[#f0a500] uppercase font-label">TYPEFORGE</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#f0a500] border-b-2 border-[#f0a500] pb-1 font-body text-sm" href="#">Features</a>
+<a class="text-white/70 hover:text-white transition-colors font-body text-sm" href="#">Languages</a>
+<a class="text-white/70 hover:text-white transition-colors font-body text-sm" href="#">Pricing</a>
+</div>
+</div>
+<button class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95">
+                Start Typing
+            </button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex flex-col items-center justify-center px-6 overflow-hidden grid-texture">
+<div class="absolute top-1/4 -right-24 w-96 h-96 bg-primary-container/10 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-1/4 -left-24 w-96 h-96 bg-secondary-container/5 blur-[120px] rounded-full"></div>
+<div class="max-w-4xl text-center z-10">
+<h1 class="font-headline text-display-lg text-6xl md:text-8xl tracking-tight leading-tight mb-8">
+                    Master typing in <span class="italic text-primary font-serif">any</span> language
+                </h1>
+<p class="font-body text-on-surface-variant text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                    A high-fidelity industrial foundry for digital precision. Engineer your speed with zero-latency feedback and adaptive multilingual mastery.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+<button class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all">
+                        Start free today
+                    </button>
+<button class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
+                        Institutional Access
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Interactive Typing Demo (The Engine) -->
+<section class="max-w-5xl mx-auto px-6 py-20">
+<div class="bg-surface-container-high rounded-sm p-1 border-t border-l border-white/5 amber-glow">
+<div class="bg-surface-container-lowest p-8 md:p-12 relative overflow-hidden">
+<!-- Stats Header -->
+<div class="grid grid-cols-3 gap-4 mb-12 border-b border-outline-variant/20 pb-8">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">WPM Rate</span>
+<div class="font-label text-4xl text-secondary font-bold">124</div>
+</div>
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Accuracy</span>
+<div class="font-label text-4xl text-secondary font-bold">98.2%</div>
+</div>
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Streak</span>
+<div class="font-label text-4xl text-primary font-bold">412</div>
+</div>
+</div>
+<!-- Typing Area -->
+<div class="font-label text-3xl md:text-4xl leading-relaxed tracking-tight text-on-surface/40 relative">
+<span class="text-on-surface">L'apprentissage de la dactylo</span>
+<span class="text-error relative">g</span><span class="w-1 h-10 bg-primary absolute -bottom-1 inline-block animate-pulse"></span>
+<span>raphie sur un clavier AZERTY nécessite une précision mécanique et une discipline constante pour forger...</span>
+</div>
+<div class="mt-12 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/50">
+<span>French AZERTY Layout</span>
+<span>Shift + Alt to toggle language</span>
+</div>
+</div>
+</div>
+</section>
+<!-- "Built Different" Feature Grid -->
+<section class="py-24 px-8 max-w-screen-2xl mx-auto">
+<h2 class="font-headline text-headline-md text-5xl mb-16 text-center md:text-left">Built different.</h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Large Feature: AI Weakness -->
+<div class="md:col-span-8 bg-surface-container-low p-10 flex flex-col justify-between group hover:bg-surface-container transition-colors">
+<div>
+<span class="material-symbols-outlined text-primary text-4xl mb-6">psychology</span>
+<h3 class="font-headline text-3xl mb-4">AI Weakness Detection</h3>
+<p class="font-body text-on-surface-variant max-w-md">Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.</p>
+</div>
+<div class="mt-12 flex items-baseline gap-4">
+<div class="h-24 w-1 bg-surface-container-highest"></div>
+<div class="h-16 w-1 bg-surface-container-highest"></div>
+<div class="h-32 w-1 bg-primary"></div>
+<div class="h-20 w-1 bg-surface-container-highest"></div>
+<span class="font-label text-xs text-primary">LATENCY PEAK DETECTED</span>
+</div>
+</div>
+<!-- Secondary: Zero Latency -->
+<div class="md:col-span-4 bg-surface-container-low p-10 group hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-secondary text-4xl mb-6">bolt</span>
+<h3 class="font-headline text-3xl mb-4">Zero Latency</h3>
+<p class="font-body text-on-surface-variant">Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.</p>
+</div>
+<!-- Multilingual -->
+<div class="md:col-span-4 bg-surface-container-low p-10">
+<span class="material-symbols-outlined text-on-surface-variant text-4xl mb-6">translate</span>
+<h3 class="font-headline text-2xl mb-4">Global Foundry</h3>
+<p class="font-body text-on-surface-variant text-sm">Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.</p>
+</div>
+<!-- Institutional -->
+<div class="md:col-span-8 bg-surface-container-high p-10 flex flex-col md:flex-row gap-10 items-center">
+<div class="flex-1">
+<div class="flex items-center gap-2 text-primary mb-4">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label text-xs uppercase tracking-widest">For Institutions</span>
+</div>
+<h3 class="font-headline text-3xl mb-4">School Grade Rigor</h3>
+<p class="font-body text-on-surface-variant">COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-background p-4 flex flex-col">
+<span class="font-label text-secondary font-bold">100%</span>
+<span class="text-[10px] uppercase font-label text-on-surface-variant">Compliance</span>
+</div>
+<div class="bg-background p-4 flex flex-col">
+<span class="font-label text-secondary font-bold">500+</span>
+<span class="text-[10px] uppercase font-label text-on-surface-variant">Schools</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Placement to Mastery -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<h2 class="font-headline text-5xl md:text-6xl max-w-xl">From Placement to Mastery.</h2>
+<p class="font-body text-on-surface-variant max-w-xs pb-2">A structured evolution through the kinetic arts of typing.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-px bg-outline-variant/20">
+<div class="bg-surface-container-lowest py-12 pr-8 group">
+<div class="font-label text-5xl text-on-surface-variant/20 mb-8 group-hover:text-primary transition-colors">01</div>
+<h4 class="font-headline text-2xl mb-4">Placement Test</h4>
+<p class="font-body text-on-surface-variant text-sm">Our 120-second kinetic analysis maps your current speed, posture, and error distribution.</p>
+</div>
+<div class="bg-surface-container-lowest py-12 px-8 group">
+<div class="font-label text-5xl text-on-surface-variant/20 mb-8 group-hover:text-primary transition-colors">02</div>
+<h4 class="font-headline text-2xl mb-4">Weakness Model</h4>
+<p class="font-body text-on-surface-variant text-sm">Artificial intelligence generates a unique "heat map" of your physical typing limitations.</p>
+</div>
+<div class="bg-surface-container-lowest py-12 px-8 group">
+<div class="font-label text-5xl text-on-surface-variant/20 mb-8 group-hover:text-primary transition-colors">03</div>
+<h4 class="font-headline text-2xl mb-4">Adaptive Lessons</h4>
+<p class="font-body text-on-surface-variant text-sm">Dynamic content that shifts difficulty in real-time based on your momentary accuracy.</p>
+</div>
+<div class="bg-surface-container-lowest py-12 pl-8 group">
+<div class="font-label text-5xl text-on-surface-variant/20 mb-8 group-hover:text-primary transition-colors">04</div>
+<h4 class="font-headline text-2xl mb-4">Compound Progress</h4>
+<p class="font-body text-on-surface-variant text-sm">Witness your evolution through high-density technical readouts and milestone certifications.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual Keyboard Coaching -->
+<section class="py-24 px-8 max-w-screen-2xl mx-auto">
+<div class="bg-surface-container p-12 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+<img alt="Mechanical keyboard close up macro" class="w-full h-full object-cover" data-alt="Mechanical keyboard close up macro focus on keys" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ_ZExzXXTDpSs_rNcx5hmhoK9Oax2-08sE8Bs9lRoe5A1VK3WDsDPLxMDEbRj8RvsFbE5qTb3YiNAto2VwuzTuMekV4HLyNcZrsU2_VeL_j5retZZgtw297i3pmu2CakRQGYVoqyk_MYIR84AAgORWeXhyj66QTM_19X9FhMM7NVGVyZY0KJ1eXxcxSVFm42-prlb0IDSFawV-z6xcBvXk4RdLP7mfXXSX5Lotwvk7oX4stoScYKts1sJW28X4Cdh_Npb8NJn268"/>
+</div>
+<div class="max-w-xl relative z-10">
+<h2 class="font-headline text-4xl mb-6">Visual Keyboard Coaching</h2>
+<p class="font-body text-on-surface-variant mb-12 text-lg">Never look down again. Our dynamic coaching interface highlights finger zones and movement paths for any layout, from QWERTY to Colemak.</p>
+<div class="flex flex-wrap gap-4">
+<div class="bg-background px-4 py-2 flex items-center gap-3 border-l-2 border-primary">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label text-xs uppercase tracking-tighter">Left Index Zone</span>
+</div>
+<div class="bg-background px-4 py-2 flex items-center gap-3 border-l-2 border-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label text-xs uppercase tracking-tighter">Right Pinky Zone</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Grid -->
+<section class="py-24 px-8 max-w-screen-2xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline text-5xl mb-4">Forged for Everyone.</h2>
+<p class="font-body text-on-surface-variant">Scale your precision from solo typing to district-wide mastery.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Free -->
+<div class="bg-surface-container-low p-10 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">Individual</h4>
+<div class="font-headline text-4xl mb-6">Free</div>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check</span>
+                                All Basic Layouts
+                            </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check</span>
+                                Weekly Progress Stats
+                            </li>
+</ul>
+</div>
+<button class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors">Select Plan</button>
+</div>
+<!-- Pro -->
+<div class="bg-surface-container-highest p-10 flex flex-col justify-between border-t-4 border-primary shadow-2xl">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h4 class="font-label text-xs uppercase tracking-widest text-primary">Power User</h4>
+<span class="bg-primary text-on-primary px-2 py-1 text-[10px] font-bold uppercase tracking-tighter">Most Popular</span>
+</div>
+<div class="font-headline text-4xl mb-6">$9<span class="text-lg text-on-surface-variant">/mo</span></div>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg">check</span>
+                                Full AI Weakness Modeling
+                            </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg">check</span>
+                                Priority Multi-language Packs
+                            </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-primary text-lg">check</span>
+                                Custom Practice Engines
+                            </li>
+</ul>
+</div>
+<button class="notched-button w-full bg-primary text-on-primary py-4 font-label font-bold text-sm uppercase tracking-widest hover:amber-glow transition-all">Go Pro Now</button>
+</div>
+<!-- Institution -->
+<div class="bg-surface-container-low p-10 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">Schools</h4>
+<div class="font-headline text-4xl mb-6">$4<span class="text-lg text-on-surface-variant">/seat</span></div>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check</span>
+                                Teacher Dashboards
+                            </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check</span>
+                                COPPA &amp; GDPR Certification
+                            </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check</span>
+                                SSO Integration
+                            </li>
+</ul>
+</div>
+<button class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors">Contact Sales</button>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-24 px-8 max-w-screen-2xl mx-auto border-t border-outline-variant/10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-primary mb-6 block">Testimonials</span>
+<h2 class="font-headline text-4xl mb-8">What People Say</h2>
+<div class="bg-surface-container p-8 relative">
+<span class="material-symbols-outlined text-primary/20 text-6xl absolute top-4 right-4">format_quote</span>
+<p class="font-body text-lg italic mb-6 leading-relaxed">"TypeForge has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary-container rounded-sm flex items-center justify-center font-label font-bold">JH</div>
+<div>
+<div class="font-label text-sm font-bold">Julianne H.</div>
+<div class="font-label text-xs text-on-surface-variant">Tech Coordinator, St. Jude Academy</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<div class="bg-surface-container-low p-6">
+<p class="font-body text-sm mb-4">"The multi-language support allowed us to deploy the same platform across our international campuses in Tokyo and Paris seamlessly."</p>
+<div class="font-label text-xs font-bold text-secondary">Global Education Partners</div>
+</div>
+<div class="bg-surface-container-low p-6">
+<p class="font-body text-sm mb-4">"I went from 40wpm to 95wpm in three weeks. The AI weakness detection actually works—it stopped me from making the same 'S' and 'D' key mistakes."</p>
+<div class="font-label text-xs font-bold text-secondary">Computer Science Student</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-[#0b0e13] dark:bg-[#0b0e13] border-t border-outline-variant/10">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-8 py-12 max-w-screen-2xl mx-auto">
+<div>
+<span class="text-lg font-bold text-[#f0a500] font-label">TYPEFORGE</span>
+<p class="mt-4 text-xs text-white/50 leading-relaxed font-body">Engineered for accuracy. Built for the foundry. The definitive typing platform for modern explorers.</p>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-label text-xs uppercase tracking-widest text-white mb-2">Product</span>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Features</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Pricing</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Enterprise</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-label text-xs uppercase tracking-widest text-white mb-2">Resources</span>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">School Resources</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Typing Guide</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Teacher Dash</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-label text-xs uppercase tracking-widest text-white mb-2">Legal</span>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Privacy Policy</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Legal</a>
+<a class="text-white/50 hover:text-[#f0a500] transition-colors text-sm font-body" href="#">Compliance</a>
+</div>
+</div>
+<div class="max-w-screen-2xl mx-auto px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="text-[10px] text-white/30 font-label tracking-widest">© 2024 TYPEFORGE KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-white/30 hover:text-primary transition-colors cursor-pointer">language</span>
+<span class="material-symbols-outlined text-white/30 hover:text-primary transition-colors cursor-pointer">terminal</span>
+</div>
+</div>
+</footer>
+</body></html>

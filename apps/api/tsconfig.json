@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@typeforge/db": ["../../packages/db/src"],
+      "@typeforge/db/*": ["../../packages/db/src/*"],
+      "@typeforge/metrics": ["../../packages/metrics/src"],
+      "@typeforge/metrics/*": ["../../packages/metrics/src/*"],
+      "@typeforge/layouts": ["../../packages/layouts/src"],
+      "@typeforge/layouts/*": ["../../packages/layouts/src/*"],
+      "@typeforge/curriculum": ["../../packages/curriculum/src"],
+      "@typeforge/curriculum/*": ["../../packages/curriculum/src/*"]
+    },
+    "types": ["@cloudflare/workers-types"],
+    "module": "ESNext",
+    "target": "ES2022",
+    "lib": ["ES2022"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", ".wrangler"]
+}

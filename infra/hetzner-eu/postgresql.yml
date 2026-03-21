@@ -1,0 +1,170 @@
+---
+# TypeForge — PostgreSQL Configuration for Hetzner EU
+# Ansible playbook for PostgreSQL 16 + PgBouncer setup
+
+- name: Setup PostgreSQL on Hetzner EU
+  hosts: all
+  become: yes
+  vars:
+    postgres_version: 17
+    db_name: typeforge_eu
+    app_user: typeforge_api
+    admin_user: typeforge_admin
+    pgbouncer_port: 6432
+    postgres_port: 5432
+    max_connections: 500
+    pool_size: 25
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - postgresql-{{ postgres_version }}
+          - postgresql-contrib-{{ postgres_version }}
+          - pgbouncer
+          - python3-psycopg2
+          - ufw
+        state: present
+
+    - name: Start and enable PostgreSQL
+      systemd:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Create application database
+      become_user: postgres
+      postgresql_db:
+        name: "{{ db_name }}"
+        encoding: UTF-8
+        lc_collate: en_US.UTF-8
+        lc_ctype: en_US.UTF-8
+        template: template0
+
+    - name: Create application user
+      become_user: postgres
+      postgresql_user:
+        name: "{{ app_user }}"
+        password: "{{ app_password }}"
+        role_attr_flags: NOSUPERUSER,NOCREATEDB
+
+    - name: Create admin user for migrations
+      become_user: postgres
+      postgresql_user:
+        name: "{{ admin_user }}"
+        password: "{{ admin_password }}"
+        role_attr_flags: CREATEDB,CREATEROLE
+
+    - name: Grant privileges to users
+      become_user: postgres
+      postgresql_privs:
+        db: "{{ db_name }}"
+        privs: ALL
+        type: database
+        role: "{{ item }}"
+      loop:
+        - "{{ app_user }}"
+        - "{{ admin_user }}"
+
+    - name: Enable required PostgreSQL extensions
+      become_user: postgres
+      postgresql_ext:
+        name: "{{ item }}"
+        db: "{{ db_name }}"
+      loop:
+        - pgcrypto
+        - citext
+        - pg_trgm
+
+    - name: Configure PostgreSQL for performance
+      lineinfile:
+        path: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^#?listen_addresses', line: "listen_addresses = '*'" }
+        - { regexp: '^#?max_connections', line: "max_connections = {{ max_connections }}" }
+        - { regexp: '^#?shared_buffers', line: "shared_buffers = 2GB" }
+        - { regexp: '^#?work_mem', line: "work_mem = 64MB" }
+        - { regexp: '^#?maintenance_work_mem', line: "maintenance_work_mem = 512MB" }
+        - { regexp: '^#?effective_cache_size', line: "effective_cache_size = 6GB" }
+        - { regexp: '^#?log_min_duration_statement', line: "log_min_duration_statement = 1000" }
+      notify: Restart PostgreSQL
+
+    - name: Configure pg_hba.conf
+      copy:
+        dest: /etc/postgresql/{{ postgres_version }}/main/pg_hba.conf
+        content: |
+          # TYPE  DATABASE        USER            ADDRESS                 METHOD
+          local   all             all                                     peer
+          host    {{ db_name }}   {{ app_user }}  127.0.0.1/32            scram-sha-256
+          host    {{ db_name }}   {{ app_user }}  ::1/128                 scram-sha-256
+          host    {{ db_name }}   {{ admin_user }} 127.0.0.1/32           scram-sha-256
+          host    {{ db_name }}   {{ admin_user }} ::1/128                scram-sha-256
+      notify: Restart PostgreSQL
+
+    - name: Configure PgBouncer
+      template:
+        src: pgbouncer.ini.j2
+        dest: /etc/pgbouncer/pgbouncer.ini
+        owner: postgres
+        group: postgres
+        mode: '0640'
+      notify: Restart PgBouncer
+
+    - name: Configure PgBouncer users
+      template:
+        src: userlist.txt.j2
+        dest: /etc/pgbouncer/userlist.txt
+        owner: postgres
+        group: postgres
+        mode: '0640'
+      notify: Restart PgBouncer
+
+    - name: Start and enable PgBouncer
+      systemd:
+        name: pgbouncer
+        state: started
+        enabled: yes
+
+    - name: Configure UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Allow SSH
+      ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+
+    - name: Allow PostgreSQL from Cloudflare IPs
+      ufw:
+        rule: allow
+        port: "{{ postgres_port }}"
+        proto: tcp
+        src: "{{ item }}"
+      loop: "{{ cloudflare_ips }}"
+
+    - name: Allow PgBouncer
+      ufw:
+        rule: allow
+        port: "{{ pgbouncer_port }}"
+        proto: tcp
+
+  handlers:
+    - name: Restart PostgreSQL
+      systemd:
+        name: postgresql
+        state: restarted
+
+    - name: Restart PgBouncer
+      systemd:
+        name: pgbouncer
+        state: restarted

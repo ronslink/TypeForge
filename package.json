@@ -1,0 +1,49 @@
+{
+  "name": "typeforge",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TypeForge — Multilingual Adaptive Typing Learning Platform",
+  "keywords": [
+    "typing",
+    "touch-typing",
+    "multilingual",
+    "education",
+    "sveltekit",
+    "cloudflare-workers"
+  ],
+  "author": "TypeForge Team",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.1",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@typeforge/web",
+    "dev:api": "turbo run dev --filter=@typeforge/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:unit": "turbo run test:unit",
+    "test:e2e": "turbo run test:e2e",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,svelte,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,svelte,js,json,md}\"",
+    "db:generate": "turbo run db:generate --filter=@typeforge/db",
+    "db:migrate": "turbo run db:migrate --filter=@typeforge/db",
+    "db:push": "turbo run db:push --filter=@typeforge/db",
+    "db:studio": "turbo run db:studio --filter=@typeforge/db",
+    "deploy:api": "turbo run deploy --filter=@typeforge/api",
+    "deploy:web": "turbo run deploy --filter=@typeforge/web"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.12",
+    "prettier": "^3.4.2",
+    "prettier-plugin-svelte": "^3.3.3",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  }
+}

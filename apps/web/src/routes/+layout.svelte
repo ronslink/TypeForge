@@ -1,0 +1,18 @@
+<script lang="ts">
+  import '../app.css';
+  import type { Snippet } from 'svelte';
+  import type { LayoutData } from './$types';
+
+  interface Props {
+    children: Snippet;
+    data: LayoutData;
+  }
+
+  let { children, data }: Props = $props();
+</script>
+
+<div class="min-h-screen bg-background">
+  <main>
+    {@render children()}
+  </main>
+</div>
