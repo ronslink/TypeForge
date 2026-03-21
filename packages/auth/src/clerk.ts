@@ -3,7 +3,10 @@
  * JWT validation, user extraction, auth state management
  */
 
+import type { Context } from 'hono';
+import type { Env } from '../../../infra/contracts/bindings.js';
 import type { Region } from './region.js';
+import { extractRegionFromClaims } from './region.js';
 
 export interface ClerkUser {
   id: string;
@@ -17,6 +20,7 @@ export interface ClerkUser {
   role: 'learner' | 'teacher' | 'org_admin' | 'platform_admin';
   orgId?: string;
   orgRole?: string;
+  subscriptionStatus?: 'trialing' | 'active' | 'past_due' | 'cancelled' | 'expired';
 }
 
 export interface AuthState {
@@ -37,28 +41,29 @@ export async function validateJWT(
   token: string,
   secretKey: string
 ): Promise<Record<string, unknown>> {
-  // In production, use Clerk's backend SDK
-  // This is a placeholder that will be replaced with actual Clerk validation
   const { verifyToken } = await import('@clerk/backend');
-  
-  const payload = await verifyToken(token, {
-    secretKey,
-  });
-  
+  const payload = await verifyToken(token, { secretKey });
   return payload as Record<string, unknown>;
 }
 
 /**
- * Get the current user from a Clerk JWT token
- * Extracts user information and regional context
+ * Get the current user from a Hono context
+ * Extracts Bearer token from Authorization header, validates JWT, returns ClerkUser
  */
-export async function getCurrentUser(
-  token: string,
-  secretKey: string
-): Promise<ClerkUser | null> {
+export async function getCurrentUser(c: Context<{ Bindings: Env }>): Promise<ClerkUser | null> {
   try {
-    const claims = await validateJWT(token, secretKey);
-    
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = authHeader.slice(7);
+    const claims = await validateJWT(token, c.env.CLERK_SECRET_KEY);
+
+    const homeRegion = extractRegionFromClaims({
+      home_region: claims.home_region as string | undefined,
+    });
+
     return {
       id: claims.sub as string,
       email: claims.email as string,
@@ -67,7 +72,7 @@ export async function getCurrentUser(
       lastName: claims.last_name as string | undefined,
       displayName: claims.name as string | undefined,
       imageUrl: claims.image_url as string | undefined,
-      homeRegion: (claims.home_region as Region) || 'EU',
+      homeRegion,
       role: (claims.role as ClerkUser['role']) || 'learner',
       orgId: claims.org_id as string | undefined,
       orgRole: claims.org_role as string | undefined,
@@ -79,15 +84,11 @@ export async function getCurrentUser(
 }
 
 /**
- * Get the full authentication state from a request
- * Combines user info with permissions context
+ * Get the full authentication state from Hono context
  */
-export async function getAuthState(
-  token: string,
-  secretKey: string
-): Promise<AuthState> {
-  const user = await getCurrentUser(token, secretKey);
-  
+export async function getAuthState(c: Context<{ Bindings: Env }>): Promise<AuthState> {
+  const user = await getCurrentUser(c);
+
   if (!user) {
     return {
       userId: '',
@@ -98,7 +99,7 @@ export async function getAuthState(
       role: 'learner',
     };
   }
-  
+
   return {
     userId: user.id,
     user,

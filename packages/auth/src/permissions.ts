@@ -3,7 +3,10 @@
  * Role-based access control and resource authorization
  */
 
+import type { Context } from 'hono';
+import type { Env } from '../../../infra/contracts/bindings.js';
 import type { ClerkUser } from './clerk.js';
+import { getCurrentUser } from './clerk.js';
 
 export interface PermissionContext {
   userId: string;
@@ -15,35 +18,35 @@ export interface PermissionContext {
 
 /**
  * Check if user can access a specific lesson
+ * Teachers/org_admins/platform_admins access freely; learners need active subscription
  */
-export function canAccessLesson(
-  ctx: PermissionContext,
-  lesson: { id: string; isPremium?: boolean; orgId?: string }
-): boolean {
+export async function canAccessLesson(
+  ctx: Context<{ Bindings: Env }>,
+  lessonId?: string
+): Promise<boolean> {
+  const user = await getCurrentUser(ctx);
+  if (!user) return false;
+
   // Platform admins can access everything
-  if (ctx.role === 'platform_admin') return true;
-  
-  // Free lessons are accessible to all
-  if (!lesson.isPremium) return true;
-  
-  // Premium lessons require active subscription
-  if (ctx.subscriptionStatus === 'active' || ctx.subscriptionStatus === 'trialing') {
-    return true;
-  }
-  
-  // Org members can access org-licensed lessons
-  if (lesson.orgId && ctx.orgId === lesson.orgId) {
-    return true;
-  }
-  
-  return false;
+  if (user.role === 'platform_admin') return true;
+
+  // Teachers and org admins can access freely
+  if (['teacher', 'org_admin'].includes(user.role)) return true;
+
+  // Learners need active subscription
+  return user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing';
 }
 
 /**
  * Check if user has an active subscription
  */
-export function hasActiveSubscription(ctx: PermissionContext): boolean {
-  return ctx.subscriptionStatus === 'active' || ctx.subscriptionStatus === 'trialing';
+export async function hasActiveSubscription(
+  ctx: Context<{ Bindings: Env }>
+): Promise<boolean> {
+  const user = await getCurrentUser(ctx);
+  if (!user) return false;
+
+  return user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing';
 }
 
 /**
@@ -52,9 +55,7 @@ export function hasActiveSubscription(ctx: PermissionContext): boolean {
 export function isOrgAdmin(ctx: PermissionContext, orgId?: string): boolean {
   if (ctx.role === 'platform_admin') return true;
   if (ctx.orgRole === 'org_admin') {
-    if (orgId) {
-      return ctx.orgId === orgId;
-    }
+    if (orgId) return ctx.orgId === orgId;
     return true;
   }
   return false;
@@ -75,19 +76,9 @@ export function canViewStudentData(
   ctx: PermissionContext,
   studentOrgId?: string
 ): boolean {
-  // Platform admins can view all
   if (ctx.role === 'platform_admin') return true;
-  
-  // Org admins can view students in their org
-  if (ctx.orgRole === 'org_admin' && ctx.orgId === studentOrgId) {
-    return true;
-  }
-  
-  // Teachers can view students in their org
-  if (ctx.role === 'teacher' && ctx.orgId === studentOrgId) {
-    return true;
-  }
-  
+  if (ctx.orgRole === 'org_admin' && ctx.orgId === studentOrgId) return true;
+  if (ctx.role === 'teacher' && ctx.orgId === studentOrgId) return true;
   return false;
 }
 
@@ -95,8 +86,7 @@ export function canViewStudentData(
  * Check if user can manage billing
  */
 export function canManageBilling(ctx: PermissionContext): boolean {
-  return ['org_admin', 'platform_admin'].includes(ctx.role) || 
-         ctx.orgRole === 'admin';
+  return ['org_admin', 'platform_admin'].includes(ctx.role) || ctx.orgRole === 'admin';
 }
 
 /**
@@ -113,14 +103,10 @@ export function canCreateCustomLessons(ctx: PermissionContext): boolean {
  */
 export function getPermissionLevel(ctx: PermissionContext): number {
   switch (ctx.role) {
-    case 'platform_admin':
-      return 100;
-    case 'org_admin':
-      return 75;
-    case 'teacher':
-      return 50;
-    case 'learner':
-    default:
-      return 25;
+    case 'platform_admin': return 100;
+    case 'org_admin': return 75;
+    case 'teacher': return 50;
+    case 'learner': return 25;
+    default: return 0;
   }
 }
