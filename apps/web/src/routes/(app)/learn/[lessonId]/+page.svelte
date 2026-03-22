@@ -23,7 +23,7 @@
   } from '@typeforge/metrics';
   import { layouts } from '@typeforge/layouts';
   import { api } from '@typeforge/api/client';
-  import { getLanguageByCode } from '$lib/i18n/languages';
+  import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
   import type { PageData } from './$types';
 
   interface Props {
@@ -39,6 +39,9 @@
   // User preferences (would come from user store in production)
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
+
+  // RTL detection from lesson or language
+  const isRTL = $derived(lesson?.rtl || language?.rtl || false);
 
   // Session state
   let currentIndex = $state(0);
@@ -91,6 +94,40 @@
   const currentChar = $derived(lessonChars[currentIndex]);
   const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
   const keyboardLayout = $derived(layouts['qwerty-us']); // Default to QWERTY for now
+
+  // RTL-aware keyboard layout - swaps left/right finger assignments
+  const rtlKeyboardLayout = $derived({
+    ...keyboardLayout,
+    keys: keyboardLayout.keys.map(key => ({
+      ...key,
+      finger: swapFingerForRTL(key.finger),
+      hand: swapHandForRTL(key.hand),
+    })),
+  });
+
+  // Use RTL layout when in RTL mode
+  const activeKeyboardLayout = $derived(isRTL ? rtlKeyboardLayout : keyboardLayout);
+
+  function swapFingerForRTL(finger: string): string {
+    const swapMap: Record<string, string> = {
+      'left-pinky': 'right-pinky',
+      'left-ring': 'right-ring',
+      'left-middle': 'right-middle',
+      'left-index': 'right-index',
+      'right-index': 'left-index',
+      'right-middle': 'left-middle',
+      'right-ring': 'left-ring',
+      'right-pinky': 'left-pinky',
+      'thumb': 'thumb',
+    };
+    return swapMap[finger] || finger;
+  }
+
+  function swapHandForRTL(hand: string): string {
+    if (hand === 'left') return 'right';
+    if (hand === 'right') return 'left';
+    return hand;
+  }
 
   // Update highlight keys based on current character
   $effect(() => {
@@ -318,6 +355,9 @@
       <div class="flex items-center gap-3 mb-2">
         <h1 class="font-headline text-3xl">{language?.nativeName || lesson.language}</h1>
         <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
+        {#if isRTL}
+          <span class="rtl-badge">RTL</span>
+        {/if}
       </div>
       <p class="text-on-surface-variant">{lesson.title}</p>
     </div>
@@ -371,13 +411,13 @@
       </div>
     {/if}
 
-    <!-- Typing Area -->
-    <div class="bg-surface-container-lowest p-8 mb-8 relative">
+    <!-- Typing Area with RTL support -->
+    <div class="bg-surface-container-lowest p-8 mb-8 relative" dir={isRTL ? 'rtl' : 'ltr'}>
       <TypingInput 
         text={lessonText} 
         {currentIndex} 
         {errors}
-        class="min-h-[120px]"
+        class="min-h-[120px] {isRTL ? 'rtl-input' : ''}"
       />
       
       <!-- Focus hint -->
@@ -400,31 +440,31 @@
       />
     </div>
 
-    <!-- Keyboard Visualization -->
-    <div class="bg-surface-container p-4">
+    <!-- Keyboard Visualization with RTL support -->
+    <div class="bg-surface-container p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
       <Keyboard 
-        layout={keyboardLayout} 
+        layout={activeKeyboardLayout} 
         {highlightKeys}
         {pressedKey}
       />
       
-      <!-- Finger Guide -->
-      <div class="flex justify-center gap-6 mt-4 text-xs text-on-surface-variant">
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 border-l-2 border-red-400"></span>
+      <!-- Finger Guide with logical properties for RTL -->
+      <div class="finger-guide">
+        <div class="finger-item">
+          <span class="finger-indicator finger-pinky"></span>
           <span>Pinky</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 border-l-2 border-orange-400"></span>
+        <div class="finger-item">
+          <span class="finger-indicator finger-ring"></span>
           <span>Ring</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 border-l-2 border-yellow-400"></span>
+        <div class="finger-item">
+          <span class="finger-indicator finger-middle"></span>
           <span>Middle</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 border-l-2 border-green-400"></span>
+        <div class="finger-item">
+          <span class="finger-indicator finger-index"></span>
           <span>Index</span>
         </div>
       </div>
@@ -460,3 +500,77 @@
     </div>
   {/if}
 </div>
+
+<style>
+  /* RTL Badge */
+  .rtl-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary-container, #f0a500);
+    color: var(--on-primary-container, #5f3f00);
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  }
+
+  /* RTL Input styling */
+  :global(.rtl-input) {
+    text-align: right;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+  }
+
+  /* Finger guide with logical properties */
+  .finger-guide {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--on-surface-variant, #d6c4ac);
+  }
+
+  .finger-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .finger-indicator {
+    display: block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-inline-start: 2px solid;
+  }
+
+  .finger-indicator.finger-pinky {
+    border-color: #ff6b6b;
+  }
+
+  .finger-indicator.finger-ring {
+    border-color: #ffa94d;
+  }
+
+  .finger-indicator.finger-middle {
+    border-color: #ffd43b;
+  }
+
+  .finger-indicator.finger-index {
+    border-color: #69db7c;
+  }
+
+  /* RTL adjustments using logical properties */
+  :global([dir="rtl"] .finger-indicator) {
+    border-inline-start: none;
+    border-inline-end: 2px solid;
+  }
+
+  /* Smooth transitions for direction changes */
+  .typing-container,
+  :global(.typing-input) {
+    transition: direction 0.3s ease;
+  }
+</style>
