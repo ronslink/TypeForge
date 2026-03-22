@@ -8,7 +8,7 @@
     data: LayoutData;
   }
 
-  let { children, data }: Props = $props();
+  let { children, data: _data }: Props = $props();
 </script>
 
 <div class="min-h-screen bg-background text-on-background">

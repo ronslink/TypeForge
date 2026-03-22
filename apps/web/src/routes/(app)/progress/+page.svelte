@@ -227,9 +227,9 @@
   });
 
   // Derived values
-  let currentLevel = $derived(progress ? calculateLevel(progress.xp) : 1);
-  let levelProgress = $derived(progress ? calculateLevelProgress(progress.xp) : 0);
-  let recentSessions = $derived(progress?.history?.slice(0, 10) || []);
+  let currentLevel = $derived(calculateLevel(progress?.xp ?? 0));
+  let levelProgress = $derived(calculateLevelProgress(progress?.xp ?? 0));
+  let recentSessions = $derived(progress?.history?.slice(0, 10) ?? []);
 </script>
 
 <svelte:head>
