@@ -2,36 +2,98 @@
  * Wordlists index - exports all language wordlists and utility functions
  */
 
-import { englishWordlist, WordlistEntry as EnglishWordlistEntry } from './en.js';
-import { frenchWordlist, WordlistEntry as FrenchWordlistEntry } from './fr.js';
-import { spanishWordlist, WordlistEntry as SpanishWordlistEntry } from './es.js';
-import { arabicWordlist, WordlistEntry as ArabicWordlistEntry } from './ar.js';
-import { swahiliWordlist, WordlistEntry as SwahiliWordlistEntry } from './sw.js';
+import type { WordlistEntry } from './fr.js';
+import { frenchWordlist } from './fr.js';
+import { spanishWordlist } from './es.js';
+import { arabicWordlist } from './ar.js';
+import { portugueseWordlist } from './pt.js';
+import { englishWordlist } from './en.js';
+import { germanWordlist } from './de.js';
+import { dutchWordlist } from './nl.js';
+import { polishWordlist } from './pl.js';
+import { finnishWordlist } from './fi.js';
+import { greekWordlist } from './el.js';
+import { czechWordlist } from './cs.js';
+import { danishWordlist } from './da.js';
+import { hindiWordlist } from './hi.js';
+import { hungarianWordlist } from './hu.js';
+import { malayWordlist } from './ms.js';
+import { norwegianWordlist } from './no.js';
+import { swedishWordlist } from './sv.js';
+import { tagalogWordlist } from './tl.js';
+import { swahiliWordlist } from './sw.js';
 
 // Re-export types
-export type { EnglishWordlistEntry, FrenchWordlistEntry, SpanishWordlistEntry, ArabicWordlistEntry, SwahiliWordlistEntry };
-export type { WordlistEntry } from './fr.js';
+export type { WordlistEntry };
 
 // Re-export wordlists
-export { englishWordlist, frenchWordlist, spanishWordlist, arabicWordlist, swahiliWordlist };
+export {
+  frenchWordlist,
+  spanishWordlist,
+  arabicWordlist,
+  portugueseWordlist,
+  englishWordlist,
+  germanWordlist,
+  dutchWordlist,
+  polishWordlist,
+  finnishWordlist,
+  greekWordlist,
+  czechWordlist,
+  danishWordlist,
+  hindiWordlist,
+  hungarianWordlist,
+  malayWordlist,
+  norwegianWordlist,
+  swedishWordlist,
+  tagalogWordlist,
+  swahiliWordlist,
+};
 
 // Language code mapping
 const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
-  en: englishWordlist,
-  english: englishWordlist,
   fr: frenchWordlist,
   french: frenchWordlist,
   es: spanishWordlist,
   spanish: spanishWordlist,
   ar: arabicWordlist,
   arabic: arabicWordlist,
+  pt: portugueseWordlist,
+  portuguese: portugueseWordlist,
+  en: englishWordlist,
+  english: englishWordlist,
+  de: germanWordlist,
+  german: germanWordlist,
+  nl: dutchWordlist,
+  dutch: dutchWordlist,
+  pl: polishWordlist,
+  polish: polishWordlist,
+  fi: finnishWordlist,
+  finnish: finnishWordlist,
+  el: greekWordlist,
+  greek: greekWordlist,
+  cs: czechWordlist,
+  czech: czechWordlist,
+  da: danishWordlist,
+  danish: danishWordlist,
+  hi: hindiWordlist,
+  hindi: hindiWordlist,
+  hu: hungarianWordlist,
+  hungarian: hungarianWordlist,
+  ms: malayWordlist,
+  malay: malayWordlist,
+  no: norwegianWordlist,
+  norwegian: norwegianWordlist,
+  sv: swedishWordlist,
+  swedish: swedishWordlist,
+  tl: tagalogWordlist,
+  tagalog: tagalogWordlist,
   sw: swahiliWordlist,
   swahili: swahiliWordlist,
 };
 
 /**
  * Get wordlist for a specific language code
- * @param code - Language code (e.g., 'en', 'fr', 'es', 'ar', 'sw')
+ * @param code - Language code (e.g., 'fr', 'es', 'ar', 'en', 'de')
  * @returns Array of WordlistEntry for the language, or empty array if not found
  */
 export function getWordlistForLanguage(code: string): WordlistEntry[] {
@@ -41,7 +103,7 @@ export function getWordlistForLanguage(code: string): WordlistEntry[] {
 
 /**
  * Get random words from a language wordlist
- * @param code - Language code (e.g., 'en', 'fr', 'es', 'ar', 'sw')
+ * @param code - Language code
  * @param count - Number of words to return
  * @param maxDifficulty - Maximum difficulty level (1-3), undefined for all
  * @returns Array of random word strings
@@ -52,12 +114,11 @@ export function getRandomWords(
   maxDifficulty?: number
 ): string[] {
   const wordlist = getWordlistForLanguage(code);
-
+  
   if (wordlist.length === 0) {
     return [];
   }
 
-  // Filter by maxDifficulty if specified
   let filtered = wordlist;
   if (maxDifficulty !== undefined) {
     filtered = wordlist.filter((entry) => entry.difficulty <= maxDifficulty);
@@ -67,10 +128,9 @@ export function getRandomWords(
     return [];
   }
 
-  // Shuffle and take requested count
   const shuffled = [...filtered].sort(() => Math.random() - 0.5);
   const selected = shuffled.slice(0, Math.min(count, shuffled.length));
-
+  
   return selected.map((entry) => entry.word);
 }
 
@@ -100,11 +160,9 @@ export function getWordCount(code: string): number {
 export function getWordsByDifficulty(
   code: string,
   difficulty: 1 | 2 | 3
-): string[] {
+): WordlistEntry[] {
   const wordlist = getWordlistForLanguage(code);
-  return wordlist
-    .filter((entry) => entry.difficulty === difficulty)
-    .map((entry) => entry.word);
+  return wordlist.filter((entry) => entry.difficulty === difficulty);
 }
 
 /**
@@ -113,9 +171,7 @@ export function getWordsByDifficulty(
  * @param tag - Tag to filter by
  * @returns Array of words with the specified tag
  */
-export function getWordsByTag(code: string, tag: string): string[] {
+export function getWordsByTag(code: string, tag: string): WordlistEntry[] {
   const wordlist = getWordlistForLanguage(code);
-  return wordlist
-    .filter((entry) => entry.tags.includes(tag))
-    .map((entry) => entry.word);
+  return wordlist.filter((entry) => entry.tags.includes(tag));
 }
