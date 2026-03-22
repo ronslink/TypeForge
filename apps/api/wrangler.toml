@@ -64,10 +64,6 @@ vars = { ENVIRONMENT = "production" }
 [env.staging]
 vars = { ENVIRONMENT = "staging" }
 
-# Build settings
-[build]
-command = "pnpm build"
-
 # Limits
 [limits]
 cpu_ms = 50
