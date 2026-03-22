@@ -15,10 +15,10 @@
 
   // Typing demo state
   let demoText = "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique.";
-  let typedText = "L'apprentissage de la dactylo";
-  let currentWpm = 124;
-  let currentAccuracy = 98.2;
-  let streak = 412;
+  let typedText = $state("L'apprentissage de la dactylo");
+  let currentWpm = $state(124);
+  let currentAccuracy = $state(98.2);
+  let streak = $state(412);
 
 
   // Progression steps
@@ -90,7 +90,42 @@
   };
 
   onMount(() => {
-    // Component mounted
+    const handleKeydown = (e: KeyboardEvent) => {
+      // Ignore navigation, modifier keys, etc (except Backspace)
+      if (e.key.length > 1 && e.key !== 'Backspace') return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      // Prevent spacebar scrolling while typing
+      if (e.key === ' ') e.preventDefault();
+
+      if (e.key === 'Backspace') {
+        typedText = typedText.slice(0, -1);
+        return;
+      }
+
+      // Stop if reached the end
+      if (typedText.length >= demoText.length) return;
+
+      const expectedChar = demoText[typedText.length];
+      
+      if (e.key === expectedChar) {
+        typedText += e.key;
+        streak += 1;
+        
+        // Faux progress simulation for the demo effects
+        if (Math.random() > 0.6 && currentWpm < 160) currentWpm += 1;
+        if (currentAccuracy < 100 && streak > 10) currentAccuracy = Math.min(100, currentAccuracy + 0.1);
+      } else {
+        streak = 0;
+        if (currentAccuracy > 0) currentAccuracy = Math.max(0, currentAccuracy - 0.5);
+      }
+      
+      // Round accuracy to 1 decimal place
+      currentAccuracy = Math.round(currentAccuracy * 10) / 10;
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
   });
 </script>
 
