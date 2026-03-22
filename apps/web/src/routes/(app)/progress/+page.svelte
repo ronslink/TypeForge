@@ -168,7 +168,7 @@
     labelIndices.forEach(i => {
       if (i < chartData.length) {
         const x = padding.left + (chartWidth * i / (chartData.length - 1));
-        const date = new Date(chartData[i].startedAt);
+        const date = new Date(chartData[i]?.startedAt ?? '');
         const label = `${date.getMonth() + 1}/${date.getDate()}`;
         ctx.fillText(label, x, height - padding.bottom + 20);
       }

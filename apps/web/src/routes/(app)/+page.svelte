@@ -446,12 +446,12 @@
         <h2 class="font-headline text-3xl md:text-4xl mb-8">What People Say</h2>
         <div class="bg-surface-container p-8 relative">
           <span class="material-symbols-outlined text-primary/20 text-6xl absolute inset-block-start-4 inset-inline-end-4">format_quote</span>
-          <p class="font-body text-lg italic mb-6 leading-relaxed">"{testimonials[0].quote}"</p>
+          <p class="font-body text-lg italic mb-6 leading-relaxed">"{testimonials[0]?.quote}"</p>
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-primary-container flex items-center justify-center font-label font-bold text-on-primary-container">{testimonials[0].initials}</div>
+            <div class="w-12 h-12 bg-primary-container flex items-center justify-center font-label font-bold text-on-primary-container">{testimonials[0]?.initials}</div>
             <div>
-              <div class="font-label text-sm font-bold">{testimonials[0].author}</div>
-              <div class="font-label text-xs text-on-surface-variant">{testimonials[0].role}</div>
+              <div class="font-label text-sm font-bold">{testimonials[0]?.author}</div>
+              <div class="font-label text-xs text-on-surface-variant">{testimonials[0]?.role}</div>
             </div>
           </div>
         </div>
