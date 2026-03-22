@@ -31,6 +31,14 @@ export { default as AchievementBadge } from './components/AchievementBadge.svelt
 // Organization Components
 export { default as OrgDashboard } from './components/OrgDashboard.svelte';
 
+// Teacher Dashboard Components
+export { default as ClassOverview } from './components/ClassOverview.svelte';
+export { default as StudentRow } from './components/StudentRow.svelte';
+export { default as StudentProgressReport } from './components/StudentProgressReport.svelte';
+export { default as ClassRoster } from './components/ClassRoster.svelte';
+export { default as OrgStatsPanel } from './components/OrgStatsPanel.svelte';
+export { default as InviteStudentModal } from './components/InviteStudentModal.svelte';
+
 // Theme Components
 export { default as ThemeProvider } from './components/ThemeProvider.svelte';
 

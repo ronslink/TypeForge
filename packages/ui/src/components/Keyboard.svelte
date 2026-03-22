@@ -11,7 +11,7 @@
   let { layout, highlightKeys = new Set(), pressedKey, isRTL = false }: Props = $props();
 
   // Group keys by row
-  $derived(rows = groupByRow(layout.keys));
+  let rows = $derived(groupByRow(layout.keys));
 
   function groupByRow(keys: KeyboardLayout['keys']): Map<number, typeof keys> {
     const map = new Map<number, typeof keys>();

@@ -27,7 +27,7 @@
     ...restProps 
   }: Props = $props();
 
-  $derived(chars = text.split(''));
+  let chars = $derived(text.split(''));
   
   // Track current word for screen reader announcements
   let currentWord = $state('');

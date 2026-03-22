@@ -121,10 +121,7 @@
           {#each navItems as item}
             <a
               href={item.href}
-              class="text-sm font-body transition-colors relative py-1 focus-indicator"
-              class:text-primary={currentPath.startsWith(item.href)}
-              class:text-on-surface/70={!currentPath.startsWith(item.href)}
-              class:hover:text-white={!currentPath.startsWith(item.href)}
+              class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith(item.href) ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
               aria-current={currentPath.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
@@ -138,10 +135,7 @@
       <div class="flex items-center gap-4">
         <a
           href="/settings"
-          class="text-sm font-body transition-colors relative py-1 focus-indicator"
-          class:text-primary={currentPath.startsWith('/settings')}
-          class:text-on-surface/70={!currentPath.startsWith('/settings')}
-          class:hover:text-white={!currentPath.startsWith('/settings')}
+          class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith('/settings') ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
           aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}
         >
           Settings

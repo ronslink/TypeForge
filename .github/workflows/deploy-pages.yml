@@ -1,0 +1,38 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          # Set KIMI_API_KEY if needed for builds
+
+      - run: pnpm build --filter=typeforge-web
+        env:
+          KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: dd567248820e8d1a89fdd66c4b8b6209
+          projectName: typeforge-web
+          directory: apps/web/.svelte-kit/output
+          wranglerVersion: '3'

@@ -8,7 +8,7 @@
 
   let { value, max = 100, variant = 'default', showLabel = false }: Props = $props();
 
-  $derived(percentage = Math.min(100, Math.max(0, (value / max) * 100)));
+  let percentage = $derived(Math.min(100, Math.max(0, (value / max) * 100)));
 
   const variantClasses = {
     default: 'bg-on-surface-variant',
