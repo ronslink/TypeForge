@@ -2,7 +2,8 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -10,22 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
-
+          version: "9"
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-
+          node-version: "20"
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm build --filter=typeforge-web
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+      - uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: dd567248820e8d1a89fdd66c4b8b6209
