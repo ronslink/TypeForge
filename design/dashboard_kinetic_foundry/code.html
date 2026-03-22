@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TYPING SCHOLAR | DASHBOARD</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#6c3832",
+                        "on-primary-fixed": "#281800",
+                        "on-surface": "#e2e2eb",
+                        "on-tertiary-fixed": "#360e0a",
+                        "surface-tint": "#ffba44",
+                        "primary-container": "#f0a500",
+                        "error": "#ffb4ab",
+                        "outline": "#9f8e79",
+                        "secondary-fixed": "#5ffbd6",
+                        "inverse-surface": "#e2e2eb",
+                        "surface-bright": "#373940",
+                        "tertiary": "#ffc1b9",
+                        "surface-variant": "#33343b",
+                        "surface-dim": "#111319",
+                        "tertiary-fixed-dim": "#ffb4ab",
+                        "secondary-fixed-dim": "#38deba",
+                        "on-secondary-fixed": "#002019",
+                        "primary": "#ffc56c",
+                        "secondary-container": "#05caa8",
+                        "on-tertiary-container": "#6b3731",
+                        "on-surface-variant": "#d6c4ac",
+                        "primary-fixed-dim": "#ffba44",
+                        "surface-container-low": "#191b22",
+                        "surface-container": "#1d1f26",
+                        "on-error": "#690005",
+                        "on-secondary": "#00382d",
+                        "on-primary-fixed-variant": "#614000",
+                        "inverse-primary": "#805600",
+                        "surface-container-highest": "#33343b",
+                        "surface": "#111319",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-background": "#e2e2eb",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005142",
+                        "tertiary-container": "#eaa299",
+                        "secondary": "#45e7c3",
+                        "tertiary-fixed": "#ffdad5",
+                        "background": "#111319",
+                        "surface-container-high": "#282a30",
+                        "on-secondary-container": "#004f40",
+                        "on-primary": "#442c00",
+                        "outline-variant": "#514533",
+                        "on-tertiary": "#51221d",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#2e3037",
+                        "primary-fixed": "#ffddaf",
+                        "on-primary-container": "#5f3f00"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .notched-button {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+        .notched-button:hover {
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+        }
+        .glow-amber:hover {
+            box-shadow: 0 0 32px rgba(240, 165, 0, 0.08);
+        }
+        .dot-grid {
+            background-image: radial-gradient(circle, #514533 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body selection:bg-primary-container selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="bg-[#111319] dark:bg-[#111319] flex justify-between items-center w-full px-12 py-6 max-w-[1920px] mx-auto fixed top-0 z-50 transition-colors duration-300">
+<div class="text-2xl font-black tracking-tighter text-[#f0a500] dark:text-[#f0a500] font-serif italic">TYPING SCHOLAR</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-slate-500 font-mono tracking-widest hover:bg-[#191b22] hover:text-[#f0a500] transition-colors duration-300" href="#">CURRICULUM</a>
+<a class="text-slate-500 font-mono tracking-widest hover:bg-[#191b22] hover:text-[#f0a500] transition-colors duration-300" href="#">ARCHIVE</a>
+<a class="text-slate-500 font-mono tracking-widest hover:bg-[#191b22] hover:text-[#f0a500] transition-colors duration-300" href="#">ANALYTICS</a>
+<a class="text-slate-500 font-mono tracking-widest hover:bg-[#191b22] hover:text-[#f0a500] transition-colors duration-300" href="#">LABS</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="bg-[#0c0e14] dark:bg-[#0c0e14] fixed left-0 top-0 h-full flex flex-col py-8 z-40 w-64 pt-24">
+<div class="px-8 mb-12">
+<div class="text-slate-600 font-label text-[10px] tracking-[0.2em] mb-1">OPERATOR_01</div>
+<div class="text-[#41e4c0] font-label text-xs font-bold tracking-[0.1em]">RANK: ACADEMIC</div>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center space-x-4 bg-[#191b22] text-[#f0a500] border-l-4 border-[#f0a500] pl-4 py-4 font-label text-xs tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span>DASHBOARD</span>
+</a>
+<a class="flex items-center space-x-4 text-slate-600 pl-5 py-4 font-label text-xs tracking-widest hover:bg-[#111319] hover:text-[#41e4c0]" href="#">
+<span class="material-symbols-outlined" data-icon="keyboard">keyboard</span>
+<span>PRACTICE</span>
+</a>
+<a class="flex items-center space-x-4 text-slate-600 pl-5 py-4 font-label text-xs tracking-widest hover:bg-[#111319] hover:text-[#41e4c0]" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>HISTORY</span>
+</a>
+<a class="flex items-center space-x-4 text-slate-600 pl-5 py-4 font-label text-xs tracking-widest hover:bg-[#111319] hover:text-[#41e4c0]" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span>RESOURCES</span>
+</a>
+</nav>
+<div class="px-5 space-y-4 mb-8">
+<button class="notched-button w-full bg-primary-container text-on-primary font-label text-xs font-bold py-3 tracking-widest glow-amber">
+                START SESSION
+            </button>
+</div>
+<div class="border-t border-outline-variant/10 pt-4 px-5">
+<a class="flex items-center space-x-4 text-slate-700 py-2 font-label text-[10px] tracking-widest hover:text-slate-300" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span>HELP</span>
+</a>
+<a class="flex items-center space-x-4 text-slate-700 py-2 font-label text-[10px] tracking-widest hover:text-slate-300" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>LOGOUT</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-32 px-12 pb-24 max-w-[1600px]">
+<!-- Header Section: Asymmetric Editorial -->
+<header class="flex flex-col md:flex-row justify-between items-end gap-12 mb-20">
+<div class="max-w-2xl">
+<div class="font-label text-primary text-xs tracking-[0.4em] mb-4">SYSTEM_STATUS: ACTIVE</div>
+<h1 class="font-headline text-6xl font-light italic leading-tight text-on-surface">
+                    Refining the <span class="font-bold text-primary-fixed">intellectual velocity</span> through disciplined precision.
+                </h1>
+</div>
+<div class="w-full md:w-auto bg-surface-container-low p-8 flex flex-col items-end text-right min-w-[280px]">
+<div class="font-label text-slate-500 text-[10px] tracking-[0.2em] mb-2">CURRENT_LATENCY</div>
+<div class="font-label text-secondary text-5xl font-bold">14ms</div>
+<div class="mt-4 font-label text-slate-600 text-[10px] max-w-[180px] leading-relaxed">
+                    NEURAL INTERFACE CALIBRATED TO ARCHIVE PROTOCOL 8.2
+                </div>
+</div>
+</header>
+<!-- Stats Grid: Industrial Clusters -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+<!-- WPM -->
+<div class="bg-surface-container-lowest p-10 relative overflow-hidden group">
+<div class="dot-grid absolute inset-0"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label text-slate-500 text-[10px] tracking-[0.3em]">WORDS_PER_MINUTE</span>
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="speed">speed</span>
+</div>
+<div class="font-label text-secondary text-6xl font-black mb-2">124</div>
+<div class="font-label text-on-surface-variant text-[10px] tracking-widest flex items-center">
+<span class="material-symbols-outlined text-[12px] mr-1" data-icon="trending_up">trending_up</span>
+                        TOP 2% GLOBALLY
+                    </div>
+</div>
+<div class="absolute bottom-0 right-0 p-4 opacity-5 text-secondary">
+<span class="material-symbols-outlined text-9xl" data-icon="monitoring">monitoring</span>
+</div>
+</div>
+<!-- Accuracy -->
+<div class="bg-surface-container-lowest p-10 relative overflow-hidden group">
+<div class="dot-grid absolute inset-0"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label text-slate-500 text-[10px] tracking-[0.3em]">PRECISION_INDEX</span>
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="verified">verified</span>
+</div>
+<div class="font-label text-secondary text-6xl font-black mb-2">98.4%</div>
+<div class="font-label text-on-surface-variant text-[10px] tracking-widest">
+                        ERROR_THRESHOLD: <span class="text-error">0.02%</span>
+</div>
+</div>
+<div class="absolute bottom-0 right-0 p-4 opacity-5 text-secondary">
+<span class="material-symbols-outlined text-9xl" data-icon="track_changes">track_changes</span>
+</div>
+</div>
+<!-- Streak -->
+<div class="bg-surface-container-lowest p-10 relative overflow-hidden group">
+<div class="dot-grid absolute inset-0"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label text-slate-500 text-[10px] tracking-[0.3em]">CONSISTENCY_STREAK</span>
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="bolt">bolt</span>
+</div>
+<div class="font-label text-secondary text-6xl font-black mb-2">42</div>
+<div class="font-label text-on-surface-variant text-[10px] tracking-widest">
+                        DAYS_REMAINING_LEVEL: 08
+                    </div>
+</div>
+<div class="absolute bottom-0 right-0 p-4 opacity-5 text-secondary">
+<span class="material-symbols-outlined text-9xl" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+</div>
+</section>
+<!-- Lesson Categories: High-Density Bento Grid -->
+<section>
+<div class="flex justify-between items-baseline mb-12 border-b border-outline-variant/10 pb-4">
+<h2 class="font-headline text-3xl italic">Archival Categories</h2>
+<div class="font-label text-slate-500 text-[10px] tracking-[0.2em]">FILTER: [ ALL_DATA ]</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-1">
+<!-- Large Card -->
+<div class="md:col-span-2 md:row-span-2 bg-surface-container-low p-12 group cursor-pointer hover:bg-surface-container-high transition-colors flex flex-col justify-between">
+<div>
+<div class="font-label text-primary text-[10px] tracking-[0.4em] mb-8">FEATURED_PROTOCOL</div>
+<h3 class="font-headline text-5xl mb-6">Classic Literature</h3>
+<p class="font-body text-slate-400 text-sm max-w-sm leading-relaxed mb-8">
+                            Master the cadence of the giants. From Austen to Zola, refine your syntax through the most elegant arrangements of the human language.
+                        </p>
+</div>
+<div class="flex items-center justify-between">
+<div class="font-label text-xs tracking-widest text-secondary flex items-center">
+<span class="material-symbols-outlined text-sm mr-2" data-icon="book_2">book_2</span>
+                            428 MODULES
+                        </div>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Small Card 1 -->
+<div class="bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex flex-col justify-between aspect-square">
+<div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">SCIENCE_JOURNAL</div>
+<div>
+<h3 class="font-label font-bold text-lg mb-2">SYNAPTIC_VOID</h3>
+<div class="font-label text-secondary text-[10px]">DIFFICULTY: HIGH</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="science">science</span>
+</div>
+</div>
+<!-- Small Card 2 -->
+<div class="bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex flex-col justify-between aspect-square">
+<div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">LEGAL_CODEX</div>
+<div>
+<h3 class="font-label font-bold text-lg mb-2">PRECEDENT_88</h3>
+<div class="font-label text-secondary text-[10px]">DIFFICULTY: EXPERT</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="gavel">gavel</span>
+</div>
+</div>
+<!-- Medium Card (Horizontal) -->
+<div class="md:col-span-2 bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex items-center justify-between">
+<div class="flex items-center space-x-8">
+<div class="w-16 h-16 bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="code">code</span>
+</div>
+<div>
+<div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">TECHNICAL_LABS</div>
+<h3 class="font-label font-bold text-xl uppercase">Assembly Protocol</h3>
+</div>
+</div>
+<div class="text-right">
+<div class="font-label text-on-surface-variant text-[10px] mb-1">COMPLETION</div>
+<div class="w-32 h-1 bg-surface-container-high relative">
+<div class="absolute inset-0 bg-secondary w-3/4"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="mt-32 p-20 bg-surface-container-low relative overflow-hidden flex flex-col items-center text-center">
+<div class="dot-grid absolute inset-0"></div>
+<div class="relative z-10 max-w-xl">
+<h2 class="font-headline text-5xl italic mb-6">Ready to initiate calibration?</h2>
+<p class="font-body text-slate-400 mb-12">
+                    System diagnostics confirm optimal readiness. The Kinetic Foundry awaits your next sequence of high-precision inputs.
+                </p>
+<button class="notched-button px-12 py-5 bg-primary-container text-on-primary font-label text-sm font-bold tracking-[0.2em] glow-amber inline-flex items-center group">
+                    START NEW SESSION
+                    <span class="material-symbols-outlined ml-4 group-hover:translate-x-1 transition-transform" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full flex justify-between px-12 py-12 items-baseline border-t border-[#33343b]/10 bg-[#0c0e14]">
+<div class="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500">
+            ©2024 THE KINETIC FOUNDRY / TYPING SCHOLAR
+        </div>
+<div class="flex space-x-12">
+<a class="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-700 hover:text-slate-300" href="#">PROTOCOL</a>
+<a class="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-700 hover:text-slate-300" href="#">RELIABILITY</a>
+<a class="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-700 hover:text-slate-300" href="#">ENCRYPTION</a>
+</div>
+</footer>
+</body></html>

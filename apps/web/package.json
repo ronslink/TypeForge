@@ -15,21 +15,24 @@
     "clean": "rm -rf .svelte-kit node_modules"
   },
   "dependencies": {
-    "clerk-sveltekit": "^0.4.3",
-    "react": "^19.0.0",
-    "@typeforge/ui": "workspace:*",
+    "@typeforge/api": "workspace:*",
     "@typeforge/curriculum": "workspace:*",
-    "@typeforge/metrics": "workspace:*",
     "@typeforge/layouts": "workspace:*",
-    "@typeforge/api": "workspace:*"
+    "@typeforge/metrics": "workspace:*",
+    "@typeforge/ui": "workspace:*",
+    "clerk-sveltekit": "^0.4.3",
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^4.8.0",
     "@sveltejs/kit": "^2.16.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/node": "^20.17.12",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
     "svelte": "^5.19.0",
     "svelte-check": "^4.1.4",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vitest": "^3.0.0",

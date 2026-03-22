@@ -1,705 +1,221 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  // Script diversity grid data
-  const scripts = [
-    { name: 'Latin', sample: 'Aa', layout: 'QWERTY', active: true },
-    { name: 'Cyrillic', sample: 'Аа', layout: 'ЙЦУКЕН', active: false },
-    { name: 'Arabic', sample: 'أب', layout: 'Arabic', active: false },
-    { name: 'CJK', sample: '中文', layout: 'Pinyin', active: false },
-    { name: 'Greek', sample: 'Αα', layout: 'Greek', active: false },
-    { name: 'Hebrew', sample: 'אב', layout: 'Hebrew', active: false },
-    { name: 'Korean', sample: '한글', layout: 'Dubeolsik', active: false },
-    { name: 'Japanese', sample: 'ひら', layout: 'Romaji', active: false },
-  ];
-
   // Typing demo state
-  let demoText = "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique.";
-  let typedText = $state("L'apprentissage de la dactylo");
+  const demoText = "Refining the intellectual velocity through disciplined precision.";
+  let typedText = $state("Refining the intellectual ");
   let currentWpm = $state(124);
   let currentAccuracy = $state(98.2);
   let streak = $state(412);
-
-
-  // Progression steps
-  const steps = [
-    { number: '01', title: 'Placement Test', description: 'Our 120-second kinetic analysis maps your current speed, posture, and error distribution.' },
-    { number: '02', title: 'Weakness Model', description: 'Artificial intelligence generates a unique "heat map" of your physical typing limitations.' },
-    { number: '03', title: 'Adaptive Lessons', description: 'Dynamic content that shifts difficulty in real-time based on your momentary accuracy.' },
-    { number: '04', title: 'Compound Progress', description: 'Witness your evolution through high-density technical readouts and milestone certifications.' }
-  ];
-
-  // Pricing plans
-  const pricingPlans = [
-    {
-      name: 'Individual',
-      price: 'Free',
-      period: '',
-      features: ['All Basic Layouts', 'Weekly Progress Stats'],
-      cta: 'Select Plan',
-      popular: false
-    },
-    {
-      name: 'Power User',
-      price: '$9',
-      period: '/mo',
-      features: ['Full AI Weakness Modeling', 'Priority Multi-language Packs', 'Custom Practice Engines'],
-      cta: 'Go Pro Now',
-      popular: true
-    },
-    {
-      name: 'Schools',
-      price: '$6',
-      period: '/seat/mo',
-      features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
-      cta: 'Contact Sales',
-      popular: false
-    }
-  ];
-
-  // Testimonials
-  const testimonials = [
-    {
-      quote: "TypeForge has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
-      author: 'Julianne H.',
-      role: 'Tech Coordinator, St. Jude Academy',
-      initials: 'JH',
-      featured: true
-    },
-    {
-      quote: "The multi-language support allowed us to deploy the same platform across our international campuses in Tokyo and Paris seamlessly.",
-      author: 'Global Education Partners',
-      role: '',
-      initials: 'GE',
-      featured: false
-    },
-    {
-      quote: "I went from 40wpm to 95wpm in three weeks. The AI weakness detection actually works—it stopped me from making the same 'S' and 'D' key mistakes.",
-      author: 'Computer Science Student',
-      role: '',
-      initials: 'CS',
-      featured: false
-    }
-  ];
-
-  // Footer links
-  const footerLinks = {
-    product: ['Features', 'Pricing', 'Enterprise'],
-    resources: ['School Resources', 'Typing Guide', 'Teacher Dash'],
-    legal: ['Privacy Policy', 'Legal', 'Compliance']
-  };
+  let hasStartedTyping = false;
 
   onMount(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      // Ignore navigation, modifier keys, etc (except Backspace)
       if (e.key.length > 1 && e.key !== 'Backspace') return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-      // Prevent spacebar scrolling while typing
       if (e.key === ' ') e.preventDefault();
-
+      
       if (e.key === 'Backspace') {
         typedText = typedText.slice(0, -1);
         return;
       }
-
-      // Stop if reached the end
-      if (typedText.length >= demoText.length) return;
-
-      const expectedChar = demoText[typedText.length];
       
+      if (typedText.length >= demoText.length) return;
+      
+      const expectedChar = demoText[typedText.length];
       if (e.key === expectedChar) {
         typedText += e.key;
         streak += 1;
-        
-        // Faux progress simulation for the demo effects
+        if (!hasStartedTyping) hasStartedTyping = true;
         if (Math.random() > 0.6 && currentWpm < 160) currentWpm += 1;
         if (currentAccuracy < 100 && streak > 10) currentAccuracy = Math.min(100, currentAccuracy + 0.1);
       } else {
         streak = 0;
         if (currentAccuracy > 0) currentAccuracy = Math.max(0, currentAccuracy - 0.5);
       }
-      
-      // Round accuracy to 1 decimal place
       currentAccuracy = Math.round(currentAccuracy * 10) / 10;
     };
-
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
   });
 </script>
 
 <svelte:head>
-  <title>TypeForge — Master typing in any language</title>
-  <meta name="description" content="Adaptive AI. Every script. Every layout. The definitive typing platform for modern explorers." />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <title>TYPING SCHOLAR | Kinetic Foundry</title>
 </svelte:head>
 
-<!-- Navigation -->
-<nav class="fixed inset-block-start-0 w-full z-50 glass-panel border-b border-outline-variant/10">
-  <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
-    <div class="flex items-center gap-8">
-      <span class="text-xl font-black tracking-tighter text-primary-container uppercase font-label">TYPEFORGE</span>
-      <div class="hidden md:flex gap-6 items-center">
-        <a href="#features" class="text-primary border-b-2 border-primary pb-1 font-body text-sm">Features</a>
-        <a href="#languages" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Languages</a>
-        <a href="#pricing" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Pricing</a>
-      </div>
-    </div>
-    <button class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95">
-      Start Typing
-    </button>
-  </div>
-</nav>
-
-<main class="pt-20">
-  <!-- Hero Section -->
-  <section class="relative min-h-[80vh] flex flex-col items-center justify-center px-6 overflow-hidden grid-texture" id="hero">
-    <!-- Ambient glow orbs -->
-    <div class="absolute inset-block-start-1/4 inset-inline-end-[-6rem] w-96 h-96 bg-primary-container/10 blur-[120px] rounded-full"></div>
-    <div class="absolute inset-block-end-1/4 inset-inline-start-[-6rem] w-96 h-96 bg-secondary-container/5 blur-[120px] rounded-full"></div>
-    
-    <div class="max-w-4xl text-center z-10">
-      <!-- Script diversity grid -->
-      <div class="flex flex-wrap justify-center gap-3 mb-10 max-w-2xl mx-auto">
-        {#each scripts as script}
-          <button 
-            class="px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors border border-outline-variant/20 flex items-center gap-2"
-            class:border-primary={script.active}
-            class:text-primary={script.active}
-          >
-            <span class="font-label text-lg">{script.sample}</span>
-            <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant">{script.layout}</span>
-          </button>
-        {/each}
-      </div>
-
-      <h1 class="font-headline text-5xl md:text-7xl lg:text-8xl tracking-tight leading-tight mb-6">
-        Master typing in <span class="italic text-primary">any</span> language
+<div class="max-w-[1600px] w-full mx-auto">
+  <!-- Header Section: Asymmetric Editorial -->
+  <header class="flex flex-col md:flex-row justify-between items-end gap-12 mb-20">
+    <div class="max-w-2xl">
+      <div class="font-label text-primary text-xs tracking-[0.4em] mb-4">SYSTEM_STATUS: ACTIVE</div>
+      <h1 class="font-headline text-6xl font-light italic leading-tight text-on-surface">
+        Refining the <span class="font-bold text-primary-fixed">intellectual velocity</span> through disciplined precision.
       </h1>
-      <p class="font-body text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-        Adaptive AI. Every script. Every layout.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <button class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all">
-          Start free today
-        </button>
-        <button class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
-          Institutional Access
-          <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </button>
+    </div>
+    <div class="w-full md:w-auto bg-surface-container-low p-8 flex flex-col items-end text-right min-w-[280px] border border-outline-variant/10">
+      <div class="font-label text-slate-500 text-[10px] tracking-[0.2em] mb-2">CURRENT_LATENCY</div>
+      <div class="font-label text-secondary text-5xl font-bold">14ms</div>
+      <div class="mt-4 font-label text-slate-600 text-[10px] max-w-[180px] leading-relaxed uppercase">
+        Neural interface calibrated to network protocol 8.2
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- Live Demo Section -->
-  <section class="max-w-5xl mx-auto px-6 py-20" id="demo">
-    <div class="bg-surface-container-high p-1 border-t border-s border-white/5 amber-glow">
-      <div class="bg-surface-container-lowest p-8 md:p-12 relative overflow-hidden">
-        <!-- Stats Header -->
-        <div class="grid grid-cols-3 gap-4 mb-12 border-b border-outline-variant/20 pb-8">
-          <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">WPM Rate</span>
-            <div class="font-label text-4xl text-secondary font-bold">{currentWpm}</div>
+  <!-- Interactive Typing Demo (The "Practice" structure embedded on Landing) -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start mb-24">
+    <!-- Typing Canvas -->
+    <div class="col-span-1 md:col-span-8 flex flex-col gap-8">
+      <div class="flex items-baseline justify-between">
+        <h2 class="font-headline text-4xl italic text-on-surface/40 select-none">Global Launch Sequence</h2>
+        <span class="font-label text-[10px] tracking-[0.3em] text-outline-variant uppercase hidden md:inline">Module: Interactive Preview</span>
+      </div>
+      <!-- Typing Area -->
+      <div class="relative group">
+        <!-- Technical Overlay (Crosshairs) -->
+        <div class="absolute -top-4 -left-4 w-8 h-8 border-t border-l border-outline-variant/30"></div>
+        <div class="absolute -bottom-4 -right-4 w-8 h-8 border-b border-r border-outline-variant/30"></div>
+        
+        <div class="bg-surface-container-lowest p-12 notch-bottom-right border-b-2 border-primary-container relative min-h-[400px]">
+          <div class="font-headline text-3xl leading-relaxed tracking-tight text-on-surface/30 relative">
+            <!-- Dynamically rendered text -->
+            <span class="text-secondary">{typedText}</span>
+            <span class="text-on-surface/90 border-l-2 border-primary animate-pulse ml-[1px]">{demoText.slice(typedText.length, typedText.length + 1)}</span>
+            <span>{demoText.slice(typedText.length + 1)}</span>
+                                
+            <div class="mt-12 text-on-surface/40 font-body text-base max-w-lg">
+              Start typing on your keyboard to instantly test the zero-latency neural engine. No signup required to begin calibration.
+            </div>
           </div>
-          <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Accuracy</span>
-            <div class="font-label text-4xl text-secondary font-bold">{currentAccuracy}%</div>
+          <!-- Hidden input for focus capture if needed -->
+          <input autofocus class="absolute inset-0 opacity-0 cursor-default" type="text" />
+        </div>
+        
+        <div class="mt-4 flex justify-between items-center">
+          <span class="font-label text-[10px] tracking-widest text-outline-variant">LIVE INTERACTIVE DEMO</span>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 shadow-[0_0_8px_rgba(65,228,192,0.5)]" class:bg-secondary={streak > 5} class:bg-outline-variant={streak <= 5}></span>
+            <span class="w-2 h-2 bg-outline-variant"></span>
+            <span class="w-2 h-2 bg-outline-variant"></span>
           </div>
-          <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Streak</span>
-            <div class="font-label text-4xl text-primary font-bold">{streak}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instrument Cluster (Sidebar Metrics) -->
+    <aside class="col-span-1 md:col-span-4 sticky top-32">
+      <div class="glass-panel p-8 flex flex-col gap-10">
+        <!-- Velocity -->
+        <div class="flex flex-col">
+          <span class="font-label text-[10px] tracking-[0.3em] text-outline uppercase mb-2">Velocity (WPM)</span>
+          <div class="flex items-baseline gap-2">
+            <span class="font-label text-6xl font-bold text-secondary">{currentWpm}</span>
+            <span class="font-label text-xs text-secondary/50">AVG: 72</span>
+          </div>
+          <div class="mt-4 h-1 w-full bg-surface-container-highest overflow-hidden">
+            <div class="h-full bg-secondary transition-all duration-300" style="width: {Math.min(currentWpm / 1.5, 100)}%"></div>
           </div>
         </div>
         
-        <!-- Typing Area -->
-        <div class="font-label text-2xl md:text-3xl lg:text-4xl leading-relaxed tracking-tight text-on-surface/40 relative">
-          <span class="text-on-surface">{typedText}</span>
-          <span class="text-error relative">g</span>
-          <span class="w-0.5 h-8 md:h-10 bg-primary absolute inline-block animate-pulse" style="bottom: 0.25rem;"></span>
-          <span>{demoText.slice(typedText.length + 1)}</span>
+        <!-- Calibration -->
+        <div class="flex flex-col">
+          <span class="font-label text-[10px] tracking-[0.3em] text-outline uppercase mb-2">Calibration (ACC)</span>
+          <div class="flex items-baseline gap-2">
+            <span class="font-label text-6xl font-bold text-primary">{currentAccuracy}</span>
+            <span class="font-label text-xs text-primary/50">%</span>
+          </div>
         </div>
         
-        <div class="mt-12 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/50">
-          <span>French AZERTY Layout</span>
-          <span>Shift + Alt to toggle language</span>
+        <!-- Action -->
+        <div class="pt-6 border-t border-outline-variant/15 flex flex-col gap-4">
+          <button class="w-full py-4 font-label text-xs tracking-[0.2em] bg-primary text-on-primary hover:bg-primary-fixed transition-colors flex items-center justify-center gap-3 font-bold notched-button">
+            CREATE ACCOUNT
+          </button>
         </div>
       </div>
-    </div>
-  </section>
+      
+      <!-- Ambient Decoration -->
+      <div class="mt-8 p-6 bg-surface-container-lowest/50 border-l-2 border-outline-variant/20 hidden md:block">
+        <p class="font-label text-[10px] leading-relaxed text-outline-variant uppercase">
+          Notice: Guest sessions do not persist calibration data to the neural archive. Create an account to permanently sync performance matrices.
+        </p>
+      </div>
+    </aside>
+  </div>
 
-  <!-- Features Section -->
-  <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="features">
-    <h2 class="font-headline text-4xl md:text-5xl mb-16 text-center md:text-start">Built different.</h2>
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-      <!-- AI Weakness Detection - Large -->
-      <div class="md:col-span-8 bg-surface-container-low p-8 md:p-10 flex flex-col justify-between group hover:bg-surface-container transition-colors">
+  <!-- Lesson Categories: High-Density Bento Grid -->
+  <section class="mb-24">
+    <div class="flex justify-between items-baseline mb-12 border-b border-outline-variant/10 pb-4">
+      <h2 class="font-headline text-3xl italic text-on-surface">Archival Categories</h2>
+      <div class="font-label text-slate-500 text-[10px] tracking-[0.2em]">FILTER: [ ALL_DATA ]</div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-1">
+      <!-- Large Card -->
+      <div class="md:col-span-2 md:row-span-2 bg-surface-container-low p-12 group cursor-pointer hover:bg-surface-container-high transition-colors flex flex-col justify-between">
         <div>
-          <span class="material-symbols-outlined text-primary text-4xl mb-6">psychology</span>
-          <h3 class="font-headline text-2xl md:text-3xl mb-4">AI Weakness Detection</h3>
-          <p class="font-body text-on-surface-variant max-w-md">Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.</p>
+          <div class="font-label text-primary text-[10px] tracking-[0.4em] mb-8">FEATURED_PROTOCOL</div>
+          <h3 class="font-headline text-5xl mb-6 text-on-surface">Classic Literature</h3>
+          <p class="font-body text-slate-400 text-sm max-w-sm leading-relaxed mb-8">
+            Master the cadence of the giants. From Austen to Zola, refine your syntax through the most elegant arrangements of the human language.
+          </p>
         </div>
-        <div class="mt-12 flex items-end gap-4">
-          <div class="h-24 w-1 bg-surface-container-highest"></div>
-          <div class="h-16 w-1 bg-surface-container-highest"></div>
-          <div class="h-32 w-1 bg-primary"></div>
-          <div class="h-20 w-1 bg-surface-container-highest"></div>
-          <span class="font-label text-xs text-primary ml-2">LATENCY PEAK DETECTED</span>
-        </div>
-      </div>
-
-      <!-- Zero Latency - Small -->
-      <div class="md:col-span-4 bg-surface-container-low p-8 md:p-10 group hover:bg-surface-container transition-colors">
-        <span class="material-symbols-outlined text-secondary text-4xl mb-6">bolt</span>
-        <h3 class="font-headline text-2xl md:text-3xl mb-4">Zero Latency</h3>
-        <p class="font-body text-on-surface-variant">Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.</p>
-      </div>
-
-      <!-- Global Foundry - Small -->
-      <div class="md:col-span-4 bg-surface-container-low p-8 md:p-10">
-        <span class="material-symbols-outlined text-on-surface-variant text-4xl mb-6">translate</span>
-        <h3 class="font-headline text-2xl mb-4">Global Foundry</h3>
-        <p class="font-body text-on-surface-variant text-sm">Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.</p>
-      </div>
-
-      <!-- Institution - Large -->
-      <div class="md:col-span-8 bg-surface-container-high p-8 md:p-10 flex flex-col md:flex-row gap-10 items-center">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 text-primary mb-4">
-            <span class="material-symbols-outlined">school</span>
-            <span class="font-label text-xs uppercase tracking-widest">For Institutions</span>
+        <div class="flex items-center justify-between">
+          <div class="font-label text-xs tracking-widest text-secondary flex items-center">
+            <span class="material-symbols-outlined text-sm mr-2">book_2</span>
+            428 MODULES
           </div>
-          <h3 class="font-headline text-2xl md:text-3xl mb-4">School Grade Rigor</h3>
-          <p class="font-body text-on-surface-variant">COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.</p>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-background p-4 flex flex-col">
-            <span class="font-label text-secondary font-bold">100%</span>
-            <span class="text-[10px] uppercase font-label text-on-surface-variant">Compliance</span>
-          </div>
-          <div class="bg-background p-4 flex flex-col">
-            <span class="font-label text-secondary font-bold">500+</span>
-            <span class="text-[10px] uppercase font-label text-on-surface-variant">Schools</span>
-          </div>
+          <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Languages Showcase Section -->
-  <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="languages">
-    <div class="text-center mb-16">
-      <h2 class="font-headline text-4xl md:text-5xl mb-4">Every language. Every script.</h2>
-      <p class="font-body text-on-surface-variant max-w-xl mx-auto">29 languages across 6 regions, from Latin to Arabic to CJK. Type in your native script with adaptive AI guidance.</p>
-    </div>
-
-    <!-- Americas -->
-    <div class="mb-10">
-      <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌎</span> Americas
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {#each [{code:'en',native:'English',text:'The quick brown fox jumps over the lazy dog.',rtl:false},{code:'es',native:'Español',text:'El veloz murciélago hindú comía feliz cardillo y kiwi.',rtl:false},{code:'pt',native:'Português',text:'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',rtl:false}] as lang}
-          <div class="bg-surface-container-low p-4 flex items-start gap-4 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
-            <span class="font-label text-2xl text-primary">{lang.native[0]}</span>
-            <div>
-              <div class="font-label text-sm text-primary mb-1">{lang.native}</div>
-              <div class="font-label text-xs text-on-surface-variant/60 mb-2">{lang.code.toUpperCase()}</div>
-              <div class="font-label text-xs text-on-surface-variant leading-relaxed">{lang.text}</div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Europe -->
-    <div class="mb-10">
-      <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌍</span> Europe
-      </h3>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {#each [{n:'Deutsch',c:'de',s:'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.'},{n:'Français',c:'fr',s:'Portez ce vieux whisky au juge blond qui fume.'},{n:'Italiano',c:'it',s:'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.'},{n:'Nederlands',c:'nl',s:"Pa's wijsje: fox lyophiliseert glad jodiumacetylide."},{n:'Polski',c:'pl',s:'Pchnąć w tę łódź jeża lub ośm skrzyń fig.'},{n:'Ελληνικά',c:'el',s:'Το λαγός και η χελώνα έτρεξαν γρήγορα.',g:true},{n:'Čeština',c:'cs',s:'Příliš žluťoučký kůň úpěl ďábelské kódy.'},{n:'Magyar',c:'hu',s:'Árvízi tölgyért bolygott sírkövet döngetett.'},{n:'Svenska',c:'sv',s:'Gädda prygelnäbba fyrskrift växer franskt.'},{n:'Norsk',c:'no',s:'Kjevveisk mot tre, eg snur og vinker til hunden.'},{n:'Dansk',c:'da',s:'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.'},{n:'Suomi',c:'fi',s:'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.'}] as lang}
-          <div class="bg-surface-container-low p-3 flex flex-col gap-2 group hover:bg-surface-container transition-colors">
-            <div class="flex items-center justify-between">
-              <span class="font-label text-base" class:text-primary={lang.g}>{lang.n}</span>
-              <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
-            </div>
-            <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Middle East & Africa -->
-    <div class="mb-10">
-      <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌏</span> Middle East & Africa
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {#each [{n:'العربية',c:'ar',s:'نص حكيم له سرعان تسري به',rtl:true},{n:'עברית',c:'he',s:'איך בלשון הקודש, ספר צלחת פסיק',rtl:true}] as lang}
-          <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary">{lang.n}</span>
-              <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
-            </div>
-            <div class="font-label text-sm text-on-surface-variant leading-relaxed" dir={lang.rtl ? 'rtl' : 'ltr'}>{lang.s}</div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- East Asia -->
-    <div class="mb-10">
-      <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌏</span> East Asia
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {#each [{n:'日本語',c:'ja',s:'いろはにほへとちりぬるを わかよたれそつねならむ'},{n:'简体中文',c:'zh',s:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。'},{n:'한국어',c:'ko',s:'다람쥐 헌 쳇바퀴에 타고파.'}] as lang}
-          <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary">{lang.n}</span>
-              <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
-            </div>
-            <div class="font-label text-xs text-on-surface-variant leading-relaxed">{lang.s}</div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- South & Southeast Asia + Central & Eastern Europe combined -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div>
-        <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-          <span>🌏</span> South & Southeast Asia
-        </h3>
-        <div class="grid grid-cols-2 gap-3">
-          {#each [{n:'हिन्दी',c:'hi',s:'क ख ग घ ङ च छ ज झ'},{n:'ไทย',c:'th',s:'กีฬาวิ่งเร็วสุด'},{n:'Tiếng Việt',c:'vi',s:'Con gà trốn đẹp trai bay qua vịnh.'},{n:'Indonesia',c:'id',s:'Muhammad fox bermimpi dengan wajar.'},{n:'Bahasa Melayu',c:'ms',s:'Lebuh rayanya berliku-liku di antara.'},{n:'Tagalog',c:'tl',s:'Ang magandang paruparo ay lumilipad sa hardin.'}] as lang}
-            <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary">{lang.n}</span>
-                <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
-              </div>
-              <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
-            </div>
-          {/each}
+      <!-- Small Card 1 -->
+      <div class="bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex flex-col justify-between aspect-square">
+        <div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">SCIENCE_JOURNAL</div>
+        <div>
+          <h3 class="font-label font-bold text-lg mb-2 text-on-surface">SYNAPTIC_VOID</h3>
+          <div class="font-label text-secondary text-[10px]">DIFFICULTY: HIGH</div>
+        </div>
+        <div class="pt-4 border-t border-outline-variant/10">
+          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">science</span>
         </div>
       </div>
-      <div>
-        <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-          <span>🌏</span> Central & Eastern Europe
-        </h3>
-        <div class="grid grid-cols-2 gap-3">
-          {#each [{n:'Русский',c:'ru',s:'Эй, жлоб! Где туз? Прячь юных съёмных.'},{n:'Українська',c:'uk',s:'Ей, барсу! Блискавично ховай юних.'},{n:'Türkçe',c:'tr',s:'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.'}] as lang}
-            <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary">{lang.n}</span>
-                <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
-              </div>
-              <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
-            </div>
-          {/each}
+      <!-- Small Card 2 -->
+      <div class="bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex flex-col justify-between aspect-square">
+        <div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">LEGAL_CODEX</div>
+        <div>
+          <h3 class="font-label font-bold text-lg mb-2 text-on-surface">PRECEDENT_88</h3>
+          <div class="font-label text-secondary text-[10px]">DIFFICULTY: EXPERT</div>
+        </div>
+        <div class="pt-4 border-t border-outline-variant/10">
+          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">gavel</span>
         </div>
       </div>
-    </div>
-
-    <div class="mt-12 text-center">
-      <p class="font-label text-sm text-on-surface-variant/60">And more — 29 languages, 8 script families, 1 adaptive platform</p>
-    </div>
-  </section>
-
-  <!-- Progression Steps Section -->
-  <section class="py-24 bg-surface-container-lowest">
-    <div class="max-w-screen-2xl mx-auto px-6 md:px-8">
-      <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-        <h2 class="font-headline text-4xl md:text-5xl lg:text-6xl max-w-xl">From Placement to Mastery.</h2>
-        <p class="font-body text-on-surface-variant max-w-xs pb-2">A structured evolution through the kinetic arts of typing.</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-outline-variant/20">
-        {#each steps as step, i}
-          <div class="bg-surface-container-lowest py-12 px-6 md:px-8 group" class:ps-0={i === 0} class:pe-0={i === 3}>
-            <div class="font-label text-5xl text-on-surface-variant/20 mb-8 group-hover:text-primary transition-colors">{step.number}</div>
-            <h4 class="font-headline text-xl md:text-2xl mb-4">{step.title}</h4>
-            <p class="font-body text-on-surface-variant text-sm">{step.description}</p>
+      <!-- Medium Card (Horizontal) -->
+      <div class="md:col-span-2 bg-surface-container-lowest p-8 group cursor-pointer hover:bg-surface-container flex items-center justify-between">
+        <div class="flex items-center space-x-8">
+          <div class="w-16 h-16 bg-surface-container-high flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary">code</span>
           </div>
-        {/each}
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing Section -->
-  <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="pricing">
-    <div class="text-center mb-16">
-      <h2 class="font-headline text-4xl md:text-5xl mb-4">Forged for Everyone.</h2>
-      <p class="font-body text-on-surface-variant">Scale your precision from solo typing to district-wide mastery.</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {#each pricingPlans as plan}
-        <div 
-          class="p-8 md:p-10 flex flex-col justify-between"
-          class:bg-surface-container-low={!plan.popular}
-          class:bg-surface-container-highest={plan.popular}
-          class:border-t-4={plan.popular}
-          class:border-primary={plan.popular}
-          class:shadow-2xl={plan.popular}
-        >
           <div>
-            <div class="flex justify-between items-start mb-4">
-              <h4 class="font-label text-xs uppercase tracking-widest" class:text-primary={plan.popular} class:text-on-surface-variant={!plan.popular}>{plan.name}</h4>
-              {#if plan.popular}
-                <span class="bg-primary text-on-primary px-2 py-1 text-[10px] font-bold uppercase tracking-tighter">Most Popular</span>
-              {/if}
-            </div>
-            <div class="font-headline text-4xl mb-6">{plan.price}<span class="text-lg text-on-surface-variant">{plan.period}</span></div>
-            <ul class="space-y-4 mb-10">
-              {#each plan.features as feature}
-                <li class="flex items-center gap-3 text-sm" class:text-on-surface-variant={!plan.popular}>
-                  <span class="material-symbols-outlined text-lg" class:text-primary={plan.popular} class:text-secondary={!plan.popular}>check</span>
-                  {feature}
-                </li>
-              {/each}
-            </ul>
-          </div>
-          {#if plan.popular}
-            <button class="notched-button w-full bg-primary text-on-primary py-4 font-label font-bold text-sm uppercase tracking-widest hover:amber-glow transition-all">
-              {plan.cta}
-            </button>
-          {:else}
-            <button class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors">
-              {plan.cta}
-            </button>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  </section>
-
-  <!-- Testimonials Section -->
-  <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto border-t border-outline-variant/10">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-      <div>
-        <span class="font-label text-xs uppercase tracking-widest text-primary mb-6 block">Testimonials</span>
-        <h2 class="font-headline text-3xl md:text-4xl mb-8">What People Say</h2>
-        <div class="bg-surface-container p-8 relative">
-          <span class="material-symbols-outlined text-primary/20 text-6xl absolute inset-block-start-4 inset-inline-end-4">format_quote</span>
-          <p class="font-body text-lg italic mb-6 leading-relaxed">"{testimonials[0]?.quote}"</p>
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-primary-container flex items-center justify-center font-label font-bold text-on-primary-container">{testimonials[0]?.initials}</div>
-            <div>
-              <div class="font-label text-sm font-bold">{testimonials[0]?.author}</div>
-              <div class="font-label text-xs text-on-surface-variant">{testimonials[0]?.role}</div>
-            </div>
+            <div class="font-label text-slate-500 text-[9px] tracking-[0.3em]">TECHNICAL_LABS</div>
+            <h3 class="font-label font-bold text-xl uppercase text-on-surface">Assembly Protocol</h3>
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-6">
-        {#each testimonials.slice(1) as testimonial}
-          <div class="bg-surface-container-low p-6">
-            <p class="font-body text-sm mb-4">"{testimonial.quote}"</p>
-            <div class="font-label text-xs font-bold text-secondary">{testimonial.author}</div>
-          </div>
-        {/each}
-      </div>
     </div>
   </section>
-</main>
 
-<!-- Footer -->
-<footer class="bg-surface-container-lowest border-t border-outline-variant/10">
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 md:px-8 py-12 max-w-screen-2xl mx-auto">
-    <div>
-      <span class="text-lg font-bold text-primary-container font-label">TYPEFORGE</span>
-      <p class="mt-4 text-xs text-on-surface/50 leading-relaxed font-body">Engineered for accuracy. Built for the foundry. The definitive typing platform for modern explorers.</p>
+  <!-- CTA Section -->
+  <section class="p-20 bg-surface-container-low relative overflow-hidden flex flex-col items-center text-center">
+    <div class="dot-grid absolute inset-0"></div>
+    <div class="relative z-10 max-w-xl">
+      <h2 class="font-headline text-5xl italic mb-6 text-on-surface">Ready to initiate calibration?</h2>
+      <p class="font-body text-slate-400 mb-12">
+        System diagnostics confirm optimal readiness. The Kinetic Foundry awaits your next sequence of high-precision inputs.
+      </p>
+      <button class="notched-button px-12 py-5 bg-primary-container text-on-primary font-label text-sm font-bold tracking-[0.2em] glow-amber inline-flex items-center group">
+        START NEW SESSION
+        <span class="material-symbols-outlined ml-4 group-hover:translate-x-1 transition-transform">play_arrow</span>
+      </button>
     </div>
-    <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Product</span>
-      {#each footerLinks.product as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
-      {/each}
-    </div>
-    <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Resources</span>
-      {#each footerLinks.resources as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
-      {/each}
-    </div>
-    <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Legal</span>
-      {#each footerLinks.legal as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
-      {/each}
-    </div>
-  </div>
-  <div class="max-w-screen-2xl mx-auto px-6 md:px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2024 TYPEFORGE KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
-    <div class="flex gap-6">
-      <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">language</span>
-      <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">terminal</span>
-    </div>
-  </div>
-</footer>
-
-<style>
-  /* Grid texture background */
-  .grid-texture {
-    background-image: radial-gradient(circle, rgba(240, 165, 0, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  /* Glass panel effect */
-  .glass-panel {
-    backdrop-filter: blur(20px);
-    background: rgba(29, 32, 37, 0.6);
-  }
-
-  /* Amber glow effect */
-  .amber-glow {
-    box-shadow: 0 0 15px rgba(240, 165, 0, 0.2);
-  }
-
-  /* Notched button shape */
-  .notched-button {
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  }
-
-  /* Font families */
-  .font-headline {
-    font-family: 'Newsreader', serif;
-  }
-
-  .font-body {
-    font-family: 'Manrope', sans-serif;
-  }
-
-  .font-label {
-    font-family: 'Space Grotesk', monospace;
-  }
-
-  /* Color utilities using CSS custom properties */
-  .bg-background {
-    background-color: var(--background, #111319);
-  }
-
-  .bg-surface {
-    background-color: var(--surface, #111319);
-  }
-
-  .bg-surface-container {
-    background-color: var(--surface-container, #1d2025);
-  }
-
-  .bg-surface-container-low {
-    background-color: var(--surface-container-low, #191c21);
-  }
-
-  .bg-surface-container-lowest {
-    background-color: var(--surface-container-lowest, #0b0e13);
-  }
-
-  .bg-surface-container-high {
-    background-color: var(--surface-container-high, #272a30);
-  }
-
-  .bg-surface-container-highest {
-    background-color: var(--surface-container-highest, #32353b);
-  }
-
-  .bg-primary {
-    background-color: var(--primary, #ffc56c);
-  }
-
-  .bg-primary-container {
-    background-color: var(--primary-container, #f0a500);
-  }
-
-  .bg-secondary {
-    background-color: var(--secondary, #41e4c0);
-  }
-
-  .bg-secondary-container {
-    background-color: var(--secondary-container, #00c7a5);
-  }
-
-  .bg-error {
-    background-color: var(--error, #ffb4ab);
-  }
-
-  .text-on-background {
-    color: var(--on-background, #e1e2ea);
-  }
-
-  .text-on-surface {
-    color: var(--on-surface, #e1e2ea);
-  }
-
-  .text-on-surface-variant {
-    color: var(--on-surface-variant, #d6c4ac);
-  }
-
-  .text-on-primary {
-    color: var(--on-primary, #442c00);
-  }
-
-  .text-on-primary-container {
-    color: var(--on-primary-container, #5f3f00);
-  }
-
-  .text-primary {
-    color: var(--primary, #ffc56c);
-  }
-
-  .text-primary-container {
-    color: var(--primary-container, #f0a500);
-  }
-
-  .text-secondary {
-    color: var(--secondary, #41e4c0);
-  }
-
-  .text-error {
-    color: var(--error, #ffb4ab);
-  }
-
-  .border-primary {
-    border-color: var(--primary, #ffc56c);
-  }
-
-  .border-outline-variant {
-    border-color: var(--outline-variant, #514533);
-  }
-
-  /* Animation for pulse */
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-
-  .animate-pulse {
-    animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Material Symbols styling */
-  .material-symbols-outlined {
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-    font-variation-settings:
-      'FILL' 0,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 24;
-  }
-</style>
+  </section>
+</div>
