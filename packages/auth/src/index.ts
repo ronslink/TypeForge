@@ -3,7 +3,7 @@
  * Clerk integration, regional routing, permissions, COPPA compliance, SSO
  */
 
-export { getCurrentUser, validateJWT, getAuthState, type AuthState, type ClerkUser } from './clerk.js';
+export { getCurrentUser, validateJWT, getAuthState, extractBearerToken, type AuthState, type ClerkUser } from './clerk.js';
 export { extractRegionFromClaims, getRegionFromUser, type Region } from './region.js';
 export { 
   canAccessLesson, 

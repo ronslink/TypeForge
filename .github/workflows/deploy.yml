@@ -15,7 +15,7 @@ on:
           - staging
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '20.18.2'
   PNPM_VERSION: '9.15.1'
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
       
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
       
@@ -74,7 +74,7 @@ jobs:
       
       - name: Deploy to Cloudflare Pages
         run: |
-          pnpm --filter=@typeforge/web exec wrangler pages deploy apps/web/.svelte-kit/cloudflare --project-name=typeforge-web
+          pnpm --filter=@typeforge/web exec wrangler pages deploy .svelte-kit/cloudflare --project-name=typeforge-web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

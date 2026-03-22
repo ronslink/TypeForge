@@ -1223,9 +1223,9 @@ You are Agent 1 - Infrastructure. Your scope is strictly:
 - Shell scripts for VPS setup
 
 Do NOT touch application code. Export only:
-- Named Hyperdrive bindings (DB_EU, DB_US, DB_AF)
-- Named Queue binding (JOBS_QUEUE)
-- Named R2 binding (ASSETS_BUCKET)
+- Named Hyperdrive bindings (HYPERDRIVE_EU, HYPERDRIVE_US, HYPERDRIVE_AF)
+- Named Queue binding (JOBS)
+- Named R2 binding (ASSETS)
 
 Reference: infra/contracts/bindings.ts for the binding interface.
 ```
@@ -1249,8 +1249,8 @@ Reference: infra/contracts/bindings.ts for the binding interface.
 You are Agent 2 - Auth & Billing. Your scope:
 - packages/auth/ — Clerk helpers, session utilities
 - apps/api/src/routes/billing.ts — Stripe webhooks
-- apps/api/src/routes/auth.ts — auth endpoints
-- apps/web/src/hooks.server.ts — Clerk SvelteKit middleware
+- apps/api/src/middleware/auth.ts — Clerk JWT validation middleware
+- apps/web/src/routes/+layout.server.ts — Clerk SvelteKit server layout
 
 Output the user's home_region in the JWT as a custom claim.
 Region logic: EU = European country codes, AF = African country codes, US = default.
@@ -1346,8 +1346,8 @@ Do NOT write API routes. Agent 7 calls these functions server-side.
 
 **Owns:** `packages/ui/`  
 **Deliverables:**
-- `KeyboardVisual.svelte` — interactive SVG keyboard, parameterised by layout, highlights active/error keys, finger zone colour coding
-- `TypingArea.svelte` — lesson text display with cursor, character state colouring (correct/error/pending), RTL support
+- `Keyboard.svelte` — interactive SVG keyboard, parameterised by layout, highlights active/error keys, finger zone colour coding
+- `TypingInput.svelte` — lesson text display with cursor, character state colouring (correct/error/pending), RTL support
 - `MetricsBar.svelte` — real-time WPM, accuracy, streak counter
 - `ProgressRing.svelte` — animated SVG ring for streaks and daily goals
 - `LessonCard.svelte` — curriculum card with difficulty badge and completion state
@@ -1366,8 +1366,8 @@ All components must:
 - Support dark and light themes via CSS custom properties
 - Be accessible (ARIA labels, keyboard navigation)
 - Emit typed CustomEvents for parent communication (never call fetch)
-KeyboardVisual.svelte must accept: layout (LayoutMap), activeKey (string|null), errorKey (string|null)
-TypingArea.svelte must accept: lesson (Lesson), onKeystroke (callback), direction ('ltr'|'rtl')
+Keyboard.svelte must accept: layout (LayoutMap), activeKey (string|null), errorKey (string|null)
+TypingInput.svelte must accept: lesson (Lesson), onKeystroke (callback), direction ('ltr'|'rtl')
 Do NOT fetch data. Components receive data via props and emit events upward.
 ```
 
@@ -1397,8 +1397,8 @@ Regional routing: middleware reads c.get('user').home_region → binds correct H
 Import from: @typeforge/db (database), @typeforge/curriculum (lesson logic).
 Auth: all routes protected via Clerk JWT middleware EXCEPT /billing/webhook.
 Pattern:
-  const user = await getCurrentUser(c)          // from packages/auth
-  const db = getDb(env[`DB_${user.region}`])    // regional Hyperdrive
+  const user = await getCurrentUser(c)                    // from packages/auth
+  const db = getDb(env[`HYPERDRIVE_${user.region}`])      // regional Hyperdrive
   const result = await queryHelper(db, ...)
 Return typed JSON. Use Hono's typed RPC for client generation.
 Do NOT write UI. apps/web imports the generated RPC client.
@@ -1438,32 +1438,34 @@ Routing: /learn, /practice, /progress, /org/:id, /settings, /onboarding
 
 ## Part 5 — Route Structure (apps/web)
 
+Routes marked ✅ are implemented. Routes marked ⬜ are planned but not yet created.
+
 ```
-/                          Landing/marketing page
-/auth/sign-in              Clerk hosted UI
-/auth/sign-up              Clerk hosted UI + region detection
-/onboarding                Placement test (first login)
+✅ /                          Landing/marketing page (apps/web/src/routes/(app)/+page.svelte)
+⬜ /auth/sign-in              Clerk hosted UI
+⬜ /auth/sign-up              Clerk hosted UI + region detection
+✅ /onboarding                Placement test (first login)
 
-/learn                     Curriculum browser
-/learn/[lessonId]          Active typing session
-/learn/[lessonId]/complete  Completion screen + next lesson
+✅ /learn                     Curriculum browser
+✅ /learn/[lessonId]          Active typing session
+⬜ /learn/[lessonId]/complete  Completion screen + next lesson
 
-/practice                  Free practice mode (no lesson)
-/drills                    Targeted weak-key drills
+✅ /practice                  Free practice mode (no lesson)
+⬜ /drills                    Targeted weak-key drills
 
-/progress                  Personal dashboard
-/progress/history          Session history + WPM chart
+✅ /progress                  Personal dashboard
+⬜ /progress/history          Session history + WPM chart
 
-/org/[orgId]               Teacher dashboard (role-gated)
-/org/[orgId]/students      Student roster + progress
-/org/[orgId]/student/[uid] Individual student drill-down
-/org/[orgId]/reports       Exportable CSV reports
+⬜ /org/[orgId]               Teacher dashboard (role-gated)
+⬜ /org/[orgId]/students      Student roster + progress
+⬜ /org/[orgId]/student/[uid] Individual student drill-down
+⬜ /org/[orgId]/reports       Exportable CSV reports
 
-/settings                  Layout, language, theme, account
-/billing                   Plan selection, Stripe portal
+✅ /settings                  Layout, language, theme, account
+✅ /billing                   Plan selection, Stripe portal
 
-/blog                      SEO content (SSR)
-/[lang]                    i18n prefix for non-EN routes
+⬜ /blog                      SEO content (SSR) — Phase 6+
+⬜ /[lang]                    i18n prefix for non-EN routes — Phase 6+
 ```
 
 ---

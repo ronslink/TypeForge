@@ -27,15 +27,7 @@ export async function authMiddleware(c: Context, next: Next) {
     return;
   }
   
-  const secretKey = c.env.CLERK_SECRET_KEY;
-  
-  if (!secretKey) {
-    console.error('CLERK_SECRET_KEY not configured');
-    c.status(500);
-    return c.json({ error: 'Server configuration error', code: 'CONFIG_ERROR' });
-  }
-  
-  const authState = await getAuthState(token, secretKey);
+  const authState = await getAuthState(c);
   
   // Store auth state in context
   c.set('auth', authState);
