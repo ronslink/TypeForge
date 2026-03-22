@@ -2,6 +2,11 @@
  * Lesson Registry - Catalog of all available lessons
  */
 
+// Import RTL lessons and wordlists
+import { arabicLessons } from './rtl-lessons.js';
+import { getRandomWords } from './wordlists/index.js';
+export { getRandomWords };
+
 export type Finger =
   | 'left_pinky'
   | 'left_ring'
@@ -52,7 +57,7 @@ export interface Lesson {
 /**
  * Complete catalog of lessons organized by difficulty and focus
  */
-export const LESSON_CATALOG: Lesson[] = [
+export let LESSON_CATALOG: Lesson[] = [
   // === Difficulty 1: Home Row Basics ===
   {
     id: 'home-row-left-pinky-a',
@@ -458,3 +463,25 @@ export function getLessonsByFinger(finger: Finger | 'all'): Lesson[] {
 export function getLessonsByKeyBigram(keyBigram: string): Lesson[] {
   return LESSON_CATALOG.filter((lesson) => lesson.tags.key_bigram === keyBigram);
 }
+
+/**
+ * Get lessons filtered by script family
+ */
+export function getLessonsByScript(script: string): Lesson[] {
+  return LESSON_CATALOG.filter((lesson) => lesson.script === script);
+}
+
+/**
+ * Get all RTL lessons (Arabic, Hebrew)
+ */
+export function getRTLLessons(): Lesson[] {
+  return LESSON_CATALOG.filter((lesson) =>
+    ['arabic', 'hebrew', 'r-arabic', 'syriac', 'mandaic'].includes(lesson.script)
+  );
+}
+
+
+
+// Append Arabic RTL lessons
+LESSON_CATALOG.push(...arabicLessons);
+

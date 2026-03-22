@@ -22,7 +22,23 @@ export {
   getLessonsByHand,
   getLessonsByFinger,
   getLessonsByKeyBigram,
+  getLessonsByScript,
+  getRTLLessons,
   type Finger,
   type LessonChar,
   type Lesson as RegistryLesson,
 } from './lesson-registry.js';
+
+// Arabic RTL lessons
+export { arabicLessons } from './rtl-lessons.js';
+
+// Wordlist exports
+export {
+  frenchWordlist,
+  spanishWordlist,
+  arabicWordlist,
+  getWordlistForLanguage,
+  getRandomWords,
+  getWordsForLesson,
+  type WordlistEntry,
+} from './wordlists/index.js';
