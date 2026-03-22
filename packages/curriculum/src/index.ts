@@ -13,3 +13,16 @@ export type {
   SchedulerConfig,
   DifficultyLevel,
 } from './types.js';
+
+// Lesson Registry exports
+export {
+  LESSON_CATALOG,
+  getLessonById,
+  getLessonsByDifficulty,
+  getLessonsByHand,
+  getLessonsByFinger,
+  getLessonsByKeyBigram,
+  type Finger,
+  type LessonChar,
+  type Lesson as RegistryLesson,
+} from './lesson-registry.js';
