@@ -57,7 +57,7 @@ export interface Lesson {
 /**
  * Complete catalog of lessons organized by difficulty and focus
  */
-export let LESSON_CATALOG: Lesson[] = [
+export const LESSON_CATALOG: Lesson[] = [
   // === Difficulty 1: Home Row Basics ===
   {
     id: 'home-row-left-pinky-a',
