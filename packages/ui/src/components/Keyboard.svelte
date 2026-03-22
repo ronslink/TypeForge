@@ -5,9 +5,10 @@
     layout: KeyboardLayout;
     highlightKeys?: Set<string>;
     pressedKey?: string;
+    isRTL?: boolean;
   }
 
-  let { layout, highlightKeys = new Set(), pressedKey }: Props = $props();
+  let { layout, highlightKeys = new Set(), pressedKey, isRTL = false }: Props = $props();
 
   // Group keys by row
   $derived(rows = groupByRow(layout.keys));
@@ -29,18 +30,65 @@
     classes.push(`finger-${key.finger}`);
     return classes.join(' ');
   }
+
+  // Get ARIA label for key
+  function getKeyAriaLabel(key: (typeof layout.keys)[0]): string {
+    const fingerNames: Record<string, string> = {
+      'left-pinky': 'Left pinky',
+      'left-ring': 'Left ring finger',
+      'left-middle': 'Left middle finger',
+      'left-index': 'Left index finger',
+      'right-index': 'Right index finger',
+      'right-middle': 'Right middle finger',
+      'right-ring': 'Right ring finger',
+      'right-pinky': 'Right pinky',
+      'thumb': 'Thumb',
+    };
+    
+    const fingerLabel = fingerNames[key.finger] || key.finger;
+    const isHighlighted = highlightKeys.has(key.char);
+    
+    let label = `${key.char.toUpperCase()} key, use ${fingerLabel}`;
+    if (key.shift && key.shift !== key.char) {
+      label += `, shift produces ${key.shift}`;
+    }
+    if (isHighlighted) {
+      label += ', current target key';
+    }
+    
+    return label;
+  }
 </script>
 
-<div class="keyboard bg-surface-container-lowest p-4">
+<!-- 
+  Accessibility Notes:
+  - role="region" with aria-label identifies this as a keyboard visualization
+  - Each key is a button with descriptive aria-label including finger assignment
+  - Focus indicators are visible with amber outline
+  - RTL support: logical properties for border positioning
+  - Decorative only - keys are not interactive but provide visual guidance
+-->
+<div 
+  class="keyboard bg-surface-container-lowest p-4" 
+  role="region" 
+  aria-label="Virtual keyboard showing finger placement guide"
+>
   {#each [0, 1, 2, 3, 4] as rowIndex}
     {#if rows.has(rowIndex)}
-      <div class="keyboard-row">
+      <div class="keyboard-row" role="group" aria-label="Row {rowIndex + 1}">
         {#each rows.get(rowIndex) || [] as key}
-          <button class={getKeyClass(key)} data-code={key.code}>
+          <button 
+            type="button"
+            class={getKeyClass(key)} 
+            data-code={key.code}
+            aria-label={getKeyAriaLabel(key)}
+            tabindex="-1"
+            disabled
+          >
             {#if key.shift && key.shift !== key.char}
-              <span class="shift-char">{key.shift}</span>
+              <span class="shift-char" aria-hidden="true">{key.shift}</span>
             {/if}
-            <span class="main-char">{key.char}</span>
+            <span class="main-char" aria-hidden="true">{key.char}</span>
           </button>
         {/each}
       </div>
@@ -74,6 +122,16 @@
     color: var(--on-surface, #e1e2ea);
     font-size: 0.75rem;
     transition: all 0.1s ease;
+    /* Ensure visible focus indicator */
+    outline: none;
+    position: relative;
+  }
+
+  /* Visible focus indicator - amber outline */
+  .key:focus-visible {
+    outline: 2px solid var(--primary, #ffc56c);
+    outline-offset: 2px;
+    z-index: 1;
   }
 
   .key.highlight {
@@ -96,36 +154,65 @@
     text-transform: lowercase;
   }
 
-  /* Finger color coding */
+  /* Finger color coding using logical properties for RTL support */
   .finger-left-pinky {
-    border-left: 2px solid #ff6b6b;
+    border-inline-start: 2px solid #ff6b6b;
   }
 
   .finger-left-ring {
-    border-left: 2px solid #ffa94d;
+    border-inline-start: 2px solid #ffa94d;
   }
 
   .finger-left-middle {
-    border-left: 2px solid #ffd43b;
+    border-inline-start: 2px solid #ffd43b;
   }
 
   .finger-left-index {
-    border-left: 2px solid #69db7c;
+    border-inline-start: 2px solid #69db7c;
   }
 
   .finger-right-index {
-    border-right: 2px solid #4dabf7;
+    border-inline-end: 2px solid #4dabf7;
   }
 
   .finger-right-middle {
-    border-right: 2px solid #748ffc;
+    border-inline-end: 2px solid #748ffc;
   }
 
   .finger-right-ring {
-    border-right: 2px solid #da77f2;
+    border-inline-end: 2px solid #da77f2;
   }
 
   .finger-right-pinky {
-    border-right: 2px solid #f783ac;
+    border-inline-end: 2px solid #f783ac;
+  }
+
+  /* Thumb keys - both sides */
+  .finger-thumb {
+    border-block-end: 2px solid #a9e34b;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .key {
+      transition: none;
+    }
+    
+    .key.pressed {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .key.highlight {
+      outline: 2px solid var(--primary, #ffc56c);
+      outline-offset: -2px;
+    }
+    
+    .key.pressed {
+      outline: 2px solid var(--on-primary-container, #5f3f00);
+      outline-offset: -2px;
+    }
   }
 </style>

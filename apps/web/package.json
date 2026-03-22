@@ -16,7 +16,12 @@
   },
   "dependencies": {
     "clerk-sveltekit": "^0.4.3",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "@typeforge/ui": "workspace:*",
+    "@typeforge/curriculum": "workspace:*",
+    "@typeforge/metrics": "workspace:*",
+    "@typeforge/layouts": "workspace:*",
+    "@typeforge/api": "workspace:*"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^4.8.0",

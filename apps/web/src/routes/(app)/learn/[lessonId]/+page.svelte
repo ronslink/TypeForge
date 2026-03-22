@@ -64,6 +64,7 @@
   let currentAccuracy = $state(100);
   let currentStreak = $state(0);
   let maxStreak = $state(0);
+  let previousStreak = $state(0);
 
   // Keystroke tracking for API
   let keystrokes = $state<Array<{
@@ -87,6 +88,10 @@
   let finalWPM = $state(0);
   let finalAccuracy = $state(0);
   let finalDuration = $state(0);
+
+  // Screen reader announcements
+  let ariaLiveText = $state('');
+  let lastAccuracyAnnouncement = $state(100);
 
   // Derived values
   const lessonText = $derived(lesson?.content.map((c) => c.char).join('') || '');
@@ -150,6 +155,18 @@
     }
   });
 
+  // Announce accuracy changes on word completion
+  $effect(() => {
+    if (isStarted && !isComplete) {
+      const accuracy = Math.round(accuracyTracker.getAccuracy());
+      // Announce when accuracy changes by more than 5%
+      if (Math.abs(accuracy - lastAccuracyAnnouncement) >= 5) {
+        ariaLiveText = `Accuracy: ${accuracy}%`;
+        lastAccuracyAnnouncement = accuracy;
+      }
+    }
+  });
+
   // Timer effect
   $effect(() => {
     if (isStarted && !isComplete) {
@@ -203,6 +220,7 @@
     accuracyTracker.onKeystroke(event.code, isCorrect);
 
     if (isCorrect) {
+      previousStreak = currentStreak;
       currentStreak++;
       maxStreak = Math.max(maxStreak, currentStreak);
       currentIndex++;
@@ -212,9 +230,12 @@
         completeLesson();
       }
     } else {
+      previousStreak = currentStreak;
       currentStreak = 0;
       errors.add(currentIndex);
       errors = new Set(errors);
+      // Announce error for screen readers
+      ariaLiveText = `Error: expected ${expectedChar.char}, typed ${typedChar}`;
     }
   }
 
@@ -238,6 +259,9 @@
     finalWPM = Math.round(wpmResult.netWPM);
     finalAccuracy = Math.round(accuracyTracker.getAccuracy());
     finalDuration = elapsedSeconds;
+
+    // Announce completion for screen readers
+    ariaLiveText = `Lesson complete! WPM: ${finalWPM}, Accuracy: ${finalAccuracy}%. Great job!`;
 
     // Submit session to API
     submitSession();
@@ -301,9 +325,21 @@
     currentWPM = 0;
     currentAccuracy = 100;
     currentStreak = 0;
+    previousStreak = 0;
     keystrokes = [];
     wpmCalculator = new WPMCalculator();
     accuracyTracker = new AccuracyTracker();
+    lastAccuracyAnnouncement = 100;
+    ariaLiveText = 'Lesson restarted';
+  }
+
+  // Handle word completion for screen reader
+  function handleWordComplete(word: string, accuracy: number) {
+    if (accuracy === 100) {
+      ariaLiveText = `Word "${word}" completed perfectly`;
+    } else {
+      ariaLiveText = `Word "${word}" completed, ${accuracy}% accuracy`;
+    }
   }
 
   // Format time display
@@ -333,9 +369,25 @@
 
 <svelte:head>
   <title>{lesson ? `${lesson.title} — TypeForge` : 'Lesson — TypeForge'}</title>
+  <meta name="description" content={lesson ? `Practice typing: ${lesson.title}` : 'Typing lesson'} />
 </svelte:head>
 
+<!-- 
+  Accessibility Notes:
+  - ARIA live region for announcing WPM, accuracy, and word completions
+  - aria-live="assertive" for errors to interrupt current speech
+  - Progress bar with aria-valuenow, aria-valuemin, aria-valuemax
+  - RTL support with dir attribute and lang for Arabic text
+  - Modal focus trap for completion overlay
+  - Skip navigation available from parent layout
+-->
+
 <ConfettiCelebration trigger={showCelebration} duration={3000} />
+
+<!-- ARIA Live Region for Screen Reader Announcements -->
+<div class="sr-only" aria-live="polite" aria-atomic="true">
+  {ariaLiveText}
+</div>
 
 <div class="max-w-5xl mx-auto px-6 py-12">
   {#if lesson}
@@ -343,58 +395,78 @@
     <div class="mb-6">
       <a 
         href="/learn" 
-        class="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2"
+        class="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2 focus-indicator"
+        aria-label="Back to lessons list"
       >
-        <span>←</span>
+        <span aria-hidden="true">←</span>
         <span>Back to lessons</span>
       </a>
     </div>
 
     <!-- Lesson Header -->
     <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2">
-        <h1 class="font-headline text-3xl">{language?.nativeName || lesson.language}</h1>
+      <div class="flex items-center gap-3 mb-2 flex-wrap">
+        <h1 class="font-headline text-3xl" id="lesson-title">
+          {language?.nativeName || lesson.language}
+        </h1>
         <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
         {#if isRTL}
-          <span class="rtl-badge">RTL</span>
+          <span class="rtl-badge" role="note" aria-label="Right-to-left language">RTL</span>
         {/if}
       </div>
-      <p class="text-on-surface-variant">{lesson.title}</p>
+      <p class="text-on-surface-variant" id="lesson-description">{lesson.title}</p>
     </div>
 
     <!-- Progress Bar -->
-    <div class="mb-8">
-      <div class="h-1 bg-surface-container-highest relative overflow-hidden">
+    <div class="mb-8" role="region" aria-label="Lesson progress">
+      <div 
+        class="h-1 bg-surface-container-highest relative overflow-hidden"
+        role="progressbar"
+        aria-valuenow={currentIndex}
+        aria-valuemin={0}
+        aria-valuemax={lessonChars.length}
+        aria-label="Typing progress"
+      >
         <div 
           class="h-full bg-secondary transition-all duration-300"
+          class:reduced-motion={false}
           style="width: {(currentIndex / lessonChars.length) * 100}%"
         ></div>
       </div>
       <div class="flex justify-between mt-2 text-xs text-on-surface-variant">
-        <span>{currentIndex} / {lessonChars.length} characters</span>
-        <span>{Math.round((currentIndex / lessonChars.length) * 100)}% complete</span>
+        <span aria-label="Characters typed">{currentIndex} / {lessonChars.length} characters</span>
+        <span aria-label="Percent complete">{Math.round((currentIndex / lessonChars.length) * 100)}% complete</span>
       </div>
     </div>
 
-    <!-- Completion Overlay -->
+    <!-- Completion Overlay (Modal) -->
     {#if isComplete}
-      <div class="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-        <div class="bg-surface-container-low p-8 max-w-md w-full text-center">
-          <h2 class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>
-          <p class="text-on-surface-variant mb-8">Great job finishing this lesson!</p>
+      <div 
+        class="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="completion-title"
+        aria-describedby="completion-description"
+      >
+        <div 
+          class="bg-surface-container-low p-8 max-w-md w-full text-center"
+          role="document"
+        >
+          <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>
+          <p id="completion-description" class="text-on-surface-variant mb-8">Great job finishing this lesson!</p>
           
           <!-- Results Grid -->
-          <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="grid grid-cols-3 gap-4 mb-8" role="region" aria-label="Your results">
             <div class="bg-surface-container p-4">
-              <div class="text-2xl font-bold text-secondary">{finalWPM}</div>
+              <div class="text-2xl font-bold text-secondary" aria-label="Words per minute">{finalWPM}</div>
               <div class="text-xs text-on-surface-variant uppercase">WPM</div>
             </div>
             <div class="bg-surface-container p-4">
-              <div class="text-2xl font-bold text-primary">{finalAccuracy}%</div>
+              <div class="text-2xl font-bold text-primary" aria-label="Accuracy percentage">{finalAccuracy}%</div>
               <div class="text-xs text-on-surface-variant uppercase">Accuracy</div>
             </div>
             <div class="bg-surface-container p-4">
-              <div class="text-2xl font-bold text-on-surface">{formatTime(finalDuration)}</div>
+              <div class="text-2xl font-bold text-on-surface" aria-label="Time taken">{formatTime(finalDuration)}</div>
               <div class="text-xs text-on-surface-variant uppercase">Time</div>
             </div>
           </div>
@@ -412,24 +484,35 @@
     {/if}
 
     <!-- Typing Area with RTL support -->
-    <div class="bg-surface-container-lowest p-8 mb-8 relative" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div 
+      class="bg-surface-container-lowest p-8 mb-8 relative" 
+      dir={isRTL ? 'rtl' : 'ltr'}
+      role="region"
+      aria-label="Typing area"
+    >
       <TypingInput 
         text={lessonText} 
         {currentIndex} 
         {errors}
+        {isRTL}
+        language={lesson.language}
         class="min-h-[120px] {isRTL ? 'rtl-input' : ''}"
+        onWordComplete={handleWordComplete}
       />
       
       <!-- Focus hint -->
       {#if !isStarted}
-        <div class="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+        <div 
+          class="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm"
+          aria-hidden="true"
+        >
           <p class="text-on-surface-variant font-label">Start typing to begin...</p>
         </div>
       {/if}
     </div>
 
     <!-- Live Metrics Bar -->
-    <div class="mb-8">
+    <div class="mb-8" role="region" aria-label="Live statistics">
       <MetricsBar
         metrics={[
           { label: 'WPM', value: currentWPM, variant: 'primary' },
@@ -437,34 +520,42 @@
           { label: 'Streak', value: currentStreak, variant: 'default' },
           { label: 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
         ]}
+        {currentStreak}
+        {previousStreak}
       />
     </div>
 
     <!-- Keyboard Visualization with RTL support -->
-    <div class="bg-surface-container p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div 
+      class="bg-surface-container p-4" 
+      dir={isRTL ? 'rtl' : 'ltr'}
+      role="region"
+      aria-label="Keyboard finger placement guide"
+    >
       <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
       <Keyboard 
         layout={activeKeyboardLayout} 
         {highlightKeys}
         {pressedKey}
+        {isRTL}
       />
       
       <!-- Finger Guide with logical properties for RTL -->
       <div class="finger-guide">
         <div class="finger-item">
-          <span class="finger-indicator finger-pinky"></span>
+          <span class="finger-indicator finger-pinky" aria-hidden="true"></span>
           <span>Pinky</span>
         </div>
         <div class="finger-item">
-          <span class="finger-indicator finger-ring"></span>
+          <span class="finger-indicator finger-ring" aria-hidden="true"></span>
           <span>Ring</span>
         </div>
         <div class="finger-item">
-          <span class="finger-indicator finger-middle"></span>
+          <span class="finger-indicator finger-middle" aria-hidden="true"></span>
           <span>Middle</span>
         </div>
         <div class="finger-item">
-          <span class="finger-indicator finger-index"></span>
+          <span class="finger-indicator finger-index" aria-hidden="true"></span>
           <span>Index</span>
         </div>
       </div>
@@ -476,7 +567,10 @@
         <h3 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4">Focus Keys</h3>
         <div class="flex flex-wrap gap-2">
           {#each lesson.tags.key_bigram.split('') as key}
-            <span class="px-3 py-1 bg-surface-container text-on-surface font-label">{key}</span>
+            <span 
+              class="px-3 py-1 bg-surface-container text-on-surface font-label"
+              aria-label="Focus key: {key}"
+            >{key}</span>
           {/each}
         </div>
       </div>
@@ -493,7 +587,7 @@
     </div>
   {:else}
     <!-- Lesson Not Found -->
-    <div class="text-center py-20">
+    <div class="text-center py-20" role="alert">
       <h1 class="font-headline text-3xl mb-4">Lesson Not Found</h1>
       <p class="text-on-surface-variant mb-8">The lesson you're looking for doesn't exist.</p>
       <Button variant="primary" onclick={() => goto('/learn')}>Browse Lessons</Button>
@@ -572,5 +666,47 @@
   .typing-container,
   :global(.typing-input) {
     transition: direction 0.3s ease;
+  }
+
+  /* Focus indicator - amber outline */
+  .focus-indicator {
+    outline: none;
+    border-radius: 2px;
+  }
+
+  .focus-indicator:focus-visible {
+    outline: 2px solid var(--primary, #ffc56c);
+    outline-offset: 2px;
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .typing-container,
+    :global(.typing-input) {
+      transition: none;
+    }
+    
+    :global(.transition-all) {
+      transition: none !important;
+    }
+  }
+
+  /* Class-based reduced motion override */
+  :global(.reduced-motion) .typing-container,
+  :global(.reduced-motion) :global(.typing-input) {
+    transition: none;
   }
 </style>

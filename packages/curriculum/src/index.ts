@@ -30,7 +30,13 @@ export {
 } from './lesson-registry.js';
 
 // Arabic RTL lessons
-export { arabicLessons } from './rtl-lessons.js';
+export {
+  arabicLessons,
+  arabicAlphabetLessons,
+  arabicHarakatLessons,
+  arabicGrammarLessons,
+  arabicPhraseLessons,
+} from './rtl-lessons.js';
 
 // Wordlist exports
 export {
@@ -39,6 +45,9 @@ export {
   arabicWordlist,
   getWordlistForLanguage,
   getRandomWords,
-  getWordsForLesson,
+  getSupportedLanguages,
+  getWordCount,
+  getWordsByDifficulty,
+  getWordsByTag,
   type WordlistEntry,
 } from './wordlists/index.js';

@@ -14,6 +14,8 @@
       "@typeforge/curriculum/*": ["../../packages/curriculum/src/*"],
       "@typeforge/ui": ["../../packages/ui/src"],
       "@typeforge/ui/*": ["../../packages/ui/src/*"],
+      "@typeforge/api": ["../../apps/api/src"],
+      "@typeforge/api/*": ["../../apps/api/src/*"],
       "$lib": ["./src/lib"],
       "$lib/*": ["./src/lib/*"]
     },

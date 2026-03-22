@@ -29,8 +29,33 @@
 
   let particles = $state<Particle[]>([]);
   let animationFrame: number;
+  let reducedMotion = $state(false);
+
+  // Check for reduced motion preference
+  onMount(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = mediaQuery.matches;
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      reducedMotion = e.matches;
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  });
 
   function createParticles() {
+    // Skip animation if reduced motion is preferred
+    if (reducedMotion) {
+      return;
+    }
+
     const newParticles: Particle[] = [];
     for (let i = 0; i < particleCount; i++) {
       newParticles.push({
@@ -58,34 +83,53 @@
       createParticles();
     }
   });
-
-  onMount(() => {
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
-  });
 </script>
 
-{#if particles.length > 0}
-  <div class="confetti-container">
-    {#each particles as particle (particle.id)}
-      <div
-        class="confetti-particle"
-        style="
-          left: {particle.x}%;
-          top: {particle.y}%;
-          width: {particle.size}px;
-          height: {particle.size}px;
-          background-color: {particle.color};
-          transform: rotate({particle.rotation}deg);
-          animation: confetti-fall {duration}ms ease-out forwards;
-          animation-delay: {Math.random() * 200}ms;
-        "
-      />
-    {/each}
-  </div>
+<!-- 
+  Accessibility Notes:
+  - Respects prefers-reduced-motion: no animation if user prefers reduced motion
+  - aria-hidden="true" because this is decorative only
+  - role="img" with aria-label for screen readers to announce celebration
+  - Static fallback: shows a simple success message when reduced motion is on
+-->
+{#if !reducedMotion}
+  {#if particles.length > 0}
+    <div 
+      class="confetti-container" 
+      aria-hidden="true"
+      role="img"
+      aria-label="Celebration animation"
+    >
+      {#each particles as particle (particle.id)}
+        <div
+          class="confetti-particle"
+          style="
+            left: {particle.x}%;
+            top: {particle.y}%;
+            width: {particle.size}px;
+            height: {particle.size}px;
+            background-color: {particle.color};
+            transform: rotate({particle.rotation}deg);
+            animation: confetti-fall {duration}ms ease-out forwards;
+            animation-delay: {Math.random() * 200}ms;
+          "
+        />
+      {/each}
+    </div>
+  {/if}
+{:else}
+  <!-- Reduced motion fallback: static success indicator -->
+  {#if trigger}
+    <div 
+      class="reduced-motion-fallback" 
+      role="status" 
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <span class="success-icon">✓</span>
+      <span class="sr-only">Success! Lesson completed.</span>
+    </div>
+  {/if}
 {/if}
 
 <style>
@@ -114,5 +158,59 @@
       transform: translateY(-100vh) rotate(720deg);
       opacity: 0;
     }
+  }
+
+  /* Reduced motion fallback styles */
+  .reduced-motion-fallback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--surface-container, #1d2025);
+    border: 2px solid var(--primary, #ffc56c);
+    border-radius: var(--radius-md, 0.25rem);
+  }
+
+  .success-icon {
+    font-size: 3rem;
+    color: var(--primary, #ffc56c);
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Reduced motion support - disable animations */
+  @media (prefers-reduced-motion: reduce) {
+    .confetti-container {
+      display: none;
+    }
+    
+    .confetti-particle {
+      animation: none !important;
+    }
+  }
+
+  /* Class-based reduced motion override */
+  :global(.reduced-motion) .confetti-container {
+    display: none;
+  }
+  
+  :global(.reduced-motion) .confetti-particle {
+    animation: none !important;
   }
 </style>

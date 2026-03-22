@@ -21,7 +21,8 @@ const config = {
       '@typeforge/metrics': '../../packages/metrics',
       '@typeforge/layouts': '../../packages/layouts',
       '@typeforge/curriculum': '../../packages/curriculum',
-      '@typeforge/ui': '../../packages/ui'
+      '@typeforge/ui': '../../packages/ui',
+      '@typeforge/api': '../../apps/api'
     }
   }
 };
