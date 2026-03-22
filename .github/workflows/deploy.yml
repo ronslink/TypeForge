@@ -40,7 +40,7 @@ jobs:
         run: pnpm --filter=@typeforge/api build
 
       - name: Deploy to Cloudflare Workers
-        run: pnpm --filter=@typeforge/api deploy
+        run: pnpm --filter=@typeforge/api run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -70,7 +70,7 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         run: |
-          pnpm --filter=@typeforge/web exec wrangler pages deploy .svelte-kit/cloudflare --project-name=typeforge-web
+          cd apps/web && pnpm exec wrangler pages deploy .svelte-kit/cloudflare --project-name=typeforge-web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
