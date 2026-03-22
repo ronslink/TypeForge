@@ -1,0 +1,66 @@
+{
+  "id": "arabic",
+  "name": "Arabic (العربية)",
+  "language": "ar",
+  "script": "arabic",
+  "rtl": true,
+  "rows": [
+    [
+      { "code": "Backquote", "char": "ذ", "charShift": "ّ" },
+      { "code": "Digit1", "char": "١", "charShift": "!" },
+      { "code": "Digit2", "char": "٢", "charShift": "@" },
+      { "code": "Digit3", "char": "٣", "charShift": "#" },
+      { "code": "Digit4", "char": "٤", "charShift": "$" },
+      { "code": "Digit5", "char": "٥", "charShift": "%" },
+      { "code": "Digit6", "char": "٦", "charShift": "^" },
+      { "code": "Digit7", "char": "٧", "charShift": "&" },
+      { "code": "Digit8", "char": "٨", "charShift": "*" },
+      { "code": "Digit9", "char": "٩", "charShift": ")" },
+      { "code": "Digit0", "char": "٠", "charShift": "(" },
+      { "code": "Minus", "char": "-", "charShift": "_" },
+      { "code": "Equal", "char": "=", "charShift": "+" }
+    ],
+    [
+      { "code": "KeyQ", "char": "ض", "charShift": "َ", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyW", "char": "ص", "charShift": "ً", "finger": "left-ring", "rtl": true },
+      { "code": "KeyE", "char": "ث", "charShift": "ُ", "finger": "left-middle", "rtl": true },
+      { "code": "KeyR", "char": "ق", "charShift": "ٌ", "finger": "left-index", "rtl": true },
+      { "code": "KeyT", "char": "ف", "charShift": "ﻹ", "finger": "left-index", "rtl": true },
+      { "code": "KeyY", "char": "غ", "charShift": "إ", "finger": "right-index", "rtl": true },
+      { "code": "KeyU", "char": "ع", "charShift": "‘", "finger": "right-index", "rtl": true },
+      { "code": "KeyI", "char": "ه", "charShift": "÷", "finger": "right-middle", "rtl": true },
+      { "code": "KeyO", "char": "خ", "charShift": "×", "finger": "right-ring", "rtl": true },
+      { "code": "KeyP", "char": "ح", "charShift": "؛", "finger": "right-pinky", "rtl": true },
+      { "code": "BracketLeft", "char": "ج", "charShift": "<", "finger": "right-pinky", "rtl": true },
+      { "code": "BracketRight", "char": "ش", "charShift": ">", "finger": "right-pinky", "rtl": true }
+    ],
+    [
+      { "code": "KeyA", "char": "س", "charShift": "ِ", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyS", "char": "ي", "charShift": "ٍ", "finger": "left-ring", "rtl": true },
+      { "code": "KeyD", "char": "ب", "charShift": "ﻷ", "finger": "left-middle", "rtl": true },
+      { "code": "KeyF", "char": "ل", "charShift": "أ", "finger": "left-index", "rtl": true },
+      { "code": "KeyG", "char": "ا", "charShift": "ـ", "finger": "left-index", "rtl": true },
+      { "code": "KeyH", "char": "ت", "charShift": "،", "finger": "right-index", "rtl": true },
+      { "code": "KeyJ", "char": "ن", "charShift": "/", "finger": "right-index", "rtl": true },
+      { "code": "KeyK", "char": "م", "charShift": "'", "finger": "right-middle", "rtl": true },
+      { "code": "KeyL", "char": "ك", "charShift": ":", "finger": "right-ring", "rtl": true },
+      { "code": "Semicolon", "char": "ط", "charShift": "\"", "finger": "right-pinky", "rtl": true },
+      { "code": "Quote", "char": "ئ", "charShift": "~", "finger": "right-pinky", "rtl": true }
+    ],
+    [
+      { "code": "KeyZ", "char": "ئ", "charShift": "ْ", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyX", "char": "ء", "charShift": "ٌ", "finger": "left-ring", "rtl": true },
+      { "code": "KeyC", "char": "ؤ", "charShift": "ﻵ", "finger": "left-middle", "rtl": true },
+      { "code": "KeyV", "char": "ر", "charShift": "آ", "finger": "left-index", "rtl": true },
+      { "code": "KeyB", "char": "لا", "charShift": "',", "finger": "left-index", "rtl": true },
+      { "code": "KeyN", "char": "ى", "charShift": ",", "finger": "right-index", "rtl": true },
+      { "code": "KeyM", "char": "ة", "charShift": ".", "finger": "right-index", "rtl": true },
+      { "code": "Comma", "char": "و", "charShift": "؟", "finger": "right-middle", "rtl": true },
+      { "code": "Period", "char": "ز", "charShift": "/", "finger": "right-ring", "rtl": true },
+      { "code": "Slash", "char": "ظ", "charShift": ":", "finger": "right-pinky", "rtl": true }
+    ],
+    [
+      { "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }
+    ]
+  ]
+}

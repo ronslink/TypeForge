@@ -22,6 +22,12 @@ export { default as LessonCard } from './components/LessonCard.svelte';
 export { default as EncouragementToast } from './components/EncouragementToast.svelte';
 export { default as ConfettiCelebration } from './components/ConfettiCelebration.svelte';
 
+// Celebration Components
+export { default as MilestoneToast } from './components/MilestoneToast.svelte';
+export { default as Celebration } from './components/Celebration.svelte';
+export { default as LevelUp } from './components/LevelUp.svelte';
+export { default as AchievementBadge } from './components/AchievementBadge.svelte';
+
 // Organization Components
 export { default as OrgDashboard } from './components/OrgDashboard.svelte';
 
@@ -33,3 +39,4 @@ export { default as WeaknessHeatmap } from './components/WeaknessHeatmap.svelte'
 
 // Utilities
 export * from './utils/design-tokens.js';
+export * from './utils/celebrations.js';

@@ -1,0 +1,65 @@
+{
+  "id": "dvorak",
+  "name": "Dvorak Simplified",
+  "language": "en",
+  "script": "latin",
+  "rows": [
+    [
+      { "code": "Backquote", "char": "`", "charShift": "~" },
+      { "code": "Digit1", "char": "1", "charShift": "!" },
+      { "code": "Digit2", "char": "2", "charShift": "@" },
+      { "code": "Digit3", "char": "3", "charShift": "#" },
+      { "code": "Digit4", "char": "4", "charShift": "$" },
+      { "code": "Digit5", "char": "5", "charShift": "%" },
+      { "code": "Digit6", "char": "6", "charShift": "^" },
+      { "code": "Digit7", "char": "7", "charShift": "&" },
+      { "code": "Digit8", "char": "8", "charShift": "*" },
+      { "code": "Digit9", "char": "9", "charShift": "(" },
+      { "code": "Digit0", "char": "0", "charShift": ")" },
+      { "code": "Minus", "char": "[", "charShift": "{" },
+      { "code": "Equal", "char": "]", "charShift": "}" }
+    ],
+    [
+      { "code": "KeyQ", "char": "'", "charShift": "\"", "finger": "left-pinky" },
+      { "code": "KeyW", "char": ",", "charShift": "<", "finger": "left-ring" },
+      { "code": "KeyE", "char": ".", "charShift": ">", "finger": "left-middle" },
+      { "code": "KeyR", "char": "p", "charShift": "P", "finger": "left-index" },
+      { "code": "KeyT", "char": "y", "charShift": "Y", "finger": "left-index" },
+      { "code": "KeyY", "char": "f", "charShift": "F", "finger": "right-index" },
+      { "code": "KeyU", "char": "g", "charShift": "G", "finger": "right-index" },
+      { "code": "KeyI", "char": "c", "charShift": "C", "finger": "right-middle" },
+      { "code": "KeyO", "char": "r", "charShift": "R", "finger": "right-ring" },
+      { "code": "KeyP", "char": "l", "charShift": "L", "finger": "right-pinky" },
+      { "code": "BracketLeft", "char": "/", "charShift": "?", "finger": "right-pinky" },
+      { "code": "BracketRight", "char": "=", "charShift": "+", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyA", "char": "a", "charShift": "A", "finger": "left-pinky" },
+      { "code": "KeyS", "char": "o", "charShift": "O", "finger": "left-ring" },
+      { "code": "KeyD", "char": "e", "charShift": "E", "finger": "left-middle" },
+      { "code": "KeyF", "char": "u", "charShift": "U", "finger": "left-index" },
+      { "code": "KeyG", "char": "i", "charShift": "I", "finger": "left-index" },
+      { "code": "KeyH", "char": "d", "charShift": "D", "finger": "right-index" },
+      { "code": "KeyJ", "char": "h", "charShift": "H", "finger": "right-index" },
+      { "code": "KeyK", "char": "t", "charShift": "T", "finger": "right-middle" },
+      { "code": "KeyL", "char": "n", "charShift": "N", "finger": "right-ring" },
+      { "code": "Semicolon", "char": "s", "charShift": "S", "finger": "right-pinky" },
+      { "code": "Quote", "char": "-", "charShift": "_", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyZ", "char": ";", "charShift": ":", "finger": "left-pinky" },
+      { "code": "KeyX", "char": "q", "charShift": "Q", "finger": "left-ring" },
+      { "code": "KeyC", "char": "j", "charShift": "J", "finger": "left-middle" },
+      { "code": "KeyV", "char": "k", "charShift": "K", "finger": "left-index" },
+      { "code": "KeyB", "char": "x", "charShift": "X", "finger": "left-index" },
+      { "code": "KeyN", "char": "b", "charShift": "B", "finger": "right-index" },
+      { "code": "KeyM", "char": "m", "charShift": "M", "finger": "right-index" },
+      { "code": "Comma", "char": "w", "charShift": "W", "finger": "right-middle" },
+      { "code": "Period", "char": "v", "charShift": "V", "finger": "right-ring" },
+      { "code": "Slash", "char": "z", "charShift": "Z", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }
+    ]
+  ]
+}

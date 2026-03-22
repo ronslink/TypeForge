@@ -1,0 +1,66 @@
+{
+  "id": "hebrew",
+  "name": "Hebrew (עברית)",
+  "language": "he",
+  "script": "hebrew",
+  "rtl": true,
+  "rows": [
+    [
+      { "code": "Backquote", "char": ";", "charShift": "~" },
+      { "code": "Digit1", "char": "1", "charShift": "!" },
+      { "code": "Digit2", "char": "2", "charShift": "@" },
+      { "code": "Digit3", "char": "3", "charShift": "#" },
+      { "code": "Digit4", "char": "4", "charShift": "$" },
+      { "code": "Digit5", "char": "5", "charShift": "%" },
+      { "code": "Digit6", "char": "6", "charShift": "^" },
+      { "code": "Digit7", "char": "7", "charShift": "&" },
+      { "code": "Digit8", "char": "8", "charShift": "*" },
+      { "code": "Digit9", "char": "9", "charShift": ")" },
+      { "code": "Digit0", "char": "0", "charShift": "(" },
+      { "code": "Minus", "char": "-", "charShift": "_" },
+      { "code": "Equal", "char": "=", "charShift": "+" }
+    ],
+    [
+      { "code": "KeyQ", "char": "/", "charShift": "Q", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyW", "char": "'", "charShift": "W", "finger": "left-ring", "rtl": true },
+      { "code": "KeyE", "char": "ק", "charShift": "E", "finger": "left-middle", "rtl": true },
+      { "code": "KeyR", "char": "ר", "charShift": "R", "finger": "left-index", "rtl": true },
+      { "code": "KeyT", "char": "א", "charShift": "T", "finger": "left-index", "rtl": true },
+      { "code": "KeyY", "char": "ט", "charShift": "Y", "finger": "right-index", "rtl": true },
+      { "code": "KeyU", "char": "ו", "charShift": "U", "finger": "right-index", "rtl": true },
+      { "code": "KeyI", "char": "ן", "charShift": "I", "finger": "right-middle", "rtl": true },
+      { "code": "KeyO", "char": "ם", "charShift": "O", "finger": "right-ring", "rtl": true },
+      { "code": "KeyP", "char": "פ", "charShift": "P", "finger": "right-pinky", "rtl": true },
+      { "code": "BracketLeft", "char": "[", "charShift": "{", "finger": "right-pinky" },
+      { "code": "BracketRight", "char": "]", "charShift": "}", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyA", "char": "ש", "charShift": "A", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyS", "char": "ד", "charShift": "S", "finger": "left-ring", "rtl": true },
+      { "code": "KeyD", "char": "ג", "charShift": "D", "finger": "left-middle", "rtl": true },
+      { "code": "KeyF", "char": "כ", "charShift": "F", "finger": "left-index", "rtl": true },
+      { "code": "KeyG", "char": "ע", "charShift": "G", "finger": "left-index", "rtl": true },
+      { "code": "KeyH", "char": "י", "charShift": "H", "finger": "right-index", "rtl": true },
+      { "code": "KeyJ", "char": "ח", "charShift": "J", "finger": "right-index", "rtl": true },
+      { "code": "KeyK", "char": "ל", "charShift": "K", "finger": "right-middle", "rtl": true },
+      { "code": "KeyL", "char": "ך", "charShift": "L", "finger": "right-ring", "rtl": true },
+      { "code": "Semicolon", "char": "ף", "charShift": ":", "finger": "right-pinky", "rtl": true },
+      { "code": "Quote", "char": ",", "charShift": "\"", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyZ", "char": "ז", "charShift": "Z", "finger": "left-pinky", "rtl": true },
+      { "code": "KeyX", "char": "ס", "charShift": "X", "finger": "left-ring", "rtl": true },
+      { "code": "KeyC", "char": "ב", "charShift": "C", "finger": "left-middle", "rtl": true },
+      { "code": "KeyV", "char": "ה", "charShift": "V", "finger": "left-index", "rtl": true },
+      { "code": "KeyB", "char": "נ", "charShift": "B", "finger": "left-index", "rtl": true },
+      { "code": "KeyN", "char": "מ", "charShift": "N", "finger": "right-index", "rtl": true },
+      { "code": "KeyM", "char": "צ", "charShift": "M", "finger": "right-index", "rtl": true },
+      { "code": "Comma", "char": "ת", "charShift": "<", "finger": "right-middle", "rtl": true },
+      { "code": "Period", "char": "ץ", "charShift": ">", "finger": "right-ring", "rtl": true },
+      { "code": "Slash", "char": ".", "charShift": "?", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }
+    ]
+  ]
+}

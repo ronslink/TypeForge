@@ -1,0 +1,66 @@
+{
+  "id": "cyrillic-ru",
+  "name": "ЙЦУКЕН (Russian)",
+  "language": "ru",
+  "script": "cyrillic",
+  "rows": [
+    [
+      { "code": "Backquote", "char": "ё", "charShift": "Ё" },
+      { "code": "Digit1", "char": "1", "charShift": "!" },
+      { "code": "Digit2", "char": "2", "charShift": "\"" },
+      { "code": "Digit3", "char": "3", "charShift": "№" },
+      { "code": "Digit4", "char": "4", "charShift": ";" },
+      { "code": "Digit5", "char": "5", "charShift": "%" },
+      { "code": "Digit6", "char": "6", "charShift": ":" },
+      { "code": "Digit7", "char": "7", "charShift": "?" },
+      { "code": "Digit8", "char": "8", "charShift": "*" },
+      { "code": "Digit9", "char": "9", "charShift": "(" },
+      { "code": "Digit0", "char": "0", "charShift": ")" },
+      { "code": "Minus", "char": "-", "charShift": "_" },
+      { "code": "Equal", "char": "=", "charShift": "+" }
+    ],
+    [
+      { "code": "KeyQ", "char": "й", "charShift": "Й", "finger": "left-pinky" },
+      { "code": "KeyW", "char": "ц", "charShift": "Ц", "finger": "left-ring" },
+      { "code": "KeyE", "char": "у", "charShift": "У", "finger": "left-middle" },
+      { "code": "KeyR", "char": "к", "charShift": "К", "finger": "left-index" },
+      { "code": "KeyT", "char": "е", "charShift": "Е", "finger": "left-index" },
+      { "code": "KeyY", "char": "н", "charShift": "Н", "finger": "right-index" },
+      { "code": "KeyU", "char": "г", "charShift": "Г", "finger": "right-index" },
+      { "code": "KeyI", "char": "ш", "charShift": "Ш", "finger": "right-middle" },
+      { "code": "KeyO", "char": "щ", "charShift": "Щ", "finger": "right-ring" },
+      { "code": "KeyP", "char": "з", "charShift": "З", "finger": "right-pinky" },
+      { "code": "BracketLeft", "char": "х", "charShift": "Х", "finger": "right-pinky" },
+      { "code": "BracketRight", "char": "ъ", "charShift": "Ъ", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyA", "char": "ф", "charShift": "Ф", "finger": "left-pinky" },
+      { "code": "KeyS", "char": "ы", "charShift": "Ы", "finger": "left-ring" },
+      { "code": "KeyD", "char": "в", "charShift": "В", "finger": "left-middle" },
+      { "code": "KeyF", "char": "а", "charShift": "А", "finger": "left-index" },
+      { "code": "KeyG", "char": "п", "charShift": "П", "finger": "left-index" },
+      { "code": "KeyH", "char": "р", "charShift": "Р", "finger": "right-index" },
+      { "code": "KeyJ", "char": "о", "charShift": "О", "finger": "right-index" },
+      { "code": "KeyK", "char": "л", "charShift": "Л", "finger": "right-middle" },
+      { "code": "KeyL", "char": "д", "charShift": "Д", "finger": "right-ring" },
+      { "code": "Semicolon", "char": "ж", "charShift": "Ж", "finger": "right-pinky" },
+      { "code": "Quote", "char": "э", "charShift": "Э", "finger": "right-pinky" },
+      { "code": "Backslash", "char": "\\", "charShift": "/", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyZ", "char": "я", "charShift": "Я", "finger": "left-pinky" },
+      { "code": "KeyX", "char": "ч", "charShift": "Ч", "finger": "left-ring" },
+      { "code": "KeyC", "char": "с", "charShift": "С", "finger": "left-middle" },
+      { "code": "KeyV", "char": "м", "charShift": "М", "finger": "left-index" },
+      { "code": "KeyB", "char": "и", "charShift": "И", "finger": "left-index" },
+      { "code": "KeyN", "char": "т", "charShift": "Т", "finger": "right-index" },
+      { "code": "KeyM", "char": "ь", "charShift": "Ь", "finger": "right-index" },
+      { "code": "Comma", "char": "б", "charShift": "Б", "finger": "right-middle" },
+      { "code": "Period", "char": "ю", "charShift": "Ю", "finger": "right-ring" },
+      { "code": "Slash", "char": ".", "charShift": ",", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }
+    ]
+  ]
+}
