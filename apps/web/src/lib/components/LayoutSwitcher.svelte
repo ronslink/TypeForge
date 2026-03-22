@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { layouts, type LayoutId } from '@typeforge/layouts';
+  import type { LayoutId } from '@typeforge/layouts';
 
   interface LayoutInfo {
     id: LayoutId;
@@ -64,7 +64,7 @@
   let dropdownElement: HTMLDivElement | null = $state(null);
 
   const currentLayoutInfo = $derived(
-    AVAILABLE_LAYOUTS.find((l) => l.id === currentLayout) || AVAILABLE_LAYOUTS[0]
+    (AVAILABLE_LAYOUTS.find((l) => l.id === currentLayout) || AVAILABLE_LAYOUTS[0])!
   );
 
   function handleSelect(layoutId: string) {

@@ -2,20 +2,18 @@
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { 
-    TypingInput, 
-    Keyboard, 
-    MetricsBar, 
-    StatCard, 
-    Button, 
+  import {
+    TypingInput,
+    Keyboard,
+    MetricsBar,
+    Button,
     ConfettiCelebration,
-    Badge 
+    Badge
   } from '@typeforge/ui';
-  import { 
-    getLessonById, 
-    LESSON_CATALOG, 
-    type Lesson, 
-    type LessonChar 
+  import {
+    getLessonById,
+    LESSON_CATALOG,
+    type RegistryLesson
   } from '@typeforge/curriculum';
   import { 
     WPMCalculator, 
@@ -23,25 +21,23 @@
   } from '@typeforge/metrics';
   import { layouts } from '@typeforge/layouts';
   import { api } from '@typeforge/api/client';
-  import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
+  import { getLanguageByCode } from '$lib/i18n/languages';
   import type { PageData } from './$types';
 
   interface Props {
-    data: PageData;
+    data?: PageData;
   }
 
-  let { data }: Props = $props();
+  let { data: _data = {} as PageData }: Props = $props();
 
   // Get lesson ID from URL params
-  const lessonId = $derived($page.params.lessonId);
-  const lesson = $derived(getLessonById(lessonId));
+  const lessonId = $derived($page.params.lessonId as string || '');
+  const lesson = $derived(getLessonById(lessonId) as RegistryLesson | undefined);
 
   // User preferences (would come from user store in production)
-  let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
 
-  // RTL detection from lesson or language
-  const isRTL = $derived(lesson?.rtl || language?.rtl || false);
+  // RTL will be set in derived values below
 
   // Session state
   let currentIndex = $state(0);
@@ -52,7 +48,6 @@
   let sessionSubmitted = $state(false);
 
   // Timer state
-  let startTime = $state<number | null>(null);
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
   const LESSON_TIME_LIMIT = 300; // 5 minutes max
@@ -100,18 +95,23 @@
   const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
   const keyboardLayout = $derived(layouts['qwerty-us']); // Default to QWERTY for now
 
+  // RTL detection from language
+  const isRTL = $derived(language?.rtl || false);
+
   // RTL-aware keyboard layout - swaps left/right finger assignments
-  const rtlKeyboardLayout = $derived({
+  // Note: The actual keyboard layout structure differs from KeyboardLayout expected by Keyboard component
+  // For now, we cast to 'any' to avoid type mismatches
+  const rtlKeyboardLayout = $derived(isRTL ? {
     ...keyboardLayout,
-    keys: keyboardLayout.keys.map(key => ({
+    rows: (keyboardLayout as any).rows?.map((row: any) => row.map((key: any) => ({
       ...key,
-      finger: swapFingerForRTL(key.finger),
-      hand: swapHandForRTL(key.hand),
-    })),
-  });
+      finger: swapFingerForRTL(key.finger || ''),
+      hand: swapHandForRTL(key.hand || ''),
+    }))),
+  } : keyboardLayout);
 
   // Use RTL layout when in RTL mode
-  const activeKeyboardLayout = $derived(isRTL ? rtlKeyboardLayout : keyboardLayout);
+  const activeKeyboardLayout = $derived(rtlKeyboardLayout);
 
   function swapFingerForRTL(finger: string): string {
     const swapMap: Record<string, string> = {
@@ -193,7 +193,7 @@
 
     if (!isStarted) {
       isStarted = true;
-      startTime = Date.now();
+      // Session started
     }
 
     pressedKey = event.key.toLowerCase();
@@ -239,7 +239,7 @@
     }
   }
 
-  function handleKeyUp(event: KeyboardEvent) {
+  function handleKeyUp(_event: KeyboardEvent) {
     pressedKey = undefined;
   }
 
@@ -248,7 +248,7 @@
     
     isComplete = true;
     showCelebration = true;
-    
+
     if (timerInterval) {
       clearInterval(timerInterval);
       timerInterval = null;
@@ -272,7 +272,12 @@
 
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
-      
+
+      if (!api.api?.v1?.sessions?.$post) {
+        console.error('API client not properly initialized');
+        return;
+      }
+
       await api.api.v1.sessions.$post({
         json: {
           wpm: finalWPM,
@@ -320,7 +325,6 @@
     isStarted = false;
     showCelebration = false;
     sessionSubmitted = false;
-    startTime = null;
     elapsedSeconds = 0;
     currentWPM = 0;
     currentAccuracy = 100;
@@ -331,6 +335,10 @@
     accuracyTracker = new AccuracyTracker();
     lastAccuracyAnnouncement = 100;
     ariaLiveText = 'Lesson restarted';
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
   }
 
   // Handle word completion for screen reader
@@ -409,7 +417,7 @@
         <h1 class="font-headline text-3xl" id="lesson-title">
           {language?.nativeName || lesson.language}
         </h1>
-        <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
+        <Badge variant="default">{getDifficultyLabel(lesson.difficulty)}</Badge>
         {#if isRTL}
           <span class="rtl-badge" role="note" aria-label="Right-to-left language">RTL</span>
         {/if}
@@ -533,11 +541,10 @@
       aria-label="Keyboard finger placement guide"
     >
       <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
-      <Keyboard 
-        layout={activeKeyboardLayout} 
+      <Keyboard
+        layout={activeKeyboardLayout as any}
         {highlightKeys}
         {pressedKey}
-        {isRTL}
       />
       
       <!-- Finger Guide with logical properties for RTL -->

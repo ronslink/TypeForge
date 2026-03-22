@@ -1,19 +1,18 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { LessonCard, Button, Badge } from '@typeforge/ui';
-  import { LESSON_CATALOG, getLessonById, type Lesson } from '@typeforge/curriculum';
-  import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
+  import { LESSON_CATALOG, type RegistryLesson } from '@typeforge/curriculum';
+  import { getLanguageByCode, type Language } from '$lib/i18n/languages';
   import type { PageData } from './$types';
 
   interface Props {
-    data: PageData;
+    data?: PageData;
   }
 
-  let { data }: Props = $props();
+  let { data: _data = {} as PageData }: Props = $props();
 
   // User preferences from onboarding (would come from data/user store in production)
   let userLanguage = $state('en');
-  let userLayout = $state('qwerty-us');
 
   // Filter states
   let selectedLanguage = $state('all');
@@ -91,7 +90,7 @@
   );
 
   // Get display tags for a lesson
-  function getLessonTags(lesson: Lesson): string[] {
+  function getLessonTags(lesson: RegistryLesson): string[] {
     const tags: string[] = [];
     if (lesson.tags.key_bigram.includes('home-row') || lesson.id.includes('home-row')) {
       tags.push('home row');
@@ -111,7 +110,7 @@
   }
 
   // Convert curriculum lesson to LessonCard format
-  function toLessonCardProps(lesson: Lesson) {
+  function toLessonCardProps(lesson: RegistryLesson) {
     const language = getLanguageByCode(lesson.language);
     const difficultyMap: Record<number, 'beginner' | 'intermediate' | 'advanced'> = {
       1: 'beginner',
@@ -167,7 +166,7 @@
     <section class="mb-12">
       <div class="flex items-center gap-3 mb-6">
         <h2 class="font-headline text-2xl">Recommended for You</h2>
-        <Badge variant="solid" size="sm">{getLanguageByCode(userLanguage)?.nativeName}</Badge>
+        <Badge variant="default">{getLanguageByCode(userLanguage)?.nativeName}</Badge>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each recommendedLessons as lesson}

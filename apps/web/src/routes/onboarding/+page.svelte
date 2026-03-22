@@ -167,12 +167,14 @@
     currentAccuracy = Math.round(accuracyCalculator.getAccuracy());
   }
 
-  function handleKeydown(event: KeyboardEvent) {
+  function handleKeydown(_event: KeyboardEvent) {
     if (!testStarted && !testEnded) {
       startTest();
     }
 
     if (testEnded) return;
+
+    const event = _event;
 
     // Prevent default for printable characters
     if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
@@ -206,7 +208,7 @@
     pressedKey = event.key.toLowerCase();
   }
 
-  function handleKeyup(event: KeyboardEvent) {
+  function handleKeyup(_event: KeyboardEvent) {
     pressedKey = undefined;
   }
 
@@ -243,13 +245,21 @@
   
   async function savePreferences() {
     const state = $onboardingStore;
-    
+
     // Check if user is logged in (Clerk)
-    const isLoggedIn = typeof window !== 'undefined' && 
+    const isLoggedIn = typeof window !== 'undefined' &&
       (window as any).Clerk?.user?.id;
-    
+
     if (isLoggedIn && state.selectedLanguage && state.selectedLayout) {
       try {
+        // Validate API client is available
+        if (!api.api?.v1?.sessions?.$post) {
+          console.error('API client not properly initialized');
+          // Still navigate to learn page even if API save fails
+          goto('/learn');
+          return;
+        }
+
         // Save preferences to API
         await api.api.v1.sessions.$post({
           json: {
@@ -497,8 +507,8 @@
             <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 text-center">
               Keyboard Layout
             </p>
-            <Keyboard 
-              layout={currentLayout} 
+            <Keyboard
+              layout={currentLayout as any}
               {highlightKeys}
               {pressedKey}
             />

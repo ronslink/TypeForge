@@ -1,22 +1,19 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { clerk } from 'clerk-sveltekit/client';
   import { ProgressRing, StatCard } from '@typeforge/ui';
   import { api } from '@typeforge/api/client';
-  import type { ProgressResponse, ProgressStatsResponse, Session } from '@typeforge/api/client';
+  import type { ProgressResponse, Session } from '@typeforge/api/client';
 
-  // Auth state
-  let auth = $derived($clerk);
-  let isSignedIn = $derived(!!auth?.user);
+  // Auth state - check if user is authenticated
+  let isSignedIn = $state(typeof window !== 'undefined' && !!(window as any).Clerk?.user);
 
   // Data states
   let progress: ProgressResponse | null = $state(null);
-  let stats: ProgressStatsResponse | null = $state(null);
   let loading = $state(true);
   let error: string | null = $state(null);
 
   // Canvas reference for WPM chart
-  let chartCanvas: HTMLCanvasElement;
+  let chartCanvas: HTMLCanvasElement | undefined = $state();
 
   // Level calculation: every 1000 XP = 1 level
   function calculateLevel(xp: number): number {
@@ -196,6 +193,11 @@
     }
 
     try {
+      if (!api.api?.v1?.progress?.$get) {
+        error = 'API client not properly initialized';
+        return;
+      }
+
       const [progressRes, statsRes] = await Promise.all([
         api.api.v1.progress.$get(),
         api.api.v1.progress.stats.$get()
@@ -206,7 +208,8 @@
       }
 
       if (statsRes.ok) {
-        stats = await statsRes.json();
+        // Stats loaded but not used in current implementation
+        await statsRes.json();
       }
     } catch (e) {
       error = 'Failed to load progress data';
@@ -247,7 +250,12 @@
         Track your typing speed, accuracy, and streak. Your progress is saved when you sign in.
       </p>
       <button
-        onclick={() => clerk.openSignIn({ redirectUrl: '/progress' })}
+        onclick={() => {
+          const clerkUI = (window as any).Clerk;
+          if (clerkUI?.openSignIn) {
+            clerkUI.openSignIn({ redirectUrl: '/progress' });
+          }
+        }}
         class="notched-button bg-primary text-on-primary px-6 py-3 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors"
       >
         Sign In

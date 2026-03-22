@@ -1,21 +1,19 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { LayoutData } from './$types';
-  import { clerk } from 'clerk-sveltekit/client';
   import { page } from '$app/stores';
   import { afterNavigate } from '$app/navigation';
 
   interface Props {
     children: Snippet;
-    data: LayoutData;
+    data?: LayoutData;
   }
 
-  let { children, data }: Props = $props();
+  let { children, data: _data }: Props = $props();
 
   // Auth state from Clerk
-  let auth = $derived($clerk);
-  let isSignedIn = $derived(!!auth?.user);
-  let user = $derived(auth?.user);
+  let isSignedIn = $state(typeof window !== 'undefined' && !!(window as any).Clerk?.user);
+  let _user = $derived((window as any).Clerk?.user);
 
   // Current page path for active nav highlighting
   let currentPath = $derived($page.url.pathname);
@@ -42,20 +40,26 @@
   });
 
   function handleSignIn() {
-    clerk.openSignIn({
-      redirectUrl: currentPath,
-    });
+    const clerkUI = (window as any).Clerk;
+    if (clerkUI?.openSignIn) {
+      clerkUI.openSignIn({
+        redirectUrl: currentPath,
+      });
+    }
   }
 
   function handleSignOut() {
-    clerk.signOut({
-      redirectUrl: '/',
-    });
+    const clerkUI = (window as any).Clerk;
+    if (clerkUI?.signOut) {
+      clerkUI.signOut({
+        redirectUrl: '/',
+      });
+    }
   }
 
   // Handle skip to content link
-  function handleSkipToContent(event: Event) {
-    event.preventDefault();
+  function handleSkipToContent(_event: Event) {
+    _event.preventDefault();
     if (mainContentRef) {
       mainContentRef.focus();
       mainContentRef.scrollIntoView({ behavior: 'smooth' });
@@ -145,21 +149,21 @@
         </a>
         
         <!-- User menu -->
-        {#if isSignedIn && user}
+        {#if isSignedIn && _user}
           <div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
-            {#if user.imageUrl}
+            {#if _user.imageUrl}
               <img
-                src={user.imageUrl}
+                src={_user.imageUrl}
                 alt=""
                 class="w-8 h-8 rounded-none object-cover border border-outline-variant"
                 role="presentation"
               />
             {:else}
-              <div 
+              <div
                 class="w-8 h-8 bg-primary-container flex items-center justify-center text-on-primary-container font-label text-sm font-bold"
                 aria-hidden="true"
               >
-                {(user.firstName?.[0] || user.emailAddresses?.[0]?.emailAddress?.[0] || 'U').toUpperCase()}
+                {(_user.firstName?.[0] || _user.emailAddresses?.[0]?.emailAddress?.[0] || 'U').toUpperCase()}
               </div>
             {/if}
             <button

@@ -20,38 +20,6 @@
   let currentAccuracy = 98.2;
   let streak = 412;
 
-  // Features data
-  const features = [
-    {
-      icon: 'psychology',
-      title: 'AI Weakness Detection',
-      description: 'Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.',
-      span: 'large',
-      hasChart: true
-    },
-    {
-      icon: 'bolt',
-      title: 'Zero Latency',
-      description: 'Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.',
-      span: 'small'
-    },
-    {
-      icon: 'translate',
-      title: 'Global Foundry',
-      description: 'Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.',
-      span: 'small'
-    },
-    {
-      icon: 'school',
-      title: 'School Grade Rigor',
-      description: 'COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.',
-      span: 'large-institution',
-      stats: [
-        { value: '100%', label: 'Compliance' },
-        { value: '500+', label: 'Schools' }
-      ]
-    }
-  ];
 
   // Progression steps
   const steps = [
@@ -121,9 +89,8 @@
     legal: ['Privacy Policy', 'Legal', 'Compliance']
   };
 
-  let mounted = false;
   onMount(() => {
-    mounted = true;
+    // Component mounted
   });
 </script>
 
