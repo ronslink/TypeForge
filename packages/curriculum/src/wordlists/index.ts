@@ -22,6 +22,7 @@ import { norwegianWordlist } from './no.js';
 import { swedishWordlist } from './sv.js';
 import { tagalogWordlist } from './tl.js';
 import { swahiliWordlist } from './sw.js';
+import { italianWordlist } from './it.js';
 
 // Re-export types
 export type { WordlistEntry };
@@ -47,6 +48,7 @@ export {
   swedishWordlist,
   tagalogWordlist,
   swahiliWordlist,
+  italianWordlist,
 };
 
 // Language code mapping
@@ -89,6 +91,8 @@ const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
   tagalog: tagalogWordlist,
   sw: swahiliWordlist,
   swahili: swahiliWordlist,
+  it: italianWordlist,
+  italian: italianWordlist,
 };
 
 /**
