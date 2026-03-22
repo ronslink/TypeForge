@@ -9,7 +9,7 @@ export class LayoutRegistry {
   private layouts: Map<string, KeyboardLayout> = new Map();
 
   constructor(initialLayouts: Record<string, KeyboardLayout> = {}) {
-    for (const [id, layout] of Object.entries(initialLayouts)) {
+    for (const [_id, layout] of Object.entries(initialLayouts)) {
       this.register(layout);
     }
   }

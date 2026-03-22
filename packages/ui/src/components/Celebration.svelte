@@ -50,7 +50,7 @@
       y: centerY,
       vx: Math.cos(angle) * velocity,
       vy: Math.sin(angle) * velocity - Math.random() * 5,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      color: COLORS[Math.floor(Math.random() * COLORS.length)] || COLORS[0],
       size: Math.random() * 6 + 3,
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.2,
@@ -196,7 +196,7 @@
     bind:this={canvas}
     class="celebration-canvas"
     aria-hidden="true"
-  />
+  ></canvas>
 {/if}
 
 <style>

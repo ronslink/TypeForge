@@ -3,7 +3,7 @@
  * Session tracking, keystroke data, and performance metrics
  */
 
-import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, smallint, jsonb, real } from 'drizzle-orm/pg-core';
+import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, smallint, real } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, lessons, exercises } from './index.js';
 

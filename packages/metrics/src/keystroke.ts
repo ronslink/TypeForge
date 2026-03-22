@@ -4,6 +4,7 @@
  */
 
 import type { KeystrokeEvent, KeystrokeStats } from './types.js';
+export type { KeystrokeStats } from './types.js';
 
 export class KeystrokeAnalyzer {
   /**
@@ -62,10 +63,12 @@ export class KeystrokeAnalyzer {
     const stutters: Array<{ index: number; duration: number }> = [];
 
     for (let i = 0; i < events.length; i++) {
-      if (events[i].flightTime && events[i].flightTime! > thresholdMs) {
+      const event = events[i];
+      const flightTime = event?.flightTime;
+      if (flightTime !== undefined && flightTime > thresholdMs) {
         stutters.push({
           index: i,
-          duration: events[i].flightTime!,
+          duration: flightTime,
         });
       }
     }

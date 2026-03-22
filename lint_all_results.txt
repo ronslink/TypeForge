@@ -1,0 +1,218 @@
+ΓÇó turbo 2.8.20
+
+   ΓÇó Packages in scope: @typeforge/api, @typeforge/assets, @typeforge/auth, @typeforge/curriculum, @typeforge/db, @typeforge/layouts, @typeforge/metrics, @typeforge/ui, @typeforge/web
+   ΓÇó Running lint in 9 packages
+   ΓÇó Remote caching disabled
+
+@typeforge/layouts:lint: cache miss, executing 86640e3448a7a443
+@typeforge/auth:lint: cache miss, executing b4c2b303805361f6
+@typeforge/metrics:lint: cache miss, executing c606c249afb676ef
+@typeforge/ui:lint: cache miss, executing 8194cf84cf323ae9
+@typeforge/api:lint: cache miss, executing 06236adf92444b08
+@typeforge/db:lint: cache miss, executing e56d84e1a50cecf1
+@typeforge/curriculum:lint: cache miss, executing 8dc04d6ec07b61e2
+@typeforge/assets:lint: cache miss, executing 3791735a0dead7d3
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: > @typeforge/layouts@0.0.1 lint D:\TypeForge\packages\layouts
+@typeforge/layouts:lint: > eslint .
+@typeforge/layouts:lint: 
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: > @typeforge/metrics@0.0.1 lint D:\TypeForge\packages\metrics
+@typeforge/metrics:lint: > eslint .
+@typeforge/metrics:lint: 
+@typeforge/ui:lint: 
+@typeforge/ui:lint: > @typeforge/ui@0.0.1 lint D:\TypeForge\packages\ui
+@typeforge/ui:lint: > eslint .
+@typeforge/ui:lint: 
+@typeforge/auth:lint: 
+@typeforge/api:lint: 
+@typeforge/db:lint: 
+@typeforge/api:lint: > @typeforge/api@0.0.1 lint D:\TypeForge\apps\api
+@typeforge/db:lint: > @typeforge/db@0.0.1 lint D:\TypeForge\packages\db
+@typeforge/api:lint: > eslint .
+@typeforge/api:lint: 
+@typeforge/auth:lint: > @typeforge/auth@0.0.1 lint D:\TypeForge\packages\auth
+@typeforge/auth:lint: > eslint .
+@typeforge/db:lint: > eslint .
+@typeforge/db:lint: 
+@typeforge/auth:lint: 
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: > @typeforge/curriculum@0.0.1 lint D:\TypeForge\packages\curriculum
+@typeforge/curriculum:lint: > eslint . --max-warnings=0
+@typeforge/curriculum:lint: 
+@typeforge/assets:lint: 
+@typeforge/assets:lint: > @typeforge/assets@0.0.1 lint D:\TypeForge\packages\assets
+@typeforge/assets:lint: > eslint .
+@typeforge/assets:lint: 
+@typeforge/db:lint: 
+@typeforge/db:lint: D:\TypeForge\packages\db\src\helpers\sessions.ts
+@typeforge/db:lint:   1:10  error  'eq' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+@typeforge/db:lint:   1:14  error  'desc' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/db:lint: 
+@typeforge/db:lint: D:\TypeForge\packages\db\src\schema\billing.ts
+@typeforge/db:lint:   8:17  error  'organisations' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/db:lint: 
+@typeforge/db:lint: D:\TypeForge\packages\db\src\schema\curriculum.ts
+@typeforge/db:lint:   6:39  error  'integer' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/db:lint: 
+@typeforge/db:lint: D:\TypeForge\packages\db\src\schema\identity.ts
+@typeforge/db:lint:   6:81  error  'jsonb' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/db:lint: 
+@typeforge/db:lint: D:\TypeForge\packages\db\src\schema\notifications.ts
+@typeforge/db:lint:   6:39  error  'integer' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/db:lint: 
+@typeforge/db:lint: Γ£û 6 problems (6 errors, 0 warnings)
+@typeforge/db:lint: 
+@typeforge/db:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\client.ts
+@typeforge/api:lint:   1095:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint:   1095:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint:   1096:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint:   1104:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint:   1104:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint:   1105:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\index.ts
+@typeforge/api:lint:   13:26  error  'requireAuth' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\middleware\regional-routing.ts
+@typeforge/api:lint:   10:10  error  'extractRegionFromClaims' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\routes\billing.ts
+@typeforge/api:lint:    8:42  error  'subscriptionSeats' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:    9:14  error  'and' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   89:8   error  'userRecord' is never reassigned. Use 'const' instead                                prefer-const
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\routes\lessons.ts
+@typeforge/api:lint:   10:19  error  'inArray' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   13:25  error  'CurriculumLesson' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\routes\organisations.ts
+@typeforge/api:lint:     8:49  error  'classMembers' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   158:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   174:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   239:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   331:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   400:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   635:9   error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\routes\progress.ts
+@typeforge/api:lint:    9:43  error  'users' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint:   10:35  error  'sql' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: D:\TypeForge\apps\api\src\routes\sessions.ts
+@typeforge/api:lint:   419:9  error  'auth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/api:lint: 
+@typeforge/api:lint: Γ£û 23 problems (23 errors, 0 warnings)
+@typeforge/api:lint:   1 error and 0 warnings potentially fixable with the `--fix` option.
+@typeforge/api:lint: 
+@typeforge/db#lint:  WARNING  command finished with error, but continuing...
+@typeforge/api:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
+@typeforge/api#lint:  WARNING  command finished with error, but continuing...
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: D:\TypeForge\packages\curriculum\src\lesson-registry.ts
+@typeforge/curriculum:lint:   60:12  error  'LESSON_CATALOG' is never reassigned. Use 'const' instead  prefer-const
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: D:\TypeForge\packages\curriculum\src\lesson-selector.ts
+@typeforge/curriculum:lint:   10:44  error  'Finger' is defined but never used. Allowed unused vars must match /^_/u                     @typescript-eslint/no-unused-vars
+@typeforge/curriculum:lint:   11:55  error  'SM2Result' is defined but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+@typeforge/curriculum:lint:   17:7   error  'DEFAULT_ACCURACY' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: D:\TypeForge\packages\curriculum\src\rtl-lessons.ts
+@typeforge/curriculum:lint:   36:7  error  'HARAKAT_MAP' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: Γ£û 5 problems (5 errors, 0 warnings)
+@typeforge/curriculum:lint:   1 error and 0 warnings potentially fixable with the `--fix` option.
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
+@typeforge/curriculum#lint:  WARNING  command finished with error, but continuing...
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\AchievementBadge.svelte
+@typeforge/ui:lint:   12:5  error  'id' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint:   42:9  error  `{@html}` can lead to XSS attack                                               svelte/no-at-html-tags
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\Button.svelte
+@typeforge/ui:lint:   19:5  error  Using a rest element or a non-destructured declaration with `$props()` means that Svelte can't infer what properties to expose when creating a custom element. Consider destructuring all the props or explicitly specifying the `customElement.props` option.
+@typeforge/ui:lint: https://svelte.dev/e/custom_element_props_identifier(custom_element_props_identifier)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\Celebration.svelte
+@typeforge/ui:lint:    14:7  error  `canvas` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+@typeforge/ui:lint: https://svelte.dev/e/non_reactive_update(non_reactive_update)                               svelte/valid-compile
+@typeforge/ui:lint:   195:3  error  Self-closing HTML tags for non-void elements are ambiguous ΓÇö use `<canvas ...></canvas>` rather than `<canvas ... />`
+@typeforge/ui:lint: https://svelte.dev/e/element_invalid_self_closing_tag(element_invalid_self_closing_tag)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\ClassRoster.svelte
+@typeforge/ui:lint:    41:36  error  This reference only captures the initial value of `sortBy`. Did you mean to reference it inside a closure instead?
+@typeforge/ui:lint: https://svelte.dev/e/state_referenced_locally(state_referenced_locally)    svelte/valid-compile
+@typeforge/ui:lint:    42:40  error  This reference only captures the initial value of `filter`. Did you mean to reference it inside a closure instead?
+@typeforge/ui:lint: https://svelte.dev/e/state_referenced_locally(state_referenced_locally)    svelte/valid-compile
+@typeforge/ui:lint:   237:7   error  Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+@typeforge/ui:lint: https://svelte.dev/e/a11y_consider_explicit_label(a11y_consider_explicit_label)  svelte/valid-compile
+@typeforge/ui:lint:   262:7   error  Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+@typeforge/ui:lint: https://svelte.dev/e/a11y_consider_explicit_label(a11y_consider_explicit_label)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\ConfettiCelebration.svelte
+@typeforge/ui:lint:   104:9  error  Self-closing HTML tags for non-void elements are ambiguous ΓÇö use `<div ...></div>` rather than `<div ... />`
+@typeforge/ui:lint: https://svelte.dev/e/element_invalid_self_closing_tag(element_invalid_self_closing_tag)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\InviteStudentModal.svelte
+@typeforge/ui:lint:   72:14  error  'error' is defined but never used                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+@typeforge/ui:lint:   83:12  error  'formatDate' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+@typeforge/ui:lint:   96:1   error  Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+@typeforge/ui:lint: https://svelte.dev/e/a11y_click_events_have_key_events(a11y_click_events_have_key_events)  svelte/valid-compile
+@typeforge/ui:lint:   96:1   error  `<div>` with a click handler must have an ARIA role
+@typeforge/ui:lint: https://svelte.dev/e/a11y_no_static_element_interactions(a11y_no_static_element_interactions)                                                                                                                                                            svelte/valid-compile
+@typeforge/ui:lint:   97:3   error  Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+@typeforge/ui:lint: https://svelte.dev/e/a11y_click_events_have_key_events(a11y_click_events_have_key_events)  svelte/valid-compile
+@typeforge/ui:lint:   97:3   error  `<div>` with a click handler must have an ARIA role
+@typeforge/ui:lint: https://svelte.dev/e/a11y_no_static_element_interactions(a11y_no_static_element_interactions)                                                                                                                                                            svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\Keyboard.svelte
+@typeforge/ui:lint:   11:56  error  'isRTL' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\LevelUp.svelte
+@typeforge/ui:lint:   21:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@typeforge/ui:lint:   50:14  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\MetricsBar.svelte
+@typeforge/ui:lint:   45:9  error  'streakMetric' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\MilestoneToast.svelte
+@typeforge/ui:lint:   92:5  error  `{@html}` can lead to XSS attack  svelte/no-at-html-tags
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\OrgStatsPanel.svelte
+@typeforge/ui:lint:   35:9  error  'seatUsagePercent' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\ProgressRing.svelte
+@typeforge/ui:lint:   22:19  error  This reference only captures the initial value of `size`. Did you mean to reference it inside a closure instead?
+@typeforge/ui:lint: https://svelte.dev/e/state_referenced_locally(state_referenced_locally)                svelte/valid-compile
+@typeforge/ui:lint:   22:26  error  This reference only captures the initial value of `strokeWidth`. Did you mean to reference it inside a closure instead?
+@typeforge/ui:lint: https://svelte.dev/e/state_referenced_locally(state_referenced_locally)         svelte/valid-compile
+@typeforge/ui:lint:   24:35  error  This reference only captures the initial value of `normalizedProgress`. Did you mean to reference it inside a closure instead?
+@typeforge/ui:lint: https://svelte.dev/e/state_referenced_locally(state_referenced_locally)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\StudentProgressReport.svelte
+@typeforge/ui:lint:   116:11  error  'remaining' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\StudentRow.svelte
+@typeforge/ui:lint:   65:1  error  Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+@typeforge/ui:lint: https://svelte.dev/e/a11y_click_events_have_key_events(a11y_click_events_have_key_events)  svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\ThemeProvider.svelte
+@typeforge/ui:lint:   5:7  error  'visible' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\TypingInput.svelte
+@typeforge/ui:lint:    27:5  error  Using a rest element or a non-destructured declaration with `$props()` means that Svelte can't infer what properties to expose when creating a custom element. Consider destructuring all the props or explicitly specifying the `customElement.props` option.
+@typeforge/ui:lint: https://svelte.dev/e/custom_element_props_identifier(custom_element_props_identifier)  svelte/valid-compile
+@typeforge/ui:lint:   135:1  error  noninteractive element cannot have nonnegative tabIndex value
+@typeforge/ui:lint: https://svelte.dev/e/a11y_no_noninteractive_tabindex(a11y_no_noninteractive_tabindex)                                                                                                                                                                                                   svelte/valid-compile
+@typeforge/ui:lint: 
+@typeforge/ui:lint: D:\TypeForge\packages\ui\src\components\WeaknessHeatmap.svelte
+@typeforge/ui:lint:   0:0  error  Parsing error: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
+@typeforge/ui:lint: https://svelte.dev/e/tag_invalid_name
+@typeforge/ui:lint: 
+@typeforge/ui:lint: Γ£û 31 problems (31 errors, 0 warnings)
+@typeforge/ui:lint: 
+@typeforge/ui:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
+@typeforge/ui#lint:  WARNING  command finished with error, but continuing...

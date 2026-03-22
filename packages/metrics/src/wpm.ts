@@ -3,7 +3,8 @@
  * Real-time per-keystroke WPM calculation
  */
 
-import type { MetricsConfig, WPMResult, KeystrokeEvent } from './types.js';
+import type { MetricsConfig, KeystrokeEvent, WPMResult } from './types.js';
+export type { WPMResult } from './types.js';
 
 export class WPMCalculator {
   private config: MetricsConfig;
@@ -27,7 +28,7 @@ export class WPMCalculator {
    * @param correct - Whether the keystroke was correct
    * @param timestamp - Unix timestamp in milliseconds
    */
-  onKeystroke(key: string, correct: boolean, timestamp: number): void {
+  onKeystroke(_key: string, correct: boolean, timestamp: number): void {
     if (this.startTime === null) {
       this.startTime = timestamp;
     }
@@ -86,10 +87,10 @@ export class WPMCalculator {
 
     // Standard WPM (correct characters only)
     const correctChars = events.filter((e) => e.correct).length;
-    const wpm = (correctChars / this.config.wordLength) / durationMinutes;
+    const wpm = correctChars / this.config.wordLength / durationMinutes;
 
     // Raw WPM (all characters including errors)
-    const rawWpm = (totalChars / this.config.wordLength) / durationMinutes;
+    const rawWpm = totalChars / this.config.wordLength / durationMinutes;
 
     // Burst WPM (best sustained speed in window)
     const burstWpm = this.calculateBurstWpm(events);
@@ -112,18 +113,21 @@ export class WPMCalculator {
 
     // Sliding window approach
     for (let i = 0; i < events.length; i++) {
-      const windowStart = events[i].timestamp;
+      const event = events[i];
+      if (!event) continue;
+      const windowStart = event.timestamp;
       const windowEnd = windowStart + windowMs;
 
       // Count correct characters in window
       let correctInWindow = 0;
-      for (let j = i; j < events.length && events[j].timestamp <= windowEnd; j++) {
-        if (events[j].correct) {
+      for (let j = i; j < events.length; j++) {
+        const windowEvent = events[j];
+        if (windowEvent && windowEvent.timestamp <= windowEnd && windowEvent.correct) {
           correctInWindow++;
         }
       }
 
-      const wpm = (correctInWindow / this.config.wordLength) / (this.config.burstWindowSeconds / 60);
+      const wpm = correctInWindow / this.config.wordLength / (this.config.burstWindowSeconds / 60);
       maxWpm = Math.max(maxWpm, wpm);
     }
 

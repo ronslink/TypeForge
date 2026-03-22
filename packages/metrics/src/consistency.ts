@@ -3,7 +3,8 @@
  * Measures typing rhythm and consistency
  */
 
-import type { ConsistencyResult, KeystrokeEvent, MetricsConfig } from './types.js';
+import type { KeystrokeEvent, MetricsConfig, ConsistencyResult } from './types.js';
+export type { ConsistencyResult } from './types.js';
 
 export class ConsistencyAnalyzer {
   private config: MetricsConfig;

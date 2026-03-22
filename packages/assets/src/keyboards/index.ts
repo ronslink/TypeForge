@@ -3,7 +3,7 @@
  * Dynamic keyboard visualizations for different layouts
  */
 
-import type { KeyboardLayout } from '@typeforge/layouts';
+import type { KeyboardLayout, KeyDefinition } from '@typeforge/layouts';
 
 export type KeyboardView = 'full' | 'hands' | 'fingers' | 'heatmap';
 export type KeyboardTheme = 'dark' | 'light' | 'high-contrast';
@@ -23,7 +23,7 @@ export const keyboardSVGs: Record<string, string> = {
   'azerty-fr': '/assets/keyboards/svg/azerty-fr.svg',
   'qwertz-de': '/assets/keyboards/svg/qwertz-de.svg',
   'dvorak-us': '/assets/keyboards/svg/dvorak-us.svg',
-  'colemak': '/assets/keyboards/svg/colemak.svg',
+  colemak: '/assets/keyboards/svg/colemak.svg',
 };
 
 // Hand position images
@@ -43,17 +43,14 @@ export const fingerColors: Record<string, { normal: string; highlight: string }>
   'right-middle': { normal: '#748ffc', highlight: '#91a7ff' },
   'right-ring': { normal: '#da77f2', highlight: '#e599f7' },
   'right-pinky': { normal: '#f783ac', highlight: '#faa2c1' },
-  'thumb': { normal: '#868e96', highlight: '#adb5bd' },
+  thumb: { normal: '#868e96', highlight: '#adb5bd' },
 };
 
 /**
  * Generate SVG for a keyboard layout
  */
-export function generateKeyboardSVG(
-  layout: KeyboardLayout,
-  config: KeyboardSVGConfig
-): string {
-  const { view, theme, highlightKeys = new Set(), pressedKey, showFingers = true } = config;
+export function generateKeyboardSVG(layout: KeyboardLayout, config: KeyboardSVGConfig): string {
+  const { view: _view, theme, highlightKeys = new Set(), pressedKey, showFingers = true } = config;
 
   const themeColors = getThemeColors(theme);
   const keyWidth = 50;
@@ -69,9 +66,10 @@ export function generateKeyboardSVG(
 
   rows.forEach((rowKeys, rowIndex) => {
     const yOffset = rowIndex * (keyHeight + keySpacing) + 20;
-    let xOffset = rowOffsets[rowIndex] + 20;
+    const rowOffset = rowOffsets[rowIndex];
+    let xOffset = (rowOffset ?? 0) + 20;
 
-    rowKeys.forEach((key) => {
+    rowKeys.forEach((key: (typeof layout.keys)[number]) => {
       const isHighlighted = highlightKeys.has(key.char);
       const isPressed = pressedKey === key.char;
       const keyClass = getKeyClasses(key, isHighlighted, isPressed, showFingers);
@@ -200,7 +198,7 @@ function groupKeysByRow(keys: KeyboardLayout['keys']): Map<number, typeof keys> 
 
   // Sort each row by column
   for (const [_, rowKeys] of rows) {
-    rowKeys.sort((a, b) => a.column - b.column);
+    rowKeys.sort((a: KeyDefinition, b: KeyDefinition) => a.column - b.column);
   }
 
   return rows;
@@ -237,6 +235,6 @@ export function generateHeatmapOverlay(
 function getHeatmapColor(accuracy: number): string {
   if (accuracy >= 0.95) return '#41e4c0'; // Teal - excellent
   if (accuracy >= 0.85) return '#ffc56c'; // Amber - good
-  if (accuracy >= 0.70) return '#ffa94d'; // Orange - needs work
+  if (accuracy >= 0.7) return '#ffa94d'; // Orange - needs work
   return '#ff6b6b'; // Red - needs attention
 }

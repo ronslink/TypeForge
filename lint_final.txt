@@ -1,0 +1,170 @@
+ΓÇó turbo 2.8.20
+
+   ΓÇó Packages in scope: @typeforge/api, @typeforge/assets, @typeforge/auth, @typeforge/curriculum, @typeforge/db, @typeforge/layouts, @typeforge/metrics, @typeforge/ui, @typeforge/web
+   ΓÇó Running lint in 9 packages
+   ΓÇó Remote caching disabled
+
+@typeforge/ui:lint: cache bypass, force executing 854ed86e4997a4e6
+@typeforge/metrics:lint: cache bypass, force executing c606c249afb676ef
+@typeforge/db:lint: cache bypass, force executing e56d84e1a50cecf1
+@typeforge/layouts:lint: cache bypass, force executing 86640e3448a7a443
+@typeforge/curriculum:lint: cache bypass, force executing 8dc04d6ec07b61e2
+@typeforge/auth:lint: cache bypass, force executing b4c2b303805361f6
+@typeforge/api:lint: cache bypass, force executing 06236adf92444b08
+@typeforge/assets:lint: cache bypass, force executing 3791735a0dead7d3
+@typeforge/db:lint: 
+@typeforge/db:lint: > @typeforge/db@0.0.1 lint D:\TypeForge\packages\db
+@typeforge/db:lint: > eslint .
+@typeforge/db:lint: 
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: > @typeforge/metrics@0.0.1 lint D:\TypeForge\packages\metrics
+@typeforge/metrics:lint: > eslint .
+@typeforge/metrics:lint: 
+@typeforge/ui:lint: 
+@typeforge/ui:lint: > @typeforge/ui@0.0.1 lint D:\TypeForge\packages\ui
+@typeforge/ui:lint: > eslint .
+@typeforge/ui:lint: 
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: > @typeforge/curriculum@0.0.1 lint D:\TypeForge\packages\curriculum
+@typeforge/curriculum:lint: > eslint . --max-warnings=0
+@typeforge/curriculum:lint: 
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: > @typeforge/layouts@0.0.1 lint D:\TypeForge\packages\layouts
+@typeforge/layouts:lint: > eslint .
+@typeforge/layouts:lint: 
+@typeforge/assets:lint: 
+@typeforge/assets:lint: > @typeforge/assets@0.0.1 lint D:\TypeForge\packages\assets
+@typeforge/assets:lint: > eslint .
+@typeforge/assets:lint: 
+@typeforge/api:lint: 
+@typeforge/api:lint: > @typeforge/api@0.0.1 lint D:\TypeForge\apps\api
+@typeforge/api:lint: > eslint .
+@typeforge/api:lint: 
+@typeforge/auth:lint: 
+@typeforge/auth:lint: > @typeforge/auth@0.0.1 lint D:\TypeForge\packages\auth
+@typeforge/auth:lint: > eslint .
+@typeforge/auth:lint: 
+@typeforge/db:lint: 
+@typeforge/db:lint: Oops! Something went wrong! :(
+@typeforge/db:lint: 
+@typeforge/db:lint: ESLint: 9.39.4
+@typeforge/db:lint: 
+@typeforge/db:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/db:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/db:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/db:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/db:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/db:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/db:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/db:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/db:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/db:lint:     at async NodeHfs.walk (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:614:3)
+@typeforge/db:lint:     at async globSearch (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:364:20)
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: Oops! Something went wrong! :(
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: ESLint: 9.39.4
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/layouts:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/layouts:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/layouts:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/layouts:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/layouts:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/layouts:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/layouts:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/layouts:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/layouts:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/layouts:lint:     at async NodeHfs.walk (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:614:3)
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: Oops! Something went wrong! :(
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: ESLint: 9.39.4
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/metrics:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/metrics:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/metrics:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/metrics:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/metrics:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/metrics:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/metrics:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/metrics:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/metrics:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/metrics:lint:     at async NodeHfs.walk (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:614:3)
+@typeforge/assets:lint: 
+@typeforge/assets:lint: Oops! Something went wrong! :(
+@typeforge/assets:lint: 
+@typeforge/assets:lint: ESLint: 9.39.4
+@typeforge/assets:lint: 
+@typeforge/assets:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/assets:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/assets:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/assets:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/assets:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/assets:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/assets:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/assets:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/assets:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/assets:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/assets:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/ui:lint: 
+@typeforge/ui:lint: Oops! Something went wrong! :(
+@typeforge/ui:lint: 
+@typeforge/ui:lint: ESLint: 9.39.4
+@typeforge/ui:lint: 
+@typeforge/ui:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/ui:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/ui:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/ui:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/ui:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/ui:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/ui:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/ui:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/ui:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/ui:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/ui:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/layouts:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: Oops! Something went wrong! :(
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: ESLint: 9.39.4
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/curriculum:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/curriculum:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/curriculum:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/curriculum:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/curriculum:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/curriculum:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/curriculum:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/curriculum:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/curriculum:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/curriculum:lint:     at async NodeHfs.walk (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:614:3)
+@typeforge/api:lint: 
+@typeforge/api:lint: Oops! Something went wrong! :(
+@typeforge/api:lint: 
+@typeforge/api:lint: ESLint: 9.39.4
+@typeforge/api:lint: 
+@typeforge/api:lint: TypeError: Key "rules": Key "svelte/a11y-click-events-have-key-events": Could not find "a11y-click-events-have-key-events" in plugin "svelte".
+@typeforge/api:lint:     at throwRuleNotFoundError (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:100:16)
+@typeforge/api:lint:     at Config.validateRulesConfig (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:603:5)
+@typeforge/api:lint:     at new Config (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\config.js:484:9)
+@typeforge/api:lint:     at [finalizeConfig] (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\config\flat-config-array.js:212:10)
+@typeforge/api:lint:     at FlatConfigArray.getConfigWithStatus (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1409:55)
+@typeforge/api:lint:     at FlatConfigArray.getConfig (D:\TypeForge\node_modules\.pnpm\@eslint+config-array@0.21.2\node_modules\@eslint\config-array\dist\cjs\index.cjs:1427:15)
+@typeforge/api:lint:     at entryFilter (D:\TypeForge\node_modules\.pnpm\eslint@9.39.4\node_modules\eslint\lib\eslint\eslint-helpers.js:323:27)
+@typeforge/api:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:574:24)
+@typeforge/api:lint:     at async NodeHfs.<anonymous> (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:604:6)
+@typeforge/api:lint:     at async NodeHfs.walk (file:///D:/TypeForge/node_modules/.pnpm/@humanfs+core@0.19.1/node_modules/@humanfs/core/src/hfs.js:614:3)
+@typeforge/metrics:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/db:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/assets:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+ ERROR  @typeforge/layouts#lint: command (D:\TypeForge\packages\layouts) C:\Users\ronon\AppData\Roaming\npm\pnpm.cmd run lint exited (2)
+
+ Tasks:    0 successful, 9 total
+Cached:    0 cached, 9 total
+  Time:    5.133s 
+Failed:    @typeforge/layouts#lint
+
+ ERROR  run failed: command  exited (2)

@@ -56,12 +56,13 @@ export function scoreString(
   expected: string,
   options: { caseInsensitive?: boolean } = {}
 ): boolean[] {
-  const normTyped = [...toNFC(typed)];   // spread to handle multi-codepoint chars
+  const normTyped = [...toNFC(typed)]; // spread to handle multi-codepoint chars
   const normExpected = [...toNFC(expected)];
 
   return normExpected.map((expectedChar, i) => {
     if (i >= normTyped.length) return false;
     const typedChar = normTyped[i];
+    if (typedChar === undefined) return false;
     if (options.caseInsensitive) {
       return typedChar.toLowerCase() === expectedChar.toLowerCase();
     }
@@ -78,11 +79,16 @@ export function graphemeClusters(str: string): string[] {
   const normalised = toNFC(str);
 
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
-    const segmenter = new (Intl as typeof Intl & {
-      Segmenter: new (locale?: string, options?: { granularity?: string }) => {
-        segment: (str: string) => Iterable<{ segment: string }>;
-      };
-    }).Segmenter(undefined, { granularity: 'grapheme' });
+    const segmenter = new (
+      Intl as typeof Intl & {
+        Segmenter: new (
+          locale?: string,
+          options?: { granularity?: string }
+        ) => {
+          segment: (str: string) => Iterable<{ segment: string }>;
+        };
+      }
+    ).Segmenter(undefined, { granularity: 'grapheme' });
     return Array.from(segmenter.segment(normalised), (s) => s.segment);
   }
 

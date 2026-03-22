@@ -28,7 +28,7 @@
   }
 
   let particles = $state<Particle[]>([]);
-  let animationFrame: number;
+  let animationFrame: number | null = null;
   let reducedMotion = $state(false);
 
   // Check for reduced motion preference
@@ -62,7 +62,7 @@
         id: i,
         x: 50, // Start from center (percentage)
         y: 100, // Start from bottom
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: colors[Math.floor(Math.random() * colors.length)] || '#FFF',
         size: Math.random() * 8 + 4,
         velocityX: (Math.random() - 0.5) * 20,
         velocityY: -Math.random() * 15 - 10,
@@ -113,7 +113,7 @@
             animation: confetti-fall {duration}ms ease-out forwards;
             animation-delay: {Math.random() * 200}ms;
           "
-        />
+        ></div>
       {/each}
     </div>
   {/if}

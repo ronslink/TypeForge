@@ -46,7 +46,7 @@ export function getRegionFromUser(user: { homeRegion?: string | null }): Region 
  * Determine the best region for a new user
  * Based on request IP geolocation
  */
-export function suggestRegionFromIP(ipAddress: string): Region {
+export function suggestRegionFromIP(_ipAddress: string): Region {
   // This would integrate with a GeoIP service
   // For now, return EU as default
   // In production, use Cloudflare's country header or a GeoIP database

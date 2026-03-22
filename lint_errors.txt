@@ -1,0 +1,177 @@
+
+> typeforge@0.0.1 lint D:\TypeForge
+> turbo run lint
+
+ΓÇó turbo 2.8.20
+
+   ΓÇó Packages in scope: @typeforge/api, @typeforge/assets, @typeforge/auth, @typeforge/curriculum, @typeforge/db, @typeforge/layouts, @typeforge/metrics, @typeforge/ui, @typeforge/web
+   ΓÇó Running lint in 9 packages
+   ΓÇó Remote caching disabled
+
+@typeforge/db:lint: cache miss, executing 95d1073fb531e581
+@typeforge/api:lint: cache miss, executing 34aec8db5ebc108b
+@typeforge/auth:lint: cache miss, executing 66136105ed38b94b
+@typeforge/metrics:lint: cache miss, executing 63f640425c067c6c
+@typeforge/ui:lint: cache miss, executing 5596325fb6bf12fb
+@typeforge/layouts:lint: cache miss, executing ba9067afd3e0d892
+@typeforge/curriculum:lint: cache miss, executing ba52e14f511701e6
+@typeforge/assets:lint: cache miss, executing b19a3a9cc53f24c5
+@typeforge/api:lint: 
+@typeforge/api:lint: > @typeforge/api@0.0.1 lint D:\TypeForge\apps\api
+@typeforge/api:lint: > eslint .
+@typeforge/api:lint: 
+@typeforge/db:lint: 
+@typeforge/db:lint: > @typeforge/db@0.0.1 lint D:\TypeForge\packages\db
+@typeforge/db:lint: > eslint .
+@typeforge/db:lint: 
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: > @typeforge/metrics@0.0.1 lint D:\TypeForge\packages\metrics
+@typeforge/metrics:lint: > eslint .
+@typeforge/metrics:lint: 
+@typeforge/auth:lint: 
+@typeforge/auth:lint: > @typeforge/auth@0.0.1 lint D:\TypeForge\packages\auth
+@typeforge/auth:lint: > eslint .
+@typeforge/auth:lint: 
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: > @typeforge/layouts@0.0.1 lint D:\TypeForge\packages\layouts
+@typeforge/layouts:lint: > eslint .
+@typeforge/layouts:lint: 
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: > @typeforge/curriculum@0.0.1 lint D:\TypeForge\packages\curriculum
+@typeforge/curriculum:lint: > eslint . --max-warnings=0
+@typeforge/curriculum:lint: 
+@typeforge/ui:lint: 
+@typeforge/ui:lint: > @typeforge/ui@0.0.1 lint D:\TypeForge\packages\ui
+@typeforge/ui:lint: > eslint .
+@typeforge/ui:lint: 
+@typeforge/assets:lint: 
+@typeforge/assets:lint: > @typeforge/assets@0.0.1 lint D:\TypeForge\packages\assets
+@typeforge/assets:lint: > eslint .
+@typeforge/assets:lint: 
+@typeforge/api:lint: 
+@typeforge/api:lint: Oops! Something went wrong! :(
+@typeforge/api:lint: 
+@typeforge/api:lint: ESLint: 9.39.4
+@typeforge/api:lint: 
+@typeforge/api:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/api:lint: 
+@typeforge/api:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/api:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/api:lint: to update your configuration file to the new format:
+@typeforge/api:lint: 
+@typeforge/api:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/api:lint: 
+@typeforge/api:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/api:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/api:lint: 
+@typeforge/db:lint: 
+@typeforge/db:lint: Oops! Something went wrong! :(
+@typeforge/db:lint: 
+@typeforge/db:lint: ESLint: 9.39.4
+@typeforge/db:lint: 
+@typeforge/db:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/db:lint: 
+@typeforge/db:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/db:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/db:lint: to update your configuration file to the new format:
+@typeforge/db:lint: 
+@typeforge/db:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/db:lint: 
+@typeforge/db:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/db:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/db:lint: 
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: Oops! Something went wrong! :(
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: ESLint: 9.39.4
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/metrics:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/metrics:lint: to update your configuration file to the new format:
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/metrics:lint: 
+@typeforge/metrics:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/metrics:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/metrics:lint: 
+@typeforge/api:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/auth:lint: 
+@typeforge/auth:lint: Oops! Something went wrong! :(
+@typeforge/auth:lint: 
+@typeforge/auth:lint: ESLint: 9.39.4
+@typeforge/auth:lint: 
+@typeforge/auth:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/auth:lint: 
+@typeforge/auth:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/auth:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/auth:lint: to update your configuration file to the new format:
+@typeforge/auth:lint: 
+@typeforge/auth:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/auth:lint: 
+@typeforge/auth:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/auth:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/auth:lint: 
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: Oops! Something went wrong! :(
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: ESLint: 9.39.4
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/curriculum:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/curriculum:lint: to update your configuration file to the new format:
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/curriculum:lint: 
+@typeforge/curriculum:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/curriculum:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/curriculum:lint: 
+@typeforge/db:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/metrics:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/auth:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/curriculum:lint: ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.
+@typeforge/ui:lint: 
+@typeforge/ui:lint: Oops! Something went wrong! :(
+@typeforge/ui:lint: 
+@typeforge/ui:lint: ESLint: 9.39.4
+@typeforge/ui:lint: 
+@typeforge/ui:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/ui:lint: 
+@typeforge/ui:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/ui:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/ui:lint: to update your configuration file to the new format:
+@typeforge/ui:lint: 
+@typeforge/ui:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/ui:lint: 
+@typeforge/ui:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/ui:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/ui:lint: 
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: Oops! Something went wrong! :(
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: ESLint: 9.39.4
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: ESLint couldn't find an eslint.config.(js|mjs|cjs) file.
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: From ESLint v9.0.0, the default configuration file is now eslint.config.js.
+@typeforge/layouts:lint: If you are using a .eslintrc.* file, please follow the migration guide
+@typeforge/layouts:lint: to update your configuration file to the new format:
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: https://eslint.org/docs/latest/use/configure/migration-guide
+@typeforge/layouts:lint: 
+@typeforge/layouts:lint: If you still have problems after following the migration guide, please stop by
+@typeforge/layouts:lint: https://eslint.org/chat/help to chat with the team.
+@typeforge/layouts:lint: 
+ ERROR  @typeforge/db#lint: command (D:\TypeForge\packages\db) C:\Users\ronon\AppData\Roaming\npm\pnpm.cmd run lint exited (2)
+ ERROR  @typeforge/metrics#lint: command (D:\TypeForge\packages\metrics) C:\Users\ronon\AppData\Roaming\npm\pnpm.cmd run lint exited (2)
+
+ Tasks:    0 successful, 9 total
+Cached:    0 cached, 9 total
+  Time:    976ms 
+Failed:    @typeforge/db#lint, @typeforge/metrics#lint
+
+ ERROR  run failed: command  exited (2)
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 2.

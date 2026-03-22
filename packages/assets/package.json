@@ -34,7 +34,9 @@
     "optimize:svg": "svgo -f static/keyboards -o static/keyboards",
     "optimize:audio": "node scripts/optimize-audio.mjs"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@typeforge/layouts": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^20.17.12",
     "svgo": "^3.3.2",

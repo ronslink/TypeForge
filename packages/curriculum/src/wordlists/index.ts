@@ -23,6 +23,8 @@ import { swedishWordlist } from './sv.js';
 import { tagalogWordlist } from './tl.js';
 import { swahiliWordlist } from './sw.js';
 import { italianWordlist } from './it.js';
+import { japaneseWordlist } from './ja.js';
+import { koreanWordlist } from './ko.js';
 
 // Re-export types
 export type { WordlistEntry };
@@ -49,6 +51,8 @@ export {
   tagalogWordlist,
   swahiliWordlist,
   italianWordlist,
+  japaneseWordlist,
+  koreanWordlist,
 };
 
 // Language code mapping
@@ -93,6 +97,10 @@ const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
   swahili: swahiliWordlist,
   it: italianWordlist,
   italian: italianWordlist,
+  ja: japaneseWordlist,
+  japanese: japaneseWordlist,
+  ko: koreanWordlist,
+  korean: koreanWordlist,
 };
 
 /**
@@ -112,13 +120,9 @@ export function getWordlistForLanguage(code: string): WordlistEntry[] {
  * @param maxDifficulty - Maximum difficulty level (1-3), undefined for all
  * @returns Array of random word strings
  */
-export function getRandomWords(
-  code: string,
-  count: number,
-  maxDifficulty?: number
-): string[] {
+export function getRandomWords(code: string, count: number, maxDifficulty?: number): string[] {
   const wordlist = getWordlistForLanguage(code);
-  
+
   if (wordlist.length === 0) {
     return [];
   }
@@ -134,7 +138,7 @@ export function getRandomWords(
 
   const shuffled = [...filtered].sort(() => Math.random() - 0.5);
   const selected = shuffled.slice(0, Math.min(count, shuffled.length));
-  
+
   return selected.map((entry) => entry.word);
 }
 
@@ -161,10 +165,7 @@ export function getWordCount(code: string): number {
  * @param difficulty - Difficulty level (1, 2, or 3)
  * @returns Array of words at the specified difficulty
  */
-export function getWordsByDifficulty(
-  code: string,
-  difficulty: 1 | 2 | 3
-): WordlistEntry[] {
+export function getWordsByDifficulty(code: string, difficulty: 1 | 2 | 3): WordlistEntry[] {
   const wordlist = getWordlistForLanguage(code);
   return wordlist.filter((entry) => entry.difficulty === difficulty);
 }

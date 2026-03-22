@@ -22,7 +22,7 @@ export interface PermissionContext {
  */
 export async function canAccessLesson(
   ctx: Context<{ Bindings: Env }>,
-  lessonId?: string
+  _lessonId?: string
 ): Promise<boolean> {
   const user = await getCurrentUser(ctx);
   if (!user) return false;

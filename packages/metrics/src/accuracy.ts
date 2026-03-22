@@ -3,7 +3,8 @@
  * Real-time per-keystroke accuracy tracking with per-key error rates
  */
 
-import type { AccuracyResult, KeystrokeEvent } from './types.js';
+import type { KeystrokeEvent, AccuracyResult } from './types.js';
+export type { AccuracyResult } from './types.js';
 
 interface KeyStats {
   total: number;

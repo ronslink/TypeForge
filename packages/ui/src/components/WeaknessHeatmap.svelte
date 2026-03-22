@@ -94,7 +94,7 @@
     </div>
     <div class="legend-item flex items-center gap-2">
       <div class="w-4 h-4 rounded-sm" style="background: rgba(244, 67, 54, 0.5); border-bottom: 2px solid #F44336;"></div>
-      <span class="text-on-surface-variant"><70% (Needs work)</span>
+      <span class="text-on-surface-variant">&lt;70% (Needs work)</span>
     </div>
   </div>
 
