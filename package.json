@@ -51,6 +51,8 @@
     "typescript-eslint": "^8.18.0"
   },
   "dependencies": {
-    "@sveltejs/adapter-cloudflare": "^4.8.0"
+    "@cloudflare/workers-types": "^4.20250110.0",
+    "@sveltejs/adapter-cloudflare": "^4.8.0",
+    "hono": "^4.6.0"
   }
 }

@@ -5,10 +5,9 @@
     layout: KeyboardLayout;
     highlightKeys?: Set<string>;
     pressedKey?: string;
-    isRTL?: boolean;
   }
 
-  let { layout, highlightKeys = new Set(), pressedKey, isRTL = false }: Props = $props();
+  let { layout, highlightKeys = new Set(), pressedKey }: Props = $props();
 
   // Group keys by row
   let rows = $derived(groupByRow(layout.keys));

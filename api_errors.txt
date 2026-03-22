@@ -1,0 +1,236 @@
+
+> @typeforge/api@0.0.1 typecheck D:\TypeForge\apps\api
+> tsc --noEmit
+
+src/client.ts(647,3): error TS2344: Type '{ '/': { $get: { input: { query: { limit?: string | undefined; }; }; output: SessionsListResponse; }; $post: { input: { json: SessionPayload; }; output: SessionCreateResponse; }; }; '/:id': { ...; }; '/:id/keystrokes': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/'' is incompatible with index signature.
+    Type '{ $get: { input: { query: { limit?: string | undefined; }; }; output: SessionsListResponse; }; $post: { input: { json: SessionPayload; }; output: SessionCreateResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ input: { query: { limit?: string | undefined; }; }; output: SessionsListResponse; }' is missing the following properties from type 'Endpoint': outputFormat, status
+src/client.ts(715,3): error TS2344: Type '{ '/': { $get: { input: { query: { language?: string | undefined; layout?: string | undefined; difficulty?: string | undefined; }; }; output: LessonsListResponse; }; }; '/next': { ...; }; '/:id': { ...; }; '/categories': { ...; }; '/languages': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/'' is incompatible with index signature.
+    Type '{ $get: { input: { query: { language?: string | undefined; layout?: string | undefined; difficulty?: string | undefined; }; }; output: LessonsListResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ input: { query: { language?: string | undefined; layout?: string | undefined; difficulty?: string | undefined; }; }; output: LessonsListResponse; }' is missing the following properties from type 'Endpoint': outputFormat, status
+src/client.ts(766,3): error TS2344: Type '{ '/me': { $get: { output: UserResponse; }; $put: { input: { json: UserUpdatePayload; }; output: UserResponse; }; }; '/me/preferences': { $put: { input: { ...; }; output: UserPreferencesResponse; }; }; '/me/progress': { ...; }; '/me/stats': { ...; }; '/me/weaknesses': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/me'' is incompatible with index signature.
+    Type '{ $get: { output: UserResponse; }; $put: { input: { json: UserUpdatePayload; }; output: UserResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: UserResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/client.ts(814,3): error TS2344: Type '{ '/': { $get: { output: OrganisationsListResponse; }; $post: { input: { json: OrganisationCreatePayload; }; output: OrganisationResponse; }; }; ... 9 more ...; '/:id/seats/:userId': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/'' is incompatible with index signature.
+    Type '{ $get: { output: OrganisationsListResponse; }; $post: { input: { json: OrganisationCreatePayload; }; output: OrganisationResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: OrganisationsListResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/client.ts(919,3): error TS2344: Type '{ '/plans': { $get: { output: PlansResponse; }; }; '/subscription': { $get: { output: SubscriptionResponse; }; }; '/checkout': { $post: { input: { json: CheckoutPayload; }; output: CheckoutResponse; }; }; '/portal': { ...; }; '/invoices': { ...; }; '/webhook': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/plans'' is incompatible with index signature.
+    Type '{ $get: { output: PlansResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: PlansResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/client.ts(961,3): error TS2344: Type '{ '/stats': { $get: { output: AdminStatsResponse; }; }; '/users': { $get: { input: { query: { page?: string | undefined; limit?: string | undefined; }; }; output: AdminUsersResponse; }; }; '/organisations': { ...; }; '/audit-logs': { ...; }; '/users/:id/status': { ...; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/stats'' is incompatible with index signature.
+    Type '{ $get: { output: AdminStatsResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: AdminStatsResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/client.ts(1011,3): error TS2344: Type '{ '/': { $get: { output: ProgressResponse; }; }; '/stats': { $get: { output: ProgressStatsResponse; }; }; }' does not satisfy the constraint 'Schema'.
+  Property ''/'' is incompatible with index signature.
+    Type '{ $get: { output: ProgressResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: ProgressResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/client.ts(1030,3): error TS2344: Type '{ '/health': { $get: { output: HealthResponse; }; }; '/api/v1': { $get: { output: ApiInfoResponse; }; }; '/api/v1/sessions': SessionsApiType; '/api/v1/lessons': LessonsApiType; ... 4 more ...; '/api/v1/admin': AdminApiType; }' does not satisfy the constraint 'Schema'.
+  Property ''/health'' is incompatible with index signature.
+    Type '{ $get: { output: HealthResponse; }; }' is not assignable to type '{ [Method: `$${Lowercase<string>}`]: Endpoint; }'.
+      Property '$get' is incompatible with index signature.
+        Type '{ output: HealthResponse; }' is missing the following properties from type 'Endpoint': input, outputFormat, status
+src/index.ts(13,26): error TS6133: 'requireAuth' is declared but its value is never read.
+src/index.ts(15,10): error TS2305: Module '"./middleware/ratelimit.js"' has no exported member 'rateLimitMiddleware'.
+src/middleware/auth.ts(22,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/middleware/regional-routing.ts(10,1): error TS6133: 'extractRegionFromClaims' is declared but its value is never read.
+src/routes/admin.ts(32,14): error TS18048: 'userCount' is possibly 'undefined'.
+src/routes/admin.ts(33,22): error TS18048: 'orgCount' is possibly 'undefined'.
+src/routes/admin.ts(34,17): error TS18048: 'sessionCount' is possibly 'undefined'.
+src/routes/admin.ts(35,28): error TS18048: 'activeSubCount' is possibly 'undefined'.
+src/routes/admin.ts(107,12): error TS2304: Cannot find name 'eq'.
+src/routes/billing.ts(8,42): error TS6133: 'subscriptionSeats' is declared but its value is never read.
+src/routes/billing.ts(9,14): error TS6133: 'and' is declared but its value is never read.
+src/routes/billing.ts(34,34): error TS2322: Type '"2024-12-18.acacia"' is not assignable to type '"2023-10-16"'.
+src/routes/billing.ts(77,28): error TS2345: Argument of type 'Context<{}, any, {}>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }'.
+src/routes/billing.ts(90,39): error TS2339: Property 'stripeCustomerId' does not exist on type 'PgTableWithColumns<{ name: "users"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 21 more ...; deletedAt: PgColumn<......'.
+src/routes/billing.ts(111,14): error TS2353: Object literal may only specify known properties, and 'stripeCustomerId' does not exist in type '{ id?: string | SQL<unknown> | undefined; clerkId?: string | SQL<unknown> | undefined; email?: string | SQL<unknown> | undefined; emailVerified?: boolean | SQL<unknown> | undefined; displayName?: string | ... 2 more ... | undefined; ... 17 more ...; deletedAt?: Date | ... 2 more ... | undefined; }'.
+src/routes/billing.ts(117,8): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(118,8): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(130,35): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(131,33): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(156,28): error TS2345: Argument of type 'Context<{}, any, {}>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }'.
+src/routes/billing.ts(161,39): error TS2339: Property 'stripeCustomerId' does not exist on type 'PgTableWithColumns<{ name: "users"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 21 more ...; deletedAt: PgColumn<......'.
+src/routes/billing.ts(173,20): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(201,28): error TS2345: Argument of type 'Context<BlankEnv, "/webhook", BlankInput>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; STRIPE_WEBHOOK_SECRET?: string | undefined; }'.
+src/routes/billing.ts(204,25): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/billing.ts(227,52): error TS2345: Argument of type 'DbClient' is not assignable to parameter of type '{ update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }; insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }; select: () => unknown; }'.
+  Types of property 'update' are incompatible.
+    Type '<TTable extends PgTable>(table: TTable) => PgUpdateBuilder<TTable, PostgresJsQueryResultHKT>' is not assignable to type '(table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }'.
+      Types of parameters 'table' and 'table' are incompatible.
+        Type 'unknown' is not assignable to type 'PgTable<TableConfig>'.
+src/routes/billing.ts(233,54): error TS2345: Argument of type 'DbClient' is not assignable to parameter of type '{ update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }; }'.
+  Types of property 'update' are incompatible.
+    Type '<TTable extends PgTable>(table: TTable) => PgUpdateBuilder<TTable, PostgresJsQueryResultHKT>' is not assignable to type '(table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }'.
+      Types of parameters 'table' and 'table' are incompatible.
+        Type 'unknown' is not assignable to type 'PgTable<TableConfig>'.
+src/routes/billing.ts(239,54): error TS2345: Argument of type 'DbClient' is not assignable to parameter of type '{ insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }; }'.
+  Types of property 'insert' are incompatible.
+    Type '<TTable extends PgTable>(table: TTable) => PgInsertBuilder<TTable, PostgresJsQueryResultHKT>' is not assignable to type '(table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }'.
+      Types of parameters 'table' and 'table' are incompatible.
+        Type 'unknown' is not assignable to type 'PgTable<TableConfig>'.
+src/routes/billing.ts(245,40): error TS2345: Argument of type 'DbClient' is not assignable to parameter of type '{ insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }; }'.
+  Types of property 'insert' are incompatible.
+    Type '<TTable extends PgTable>(table: TTable) => PgInsertBuilder<TTable, PostgresJsQueryResultHKT>' is not assignable to type '(table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }'.
+      Types of parameters 'table' and 'table' are incompatible.
+        Type 'unknown' is not assignable to type 'PgTable<TableConfig>'.
+src/routes/billing.ts(251,49): error TS2345: Argument of type 'DbClient' is not assignable to parameter of type '{ update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }; }'.
+  Types of property 'update' are incompatible.
+    Type '<TTable extends PgTable>(table: TTable) => PgUpdateBuilder<TTable, PostgresJsQueryResultHKT>' is not assignable to type '(table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown>; }; }'.
+      Types of parameters 'table' and 'table' are incompatible.
+        Type 'unknown' is not assignable to type 'PgTable<TableConfig>'.
+src/routes/billing.ts(287,26): error TS2571: Object is of type 'unknown'.
+src/routes/billing.ts(308,30): error TS2571: Object is of type 'unknown'.
+src/routes/billing.ts(309,15): error TS2554: Expected 0 arguments, but got 1.
+src/routes/billing.ts(311,23): error TS2339: Property 'stripePriceId' does not exist on type 'PgTableWithColumns<{ name: "plans"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "plans"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 14 more ...; updatedAt: PgColumn<......'.
+src/routes/billing.ts(384,6): error TS2339: Property 'select' does not exist on type '{ insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }; }'.
+src/routes/billing.ts(386,21): error TS2339: Property 'stripePriceId' does not exist on type 'PgTableWithColumns<{ name: "plans"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "plans"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 14 more ...; updatedAt: PgColumn<......'.
+src/routes/billing.ts(424,6): error TS2339: Property 'select' does not exist on type '{ insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]>; }; }; }'.
+src/routes/billing.ts(437,17): error TS2532: Object is possibly 'undefined'.
+src/routes/lessons.ts(10,19): error TS6133: 'inArray' is declared but its value is never read.
+src/routes/lessons.ts(13,1): error TS6133: 'CurriculumLesson' is declared but its value is never read.
+src/routes/lessons.ts(68,21): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "difficulty"; tableName: "lessons"; dataType: "string"; columnType: "PgEnumColumn"; data: "beginner" | "intermediate" | "advanced" | "expert"; driverParam: string; notNull: true; hasDefault: true; enumValues: [...]; baseColumn: never; }, {}, {}>, right: "beginner" | ... 3 more ... | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '"beginner" | "intermediate" | "advanced" | "expert" | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string>, right: string | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "difficulty"; tableName: "lessons"; dataType: "string"; columnType: "PgEnumColumn"; data: "beginner" | "intermediate" | "advanced" | "expert"; driverParam: string; notNull: true; hasDefault: true; enumValues: [...]; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string>'.
+      Type 'PgColumn<{ name: "difficulty"; tableName: "lessons"; dataType: "string"; columnType: "PgEnumColumn"; data: "beginner" | "intermediate" | "advanced" | "expert"; driverParam: string; notNull: true; hasDefault: true; enumValues: [...]; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "difficulty"; tableName: "lessons"; dataType: "string"; columnType: "PgEnumColumn"; data: "beginner" | "intermediate" | "advanced" | "expert"; driverParam: string; notNull: true; hasDefault: true; enumValues: [...]; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/lessons.ts(72,5): error TS2740: Type 'Omit<PgSelectBase<"lessons", { id: PgColumn<{ name: "id"; tableName: "lessons"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 13 more ...; updatedAt: PgColumn<...>; }, ... 5 more ..., { ...; }>, ...' is missing the following properties from type 'PgSelectBase<"lessons", { id: PgColumn<{ name: "id"; tableName: "lessons"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 13 more ...; updatedAt: PgColumn<...>; }, ... 5 more ..., { ...; }>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+src/routes/lessons.ts(175,9): error TS2322: Type '{ exercises: ExerciseResponse[]; id: string; createdAt: Date; updatedAt: Date; description: string | null; slug: string; languageCode: string; layoutId: string | null; isActive: boolean; ... 6 more ...; estimatedMinutes: number; }' is not assignable to type 'LessonResponse'.
+  Types of property 'focusKeys' are incompatible.
+    Type 'unknown' is not assignable to type 'string[]'.
+src/routes/lessons.ts(182,24): error TS2339: Property 'reason' does not exist on type 'Lesson'.
+src/routes/lessons.ts(183,26): error TS2339: Property 'priority' does not exist on type 'Lesson'.
+src/routes/lessons.ts(252,5): error TS2740: Type 'Omit<PgSelectBase<"lesson_categories", { id: PgColumn<{ name: "id"; tableName: "lesson_categories"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 5 more ...; createdAt: PgColumn<...>; }, ... 5 mo...' is missing the following properties from type 'PgSelectBase<"lesson_categories", { id: PgColumn<{ name: "id"; tableName: "lesson_categories"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 5 more ...; createdAt: PgColumn<...>; }, ... 5 more .....': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+src/routes/organisations.ts(8,49): error TS6133: 'classMembers' is declared but its value is never read.
+src/routes/organisations.ts(8,92): error TS2305: Module '"@typeforge/db"' has no exported member 'orgBilling'.
+src/routes/organisations.ts(29,34): error TS2322: Type '"2024-12-18.acacia"' is not assignable to type '"2023-10-16"'.
+src/routes/organisations.ts(74,12): error TS18048: 'org' is possibly 'undefined'.
+src/routes/organisations.ts(83,12): error TS18048: 'org' is possibly 'undefined'.
+src/routes/organisations.ts(88,12): error TS18048: 'org' is possibly 'undefined'.
+src/routes/organisations.ts(158,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(174,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(239,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(242,28): error TS2345: Argument of type 'Context<{}, any, {}>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; }'.
+src/routes/organisations.ts(253,73): error TS2339: Property 'stripeCustomerId' does not exist on type 'PgTableWithColumns<{ name: "organisations"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; ... 18 more ...; deleted...'.
+src/routes/organisations.ts(255,12): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/organisations.ts(266,45): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(params?: CustomerCreateParams | undefined, options?: RequestOptions | undefined): Promise<Response<Customer>>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | number | null'.
+      Type 'undefined' is not assignable to type 'string | number | null'.
+  Overload 2 of 2, '(options?: RequestOptions | undefined): Promise<Response<Customer>>', gave the following error.
+    Object literal may only specify known properties, and 'name' does not exist in type 'RequestOptions'.
+src/routes/organisations.ts(278,14): error TS2353: Object literal may only specify known properties, and 'stripeCustomerId' does not exist in type '{ id?: string | SQL<unknown> | undefined; clerkOrgId?: string | SQL<unknown> | null | undefined; name?: string | SQL<unknown> | undefined; slug?: string | SQL<unknown> | undefined; orgType?: "school" | ... 6 more ... | undefined; ... 14 more ...; deletedAt?: Date | ... 2 more ... | undefined; }'.
+src/routes/organisations.ts(279,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "organisations"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/organisations.ts(283,19): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/organisations.ts(286,5): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(options?: RequestOptions | undefined): Promise<Response<Session>>', gave the following error.
+    Object literal may only specify known properties, and 'customer' does not exist in type 'RequestOptions'.
+src/routes/organisations.ts(294,35): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/organisations.ts(295,33): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/organisations.ts(331,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(334,28): error TS2345: Argument of type 'Context<{}, any, {}>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; }'.
+src/routes/organisations.ts(363,34): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/organisations.ts(400,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(403,28): error TS2345: Argument of type 'Context<{}, any, {}>' is not assignable to parameter of type '{ env: { STRIPE_SECRET_KEY?: string | undefined; }; }'.
+  Types of property 'env' are incompatible.
+    Type 'unknown' is not assignable to type '{ STRIPE_SECRET_KEY?: string | undefined; }'.
+src/routes/organisations.ts(444,34): error TS18046: 'c.env' is of type 'unknown'.
+src/routes/organisations.ts(534,33): error TS2339: Property 'orgId' does not exist on type 'PgTableWithColumns<{ name: "subscription_seats"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; subscriptionId...'.
+src/routes/organisations.ts(588,7): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/organisations.ts(599,5): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { orgId: string | SQL<unknown> | Placeholder<string, any>; status?: "active" | "suspended" | "invited" | SQL<unknown> | "removed" | Placeholder<string, any> | undefined; ... 7 more ...; joinedAt?: Date | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { orgId: string | SQL<unknown> | Placeholder<string, any>; status?: "active" | "suspended" | "invited" | SQL<unknown> | "removed" | Placeholder<string, any> | undefined; ... 7 more ...; joinedAt?: Date | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'orgId' does not exist in type '{ orgId: string | SQL<unknown> | Placeholder<string, any>; status?: "active" | "suspended" | "invited" | SQL<unknown> | "removed" | Placeholder<string, any> | undefined; ... 7 more ...; joinedAt?: Date | ... 3 more ... | undefined; }[]'.
+src/routes/organisations.ts(608,5): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; subscriptionId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<...> | undefined; allocatedAt?: Date | ... 2 more ... | undefined; revokedAt?: Date | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'orgId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; subscriptionId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<...> | undefined; allocatedAt?: Date | ... 2 more ... | undefined; revokedAt?: Date | ... 3 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; subscriptionId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<...> | undefined; allocatedAt?: Date | ... 2 more ... | undefined; revokedAt?: Date | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'orgId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; subscriptionId: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<...> | undefined; allocatedAt?: Date | ... 2 more ... | undefined; revokedAt?: Date | ... 3 more ... | undefined; }[]'.
+src/routes/organisations.ts(635,9): error TS6133: 'auth' is declared but its value is never read.
+src/routes/organisations.ts(655,7): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "org_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/organisations.ts(656,7): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "org_members"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/organisations.ts(663,28): error TS2339: Property 'orgId' does not exist on type 'PgTableWithColumns<{ name: "subscription_seats"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, {}, {}>; subscriptionId...'.
+src/routes/organisations.ts(664,7): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | undefined' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'undefined' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | undefined>, right: string | SQLWrapper | undefined): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | undefined>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is missing the following properties from type 'Aliased<string | undefined>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "subscription_seats"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; enumValues: undefined; baseColumn: never; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/progress.ts(9,43): error TS6133: 'users' is declared but its value is never read.
+src/routes/progress.ts(10,35): error TS6133: 'sql' is declared but its value is never read.
+src/routes/sessions.ts(288,18): error TS18048: 'session' is possibly 'undefined'.
+src/routes/sessions.ts(419,9): error TS6133: 'auth' is declared but its value is never read.
+D:\TypeForge\apps\api:
+ΓÇëERR_PNPM_RECURSIVE_RUN_FIRST_FAILΓÇë @typeforge/api@0.0.1 typecheck: `tsc --noEmit`
+Exit status 2

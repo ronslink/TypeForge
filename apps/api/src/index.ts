@@ -10,9 +10,9 @@ import { secureHeaders } from 'hono/secure-headers';
 import { prettyJSON } from 'hono/pretty-json';
 
 // Middleware
-import { authMiddleware, requireAuth } from './middleware/auth.js';
+import { authMiddleware } from './middleware/auth.js';
 import { regionalRoutingMiddleware } from './middleware/regional-routing.js';
-import { rateLimitMiddleware } from './middleware/ratelimit.js';
+import { rateLimits } from './middleware/ratelimit.js';
 
 // Routes
 import {
@@ -57,7 +57,7 @@ app.use(
 app.use('*', prettyJSON());
 
 // Rate limiting
-app.use('/api/*', rateLimitMiddleware);
+app.use('/api/*', rateLimits.api);
 
 // Authentication middleware
 app.use('/api/*', authMiddleware);

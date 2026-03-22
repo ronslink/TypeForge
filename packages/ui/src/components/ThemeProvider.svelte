@@ -1,29 +1,27 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { theme, type Theme } from '$lib/stores/theme';
+  let { children, defaultTheme = 'light' }: { children: any; defaultTheme?: 'light' | 'dark' | 'system' } = $props();
 
-  let visible = $state(false);
+  let currentTheme = $state(defaultTheme);
   let mounted = $state(false);
 
   $effect(() => {
     mounted = true;
-    if (browser) {
-      const stored = localStorage.getItem('theme') as Theme | null;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
       if (stored && ['light', 'dark'].includes(stored)) {
-        theme.set(stored);
+        currentTheme = stored;
       }
-      visible = true;
     }
   });
 
   $effect(() => {
-    if (browser && mounted) {
-      document.documentElement.setAttribute('data-theme', $theme);
-      localStorage.setItem('theme', $theme);
+    if (typeof window !== 'undefined' && mounted) {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('theme', currentTheme);
     }
   });
 </script>
 
 <div data-theme-provider style="display: contents">
-  <slot />
+  {@render children()}
 </div>

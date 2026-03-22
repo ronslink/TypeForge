@@ -285,7 +285,7 @@ app.post('/', async (c) => {
   // Store keystroke events if provided
   if (payload.keystrokes && payload.keystrokes.length > 0) {
     const events = payload.keystrokes.map((k) => ({
-      sessionId: session.id,
+      sessionId: session!.id,
       character: k.character,
       expected: k.expected,
       correct: k.correct,
@@ -416,7 +416,7 @@ app.get('/:id', async (c) => {
  * Legacy endpoint for completing sessions started with POST
  */
 app.put('/:id', async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
   const sessionId = c.req.param('id');
 

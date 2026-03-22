@@ -59,13 +59,13 @@
 
   // Tooltip state
   let showTooltip = $state(false);
-  let tooltipRef: HTMLDivElement | undefined = $state();
 </script>
 
 <div
   class="student-row"
   class:struggling={student.status === 'struggling'}
   onclick={() => onClick?.(student)}
+  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick?.(student); }}
   onmouseenter={() => showTooltip = true}
   onmouseleave={() => showTooltip = false}
   role="button"
@@ -109,7 +109,7 @@
 
   <!-- Tooltip -->
   {#if showTooltip}
-    <div class="student-tooltip" bind:this={tooltipRef}>
+    <div class="student-tooltip">
       <div class="tooltip-header">
         <span class="tooltip-name">{student.name}</span>
         <span class="tooltip-email">{student.email}</span>

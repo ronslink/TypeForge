@@ -67,15 +67,11 @@ export function getGoogleAuthUrl(
   }
 ): string {
   const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-  
-  const defaultScopes = [
-    'openid',
-    'email',
-    'profile',
-  ];
-  
+
+  const defaultScopes = ['openid', 'email', 'profile'];
+
   const scopes = options.scopes || defaultScopes;
-  
+
   const params = new URLSearchParams({
     client_id: options.clientId,
     redirect_uri: options.redirectUri,
@@ -85,19 +81,19 @@ export function getGoogleAuthUrl(
     access_type: 'offline',
     include_granted_scopes: 'true',
   });
-  
+
   // Add hosted domain hint if specified (restricts to Workspace domain)
   if (options.hd) {
     params.append('hd', options.hd);
   }
-  
+
   // Prompt for consent to ensure we get refresh token
   if (options.prompt) {
     params.append('prompt', options.prompt);
   } else {
     params.append('prompt', 'consent select_account');
   }
-  
+
   return `${baseUrl}?${params.toString()}`;
 }
 
@@ -113,7 +109,7 @@ export async function exchangeGoogleCode(
   }
 ): Promise<GoogleTokens> {
   const tokenUrl = 'https://oauth2.googleapis.com/token';
-  
+
   const body = new URLSearchParams({
     code,
     client_id: options.clientId,
@@ -121,7 +117,7 @@ export async function exchangeGoogleCode(
     redirect_uri: options.redirectUri,
     grant_type: 'authorization_code',
   });
-  
+
   const response = await fetch(tokenUrl, {
     method: 'POST',
     headers: {
@@ -129,13 +125,13 @@ export async function exchangeGoogleCode(
     },
     body: body.toString(),
   });
-  
+
   if (!response.ok) {
     const error = await response.text();
     throw new Error(`Google token exchange failed: ${error}`);
   }
-  
-  const tokens = await response.json() as GoogleTokens;
+
+  const tokens = (await response.json()) as GoogleTokens;
   return tokens;
 }
 
@@ -145,15 +141,18 @@ export async function exchangeGoogleCode(
  */
 export function decodeGoogleIdToken(idToken: string): GoogleUserInfo {
   const parts = idToken.split('.');
-  
+
   if (parts.length !== 3) {
     throw new Error('Invalid ID token format');
   }
-  
+
   // Decode the payload (middle part)
   const payload = parts[1];
+  if (!payload) {
+    throw new Error('Invalid ID token format: missing payload');
+  }
   const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-  
+
   return JSON.parse(decodedPayload) as GoogleUserInfo;
 }
 
@@ -162,7 +161,9 @@ export function decodeGoogleIdToken(idToken: string): GoogleUserInfo {
  */
 export function getWorkspaceDomain(email: string): string | null {
   const match = email.match(/@(.+)$/);
-  return match ? match[1].toLowerCase() : null;
+  if (!match) return null;
+  const domain = match[1];
+  return domain ? domain.toLowerCase() : null;
 }
 
 /**
@@ -175,12 +176,12 @@ export async function verifyWorkspaceDomain(
 ): Promise<WorkspaceConfig | null> {
   // In a real implementation, this would query the database
   // For now, we'll return a mock implementation
-  
+
   if (!db) {
     console.warn('[SSO] No database provided for domain verification');
     return null;
   }
-  
+
   // This would typically query an org_settings or org_domains table
   // Example query (pseudo-code):
   // const config = await db
@@ -193,9 +194,9 @@ export async function verifyWorkspaceDomain(
   //   ))
   //   .innerJoin(organisations, eq(orgDomains.orgId, organisations.id))
   //   .limit(1);
-  
+
   console.log(`[SSO] Verifying workspace domain: ${domain}`);
-  
+
   // Return null to indicate domain not found or not verified
   // In production, this would return the actual workspace config
   return null;
@@ -217,20 +218,20 @@ export async function linkUserToOrg(
       error: 'Clerk secret key not configured',
     };
   }
-  
+
   try {
     // Check if user is already a member
     const checkResponse = await fetch(
       `https://api.clerk.com/v1/organizations/${orgId}/memberships?user_id=${userId}`,
       {
         headers: {
-          'Authorization': `Bearer ${clerkSecretKey}`,
+          Authorization: `Bearer ${clerkSecretKey}`,
         },
       }
     );
-    
+
     if (checkResponse.ok) {
-      const existing = await checkResponse.json() as { data: unknown[] };
+      const existing = (await checkResponse.json()) as { data: unknown[] };
       if (existing.data && existing.data.length > 0) {
         return {
           success: true,
@@ -238,32 +239,29 @@ export async function linkUserToOrg(
         };
       }
     }
-    
+
     // Create new membership
-    const response = await fetch(
-      `https://api.clerk.com/v1/organizations/${orgId}/memberships`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${clerkSecretKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          role: mapRoleToClerkRole(role),
-        }),
-      }
-    );
-    
+    const response = await fetch(`https://api.clerk.com/v1/organizations/${orgId}/memberships`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${clerkSecretKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        role: mapRoleToClerkRole(role),
+      }),
+    });
+
     if (!response.ok) {
       const error = await response.text();
       throw new Error(`Failed to create org membership: ${error}`);
     }
-    
-    const result = await response.json() as { id: string };
-    
+
+    const result = (await response.json()) as { id: string };
+
     console.log(`[SSO] Linked user ${userId} to org ${orgId} with role ${role}`);
-    
+
     return {
       success: true,
       membershipId: result.id,
@@ -286,7 +284,7 @@ function mapRoleToClerkRole(role: 'learner' | 'teacher' | 'org_admin'): string {
     teacher: 'org:teacher',
     org_admin: 'org:admin',
   };
-  
+
   return roleMap[role] || 'org:member';
 }
 
@@ -294,7 +292,7 @@ function mapRoleToClerkRole(role: 'learner' | 'teacher' | 'org_admin'): string {
  * Handle the complete Google Workspace SSO flow
  */
 export async function handleGoogleWorkspaceSSO(
-  ctx: Context,
+  _ctx: Context,
   options: {
     code: string;
     state: string;
@@ -316,10 +314,10 @@ export async function handleGoogleWorkspaceSSO(
       clientSecret: options.googleClientSecret,
       redirectUri: options.redirectUri,
     });
-    
+
     // Decode ID token to get user info
     const userInfo = decodeGoogleIdToken(tokens.id_token);
-    
+
     // Verify email is from a Workspace domain
     if (!userInfo.hd) {
       return {
@@ -327,17 +325,17 @@ export async function handleGoogleWorkspaceSSO(
         error: 'Not a Google Workspace account',
       };
     }
-    
+
     // Verify the workspace domain is registered
     const workspaceConfig = await verifyWorkspaceDomain(userInfo.hd);
-    
+
     if (!workspaceConfig) {
       return {
         success: false,
         error: 'Workspace domain not registered',
       };
     }
-    
+
     // Link user to organization
     const linkResult = await linkUserToOrg(
       userInfo.sub,
@@ -345,14 +343,14 @@ export async function handleGoogleWorkspaceSSO(
       workspaceConfig.defaultRole,
       options.clerkSecretKey
     );
-    
+
     if (!linkResult.success) {
       return {
         success: false,
         error: linkResult.error || 'Failed to link user to organization',
       };
     }
-    
+
     return {
       success: true,
       user: userInfo,
@@ -399,14 +397,14 @@ export async function verifyOAuthState(
 ): Promise<Record<string, unknown> | null> {
   const key = `oauth:state:${state}`;
   const stored = await kv.get(key);
-  
+
   if (!stored) {
     return null;
   }
-  
+
   // Delete after retrieval (one-time use)
   await kv.delete(key);
-  
+
   try {
     return JSON.parse(stored) as Record<string, unknown>;
   } catch {

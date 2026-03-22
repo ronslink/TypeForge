@@ -132,6 +132,7 @@
   - Arrow keys navigate between words when not actively typing
   - RTL support: dir attribute and lang for Arabic/Hebrew text
 -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
   class="typing-input font-label text-3xl md:text-4xl leading-relaxed tracking-tight {className}"
   class:is-rtl={isRTL}

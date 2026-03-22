@@ -6,7 +6,7 @@
 import { Hono } from 'hono';
 import { requireRole, getDb } from '../middleware/index.js';
 import { users, organisations, subscriptions, sessions, auditLogs } from '@typeforge/db';
-import { desc, count, sql } from 'drizzle-orm';
+import { desc, count, sql, eq } from 'drizzle-orm';
 
 const app = new Hono();
 
@@ -29,10 +29,10 @@ app.get('/stats', async (c) => {
   
   return c.json({
     stats: {
-      users: userCount.count,
-      organisations: orgCount.count,
-      sessions: sessionCount.count,
-      activeSubscriptions: activeSubCount.count,
+      users: userCount?.count || 0,
+      organisations: orgCount?.count || 0,
+      sessions: sessionCount?.count || 0,
+      activeSubscriptions: activeSubCount?.count || 0,
     }
   });
 });

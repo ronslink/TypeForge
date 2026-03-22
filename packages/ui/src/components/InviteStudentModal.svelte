@@ -80,21 +80,14 @@
     onCancelInvite?.(invitationId);
   }
 
-  function formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-    });
-  }
-
   function getDaysUntilExpiry(expiresAt: Date): number {
     const diff = new Date(expiresAt).getTime() - Date.now();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 </script>
 
-<div class="modal-overlay" onclick={onClose}>
-  <div class="modal-content" onclick={(e) => e.stopPropagation()}>
+<div class="modal-overlay" role="button" tabindex="0" onclick={onClose} onkeydown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}>
+  <div class="modal-content" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} tabindex="-1">
     <!-- Header -->
     <header class="modal-header">
       <h2 class="modal-title">Invite Student</h2>

@@ -7,7 +7,7 @@
 import type { Context, Next } from 'hono';
 import type { Env } from '../../../../infra/contracts/bindings.js';
 import { createRegionalDb, type DbClient, type Region } from '@typeforge/db';
-import { extractRegionFromClaims } from '@typeforge/auth';
+
 
 // Extend Hono context with regional routing variables
 declare module 'hono' {

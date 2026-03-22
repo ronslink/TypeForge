@@ -42,7 +42,6 @@
   // Find WPM metric
   const wpmMetric = $derived(metrics.find(m => m.label === 'WPM'));
   const accuracyMetric = $derived(metrics.find(m => m.label === 'Accuracy'));
-  const streakMetric = $derived(metrics.find(m => m.label === 'Streak'));
 
   // Announce WPM every N seconds (not every keystroke - too noisy)
   $effect(() => {

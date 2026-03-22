@@ -5,7 +5,7 @@
 
 import { Hono } from 'hono';
 import { requireAuth, requireRole, getAuth, getDb } from '../middleware/index.js';
-import { organisations, orgMembers, orgClasses, classMembers, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users } from '@typeforge/db';
+import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users } from '@typeforge/db';
 import { eq, and, sql } from 'drizzle-orm';
 import Stripe from 'stripe';
 
@@ -21,12 +21,12 @@ app.use('*', requireAuth);
 /**
  * Initialize Stripe client
  */
-function getStripe(c: { env: { STRIPE_SECRET_KEY?: string } }): Stripe {
-  const secretKey = c.env.STRIPE_SECRET_KEY;
+function getStripe(c: any): Stripe {
+  const secretKey = (c.env as any).STRIPE_SECRET_KEY;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
-  return new Stripe(secretKey, { apiVersion: '2024-12-18.acacia' });
+  return new Stripe(secretKey, { apiVersion: '2023-10-16' });
 }
 
 /**
@@ -71,7 +71,7 @@ app.post('/', requireRole('org_admin', 'platform_admin'), async (c) => {
   
   // Add creator as admin
   await db.insert(orgMembers).values({
-    orgId: org.id,
+    orgId: org!.id,
     userId: auth.userId,
     role: 'admin',
     status: 'active',
@@ -80,12 +80,12 @@ app.post('/', requireRole('org_admin', 'platform_admin'), async (c) => {
   
   // Create default org settings
   await db.insert(orgSettings).values({
-    orgId: org.id,
+    orgId: org!.id,
   });
   
   // Initialize org billing record
   await db.insert(orgBilling).values({
-    orgId: org.id,
+    orgId: org!.id,
     seatPriceCents: SEAT_PRICE_CENTS,
     billingInterval: 'monthly',
     currentSeatCount: 1, // Creator counts as 1 seat
@@ -101,7 +101,7 @@ app.post('/', requireRole('org_admin', 'platform_admin'), async (c) => {
 app.get('/:id', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   const [org] = await db
     .select()
@@ -155,9 +155,9 @@ app.get('/:id', async (c) => {
  * GET /organisations/:id/classes - List organisation classes
  */
 app.get('/:id/classes', async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   const classes = await db
     .select()
@@ -171,9 +171,9 @@ app.get('/:id/classes', async (c) => {
  * GET /organisations/:id/members - List organisation members
  */
 app.get('/:id/members', async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   const members = await db
     .select({
@@ -193,7 +193,7 @@ app.get('/:id/members', async (c) => {
 app.post('/:id/invite', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   const body = await c.req.json();
   const { email, role, classId } = body;
@@ -236,9 +236,9 @@ app.post('/:id/invite', async (c) => {
  * POST /organisations/:id/billing/seats - Create Stripe subscription for org seat licensing
  */
 app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   const stripe = getStripe(c);
   
   const body = await c.req.json();
@@ -280,10 +280,10 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
   }
   
   // Create checkout session for seats
-  const priceId = c.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID;
+  const priceId = (c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID;
   
   const session = await stripe.checkout.sessions.create({
-    customer: customerId,
+    customer: customerId as string,
     line_items: [
       {
         price: priceId,
@@ -291,8 +291,8 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
       },
     ],
     mode: 'subscription',
-    success_url: successUrl || `${c.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${c.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing`,
+    success_url: successUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: cancelUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/cancel`,
     metadata: {
       orgId,
       type: 'org_seats',
@@ -328,9 +328,9 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
  * POST /organisations/:id/billing/seats/upgrade - Add seats with prorated billing
  */
 app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'), async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   const stripe = getStripe(c);
   
   const body = await c.req.json();
@@ -360,7 +360,7 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === (c.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => item.price.id === ((c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {
@@ -397,9 +397,9 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
  * POST /organisations/:id/billing/seats/downgrade - Remove seats at end of billing period
  */
 app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admin'), async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   const stripe = getStripe(c);
   
   const body = await c.req.json();
@@ -441,7 +441,7 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === (c.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => item.price.id === ((c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {
@@ -478,7 +478,7 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
 app.get('/:id/seats', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   // Check membership
   const [membership] = await db
@@ -552,9 +552,9 @@ app.get('/:id/seats', async (c) => {
  * POST /organisations/:id/seats/assign - Assign a seat to a user
  */
 app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
+  const orgId = c.req.param('id') as string;
   
   const body = await c.req.json();
   const { userId, role = 'learner' } = body;
@@ -603,12 +603,10 @@ app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => 
     joinedAt: new Date(),
   });
   
-  // Create seat assignment record
   await db.insert(subscriptionSeats).values({
     orgId,
     userId,
-    assignedBy: auth.userId,
-    assignedAt: new Date(),
+    allocatedAt: new Date(),
   });
   
   // Update seat count
@@ -632,10 +630,10 @@ app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => 
  * DELETE /organisations/:id/seats/:userId - Remove a seat assignment
  */
 app.delete('/:id/seats/:userId', requireRole('org_admin', 'teacher'), async (c) => {
-  const auth = getAuth(c)!;
+  getAuth(c);
   const db = getDb(c);
-  const orgId = c.req.param('id');
-  const targetUserId = c.req.param('userId');
+  const orgId = c.req.param('id') as string;
+  const targetUserId = c.req.param('userId') as string;
   
   // Get current billing info
   const [billing] = await db

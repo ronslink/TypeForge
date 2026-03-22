@@ -47,7 +47,7 @@
         </p>
       {/if}
     </div>
-    <Badge variant="solid" size="sm">
+    <Badge variant="primary">
       {lesson.language}
     </Badge>
   </div>

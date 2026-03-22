@@ -3,17 +3,33 @@
  * Session tracking, keystroke data, and performance metrics
  */
 
-import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, smallint, real } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  pgEnum,
+  uuid,
+  text,
+  integer,
+  timestamp,
+  boolean,
+  smallint,
+  real,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, lessons, exercises } from './index.js';
 
 // Enums
-export const sessionStatusEnum = pgEnum('session_status', ['in_progress', 'completed', 'abandoned']);
+export const sessionStatusEnum = pgEnum('session_status', [
+  'in_progress',
+  'completed',
+  'abandoned',
+]);
 
 // Typing sessions table
 export const typingSessions = pgTable('typing_sessions', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   lessonId: uuid('lesson_id').references(() => lessons.id, { onDelete: 'set null' }),
   exerciseId: uuid('exercise_id').references(() => exercises.id, { onDelete: 'set null' }),
   languageCode: text('language_code').notNull(),
@@ -36,7 +52,9 @@ export const typingSessions = pgTable('typing_sessions', {
 // Keystroke events table (for detailed analysis)
 export const keystrokeEvents = pgTable('keystroke_events', {
   id: uuid('id').primaryKey().defaultRandom(),
-  sessionId: uuid('session_id').notNull().references(() => typingSessions.id, { onDelete: 'cascade' }),
+  sessionId: uuid('session_id')
+    .notNull()
+    .references(() => typingSessions.id, { onDelete: 'cascade' }),
   character: text('character').notNull(),
   expected: text('expected').notNull(),
   correct: boolean('correct').notNull(),
@@ -50,55 +68,75 @@ export const keystrokeEvents = pgTable('keystroke_events', {
 });
 
 // Daily stats table (aggregated)
-export const dailyStats = pgTable('daily_stats', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  date: timestamp('date').notNull(),
-  languageCode: text('language_code').notNull(),
-  totalSessions: integer('total_sessions').notNull().default(0),
-  totalMinutes: integer('total_minutes').notNull().default(0),
-  totalCharacters: integer('total_characters').notNull().default(0),
-  avgWpm: real('avg_wpm'),
-  avgAccuracy: real('avg_accuracy'),
-  bestWpm: real('best_wpm'),
-  lessonsCompleted: integer('lessons_completed').notNull().default(0),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userDateLangUnique: { unique: true, columns: [table.userId, table.date, table.languageCode] },
-}));
+export const dailyStats = pgTable(
+  'daily_stats',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    date: timestamp('date').notNull(),
+    languageCode: text('language_code').notNull(),
+    totalSessions: integer('total_sessions').notNull().default(0),
+    totalMinutes: integer('total_minutes').notNull().default(0),
+    totalCharacters: integer('total_characters').notNull().default(0),
+    avgWpm: real('avg_wpm'),
+    avgAccuracy: real('avg_accuracy'),
+    bestWpm: real('best_wpm'),
+    lessonsCompleted: integer('lessons_completed').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userDateLangUnique: { unique: true, columns: [table.userId, table.date, table.languageCode] },
+  })
+);
 
 // User progress table (per lesson)
-export const userProgress = pgTable('user_progress', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  lessonId: uuid('lesson_id').notNull().references(() => lessons.id, { onDelete: 'cascade' }),
-  status: text('status').notNull().default('not_started'), // 'not_started' | 'in_progress' | 'completed'
-  bestWpm: real('best_wpm'),
-  bestAccuracy: real('best_accuracy'),
-  attempts: integer('attempts').notNull().default(0),
-  completedAt: timestamp('completed_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userLessonUnique: { unique: true, columns: [table.userId, table.lessonId] },
-}));
+export const userProgress = pgTable(
+  'user_progress',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    lessonId: uuid('lesson_id')
+      .notNull()
+      .references(() => lessons.id, { onDelete: 'cascade' }),
+    status: text('status').notNull().default('not_started'), // 'not_started' | 'in_progress' | 'completed'
+    bestWpm: real('best_wpm'),
+    bestAccuracy: real('best_accuracy'),
+    attempts: integer('attempts').notNull().default(0),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userLessonUnique: { unique: true, columns: [table.userId, table.lessonId] },
+  })
+);
 
 // Key mastery table (per user, per key)
-export const keyMastery = pgTable('key_mastery', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  layoutId: text('layout_id').notNull(),
-  key: text('key').notNull(),
-  totalAttempts: integer('total_attempts').notNull().default(0),
-  correctAttempts: integer('correct_attempts').notNull().default(0),
-  avgDwellTime: integer('avg_dwell_time'),
-  masteryLevel: smallint('mastery_level').notNull().default(0), // 0-100
-  lastPracticedAt: timestamp('last_practiced_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userLayoutKeyUnique: { unique: true, columns: [table.userId, table.layoutId, table.key] },
-}));
+export const keyMastery = pgTable(
+  'key_mastery',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    layoutId: text('layout_id').notNull(),
+    key: text('key').notNull(),
+    totalAttempts: integer('total_attempts').notNull().default(0),
+    correctAttempts: integer('correct_attempts').notNull().default(0),
+    avgDwellTime: integer('avg_dwell_time'),
+    masteryLevel: smallint('mastery_level').notNull().default(0), // 0-100
+    lastPracticedAt: timestamp('last_practiced_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userLayoutKeyUnique: { unique: true, columns: [table.userId, table.layoutId, table.key] },
+  })
+);
 
 // Relations
 export const typingSessionsRelations = relations(typingSessions, ({ one, many }) => ({
@@ -148,3 +186,6 @@ export const keyMasteryRelations = relations(keyMastery, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// Alias for backwards compatibility with API
+export const sessions = typingSessions;

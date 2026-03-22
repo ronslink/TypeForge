@@ -19,9 +19,9 @@
   const normalizedProgress = $derived(Math.min(100, Math.max(0, progress)));
 
   // Calculate circle properties
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (normalizedProgress / 100) * circumference;
+  const radius = $derived((size - strokeWidth) / 2);
+  const circumference = $derived(radius * 2 * Math.PI);
+  const offset = $derived(circumference - (normalizedProgress / 100) * circumference);
 
   const variantColors = {
     primary: '#F0A500', // amber

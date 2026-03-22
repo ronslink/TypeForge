@@ -10,12 +10,11 @@
 
   interface Props {
     weaknesses: KeyWeakness[];
-    layout?: 'qwerty' | 'azerty' | 'qwertz';
     showLabels?: boolean;
     children?: Snippet;
   }
 
-  let { weaknesses, layout = 'qwerty', showLabels = true, children }: Props = $props();
+  const { weaknesses, showLabels = true, children }: Props = $props();
 
   // QWERTY layout rows
   const keyboardRows = [
@@ -26,9 +25,7 @@
   ];
 
   // Create a map for quick lookup
-  const weaknessMap = $derived(
-    new Map(weaknesses.map((w) => [w.key.toLowerCase(), w]))
-  );
+  const weaknessMap = $derived(new Map(weaknesses.map((w) => [w.key.toLowerCase(), w])));
 
   function getKeyColor(accuracy: number): string {
     if (accuracy >= 95) return 'rgba(76, 175, 80, 0.3)'; // Green - good
@@ -48,9 +45,7 @@
 <div class="weakness-heatmap">
   <div class="heatmap-header mb-4">
     <h3 class="font-label text-lg font-bold text-on-surface">Key Weakness Map</h3>
-    <p class="text-sm text-on-surface-variant">
-      Keys highlighted in red need more practice
-    </p>
+    <p class="text-sm text-on-surface-variant">Keys highlighted in red need more practice</p>
   </div>
 
   <div class="keyboard-container">
@@ -81,19 +76,31 @@
 
   <div class="legend mt-4 flex gap-4 text-xs">
     <div class="legend-item flex items-center gap-2">
-      <div class="w-4 h-4 rounded-sm" style="background: rgba(76, 175, 80, 0.3); border-bottom: 2px solid #4CAF50;"></div>
+      <div
+        class="w-4 h-4 rounded-sm"
+        style="background: rgba(76, 175, 80, 0.3); border-bottom: 2px solid #4CAF50;"
+      ></div>
       <span class="text-on-surface-variant">95%+ (Good)</span>
     </div>
     <div class="legend-item flex items-center gap-2">
-      <div class="w-4 h-4 rounded-sm" style="background: rgba(255, 193, 7, 0.3); border-bottom: 2px solid #FFC107;"></div>
+      <div
+        class="w-4 h-4 rounded-sm"
+        style="background: rgba(255, 193, 7, 0.3); border-bottom: 2px solid #FFC107;"
+      ></div>
       <span class="text-on-surface-variant">85-94%</span>
     </div>
     <div class="legend-item flex items-center gap-2">
-      <div class="w-4 h-4 rounded-sm" style="background: rgba(255, 152, 0, 0.4); border-bottom: 2px solid #FF9800;"></div>
+      <div
+        class="w-4 h-4 rounded-sm"
+        style="background: rgba(255, 152, 0, 0.4); border-bottom: 2px solid #FF9800;"
+      ></div>
       <span class="text-on-surface-variant">70-84%</span>
     </div>
     <div class="legend-item flex items-center gap-2">
-      <div class="w-4 h-4 rounded-sm" style="background: rgba(244, 67, 54, 0.5); border-bottom: 2px solid #F44336;"></div>
+      <div
+        class="w-4 h-4 rounded-sm"
+        style="background: rgba(244, 67, 54, 0.5); border-bottom: 2px solid #F44336;"
+      ></div>
       <span class="text-on-surface-variant">&lt;70% (Needs work)</span>
     </div>
   </div>

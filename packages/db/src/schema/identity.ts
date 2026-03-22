@@ -3,12 +3,32 @@
  * Core user record, extended profile, preferences, and device registry
  */
 
-import { pgTable, pgEnum, uuid, text, boolean, date, timestamp, smallint, char, jsonb } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  pgEnum,
+  uuid,
+  text,
+  boolean,
+  date,
+  timestamp,
+  smallint,
+  char,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums
-export const userStatusEnum = pgEnum('user_status', ['active', 'suspended', 'pending_verification', 'deleted']);
-export const userRoleEnum = pgEnum('user_role', ['learner', 'teacher', 'org_admin', 'platform_admin']);
+export const userStatusEnum = pgEnum('user_status', [
+  'active',
+  'suspended',
+  'pending_verification',
+  'deleted',
+]);
+export const userRoleEnum = pgEnum('user_role', [
+  'learner',
+  'teacher',
+  'org_admin',
+  'platform_admin',
+]);
 export const accountTypeEnum = pgEnum('account_type', ['individual', 'institutional']);
 export const homeRegionEnum = pgEnum('home_region', ['EU', 'US', 'AF']);
 
@@ -26,16 +46,15 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').notNull().default('learner'),
   status: userStatusEnum('status').notNull().default('pending_verification'),
   homeRegion: homeRegionEnum('home_region').notNull(),
+  stripeCustomerId: text('stripe_customer_id'),
   locale: text('locale').notNull().default('en'),
   timezone: text('timezone').notNull().default('UTC'),
   dateOfBirth: date('date_of_birth'),
-  isMinor: boolean('is_minor').generatedAlwaysAs(
-    'date_of_birth IS NOT NULL AND date_of_birth > CURRENT_DATE - INTERVAL \'18 years\'',
-    { mode: 'stored' }
-  ),
+  // isMinor is computed in application logic based on dateOfBirth
+  isMinor: boolean('is_minor').default(false),
   parentalConsentAt: timestamp('parental_consent_at', { withTimezone: true }),
   parentalEmail: text('parental_email'),
-  referredBy: uuid('referred_by').references(() => users.id, { onDelete: 'set null' }),
+  referredBy: uuid('referred_by'),
   lastActiveAt: timestamp('last_active_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -44,7 +63,9 @@ export const users = pgTable('users', {
 
 // User profiles table (extended profile)
 export const userProfiles = pgTable('user_profiles', {
-  userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
   bio: text('bio'),
   countryCode: char('country_code', { length: 2 }),
   city: text('city'),
@@ -58,7 +79,9 @@ export const userProfiles = pgTable('user_profiles', {
 
 // User preferences table
 export const userPreferences = pgTable('user_preferences', {
-  userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
   defaultLanguageCode: text('default_language_code').notNull().default('en'),
   defaultLayoutId: text('default_layout_id').notNull().default('qwerty-us'),
   showKeyboardVisual: boolean('show_keyboard_visual').notNull().default(true),
@@ -81,19 +104,25 @@ export const userPreferences = pgTable('user_preferences', {
 });
 
 // User devices table
-export const userDevices = pgTable('user_devices', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  deviceName: text('device_name'),
-  deviceType: text('device_type'),
-  os: text('os'),
-  browser: text('browser'),
-  pushToken: text('push_token'),
-  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userPushTokenUnique: { unique: true, columns: [table.userId, table.pushToken] },
-}));
+export const userDevices = pgTable(
+  'user_devices',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    deviceName: text('device_name'),
+    deviceType: text('device_type'),
+    os: text('os'),
+    browser: text('browser'),
+    pushToken: text('push_token'),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userPushTokenUnique: { unique: true, columns: [table.userId, table.pushToken] },
+  })
+);
 
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({

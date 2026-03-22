@@ -3,20 +3,42 @@
  * Schools, companies, or any institutional account
  */
 
-import { pgTable, pgEnum, uuid, text, boolean, timestamp, char, integer } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import {
+  pgTable,
+  pgEnum,
+  uuid,
+  text,
+  boolean,
+  timestamp,
+  char,
+  integer,
+} from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 import { users, homeRegionEnum } from './identity.js';
 
 // Enums
-export const orgTypeEnum = pgEnum('org_type', ['school', 'university', 'company', 'nonprofit', 'government', 'other']);
+export const orgTypeEnum = pgEnum('org_type', [
+  'school',
+  'university',
+  'company',
+  'nonprofit',
+  'government',
+  'other',
+]);
 export const orgStatusEnum = pgEnum('org_status', ['active', 'suspended', 'trial', 'cancelled']);
 export const memberRoleEnum = pgEnum('member_role', ['admin', 'teacher', 'student', 'viewer']);
-export const memberStatusEnum = pgEnum('member_status', ['active', 'invited', 'suspended', 'removed']);
+export const memberStatusEnum = pgEnum('member_status', [
+  'active',
+  'invited',
+  'suspended',
+  'removed',
+]);
 
 // Organisations table
 export const organisations = pgTable('organisations', {
   id: uuid('id').primaryKey().defaultRandom(),
   clerkOrgId: text('clerk_org_id').unique(),
+  stripeCustomerId: text('stripe_customer_id').unique(),
   name: text('name').notNull(),
   slug: text('slug').unique().notNull(),
   orgType: orgTypeEnum('org_type').notNull().default('school'),
@@ -38,25 +60,33 @@ export const organisations = pgTable('organisations', {
 });
 
 // Org members table
-export const orgMembers = pgTable('org_members', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  orgId: uuid('org_id').notNull().references(() => organisations.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
-  role: memberRoleEnum('role').notNull().default('student'),
-  status: memberStatusEnum('status').notNull().default('invited'),
-  invitedEmail: text('invited_email'),
-  invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
-  joinedAt: timestamp('joined_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  orgUserUnique: { unique: true, columns: [table.orgId, table.userId] },
-}));
+export const orgMembers = pgTable(
+  'org_members',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organisations.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    role: memberRoleEnum('role').notNull().default('student'),
+    status: memberStatusEnum('status').notNull().default('invited'),
+    invitedEmail: text('invited_email'),
+    invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
+    joinedAt: timestamp('joined_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    orgUserUnique: { unique: true, columns: [table.orgId, table.userId] },
+  })
+);
 
 // Org classes table
 export const orgClasses = pgTable('org_classes', {
   id: uuid('id').primaryKey().defaultRandom(),
-  orgId: uuid('org_id').notNull().references(() => organisations.id, { onDelete: 'cascade' }),
+  orgId: uuid('org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   description: text('description'),
   teacherId: uuid('teacher_id').references(() => users.id, { onDelete: 'set null' }),
@@ -68,22 +98,35 @@ export const orgClasses = pgTable('org_classes', {
 });
 
 // Class members table
-export const classMembers = pgTable('class_members', {
-  classId: uuid('class_id').notNull().references(() => orgClasses.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  pk: { primaryKey: true, columns: [table.classId, table.userId] },
-}));
+export const classMembers = pgTable(
+  'class_members',
+  {
+    classId: uuid('class_id')
+      .notNull()
+      .references(() => orgClasses.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    pk: { primaryKey: true, columns: [table.classId, table.userId] },
+  })
+);
 
 // Org invitations table
 export const orgInvitations = pgTable('org_invitations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  orgId: uuid('org_id').notNull().references(() => organisations.id, { onDelete: 'cascade' }),
+  orgId: uuid('org_id')
+    .notNull()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
   classId: uuid('class_id').references(() => orgClasses.id, { onDelete: 'set null' }),
   email: text('email').notNull(),
   role: memberRoleEnum('role').notNull().default('student'),
-  token: text('token').unique().notNull().defaultRandom(),
+  token: text('token')
+    .unique()
+    .notNull()
+    .default(sql`gen_random_uuid()`),
   invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull().defaultNow(),
   acceptedAt: timestamp('accepted_at', { withTimezone: true }),
@@ -92,7 +135,9 @@ export const orgInvitations = pgTable('org_invitations', {
 
 // Org settings table
 export const orgSettings = pgTable('org_settings', {
-  orgId: uuid('org_id').primaryKey().references(() => organisations.id, { onDelete: 'cascade' }),
+  orgId: uuid('org_id')
+    .primaryKey()
+    .references(() => organisations.id, { onDelete: 'cascade' }),
   ssoEnabled: boolean('sso_enabled').notNull().default(false),
   ssoProvider: text('sso_provider'),
   ssoDomain: text('sso_domain'),

@@ -3,13 +3,18 @@
  * Notifications, audit logs, and system events
  */
 
-import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, pgEnum, uuid, text, timestamp, boolean, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, organisations } from './index.js';
 
 // Enums
 export const notificationChannelEnum = pgEnum('notification_channel', ['email', 'push', 'in_app']);
-export const notificationStatusEnum = pgEnum('notification_status', ['pending', 'sent', 'delivered', 'failed']);
+export const notificationStatusEnum = pgEnum('notification_status', [
+  'pending',
+  'sent',
+  'delivered',
+  'failed',
+]);
 
 // Notification templates table
 export const notificationTemplates = pgTable('notification_templates', {
@@ -26,7 +31,9 @@ export const notificationTemplates = pgTable('notification_templates', {
 // Notifications table
 export const notifications = pgTable('notifications', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   templateId: uuid('template_id').references(() => notificationTemplates.id),
   channel: notificationChannelEnum('channel').notNull(),
   status: notificationStatusEnum('status').notNull().default('pending'),

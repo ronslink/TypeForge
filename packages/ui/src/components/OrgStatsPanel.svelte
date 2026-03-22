@@ -32,9 +32,6 @@
   let growthCanvas: HTMLCanvasElement | undefined = $state();
 
   // Derived values
-  const seatUsagePercent = $derived(
-    org.seatsTotal > 0 ? Math.round((org.seatsUsed / org.seatsTotal) * 100) : 0
-  );
 
   const isSeatsFull = $derived(org.seatsUsed >= org.seatsTotal);
 

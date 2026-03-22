@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    id: string;
+
     name: string;
     description: string;
     icon: string;
@@ -9,7 +9,7 @@
   }
 
   let {
-    id,
+
     name,
     description,
     icon,
@@ -209,6 +209,7 @@
     color: #a1a1aa;
     line-height: 1.4;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;

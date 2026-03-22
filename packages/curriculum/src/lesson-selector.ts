@@ -1,20 +1,17 @@
 /**
  * Lesson Selector - Adaptive lesson selection based on user progress
- * 
+ *
  * Selection Logic:
  * 1. Prioritize weak areas (accuracy < 85% on specific key/bigram)
  * 2. Then select next row in current layout progression
  * 3. Apply spaced repetition using SM-2 algorithm
  */
 
-import { LESSON_CATALOG, type Lesson, type Finger } from './lesson-registry.js';
-import { calculateNextReview, accuracyToQuality, type SM2Result } from './sm2.js';
+import { LESSON_CATALOG, type Lesson } from './lesson-registry.js';
+import { calculateNextReview, accuracyToQuality } from './sm2.js';
 
 /** Weak area threshold - accuracy below this triggers priority practice */
 const WEAK_AREA_THRESHOLD = 85;
-
-/** Default accuracy for new/unseen keys */
-const DEFAULT_ACCURACY = 100;
 
 /** Session history entry */
 export interface SessionHistoryEntry {
@@ -52,42 +49,46 @@ export interface SelectedLesson {
 
 /**
  * Select the next lesson for a user based on their history and weak areas
- * 
+ *
  * @param userId - Unique user identifier
  * @param sessionHistory - Array of completed session history
  * @param weakAreas - Map of key/bigram -> weak area info
  * @returns Promise resolving to the next lesson to practice
  */
 export async function selectNextLesson(
-  userId: string,
+  _userId: string,
   sessionHistory: SessionHistoryEntry[],
   weakAreas: Map<string, WeakArea>
 ): Promise<Lesson> {
   const now = new Date();
-  
+
   // Build lesson progress map from session history
   const lessonProgressMap = buildLessonProgressMap(sessionHistory);
-  
+
   // Calculate priority scores for all lessons
-  const scoredLessons: Array<{ lesson: Lesson; reason: SelectedLesson['reason']; priority: number }> = [];
-  
+  const scoredLessons: Array<{
+    lesson: Lesson;
+    reason: SelectedLesson['reason'];
+    priority: number;
+  }> = [];
+
   for (const lesson of LESSON_CATALOG) {
     const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now);
     if (score.priority > 0) {
       scoredLessons.push(score);
     }
   }
-  
+
   // Sort by priority (highest first)
   scoredLessons.sort((a, b) => b.priority - a.priority);
-  
+
   // Return the highest priority lesson, or default to first lesson if none scored
   if (scoredLessons.length > 0) {
-    return scoredLessons[0].lesson;
+    return scoredLessons[0]!.lesson;
   }
-  
+
   // Fallback: return the first lesson in the catalog
-  return LESSON_CATALOG[0];
+  return LESSON_CATALOG[0]!;
 }
 
 /**
@@ -97,7 +98,7 @@ function buildLessonProgressMap(
   sessionHistory: SessionHistoryEntry[]
 ): Map<string, LessonProgress> {
   const progressMap = new Map<string, LessonProgress>();
-  
+
   // Group sessions by lesson
   const sessionsByLesson = new Map<string, SessionHistoryEntry[]>();
   for (const session of sessionHistory) {
@@ -105,23 +106,23 @@ function buildLessonProgressMap(
     existing.push(session);
     sessionsByLesson.set(session.lessonId, existing);
   }
-  
+
   // Calculate progress for each lesson
   for (const [lessonId, sessions] of sessionsByLesson) {
     if (sessions.length === 0) continue;
-    
+
     // Sort by completion date
     sessions.sort((a, b) => a.completedAt.getTime() - b.completedAt.getTime());
-    
-    const lastSession = sessions[sessions.length - 1];
+
+    const lastSession = sessions[sessions.length - 1]!;
     const accuracy = lastSession.accuracy;
     const quality = accuracyToQuality(accuracy);
-    
+
     // Calculate SM-2 values based on all sessions
     let easeFactor = 2.5;
     let interval = 0;
     let repetitions = 0;
-    
+
     for (const session of sessions) {
       const sessionQuality = accuracyToQuality(session.accuracy);
       const result = calculateNextReview(sessionQuality, easeFactor, interval, repetitions);
@@ -129,9 +130,9 @@ function buildLessonProgressMap(
       interval = result.interval;
       repetitions = result.repetitions;
     }
-    
+
     const nextReviewResult = calculateNextReview(quality, easeFactor, interval, repetitions);
-    
+
     progressMap.set(lessonId, {
       lessonId,
       easeFactor: nextReviewResult.easeFactor,
@@ -141,7 +142,7 @@ function buildLessonProgressMap(
       lastAccuracy: accuracy,
     });
   }
-  
+
   return progressMap;
 }
 
@@ -156,7 +157,7 @@ function calculateLessonPriority(
 ): SelectedLesson {
   const lessonProgress = lessonProgressMap.get(lesson.id);
   const keyBigram = lesson.tags.key_bigram;
-  
+
   // 1. Check for weak areas (highest priority)
   const weakArea = weakAreas.get(keyBigram);
   if (weakArea && weakArea.accuracy < WEAK_AREA_THRESHOLD) {
@@ -167,13 +168,13 @@ function calculateLessonPriority(
       priority: 100 + weaknessSeverity * 50, // 100-150 range
     };
   }
-  
+
   // 2. Check for spaced repetition due lessons
   if (lessonProgress) {
     const daysUntilReview = Math.ceil(
       (lessonProgress.nextReviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
     if (daysUntilReview <= 0) {
       // Review is due or overdue
       const overdueBoost = Math.abs(daysUntilReview) * 5;
@@ -183,7 +184,7 @@ function calculateLessonPriority(
         priority: 70 + overdueBoost, // 70+ range
       };
     }
-    
+
     // Lesson already practiced and not due for review - lower priority
     return {
       lesson,
@@ -191,16 +192,16 @@ function calculateLessonPriority(
       priority: Math.max(0, 30 - daysUntilReview),
     };
   }
-  
+
   // 3. New lesson - calculate based on difficulty progression
   // Prefer lower difficulty lessons for new users
   const difficultyBonus = (6 - lesson.difficulty) * 5; // 25, 20, 15, 10, 5
-  
+
   // Check if prerequisites are met (lower difficulty lessons should be done first)
   const hasLowerDifficultyAvailable = LESSON_CATALOG.some(
     (l) => l.difficulty < lesson.difficulty && !lessonProgressMap.has(l.id)
   );
-  
+
   if (hasLowerDifficultyAvailable && lesson.difficulty > 1) {
     // Lower priority if easier lessons are still available
     return {
@@ -209,7 +210,7 @@ function calculateLessonPriority(
       priority: difficultyBonus * 0.5,
     };
   }
-  
+
   return {
     lesson,
     reason: 'new_lesson',
@@ -219,7 +220,7 @@ function calculateLessonPriority(
 
 /**
  * Get recommended lessons for a user with full details
- * 
+ *
  * @param userId - Unique user identifier
  * @param sessionHistory - Array of completed session history
  * @param weakAreas - Map of key/bigram -> weak area info
@@ -227,32 +228,32 @@ function calculateLessonPriority(
  * @returns Promise resolving to array of selected lessons with reasons
  */
 export async function getRecommendedLessons(
-  userId: string,
+  _userId: string,
   sessionHistory: SessionHistoryEntry[],
   weakAreas: Map<string, WeakArea>,
   count: number = 5
 ): Promise<SelectedLesson[]> {
   const now = new Date();
   const lessonProgressMap = buildLessonProgressMap(sessionHistory);
-  
+
   const scoredLessons: SelectedLesson[] = [];
-  
+
   for (const lesson of LESSON_CATALOG) {
     const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now);
     if (score.priority > 0) {
       scoredLessons.push(score);
     }
   }
-  
+
   // Sort by priority (highest first)
   scoredLessons.sort((a, b) => b.priority - a.priority);
-  
+
   return scoredLessons.slice(0, count);
 }
 
 /**
  * Update weak areas based on session performance
- * 
+ *
  * @param weakAreas - Current weak areas map
  * @param lesson - The lesson that was practiced
  * @param accuracy - Accuracy achieved in the session
@@ -265,9 +266,9 @@ export function updateWeakAreas(
 ): Map<string, WeakArea> {
   const keyBigram = lesson.tags.key_bigram;
   const now = new Date();
-  
+
   const existing = weakAreas.get(keyBigram);
-  
+
   if (accuracy < WEAK_AREA_THRESHOLD) {
     // Add or update weak area
     weakAreas.set(keyBigram, {
@@ -280,13 +281,13 @@ export function updateWeakAreas(
     // Remove from weak areas if now above threshold
     weakAreas.delete(keyBigram);
   }
-  
+
   return weakAreas;
 }
 
 /**
  * Get weak areas that need practice
- * 
+ *
  * @param weakAreas - Map of weak areas
  * @returns Array of weak areas sorted by priority (lowest accuracy first)
  */

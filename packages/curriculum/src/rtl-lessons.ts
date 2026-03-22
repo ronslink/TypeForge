@@ -6,42 +6,78 @@
 import type { Lesson, LessonChar, Finger } from './lesson-registry.js';
 
 // Helper to create lesson characters with consistent structure
-function createLessonChar(char: string, code: string, finger: Finger): LessonChar {
-  return { char, code, expectedFinger: finger };
+function createLessonChar(char: string, code: string | undefined, finger: Finger): LessonChar {
+  return { char, code: code!, expectedFinger: finger };
 }
 
 // Arabic letter to key code mapping (simplified for Arabic keyboard layout)
 const ARABIC_KEY_MAP: Record<string, string> = {
   // Row 1 (top) - numbers and special chars
-  '١': 'Digit1', '٢': 'Digit2', '٣': 'Digit3', '٤': 'Digit4', '٥': 'Digit5',
-  '٦': 'Digit6', '٧': 'Digit7', '٨': 'Digit8', '٩': 'Digit9', '٠': 'Digit0',
-  'ذ': 'Minus', 'ّ': 'Equal',
-  
+  '١': 'Digit1',
+  '٢': 'Digit2',
+  '٣': 'Digit3',
+  '٤': 'Digit4',
+  '٥': 'Digit5',
+  '٦': 'Digit6',
+  '٧': 'Digit7',
+  '٨': 'Digit8',
+  '٩': 'Digit9',
+  '٠': 'Digit0',
+  ذ: 'Minus',
+  'ّ': 'Equal',
+
   // Row 2 (QWERTY row)
-  'ض': 'KeyQ', 'ص': 'KeyW', 'ث': 'KeyE', 'ق': 'KeyR', 'ف': 'KeyT',
-  'غ': 'KeyY', 'ع': 'KeyU', 'ه': 'KeyI', 'خ': 'KeyO', 'ح': 'KeyP',
-  'ج': 'BracketLeft', 'د': 'BracketRight',
-  
+  ض: 'KeyQ',
+  ص: 'KeyW',
+  ث: 'KeyE',
+  ق: 'KeyR',
+  ف: 'KeyT',
+  غ: 'KeyY',
+  ع: 'KeyU',
+  ه: 'KeyI',
+  خ: 'KeyO',
+  ح: 'KeyP',
+  ج: 'BracketLeft',
+  د: 'BracketRight',
+
   // Row 3 (home row)
-  'ش': 'KeyA', 'س': 'KeyS', 'ي': 'KeyD', 'ب': 'KeyF', 'ل': 'KeyG',
-  'ا': 'KeyH', 'ت': 'KeyJ', 'ن': 'KeyK', 'م': 'KeyL', 'ك': 'Semicolon',
-  'ط': 'Quote',
-  
+  ش: 'KeyA',
+  س: 'KeyS',
+  ي: 'KeyD',
+  ب: 'KeyF',
+  ل: 'KeyG',
+  ا: 'KeyH',
+  ت: 'KeyJ',
+  ن: 'KeyK',
+  م: 'KeyL',
+  ك: 'Semicolon',
+  ط: 'Quote',
+
   // Row 4 (bottom row)
-  'ئ': 'Backslash', 'ء': 'KeyZ', 'ؤ': 'KeyX', 'ر': 'KeyC', 'ى': 'KeyV',
-  'ة': 'KeyB', 'و': 'KeyN', 'ز': 'KeyM', 'ظ': 'Comma', ' ': 'Space',
+  ئ: 'Backslash',
+  ء: 'KeyZ',
+  ؤ: 'KeyX',
+  ر: 'KeyC',
+  ى: 'KeyV',
+  ة: 'KeyB',
+  و: 'KeyN',
+  ز: 'KeyM',
+  ظ: 'Comma',
+  ' ': 'Space',
 };
 
 // Harakat (diacritics/vowel marks)
-const HARAKAT_MAP: Record<string, string> = {
-  'َ': 'Fatha',      // fatha
-  'ُ': 'Damma',      // damma
-  'ِ': 'Kasra',      // kasra
-  'ْ': 'Sukun',      // sukun
-  'ّ': 'Shadda',     // shadda
-  'ً': 'Fathatan',   // fathatan
-  'ٌ': 'Dammatan',   // dammatan
-  'ٍ': 'Kasratan',   // kasratan
+// Arabic diacritics/marks mapping (reserved for future use)
+
+export const HARAKAT_MAP: Record<string, string> = {
+  'َ': 'Fatha', // fatha
+  'ُ': 'Damma', // damma
+  'ِ': 'Kasra', // kasra
+  'ْ': 'Sukun', // sukun
+  'ّ': 'Shadda', // shadda
+  'ً': 'Fathatan', // fathatan
+  'ٌ': 'Dammatan', // dammatan
+  'ٍ': 'Kasratan', // kasratan
 };
 
 /**
@@ -509,20 +545,17 @@ export const arabicLessons: Lesson[] = [
 ];
 
 // Export individual lesson categories for convenience
-export const arabicAlphabetLessons = arabicLessons.filter((l) =>
-  l.id.startsWith('ar-alphabet')
+export const arabicAlphabetLessons = arabicLessons.filter((l) => l.id.startsWith('ar-alphabet'));
+
+export const arabicHarakatLessons = arabicLessons.filter((l) => l.id.includes('harakat'));
+
+export const arabicGrammarLessons = arabicLessons.filter(
+  (l) =>
+    l.id.includes('sun-letters') || l.id.includes('moon-letters') || l.id.includes('weak-letters')
 );
 
-export const arabicHarakatLessons = arabicLessons.filter((l) =>
-  l.id.includes('harakat')
-);
-
-export const arabicGrammarLessons = arabicLessons.filter((l) =>
-  l.id.includes('sun-letters') || l.id.includes('moon-letters') || l.id.includes('weak-letters')
-);
-
-export const arabicPhraseLessons = arabicLessons.filter((l) =>
-  l.id.includes('simple-words') || l.id.includes('phrases')
+export const arabicPhraseLessons = arabicLessons.filter(
+  (l) => l.id.includes('simple-words') || l.id.includes('phrases')
 );
 
 export default arabicLessons;

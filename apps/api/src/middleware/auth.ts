@@ -19,7 +19,7 @@ declare module 'hono' {
  */
 export async function authMiddleware(c: Context, next: Next) {
   const authHeader = c.req.header('Authorization');
-  const token = extractBearerToken(authHeader);
+  const token = extractBearerToken(authHeader || '');
   
   if (!token) {
     // No token provided - continue without auth (for public routes)

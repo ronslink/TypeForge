@@ -5,8 +5,8 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
-import { subscriptions, plans, invoices, subscriptionSeats, users } from '@typeforge/db';
-import { eq, and } from 'drizzle-orm';
+import { subscriptions, plans, invoices, planPrices, users } from '@typeforge/db';
+import { eq } from 'drizzle-orm';
 import Stripe from 'stripe';
 
 const app = new Hono();
@@ -26,12 +26,12 @@ const INDIVIDUAL_PRICES = {
 /**
  * Initialize Stripe client
  */
-function getStripe(c: { env: { STRIPE_SECRET_KEY?: string; STRIPE_WEBHOOK_SECRET?: string } }): Stripe {
+function getStripe(c: any): Stripe {
   const secretKey = c.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
-  return new Stripe(secretKey, { apiVersion: '2024-12-18.acacia' });
+  return new Stripe(secretKey, { apiVersion: '2023-10-16' });
 }
 
 /**
@@ -86,7 +86,7 @@ app.post('/checkout', requireAuth, async (c) => {
   const db = getDb(c);
   
   // Get or create Stripe customer
-  let [userRecord] = await db
+  const [userRecord] = await db
     .select({ stripeCustomerId: users.stripeCustomerId, email: users.email })
     .from(users)
     .where(eq(users.id, auth.userId))
@@ -114,8 +114,8 @@ app.post('/checkout', requireAuth, async (c) => {
   
   // Get price ID from environment or use default
   const priceId = interval === 'monthly' 
-    ? (c.env.STRIPE_PRICE_MONTHLY || INDIVIDUAL_PRICES.monthly.priceId)
-    : (c.env.STRIPE_PRICE_ANNUAL || INDIVIDUAL_PRICES.annual.priceId);
+    ? ((c.env as any).STRIPE_PRICE_MONTHLY || INDIVIDUAL_PRICES.monthly.priceId)
+    : ((c.env as any).STRIPE_PRICE_ANNUAL || INDIVIDUAL_PRICES.annual.priceId);
   
   // Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -127,8 +127,8 @@ app.post('/checkout', requireAuth, async (c) => {
       },
     ],
     mode: 'subscription',
-    success_url: successUrl || `${c.env.APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${c.env.APP_URL || 'https://typeforge.io'}/billing/cancel`,
+    success_url: successUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: cancelUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing/cancel`,
     metadata: {
       userId: auth.userId,
       type: 'individual',
@@ -170,7 +170,7 @@ app.post('/portal', requireAuth, async (c) => {
   // Create portal session
   const session = await stripe.billingPortal.sessions.create({
     customer: userRecord.stripeCustomerId,
-    return_url: `${c.env.APP_URL || 'https://typeforge.io'}/billing`,
+    return_url: `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing`,
   });
   
   return c.json({ 
@@ -201,7 +201,7 @@ app.post('/webhook', async (c) => {
   const stripe = getStripe(c);
   const body = await c.req.text();
   const signature = c.req.header('Stripe-Signature');
-  const webhookSecret = c.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = (c.env as any).STRIPE_WEBHOOK_SECRET;
   
   if (!signature || !webhookSecret) {
     return c.json({ error: 'Missing signature or webhook secret', code: 'INVALID_REQUEST' }, 400);
@@ -264,11 +264,7 @@ app.post('/webhook', async (c) => {
  */
 async function handleSubscriptionUpdate(
   subscription: Stripe.Subscription,
-  db: { 
-    update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown> } };
-    insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]> } };
-    select: () => unknown;
-  }
+  db: any
 ): Promise<void> {
   const userId = subscription.metadata?.userId;
   const orgId = subscription.metadata?.orgId;
@@ -305,13 +301,13 @@ async function handleSubscriptionUpdate(
   } else {
     // Get plan ID from price ID
     const priceId = subscription.items.data[0]?.price.id;
-    const planRecord = await db
-      .select({ id: plans.id })
-      .from(plans)
-      .where(eq(plans.stripePriceId, priceId || ''))
-      .limit(1) as unknown as { id: string }[];
+    const planPrice = await db
+      .select({ planId: planPrices.planId })
+      .from(planPrices)
+      .where(eq(planPrices.stripePriceId, priceId || ''))
+      .limit(1) as unknown as { planId: string }[];
     
-    const planId = planRecord[0]?.id || 'individual';
+    const planId = planPrice[0]?.planId || 'individual';
     
     // Create new subscription record
     await db
@@ -337,9 +333,7 @@ async function handleSubscriptionUpdate(
  */
 async function handleSubscriptionDeletion(
   subscription: Stripe.Subscription,
-  db: { 
-    update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown> } };
-  }
+  db: any
 ): Promise<void> {
   await db
     .update(subscriptions)
@@ -359,9 +353,7 @@ async function handleSubscriptionDeletion(
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   stripe: Stripe,
-  db: { 
-    insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]> } };
-  }
+  db: any
 ): Promise<void> {
   if (session.mode !== 'subscription') {
     return;
@@ -380,13 +372,13 @@ async function handleCheckoutCompleted(
   
   // Get plan ID from price ID
   const priceId = subscription.items.data[0]?.price.id;
-  const planRecord = await db
-    .select({ id: plans.id })
-    .from(plans)
-    .where(eq(plans.stripePriceId, priceId || ''))
-    .limit(1) as unknown as { id: string }[];
+  const planPrice = await db
+    .select({ planId: planPrices.planId })
+    .from(planPrices)
+    .where(eq(planPrices.stripePriceId, priceId || ''))
+    .limit(1) as unknown as { planId: string }[];
   
-  const planId = planRecord[0]?.id || 'individual';
+  const planId = planPrice[0]?.planId || 'individual';
   
   // Create subscription record
   await db
@@ -411,9 +403,7 @@ async function handleCheckoutCompleted(
  */
 async function handleInvoicePaid(
   invoice: Stripe.Invoice,
-  db: { 
-    insert: (table: unknown) => { values: (values: unknown) => { returning: () => Promise<unknown[]> } };
-  }
+  db: any
 ): Promise<void> {
   if (!invoice.subscription) {
     return;
@@ -434,12 +424,12 @@ async function handleInvoicePaid(
   await db
     .insert(invoices)
     .values({
-      entityId: subRecord[0].entityId,
+      entityId: subRecord[0]!.entityId,
       stripeInvoiceId: invoice.id,
       amount: invoice.amount_due,
       currency: invoice.currency,
       status: 'paid',
-      paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions.paid_at * 1000) : new Date(),
+      paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions!.paid_at * 1000) : new Date(),
       pdfUrl: invoice.invoice_pdf,
       periodStart: invoice.period_start ? new Date(invoice.period_start * 1000) : null,
       periodEnd: invoice.period_end ? new Date(invoice.period_end * 1000) : null,
@@ -454,9 +444,7 @@ async function handleInvoicePaid(
  */
 async function handleInvoicePaymentFailed(
   invoice: Stripe.Invoice,
-  db: { 
-    update: (table: unknown) => { set: (values: unknown) => { where: (condition: unknown) => Promise<unknown> } };
-  }
+  db: any
 ): Promise<void> {
   if (!invoice.subscription) {
     return;

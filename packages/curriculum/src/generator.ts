@@ -76,7 +76,7 @@ export class LessonGenerator {
   private generateKeyDrill(keys: string[], count: number): Exercise {
     const content: string[] = [];
     for (let i = 0; i < count; i++) {
-      const key = keys[i % keys.length];
+      const key = keys[i % keys.length]!;
       content.push(key.repeat(5 + Math.floor(Math.random() * 5)));
     }
     return {

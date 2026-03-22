@@ -29,5 +29,6 @@
     "**/.svelte-kit": true,
     "**/.wrangler": true,
     "**/dist": true
-  }
+  },
+  "cSpell.words": ["azerty", "typeforge"]
 }

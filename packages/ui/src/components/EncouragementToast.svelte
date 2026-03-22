@@ -92,7 +92,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-label: 'Label';
+    font-family: 'Inter', system-ui, sans-serif;
     font-weight: 600;
     transform: translateY(100px);
     opacity: 0;

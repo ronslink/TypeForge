@@ -2,7 +2,16 @@
  * Layout type definitions
  */
 
-export type Finger = 'left-pinky' | 'left-ring' | 'left-middle' | 'left-index' | 'right-index' | 'right-middle' | 'right-ring' | 'right-pinky' | 'thumb';
+export type Finger =
+  | 'left-pinky'
+  | 'left-ring'
+  | 'left-middle'
+  | 'left-index'
+  | 'right-index'
+  | 'right-middle'
+  | 'right-ring'
+  | 'right-pinky'
+  | 'thumb';
 
 export type Hand = 'left' | 'right' | 'thumb';
 
@@ -54,13 +63,7 @@ export interface FingerAssignment {
 // ============================================================================
 
 /** Available layout names */
-export type LayoutName = 
-  | 'qwerty-us'
-  | 'azerty-fr'
-  | 'qwertz-de'
-  | 'dvorak'
-  | 'arabic'
-  | 'cyrillic';
+export type LayoutName = 'qwerty-us' | 'azerty-fr' | 'qwertz-de' | 'dvorak' | 'arabic' | 'cyrillic';
 
 /** Key definition in row-based layout */
 export interface Key {
@@ -82,6 +85,8 @@ export interface Layout {
   name: string;
   /** Language code (BCP-47) */
   language: string;
+  /** Script (e.g., 'Latin', 'Cyrillic', 'Arabic', 'Hebrew') */
+  script: string;
   /** Rows of keys (0 = number row, 1 = top alpha, 2 = home row, 3 = bottom alpha, 4 = space/modifiers) */
   rows: Key[][];
 }

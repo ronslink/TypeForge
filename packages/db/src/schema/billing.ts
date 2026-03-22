@@ -3,16 +3,63 @@
  * Plans, subscriptions, invoices, and payment tracking
  */
 
-import { pgTable, pgEnum, uuid, text, integer, timestamp, char, jsonb, boolean, smallint } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  pgEnum,
+  uuid,
+  text,
+  integer,
+  timestamp,
+  char,
+  jsonb,
+  boolean,
+  smallint,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, organisations } from './index.js';
 
 // Enums
-export const planTypeEnum = pgEnum('plan_type', ['free', 'individual', 'org_seat', 'org_flat', 'custom']);
-export const planIntervalEnum = pgEnum('plan_interval', ['monthly', 'annual', 'lifetime', 'one_time']);
-export const subStatusEnum = pgEnum('sub_status', ['trialing', 'active', 'past_due', 'cancelled', 'paused', 'expired']);
+export const planTypeEnum = pgEnum('plan_type', [
+  'free',
+  'individual',
+  'org_seat',
+  'org_flat',
+  'custom',
+]);
+export const planIntervalEnum = pgEnum('plan_interval', [
+  'monthly',
+  'annual',
+  'lifetime',
+  'one_time',
+]);
+
+// Org Billing table
+export const orgBilling = pgTable('org_billing', {
+  orgId: uuid('org_id').primaryKey().references(() => organisations.id, { onDelete: 'cascade' }),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  seatPriceCents: integer('seat_price_cents').notNull().default(600),
+  billingInterval: planIntervalEnum('billing_interval').notNull().default('monthly'),
+  currentSeatCount: integer('current_seat_count').notNull().default(0),
+  purchasedSeats: integer('purchased_seats').notNull().default(0),
+  pendingSeatCount: integer('pending_seat_count'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+export const subStatusEnum = pgEnum('sub_status', [
+  'trialing',
+  'active',
+  'past_due',
+  'cancelled',
+  'paused',
+  'expired',
+]);
 export const entityTypeEnum = pgEnum('entity_type', ['user', 'organisation']);
-export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'open', 'paid', 'void', 'uncollectible']);
+export const invoiceStatusEnum = pgEnum('invoice_status', [
+  'draft',
+  'open',
+  'paid',
+  'void',
+  'uncollectible',
+]);
 
 // Plans table
 export const plans = pgTable('plans', {
@@ -35,45 +82,61 @@ export const plans = pgTable('plans', {
 });
 
 // Subscriptions table
-export const subscriptions = pgTable('subscriptions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  entityType: entityTypeEnum('entity_type').notNull(),
-  entityId: uuid('entity_id').notNull(),
-  planId: uuid('plan_id').notNull().references(() => plans.id),
-  stripeSubscriptionId: text('stripe_subscription_id').unique(),
-  stripeCustomerId: text('stripe_customer_id'),
-  status: subStatusEnum('status').notNull().default('trialing'),
-  trialStart: timestamp('trial_start', { withTimezone: true }),
-  trialEnd: timestamp('trial_end', { withTimezone: true }),
-  currentPeriodStart: timestamp('current_period_start', { withTimezone: true }),
-  currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
-  cancelAt: timestamp('cancel_at', { withTimezone: true }),
-  cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
-  endedAt: timestamp('ended_at', { withTimezone: true }),
-  customPriceCents: integer('custom_price_cents'),
-  customSeatLimit: integer('custom_seat_limit'),
-  notes: text('notes'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  entityUnique: { unique: true, columns: [table.entityType, table.entityId] },
-}));
+export const subscriptions = pgTable(
+  'subscriptions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    entityType: entityTypeEnum('entity_type').notNull(),
+    entityId: uuid('entity_id').notNull(),
+    planId: uuid('plan_id')
+      .notNull()
+      .references(() => plans.id),
+    stripeSubscriptionId: text('stripe_subscription_id').unique(),
+    stripeCustomerId: text('stripe_customer_id'),
+    status: subStatusEnum('status').notNull().default('trialing'),
+    trialStart: timestamp('trial_start', { withTimezone: true }),
+    trialEnd: timestamp('trial_end', { withTimezone: true }),
+    currentPeriodStart: timestamp('current_period_start', { withTimezone: true }),
+    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
+    cancelAt: timestamp('cancel_at', { withTimezone: true }),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    customPriceCents: integer('custom_price_cents'),
+    customSeatLimit: integer('custom_seat_limit'),
+    notes: text('notes'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    entityUnique: { unique: true, columns: [table.entityType, table.entityId] },
+  })
+);
 
 // Subscription seats table
-export const subscriptionSeats = pgTable('subscription_seats', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  subscriptionId: uuid('subscription_id').notNull().references(() => subscriptions.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  allocatedAt: timestamp('allocated_at', { withTimezone: true }).notNull().defaultNow(),
-  revokedAt: timestamp('revoked_at', { withTimezone: true }),
-}, (table) => ({
-  subUserUnique: { unique: true, columns: [table.subscriptionId, table.userId] },
-}));
+export const subscriptionSeats = pgTable(
+  'subscription_seats',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subscriptionId: uuid('subscription_id')
+      .references(() => subscriptions.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    orgId: uuid('org_id').references(() => organisations.id, { onDelete: 'cascade' }),
+    allocatedAt: timestamp('allocated_at', { withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+  },
+  (table) => ({
+    subUserUnique: { unique: true, columns: [table.subscriptionId, table.userId] },
+  })
+);
 
 // Plan prices table
 export const planPrices = pgTable('plan_prices', {
   id: uuid('id').primaryKey().defaultRandom(),
-  planId: uuid('plan_id').notNull().references(() => plans.id, { onDelete: 'cascade' }),
+  planId: uuid('plan_id')
+    .notNull()
+    .references(() => plans.id, { onDelete: 'cascade' }),
   stripePriceId: text('stripe_price_id').unique().notNull(),
   interval: planIntervalEnum('interval').notNull(),
   currency: char('currency', { length: 3 }).notNull().default('USD'),
@@ -85,7 +148,9 @@ export const planPrices = pgTable('plan_prices', {
 // Invoices table
 export const invoices = pgTable('invoices', {
   id: uuid('id').primaryKey().defaultRandom(),
-  subscriptionId: uuid('subscription_id').references(() => subscriptions.id, { onDelete: 'set null' }),
+  subscriptionId: uuid('subscription_id').references(() => subscriptions.id, {
+    onDelete: 'set null',
+  }),
   stripeInvoiceId: text('stripe_invoice_id').unique(),
   entityType: entityTypeEnum('entity_type').notNull(),
   entityId: uuid('entity_id').notNull(),
@@ -109,7 +174,9 @@ export const invoices = pgTable('invoices', {
 // Invoice line items table
 export const invoiceLineItems = pgTable('invoice_line_items', {
   id: uuid('id').primaryKey().defaultRandom(),
-  invoiceId: uuid('invoice_id').notNull().references(() => invoices.id, { onDelete: 'cascade' }),
+  invoiceId: uuid('invoice_id')
+    .notNull()
+    .references(() => invoices.id, { onDelete: 'cascade' }),
   description: text('description').notNull(),
   quantity: integer('quantity').notNull().default(1),
   unitAmountCents: integer('unit_amount_cents').notNull(),

@@ -21,10 +21,13 @@ export async function getUserByClerkId(db: DbClient, clerkId: string): Promise<S
 
 export async function createUser(db: DbClient, data: InsertUser): Promise<SelectUser> {
   const [row] = await db.insert(users).values(data).returning();
-  return row;
+  return row!;
 }
 
-export async function updateUserLastActive(db: DbClient, userId: string): Promise<SelectUser | null> {
+export async function updateUserLastActive(
+  db: DbClient,
+  userId: string
+): Promise<SelectUser | null> {
   const [row] = await db
     .update(users)
     .set({ lastActiveAt: new Date() })

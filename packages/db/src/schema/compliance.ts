@@ -4,7 +4,17 @@
  * Consent records, data subject requests, audit logs
  */
 
-import { pgTable, pgEnum, uuid, text, timestamp, boolean, jsonb, char } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  pgEnum,
+  uuid,
+  text,
+  integer,
+  timestamp,
+  boolean,
+  jsonb,
+  char,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, organisations } from './index.js';
 
@@ -41,7 +51,9 @@ export const requestTypeEnum = pgEnum('request_type', [
 // Consent records table
 export const consentRecords = pgTable('consent_records', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   orgId: uuid('org_id').references(() => organisations.id, { onDelete: 'set null' }),
   consentType: consentTypeEnum('consent_type').notNull(),
   version: text('version').notNull(), // Version of the policy/term
@@ -58,7 +70,9 @@ export const consentRecords = pgTable('consent_records', {
 // Data subject requests table (GDPR, etc.)
 export const dataSubjectRequests = pgTable('data_subject_requests', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   requestType: requestTypeEnum('request_type').notNull(),
   status: requestStatusEnum('status').notNull().default('pending'),
   description: text('description'),

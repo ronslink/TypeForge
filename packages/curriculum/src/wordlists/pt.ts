@@ -302,3 +302,6 @@ export const brasileiroWordlist: WordlistEntry[] = [
   { word: 'fortaleza', difficulty: 3, tags: ['noun', 'geography'] },
   { word: 'democracia', difficulty: 3, tags: ['noun', 'politics'] },
 ];
+
+// Alias for Portuguese
+export const portugueseWordlist = brasileiroWordlist;

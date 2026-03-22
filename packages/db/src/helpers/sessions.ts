@@ -1,4 +1,3 @@
-import { eq, desc } from 'drizzle-orm';
 import type { DbClient } from '../client.js';
 import { typingSessions } from '../schema/index.js';
 
@@ -7,7 +6,7 @@ export type SelectSession = typeof typingSessions.$inferSelect;
 
 export async function createSession(db: DbClient, data: InsertSession): Promise<SelectSession> {
   const [row] = await db.insert(typingSessions).values(data).returning();
-  return row;
+  return row!;
 }
 
 export async function getSession(db: DbClient, sessionId: string): Promise<SelectSession | null> {

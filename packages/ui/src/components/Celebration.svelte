@@ -11,7 +11,7 @@
     onComplete,
   }: Props = $props();
 
-  let canvas: HTMLCanvasElement;
+  let canvas: HTMLCanvasElement | undefined = $state();
   let ctx: CanvasRenderingContext2D | null = null;
   let animationId: number | null = null;
   let particles: Particle[] = [];
@@ -50,7 +50,7 @@
       y: centerY,
       vx: Math.cos(angle) * velocity,
       vy: Math.sin(angle) * velocity - Math.random() * 5,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)] || COLORS[0],
+      color: COLORS[Math.floor(Math.random() * COLORS.length)]!,
       size: Math.random() * 6 + 3,
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.2,
@@ -102,7 +102,7 @@
     p.alpha -= FADE_RATE;
 
     // Bounce off bottom
-    if (p.y > canvas.height + p.size) {
+    if (p.y > canvas!.height + p.size) {
       p.alpha = 0;
     }
 

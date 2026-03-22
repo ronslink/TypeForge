@@ -113,7 +113,6 @@
     ctx.clearRect(0, 0, width, height);
 
     const accuracy = student.avgAccuracy;
-    const remaining = 100 - accuracy;
 
     // Draw background circle
     ctx.beginPath();

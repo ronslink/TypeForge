@@ -6,11 +6,21 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
-import { lessons, exercises, lessonCategories, languages, typingSessions, keyMastery } from '@typeforge/db';
-import { eq, and, inArray, desc } from 'drizzle-orm';
-import { selectNextLesson, type SessionHistoryEntry, type WeakArea } from '@typeforge/curriculum/lesson-selector';
+import {
+  lessons,
+  exercises,
+  lessonCategories,
+  languages,
+  typingSessions,
+  keyMastery,
+} from '@typeforge/db';
+import { eq, and, desc } from 'drizzle-orm';
+import {
+  selectNextLesson,
+  type SessionHistoryEntry,
+  type WeakArea,
+} from '@typeforge/curriculum/lesson-selector';
 import type { Env } from '../../../../infra/contracts/bindings.js';
-import type { Lesson as CurriculumLesson } from '@typeforge/curriculum/types';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -55,9 +65,8 @@ app.get('/', async (c) => {
   const layoutId = c.req.query('layout');
   const difficulty = c.req.query('difficulty');
 
-  let query = db.select().from(lessons);
+  const conditions: any[] = [];
 
-  const conditions = [];
   if (languageCode) {
     conditions.push(eq(lessons.languageCode, languageCode));
   }
@@ -65,14 +74,13 @@ app.get('/', async (c) => {
     conditions.push(eq(lessons.layoutId, layoutId));
   }
   if (difficulty) {
-    conditions.push(eq(lessons.difficulty, difficulty));
+    conditions.push(eq(lessons.difficulty, difficulty as any));
   }
 
-  if (conditions.length > 0) {
-    query = query.where(and(...conditions));
-  }
-
-  const lessonList = await query;
+  const lessonList = await db
+    .select()
+    .from(lessons)
+    .where(conditions.length > 0 ? (and(...conditions) as any) : undefined);
 
   return c.json({ lessons: lessonList as LessonResponse[] });
 });
@@ -142,11 +150,7 @@ app.get('/next', requireAuth, async (c) => {
   const nextLesson = await selectNextLesson(userId, historyEntries, weakAreas);
 
   // Fetch full lesson details from database
-  const [dbLesson] = await db
-    .select()
-    .from(lessons)
-    .where(eq(lessons.id, nextLesson.id))
-    .limit(1);
+  const [dbLesson] = await db.select().from(lessons).where(eq(lessons.id, nextLesson.id)).limit(1);
 
   if (!dbLesson) {
     return c.json(
@@ -174,13 +178,13 @@ app.get('/next', requireAuth, async (c) => {
 
   const response: LessonResponse = {
     ...dbLesson,
+    focusKeys: dbLesson.focusKeys as string[],
+    prerequisites: dbLesson.prerequisites as string[],
     exercises: lessonExercises as ExerciseResponse[],
   };
 
   return c.json({
     lesson: response,
-    reason: nextLesson.reason,
-    priority: nextLesson.priority,
   });
 });
 
@@ -234,6 +238,8 @@ app.get('/:id', async (c) => {
   return c.json({
     lesson: {
       ...lesson,
+      focusKeys: lesson.focusKeys as string[],
+      prerequisites: lesson.prerequisites as string[],
       exercises: lessonExercises as ExerciseResponse[],
     } as LessonResponse,
   });
@@ -246,13 +252,10 @@ app.get('/categories', async (c) => {
   const db = getDb(c);
   const languageCode = c.req.query('language');
 
-  let query = db.select().from(lessonCategories);
-
-  if (languageCode) {
-    query = query.where(eq(lessonCategories.languageCode, languageCode));
-  }
-
-  const categories = await query;
+  const categories = await db
+    .select()
+    .from(lessonCategories)
+    .where(languageCode ? eq(lessonCategories.languageCode, languageCode) : undefined);
 
   return c.json({ categories });
 });
