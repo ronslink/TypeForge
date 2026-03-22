@@ -8,12 +8,12 @@
   let isSignedIn = $state(typeof window !== 'undefined' && !!(window as any).Clerk?.user);
 
   // Data states
-  let progress: ProgressResponse | null = $state(null);
+  let progress = $state<ProgressResponse | null>(null);
   let loading = $state(true);
-  let error: string | null = $state(null);
+  let error = $state<string | null>(null);
 
   // Canvas reference for WPM chart
-  let chartCanvas: HTMLCanvasElement | undefined = $state();
+  let chartCanvas = $state<HTMLCanvasElement | undefined>(undefined);
 
   // Level calculation: every 1000 XP = 1 level
   function calculateLevel(xp: number): number {
