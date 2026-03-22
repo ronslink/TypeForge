@@ -2,30 +2,36 @@
  * Wordlists index - exports all language wordlists and utility functions
  */
 
+import { englishWordlist, WordlistEntry as EnglishWordlistEntry } from './en.js';
 import { frenchWordlist, WordlistEntry as FrenchWordlistEntry } from './fr.js';
 import { spanishWordlist, WordlistEntry as SpanishWordlistEntry } from './es.js';
 import { arabicWordlist, WordlistEntry as ArabicWordlistEntry } from './ar.js';
+import { swahiliWordlist, WordlistEntry as SwahiliWordlistEntry } from './sw.js';
 
 // Re-export types
-export type { FrenchWordlistEntry, SpanishWordlistEntry, ArabicWordlistEntry };
+export type { EnglishWordlistEntry, FrenchWordlistEntry, SpanishWordlistEntry, ArabicWordlistEntry, SwahiliWordlistEntry };
 export type { WordlistEntry } from './fr.js';
 
 // Re-export wordlists
-export { frenchWordlist, spanishWordlist, arabicWordlist };
+export { englishWordlist, frenchWordlist, spanishWordlist, arabicWordlist, swahiliWordlist };
 
 // Language code mapping
 const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
+  en: englishWordlist,
+  english: englishWordlist,
   fr: frenchWordlist,
   french: frenchWordlist,
   es: spanishWordlist,
   spanish: spanishWordlist,
   ar: arabicWordlist,
   arabic: arabicWordlist,
+  sw: swahiliWordlist,
+  swahili: swahiliWordlist,
 };
 
 /**
  * Get wordlist for a specific language code
- * @param code - Language code (e.g., 'fr', 'es', 'ar', 'french', 'spanish', 'arabic')
+ * @param code - Language code (e.g., 'en', 'fr', 'es', 'ar', 'sw')
  * @returns Array of WordlistEntry for the language, or empty array if not found
  */
 export function getWordlistForLanguage(code: string): WordlistEntry[] {
@@ -35,7 +41,7 @@ export function getWordlistForLanguage(code: string): WordlistEntry[] {
 
 /**
  * Get random words from a language wordlist
- * @param code - Language code (e.g., 'fr', 'es', 'ar')
+ * @param code - Language code (e.g., 'en', 'fr', 'es', 'ar', 'sw')
  * @param count - Number of words to return
  * @param maxDifficulty - Maximum difficulty level (1-3), undefined for all
  * @returns Array of random word strings
@@ -46,7 +52,7 @@ export function getRandomWords(
   maxDifficulty?: number
 ): string[] {
   const wordlist = getWordlistForLanguage(code);
-  
+
   if (wordlist.length === 0) {
     return [];
   }
@@ -64,7 +70,7 @@ export function getRandomWords(
   // Shuffle and take requested count
   const shuffled = [...filtered].sort(() => Math.random() - 0.5);
   const selected = shuffled.slice(0, Math.min(count, shuffled.length));
-  
+
   return selected.map((entry) => entry.word);
 }
 

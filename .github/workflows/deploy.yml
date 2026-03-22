@@ -16,7 +16,7 @@ on:
 
 env:
   NODE_VERSION: '20.18.2'
-  PNPM_VERSION: '9.15.1'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy-api:
@@ -25,22 +25,20 @@ jobs:
     environment: ${{ github.event.inputs.environment || 'production' }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build API
         run: pnpm --filter=@typeforge/api build
-      
+
       - name: Deploy to Cloudflare Workers
         run: pnpm --filter=@typeforge/api deploy
         env:
@@ -53,25 +51,23 @@ jobs:
     environment: ${{ github.event.inputs.environment || 'production' }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build Web
         run: pnpm --filter=@typeforge/web build
         env:
           PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      
+
       - name: Deploy to Cloudflare Pages
         run: |
           pnpm --filter=@typeforge/web exec wrangler pages deploy .svelte-kit/cloudflare --project-name=typeforge-web

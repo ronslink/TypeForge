@@ -190,6 +190,424 @@ export interface ProgressStatsResponse {
   improvement: number;
 }
 
+// ============================================================================
+// Users types
+// ============================================================================
+
+export interface UserProfile {
+  userId: string;
+  bio: string | null;
+  timezone: string | null;
+  country: string | null;
+  avatarUrl: string | null;
+}
+
+export interface UserPreferences {
+  userId: string;
+  theme: string;
+  soundEnabled: boolean;
+  keyClickVolume: number;
+  showLiveWpm: boolean;
+  showLiveAccuracy: boolean;
+  showKeyboard: boolean;
+  language: string;
+  layoutId: string;
+  updatedAt: string;
+}
+
+export interface User {
+  id: string;
+  clerkId: string;
+  email: string;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  avatarUrl: string | null;
+  role: 'learner' | 'teacher' | 'org_admin' | 'platform_admin';
+  status: 'active' | 'suspended' | 'deleted';
+  homeRegion: string;
+  stripeCustomerId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserWithProfile extends User {
+  profile: UserProfile | null;
+  preferences: UserPreferences | null;
+}
+
+export interface UserResponse {
+  user: UserWithProfile;
+}
+
+export interface UserUpdatePayload {
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+}
+
+export interface UserPreferencesUpdatePayload {
+  theme?: string;
+  soundEnabled?: boolean;
+  keyClickVolume?: number;
+  showLiveWpm?: boolean;
+  showLiveAccuracy?: boolean;
+  showKeyboard?: boolean;
+  language?: string;
+  layoutId?: string;
+}
+
+export interface UserPreferencesResponse {
+  preferences: UserPreferences;
+}
+
+export interface UserProgressEntry {
+  userId: string;
+  lessonId: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  attempts: number;
+  bestWpm: number | null;
+  bestAccuracy: number | null;
+  completedAt: string | null;
+}
+
+export interface UserProgressResponse {
+  progress: UserProgressEntry[];
+}
+
+export interface DailyStat {
+  userId: string;
+  date: string;
+  totalSessions: number;
+  totalMinutes: number;
+  totalCharacters: number;
+  lessonsCompleted: number;
+  avgWpm: number | null;
+  avgAccuracy: number | null;
+}
+
+export interface UserStatsResponse {
+  stats: DailyStat[];
+  totals: {
+    totalSessions: number;
+    totalMinutes: number;
+    totalCharacters: number;
+    lessonsCompleted: number;
+  };
+  averages: {
+    wpm: number;
+    accuracy: number;
+  };
+}
+
+export interface KeyMastery {
+  userId: string;
+  layoutId: string;
+  keyCode: string;
+  masteryLevel: number;
+  totalAttempts: number;
+  correctAttempts: number;
+  avgFlightTime: number | null;
+  updatedAt: string;
+}
+
+export interface UserWeaknessesResponse {
+  weaknesses: KeyMastery[];
+}
+
+// ============================================================================
+// Organisations types
+// ============================================================================
+
+export interface Organisation {
+  id: string;
+  name: string;
+  slug: string;
+  orgType: 'school' | 'company' | 'individual';
+  status: 'trial' | 'active' | 'suspended' | 'cancelled';
+  homeRegion: string;
+  countryCode: string | null;
+  website: string | null;
+  stripeCustomerId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgMember {
+  orgId: string;
+  userId: string;
+  role: 'admin' | 'teacher' | 'student';
+  status: 'active' | 'inactive' | 'invited';
+  joinedAt: string | null;
+}
+
+export interface OrgSettings {
+  orgId: string;
+  allowSelfJoin: boolean;
+  requireApproval: boolean;
+  defaultRole: string;
+}
+
+export interface OrgBilling {
+  orgId: string;
+  stripeSubscriptionId: string | null;
+  seatPriceCents: number;
+  billingInterval: 'monthly' | 'annual';
+  currentSeatCount: number;
+  purchasedSeats: number;
+  pendingSeatCount: number | null;
+  updatedAt: string;
+}
+
+export interface OrganisationsListResponse {
+  organisations: Array<{ org: Organisation; member: OrgMember }>;
+}
+
+export interface OrganisationResponse {
+  organisation: Organisation & {
+    settings: OrgSettings | null;
+    billing: OrgBilling | null;
+    userRole: string;
+  };
+}
+
+export interface OrganisationCreatePayload {
+  name: string;
+  slug: string;
+  orgType?: 'school' | 'company' | 'individual';
+  countryCode?: string;
+  website?: string;
+}
+
+export interface OrgClass {
+  id: string;
+  orgId: string;
+  name: string;
+  description: string | null;
+  teacherId: string | null;
+  createdAt: string;
+}
+
+export interface OrgClassesResponse {
+  classes: OrgClass[];
+}
+
+export interface OrgMembersResponse {
+  members: Array<{ member: OrgMember; user: User }>;
+}
+
+export interface InvitePayload {
+  email: string;
+  role?: 'admin' | 'teacher' | 'student';
+  classId?: string;
+}
+
+export interface InvitationResponse {
+  invitation: {
+    id: string;
+    orgId: string;
+    classId: string | null;
+    email: string;
+    role: string;
+    invitedBy: string;
+    expiresAt: string;
+  };
+}
+
+export interface SeatCheckoutPayload {
+  seatCount: number;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface SeatCheckoutResponse {
+  checkoutUrl: string | null;
+  sessionId: string;
+  seatCount: number;
+  monthlyCost: number;
+}
+
+export interface SeatUpgradePayload {
+  additionalSeats: number;
+}
+
+export interface SeatUpgradeResponse {
+  success: boolean;
+  previousSeats: number;
+  newSeats: number;
+  additionalSeats: number;
+  proratedCharge: boolean;
+}
+
+export interface SeatDowngradePayload {
+  targetSeats: number;
+}
+
+export interface SeatDowngradeResponse {
+  success: boolean;
+  previousSeats: number;
+  newSeats: number;
+  effectiveAt: string;
+  nextBillingDate: string;
+}
+
+export interface SeatsResponse {
+  seats: {
+    activeMembers: number;
+    purchased: number;
+    pending: number;
+    available: number;
+    pricePerSeat: number;
+    interval: string;
+    monthlyTotal: number;
+    hasActiveSubscription: boolean;
+  };
+  seatAssignments: Array<{ seat: unknown; user: User | null }>;
+}
+
+export interface SeatAssignPayload {
+  userId: string;
+  role?: 'learner' | 'teacher' | 'admin';
+}
+
+export interface SeatAssignResponse {
+  success: boolean;
+  userId: string;
+  role: string;
+  seatAssigned: boolean;
+}
+
+export interface SeatRemoveResponse {
+  success: boolean;
+  userId: string;
+  seatRemoved: boolean;
+}
+
+// ============================================================================
+// Billing types
+// ============================================================================
+
+export interface Plan {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  priceMonthly: number | null;
+  priceAnnual: number | null;
+  stripePriceId: string | null;
+  isPublic: boolean;
+  displayOrder: number;
+  features: unknown;
+  createdAt: string;
+}
+
+export interface PlansResponse {
+  plans: Plan[];
+}
+
+export interface Subscription {
+  id: string;
+  entityId: string;
+  planId: string;
+  stripeSubscriptionId: string | null;
+  stripeCustomerId: string | null;
+  status: 'trialing' | 'active' | 'past_due' | 'cancelled' | 'expired';
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SubscriptionResponse {
+  subscription: { subscription: Subscription; plan: Plan } | undefined;
+}
+
+export interface CheckoutPayload {
+  interval?: 'monthly' | 'annual';
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface CheckoutResponse {
+  checkoutUrl: string | null;
+  sessionId: string;
+}
+
+export interface PortalResponse {
+  portalUrl: string;
+}
+
+export interface Invoice {
+  id: string;
+  entityId: string;
+  stripeInvoiceId: string;
+  amount: number;
+  currency: string;
+  status: 'paid' | 'open' | 'void' | 'uncollectible';
+  paidAt: string | null;
+  pdfUrl: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  createdAt: string;
+}
+
+export interface InvoicesResponse {
+  invoices: Invoice[];
+}
+
+export interface WebhookResponse {
+  received: boolean;
+}
+
+// ============================================================================
+// Admin types
+// ============================================================================
+
+export interface AdminStatsResponse {
+  stats: {
+    users: number;
+    organisations: number;
+    sessions: number;
+    activeSubscriptions: number;
+  };
+}
+
+export interface AdminUsersResponse {
+  users: User[];
+  page: number;
+  limit: number;
+}
+
+export interface AdminOrganisationsResponse {
+  organisations: Organisation[];
+}
+
+export interface AuditLog {
+  id: string;
+  userId: string | null;
+  action: string;
+  resourceType: string;
+  resourceId: string | null;
+  metadata: unknown;
+  createdAt: string;
+}
+
+export interface AuditLogsResponse {
+  logs: AuditLog[];
+  page: number;
+  limit: number;
+}
+
+export interface AdminUserStatusPayload {
+  status: 'active' | 'suspended' | 'deleted';
+}
+
+export interface AdminUserResponse {
+  user: User;
+}
+
 export interface ApiError {
   error: string;
   code: string;
@@ -341,6 +759,251 @@ export type LessonsApiType = Hono<
 >;
 
 /**
+ * Type definition for the Users API routes
+ */
+export type UsersApiType = Hono<
+  { Bindings: Env },
+  {
+    '/me': {
+      $get: {
+        output: UserResponse;
+      };
+      $put: {
+        input: {
+          json: UserUpdatePayload;
+        };
+        output: UserResponse;
+      };
+    };
+    '/me/preferences': {
+      $put: {
+        input: {
+          json: UserPreferencesUpdatePayload;
+        };
+        output: UserPreferencesResponse;
+      };
+    };
+    '/me/progress': {
+      $get: {
+        output: UserProgressResponse;
+      };
+    };
+    '/me/stats': {
+      $get: {
+        output: UserStatsResponse;
+      };
+    };
+    '/me/weaknesses': {
+      $get: {
+        input: {
+          query: {
+            layout?: string;
+          };
+        };
+        output: UserWeaknessesResponse;
+      };
+    };
+  }
+>;
+
+/**
+ * Type definition for the Organisations API routes
+ */
+export type OrganisationsApiType = Hono<
+  { Bindings: Env },
+  {
+    '/': {
+      $get: {
+        output: OrganisationsListResponse;
+      };
+      $post: {
+        input: {
+          json: OrganisationCreatePayload;
+        };
+        output: OrganisationResponse;
+      };
+    };
+    '/:id': {
+      $get: {
+        input: {
+          param: { id: string };
+        };
+        output: OrganisationResponse;
+      };
+    };
+    '/:id/classes': {
+      $get: {
+        input: {
+          param: { id: string };
+        };
+        output: OrgClassesResponse;
+      };
+    };
+    '/:id/members': {
+      $get: {
+        input: {
+          param: { id: string };
+        };
+        output: OrgMembersResponse;
+      };
+    };
+    '/:id/invite': {
+      $post: {
+        input: {
+          param: { id: string };
+          json: InvitePayload;
+        };
+        output: InvitationResponse;
+      };
+    };
+    '/:id/billing/seats': {
+      $post: {
+        input: {
+          param: { id: string };
+          json: SeatCheckoutPayload;
+        };
+        output: SeatCheckoutResponse;
+      };
+    };
+    '/:id/billing/seats/upgrade': {
+      $post: {
+        input: {
+          param: { id: string };
+          json: SeatUpgradePayload;
+        };
+        output: SeatUpgradeResponse;
+      };
+    };
+    '/:id/billing/seats/downgrade': {
+      $post: {
+        input: {
+          param: { id: string };
+          json: SeatDowngradePayload;
+        };
+        output: SeatDowngradeResponse;
+      };
+    };
+    '/:id/seats': {
+      $get: {
+        input: {
+          param: { id: string };
+        };
+        output: SeatsResponse;
+      };
+    };
+    '/:id/seats/assign': {
+      $post: {
+        input: {
+          param: { id: string };
+          json: SeatAssignPayload;
+        };
+        output: SeatAssignResponse;
+      };
+    };
+    '/:id/seats/:userId': {
+      $delete: {
+        input: {
+          param: { id: string; userId: string };
+        };
+        output: SeatRemoveResponse;
+      };
+    };
+  }
+>;
+
+/**
+ * Type definition for the Billing API routes
+ */
+export type BillingApiType = Hono<
+  { Bindings: Env },
+  {
+    '/plans': {
+      $get: {
+        output: PlansResponse;
+      };
+    };
+    '/subscription': {
+      $get: {
+        output: SubscriptionResponse;
+      };
+    };
+    '/checkout': {
+      $post: {
+        input: {
+          json: CheckoutPayload;
+        };
+        output: CheckoutResponse;
+      };
+    };
+    '/portal': {
+      $post: {
+        output: PortalResponse;
+      };
+    };
+    '/invoices': {
+      $get: {
+        output: InvoicesResponse;
+      };
+    };
+    '/webhook': {
+      $post: {
+        output: WebhookResponse;
+      };
+    };
+  }
+>;
+
+/**
+ * Type definition for the Admin API routes
+ */
+export type AdminApiType = Hono<
+  { Bindings: Env },
+  {
+    '/stats': {
+      $get: {
+        output: AdminStatsResponse;
+      };
+    };
+    '/users': {
+      $get: {
+        input: {
+          query: {
+            page?: string;
+            limit?: string;
+          };
+        };
+        output: AdminUsersResponse;
+      };
+    };
+    '/organisations': {
+      $get: {
+        output: AdminOrganisationsResponse;
+      };
+    };
+    '/audit-logs': {
+      $get: {
+        input: {
+          query: {
+            page?: string;
+            limit?: string;
+          };
+        };
+        output: AuditLogsResponse;
+      };
+    };
+    '/users/:id/status': {
+      $put: {
+        input: {
+          param: { id: string };
+          json: AdminUserStatusPayload;
+        };
+        output: AdminUserResponse;
+      };
+    };
+  }
+>;
+
+/**
  * Type definition for the Progress API routes
  */
 export type ProgressApiType = Hono<
@@ -378,6 +1041,10 @@ export type AppType = Hono<
     '/api/v1/sessions': SessionsApiType;
     '/api/v1/lessons': LessonsApiType;
     '/api/v1/progress': ProgressApiType;
+    '/api/v1/users': UsersApiType;
+    '/api/v1/organisations': OrganisationsApiType;
+    '/api/v1/billing': BillingApiType;
+    '/api/v1/admin': AdminApiType;
   }
 >;
 
