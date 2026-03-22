@@ -18,17 +18,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunk: all node_modules except Svelte
+          // Vendor chunk: Clerk auth
           vendor: [
             'clerk-sveltekit',
-            '@clerk/clerk-js',
           ],
           // Svelte framework chunk
           svelte: ['svelte', 'svelte/transition', 'svelte/animate', 'svelte/store'],
-          // UI components chunk
-          ui: [
-            '@typeforge/ui',
-          ],
           // Core app chunks
           core: [
             '@typeforge/metrics',
