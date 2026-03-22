@@ -253,7 +253,7 @@
     if (isLoggedIn && state.selectedLanguage && state.selectedLayout) {
       try {
         // Validate API client is available
-        if (!api.api?.v1?.sessions?.$post) {
+        if (!(api as any).api?.v1?.sessions?.$post) {
           console.error('API client not properly initialized');
           // Still navigate to learn page even if API save fails
           goto('/learn');
@@ -261,7 +261,7 @@
         }
 
         // Save preferences to API
-        await api.api.v1.sessions.$post({
+        await (api as any).api.v1.sessions.$post({
           json: {
             wpm: state.testResults?.wpm || 0,
             accuracy: state.testResults?.accuracy || 0,

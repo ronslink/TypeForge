@@ -193,14 +193,14 @@
     }
 
     try {
-      if (!api.api?.v1?.progress?.$get) {
+      if (!(api as any).api?.v1?.progress?.$get) {
         error = 'API client not properly initialized';
         return;
       }
 
       const [progressRes, statsRes] = await Promise.all([
-        api.api.v1.progress.$get(),
-        api.api.v1.progress.stats.$get()
+        (api as any).api.v1.progress.$get(),
+        (api as any).api.v1.progress.stats.$get()
       ]);
 
       if (progressRes.ok) {

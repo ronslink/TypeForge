@@ -273,12 +273,12 @@
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
 
-      if (!api.api?.v1?.sessions?.$post) {
+      if (!(api as any).api?.v1?.sessions?.$post) {
         console.error('API client not properly initialized');
         return;
       }
 
-      await api.api.v1.sessions.$post({
+      await (api as any).api.v1.sessions.$post({
         json: {
           wpm: finalWPM,
           accuracy: finalAccuracy,
