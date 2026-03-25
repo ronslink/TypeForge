@@ -24,26 +24,15 @@ export default defineConfig({
           ],
           // Svelte framework chunk
           svelte: ['svelte', 'svelte/transition', 'svelte/animate', 'svelte/store'],
-          // Core app chunks
-          core: [
-            '@typeforge/metrics',
-            '@typeforge/curriculum',
-            '@typeforge/layouts',
-          ],
         },
       },
     },
   },
   optimizeDeps: {
-    include: [
-      'drizzle-orm',
-      '@clerk/backend',
-      'clerk-sveltekit',
-      '@typeforge/ui',
-      '@typeforge/metrics',
-      '@typeforge/curriculum',
-      '@typeforge/layouts',
+    exclude: [
       '@typeforge/api',
+      '@typeforge/db',
+      '@typeforge/curriculum',
     ],
   },
 });

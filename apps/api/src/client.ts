@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
 /**
  * TypeForge API - Typed Hono RPC Client
  * 
@@ -18,7 +16,24 @@
 
 import { hc } from 'hono/client';
 import type { Hono } from 'hono';
-import type { Env } from '../../../infra/contracts/bindings.js';
+
+// Env type for frontend - uses string for base URL binding
+// The actual Cloudflare bindings are only available server-side
+interface Env {
+ Bindings: {
+    HYPERDRIVE_EU: unknown;
+    HYPERDRIVE_US: unknown;
+    HYPERDRIVE_AF: unknown;
+    DB: unknown;
+    ASSETS: unknown;
+    JOBS: unknown;
+    CACHE: unknown;
+    UPSTASH_REDIS_REST_URL: string;
+    UPSTASH_REDIS_REST_TOKEN: string;
+    CLERK_SECRET_KEY: string;
+    ENVIRONMENT: string;
+  };
+}
 
 // ============================================================================
 // Type Definitions for API Responses

@@ -9,6 +9,22 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./lesson-selector": {
+      "types": "./src/lesson-selector.ts",
+      "default": "./src/lesson-selector.ts"
+    },
+    "./lesson-registry": {
+      "types": "./src/lesson-registry.ts",
+      "default": "./src/lesson-registry.ts"
+    },
+    "./rtl-lessons": {
+      "types": "./src/rtl-lessons.ts",
+      "default": "./src/rtl-lessons.ts"
+    },
+    "./generator": {
+      "types": "./src/generator.ts",
+      "default": "./src/generator.ts"
     }
   },
   "scripts": {

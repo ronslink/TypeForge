@@ -17,6 +17,7 @@
   "dependencies": {
     "@hono/zod-validator": "^0.4.0",
     "@typeforge/auth": "workspace:*",
+    "@typeforge/curriculum": "workspace:*",
     "@typeforge/db": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.6.0",
