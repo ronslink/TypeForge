@@ -54,6 +54,9 @@ importers:
       '@typeforge/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@typeforge/curriculum':
+        specifier: workspace:*
+        version: link:../../packages/curriculum
       '@typeforge/db':
         specifier: workspace:*
         version: link:../../packages/db
