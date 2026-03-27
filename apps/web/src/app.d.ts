@@ -1,5 +1,6 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference types="@cloudflare/workers-types" />
+/// <reference types="svelte-clerk/env" />
 
 declare global {
   namespace App {

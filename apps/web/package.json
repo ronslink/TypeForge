@@ -20,8 +20,8 @@
     "@typeforge/layouts": "workspace:*",
     "@typeforge/metrics": "workspace:*",
     "@typeforge/ui": "workspace:*",
-    "clerk-sveltekit": "^0.4.3",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "svelte-clerk": "^1.1.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "^4.8.0",

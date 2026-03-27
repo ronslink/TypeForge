@@ -3,6 +3,8 @@
   import type { LayoutData } from './$types';
   import { page } from '$app/stores';
   import { afterNavigate } from '$app/navigation';
+  import { Show, SignInButton, SignUpButton, UserButton, useClerkContext } from 'svelte-clerk';
+  import { derived } from 'svelte/store';
 
   interface Props {
     children: Snippet;
@@ -11,16 +13,17 @@
 
   let { children, data: _data }: Props = $props();
 
-  // Auth state from Clerk
-  let isSignedIn = $state(typeof window !== 'undefined' && !!(window as any).Clerk?.user);
-  let _user = $derived((window as any).Clerk?.user);
+  // Get auth state from Clerk context
+  const { state } = useClerkContext();
+  const isSignedIn = derived(state, $state => $state.user !== null);
+  const user = derived(state, $state => $state.user);
 
   // Current page path for active nav highlighting
   let currentPath = $derived($page.url.pathname);
 
   // Pages that should show the auth banner when not logged in
   const authBannerPages = ['/learn', '/progress', '/practice'];
-  let showAuthBanner = $derived(!isSignedIn && authBannerPages.some(p => currentPath.startsWith(p)));
+  let showAuthBanner = $derived(!$isSignedIn && authBannerPages.some(p => currentPath.startsWith(p)));
 
   // Navigation items
   const navItems = [
@@ -38,24 +41,6 @@
       mainContentRef.focus();
     }
   });
-
-  function handleSignIn() {
-    const clerkUI = (window as any).Clerk;
-    if (clerkUI?.openSignIn) {
-      clerkUI.openSignIn({
-        redirectUrl: currentPath,
-      });
-    }
-  }
-
-  function handleSignOut() {
-    const clerkUI = (window as any).Clerk;
-    if (clerkUI?.signOut) {
-      clerkUI.signOut({
-        redirectUrl: '/',
-      });
-    }
-  }
 
   // Handle skip to content link
   function handleSkipToContent(_event: Event) {
@@ -96,12 +81,7 @@
         <span class="text-sm text-on-surface-variant font-body">
           Sign in to save your progress
         </span>
-        <button
-          onclick={handleSignIn}
-          class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors focus-indicator"
-        >
-          Sign In
-        </button>
+        <SignInButton />
       </div>
     </div>
   {/if}
@@ -125,11 +105,11 @@
           {#each navItems as item}
             <a
               href={item.href}
-              class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith(item.href) ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
-              aria-current={currentPath.startsWith(item.href) ? 'page' : undefined}
+              class="text-sm font-body transition-colors relative py-1 focus-indicator {$page.url.pathname.startsWith(item.href) ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
+              aria-current={$page.url.pathname.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
-              {#if currentPath.startsWith(item.href)}
+              {#if $page.url.pathname.startsWith(item.href)}
                 <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
               {/if}
             </a>
@@ -139,48 +119,24 @@
       <div class="flex items-center gap-4">
         <a
           href="/settings"
-          class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith('/settings') ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
-          aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}
+          class="text-sm font-body transition-colors relative py-1 focus-indicator {$page.url.pathname.startsWith('/settings') ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
+          aria-current={$page.url.pathname.startsWith('/settings') ? 'page' : undefined}
         >
           Settings
-          {#if currentPath.startsWith('/settings')}
+          {#if $page.url.pathname.startsWith('/settings')}
             <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
           {/if}
         </a>
         
-        <!-- User menu -->
-        {#if isSignedIn && _user}
-          <div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
-            {#if _user.imageUrl}
-              <img
-                src={_user.imageUrl}
-                alt=""
-                class="w-8 h-8 rounded-none object-cover border border-outline-variant"
-                role="presentation"
-              />
-            {:else}
-              <div
-                class="w-8 h-8 bg-primary-container flex items-center justify-center text-on-primary-container font-label text-sm font-bold"
-                aria-hidden="true"
-              >
-                {(_user.firstName?.[0] || _user.emailAddresses?.[0]?.emailAddress?.[0] || 'U').toUpperCase()}
-              </div>
-            {/if}
-            <button
-              onclick={handleSignOut}
-              class="text-xs text-on-surface-variant hover:text-white transition-colors font-body focus-indicator"
-            >
-              Sign Out
-            </button>
-          </div>
-        {:else}
-          <button
-            onclick={handleSignIn}
-            class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 focus-indicator"
-          >
-            Start Typing
-          </button>
-        {/if}
+        <!-- User menu using Clerk components -->
+        <div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
+          <Show when="signed-out">
+            <SignInButton />
+          </Show>
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
+        </div>
       </div>
     </div>
   </nav>
