@@ -16,7 +16,7 @@
   let userLayout = $state('qwerty-us');
 
   // Filter states
-  let selectedLanguage = $state('all');
+  let selectedLanguage = $state(userLanguage);
   let selectedDifficulty = $state('all');
   let selectedTag = $state('all');
   let searchQuery = $state('');
@@ -163,7 +163,7 @@
   </div>
 
   <!-- Recommended Section -->
-  {#if recommendedLessons.length > 0 && selectedLanguage === 'all' && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery}
+  {#if recommendedLessons.length > 0 && selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery}
     <section class="mb-12">
       <div class="flex items-center gap-3 mb-6">
         <h2 class="font-headline text-2xl">Recommended for You</h2>
@@ -266,7 +266,7 @@
   <!-- Lesson Grid -->
   <section>
     <h2 class="font-headline text-2xl mb-6">
-      {selectedLanguage === 'all' && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery
+      {selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery
         ? 'All Lessons'
         : 'Filtered Lessons'}
     </h2>

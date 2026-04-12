@@ -24,6 +24,7 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
+  import { layouts } from '@typeforge/layouts';
   import type { PageData } from './$types';
 
   interface Props {
