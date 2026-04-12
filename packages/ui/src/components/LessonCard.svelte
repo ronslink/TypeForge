@@ -50,9 +50,11 @@
         </p>
       {/if}
     </div>
-    <Badge variant="primary">
-      {lesson.language}
-    </Badge>
+    {#if lesson.language}
+      <Badge variant="primary">
+        {lesson.language}
+      </Badge>
+    {/if}
   </div>
 
   <div class="flex items-center gap-4 mb-4">

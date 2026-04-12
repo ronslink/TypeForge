@@ -123,10 +123,10 @@
 
     return {
       id: lesson.id,
-      title: language?.nativeName || lesson.language,
-      description: lesson.title,
+      title: lesson.title,
+      description: `Focus Characters: ${lesson.tags.key_bigram || lesson.content.substring(0, 15)}`,
       difficulty: difficultyMap[lesson.difficulty] || 'beginner',
-      language: language?.nativeName || lesson.language,
+      language: '', // Intentionally left blank to avoid redundancy on every card
       duration: Math.max(1, Math.round(lesson.content.length / 100)), // Estimate based on content length
       progress: undefined,
     };
@@ -168,10 +168,49 @@
 </svelte:head>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="font-headline text-4xl mb-2">Learn</h1>
-    <p class="text-on-surface-variant">Choose a lesson to practice your typing skills.</p>
+  <!-- Interactive Header Panel -->
+  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 p-8 bg-gradient-to-br from-surface-container-low to-surface-container-lowest rounded-2xl shadow-xl border border-surface-container border-b-4 border-b-primary">
+    <div>
+      <h1 class="font-headline text-4xl mb-3 flex items-center gap-3">
+        Learn ⚡
+      </h1>
+      <p class="text-on-surface-variant max-w-md text-sm leading-relaxed">Master your typing sequence with guided curriculum modules specifically tailored to your preferred dialect and hardware structure.</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+        <!-- Global Language Selector -->
+        <div class="flex flex-col gap-1.5 flex-1">
+          <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Target Language</label>
+          <select
+            id="lang-select"
+            bind:value={selectedLanguage}
+            class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container rounded-lg border border-transparent shadow-inner cursor-pointer transition-colors"
+          >
+            <option value="all">All Languages</option>
+            {#each languages as lang}
+              <option value={lang.code}>{lang.nativeName}</option>
+            {/each}
+          </select>
+        </div>
+
+        <!-- Global Layout Selector -->
+        <div class="flex flex-col gap-1.5 flex-1">
+          <label for="global-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Hardware Layout</label>
+          <select 
+            id="global-layout"
+            class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container rounded-lg border border-transparent shadow-inner cursor-pointer transition-colors"
+            bind:value={userLayout}
+          >
+            <option value="qwerty-us">QWERTY (US)</option>
+            <option value="dvorak">Dvorak</option>
+            <option value="azerty-fr">AZERTY (FR)</option>
+            <option value="qwertz-de">QWERTZ (DE)</option>
+            <option value="cyrillic-ru">Cyrillic (RU)</option>
+            <option value="arabic">Arabic</option>
+            <option value="hebrew">Hebrew</option>
+          </select>
+        </div>
+    </div>
   </div>
 
   <!-- Recommended Section -->
@@ -225,16 +264,7 @@
           {/if}
         </div>
 
-        <!-- Language Filter -->
-        <select
-          bind:value={selectedLanguage}
-          class="bg-surface-container px-4 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-        >
-          <option value="all">All Languages</option>
-          {#each languages as lang}
-            <option value={lang.code}>{lang.nativeName}</option>
-          {/each}
-        </select>
+        <!-- Remove inline Language selector to rely cleanly on the Header setup -->
 
         <!-- Difficulty Filter -->
         <select
@@ -291,13 +321,18 @@
             {#each groupedLessons as stage, index}
               <div class="mb-14 relative">
                 <!-- Timeline node marker -->
-                <div class="absolute -left-[21px] md:-left-[37px] top-1 w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border-4 border-background text-primary font-bold z-10 shadow-lg">
+                <div class="absolute -left-[21px] md:-left-[37px] top-4 w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border-4 border-background text-primary font-bold z-10 shadow-[0_0_15px_rgba(240,165,0,0.2)]">
                   {index + 1}
                 </div>
                 
-                <div class="mb-6 ml-6">
-                  <h3 class="font-headline text-2xl text-primary">{stage.title}</h3>
-                  <p class="text-on-surface-variant text-sm mt-1">{stage.description}</p>
+                <div class="mb-6 ml-6 p-6 bg-surface-container-low/50 backdrop-blur-sm rounded-xl border border-surface-container shadow-sm flex items-center justify-between">
+                  <div>
+                    <h3 class="font-headline text-2xl text-on-surface">{stage.title}</h3>
+                    <p class="text-on-surface-variant text-sm mt-1.5">{stage.description}</p>
+                  </div>
+                  <div class="hidden sm:block text-primary/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                  </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ml-6">
