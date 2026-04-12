@@ -22,6 +22,7 @@
   import { createApiClient } from '@typeforge/api/client';
   import { layouts } from '@typeforge/layouts';
   import type { PageData } from './$types';
+  import { FAMOUS_BOOKS } from './books';
 
   interface Props {
     data: PageData;
@@ -34,8 +35,8 @@
   let userLayout = $state('qwerty-us');
 
   // Practice Modes State
-  let mode = $state<'select' | 'words' | 'sentences' | 'custom'>('select');
-  let customText = $state('');
+  let mode = $state<'select' | 'words' | 'sentences' | 'book'>('select');
+  let selectedBookId = $state(FAMOUS_BOOKS[0].id);
 
   // Typing Session State
   let lessonChars = $state<LessonChar[]>([]);
@@ -120,7 +121,7 @@
     });
   }
 
-  function mountPracticeMode(selectedMode: 'words' | 'sentences' | 'custom') {
+  function mountPracticeMode(selectedMode: 'words' | 'sentences' | 'book') {
     mode = selectedMode;
     if (selectedMode === 'words') {
       const words = getRandomWords(userLanguage, 50);
@@ -135,8 +136,9 @@
         }
         text = text.trim();
         lessonChars = generateLessonSequence(text);
-    } else if (selectedMode === 'custom' && customText.trim().length > 0) {
-      lessonChars = generateLessonSequence(customText.trim());
+    } else if (selectedMode === 'book') {
+        const book = FAMOUS_BOOKS.find(b => b.id === selectedBookId) || FAMOUS_BOOKS[0];
+        lessonChars = generateLessonSequence(book.excerpt);
     }
     
     // Reset state
@@ -157,7 +159,7 @@
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (mode === 'select' || (mode === 'custom' && lessonChars.length === 0)) return;
+    if (mode === 'select') return;
     if (isComplete) return;
 
     if (event.key.length === 1 || event.key === 'Backspace') {
@@ -294,7 +296,7 @@
 
 <div class="max-w-7xl mx-auto px-6 py-12">
   
-  {#if mode === 'select' || (mode === 'custom' && lessonChars.length === 0)}
+  {#if mode === 'select'}
     <h1 class="font-headline text-4xl mb-4">Practice</h1>
     <p class="text-on-surface-variant mb-8">Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states.</p>
 
@@ -314,21 +316,25 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      <button onclick={() => mountPracticeMode('words')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all">
+      <button onclick={() => mountPracticeMode('words')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all flex flex-col gap-3">
         <h3 class="font-headline text-xl mb-2">Words</h3>
-        <p class="text-on-surface-variant text-sm">Practice common words pulled natively from localized arrays</p>
+        <p class="text-on-surface-variant text-sm flex-1">Practice common words pulled natively from localized arrays</p>
       </button>
       
-      <button onclick={() => mountPracticeMode('sentences')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all">
+      <button onclick={() => mountPracticeMode('sentences')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all flex flex-col gap-3">
         <h3 class="font-headline text-xl mb-2">Sentences</h3>
-        <p class="text-on-surface-variant text-sm">Synthesized punctuated sentence blocks</p>
+        <p class="text-on-surface-variant text-sm flex-1">Synthesized punctuated sentence blocks</p>
       </button>
       
       <div class="bg-surface-container-low p-6 rounded-2xl border border-transparent filter-none flex flex-col gap-3">
-        <h3 class="font-headline text-xl">Custom</h3>
-        <p class="text-on-surface-variant text-sm flex-1">Paste custom JSON, literature, or APIs to practice.</p>
-        <textarea bind:value={customText} placeholder="Type custom drills here..." class="w-full h-24 bg-surface-container text-on-surface p-3 text-xs outline-none focus:ring-1 focus:ring-primary rounded mb-2"></textarea>
-        <button onclick={() => mountPracticeMode('custom')} class="bg-primary text-black font-bold uppercase tracking-wider text-xs py-2 px-4 rounded hover:bg-opacity-80 transition-colors">Start Custom Drill</button>
+        <h3 class="font-headline text-xl">Literature</h3>
+        <p class="text-on-surface-variant text-sm flex-1">Practice pacing using heavy formatting loaded from public domain excerpts.</p>
+        <select bind:value={selectedBookId} class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-2 font-body font-bold shadow-inner">
+           {#each FAMOUS_BOOKS as book}
+             <option value={book.id}>{book.title} ({book.author})</option>
+           {/each}
+        </select>
+        <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">Start Book Drill</button>
       </div>
     </div>
   {:else}
