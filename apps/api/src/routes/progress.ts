@@ -8,9 +8,7 @@ import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
 import { typingSessions, userXp, streaks } from '@typeforge/db';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
-import type { Env } from '../../../../infra/contracts/bindings.js';
-
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 // All progress routes require authentication
 app.use('*', requireAuth);

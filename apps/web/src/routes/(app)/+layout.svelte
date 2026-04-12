@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { LayoutData } from './$types';
-  import { clerk } from 'clerk-sveltekit/client';
+  import { useClerkContext } from 'svelte-clerk';
   import { page } from '$app/stores';
   import { afterNavigate } from '$app/navigation';
 
@@ -13,16 +13,19 @@
   let { children, data }: Props = $props();
 
   // Auth state from Clerk
-  let auth = $derived($clerk);
-  let isSignedIn = $derived(!!auth?.user);
-  let user = $derived(auth?.user);
+  const ctx = useClerkContext();
+  let clerk = $derived(ctx?.clerk);
+  let isSignedIn = $derived(!!ctx?.user);
+  let user = $derived(ctx?.user);
 
   // Current page path for active nav highlighting
   let currentPath = $derived($page.url.pathname);
 
   // Pages that should show the auth banner when not logged in
   const authBannerPages = ['/learn', '/progress', '/practice'];
-  let showAuthBanner = $derived(!isSignedIn && authBannerPages.some(p => currentPath.startsWith(p)));
+  let showAuthBanner = $derived(
+    !isSignedIn && authBannerPages.some((p) => currentPath.startsWith(p))
+  );
 
   // Navigation items
   const navItems = [
@@ -33,7 +36,7 @@
 
   // Focus management - after navigation, focus moves to main content
   let mainContentRef = $state<HTMLElement | null>(null);
-  
+
   afterNavigate(() => {
     // Move focus to main content area for screen readers
     if (mainContentRef) {
@@ -42,13 +45,13 @@
   });
 
   function handleSignIn() {
-    clerk.openSignIn({
+    clerk?.openSignIn({
       redirectUrl: currentPath,
     });
   }
 
   function handleSignOut() {
-    clerk.signOut({
+    clerk?.signOut({
       redirectUrl: '/',
     });
   }
@@ -72,19 +75,15 @@
   - Current page indicated with aria-current
 -->
 
-<div class="min-h-screen bg-background">
+<div class="min-h-screen bg-background grid-texture text-on-background">
   <!-- Skip to Content Link - Visible on focus for keyboard users -->
-  <a 
-    href="#main-content" 
-    class="skip-to-content"
-    onclick={handleSkipToContent}
-  >
+  <a href="#main-content" class="skip-to-content" onclick={handleSkipToContent}>
     Skip to main content
   </a>
 
   <!-- Auth Banner - Sticky top banner for non-authenticated users -->
   {#if showAuthBanner}
-    <div 
+    <div
       class="fixed top-0 left-0 right-0 z-[60] bg-surface-container-high border-b border-outline-variant"
       role="banner"
     >
@@ -103,15 +102,15 @@
   {/if}
 
   <!-- Navigation -->
-  <nav 
-    class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl" 
+  <nav
+    class="fixed top-0 w-full z-50 glass-panel border-b border-outline-variant/10"
     class:mt-12={showAuthBanner}
     aria-label="Main navigation"
   >
     <div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
       <div class="flex items-center gap-8">
-        <a 
-          href="/" 
+        <a
+          href="/"
           class="text-xl font-black tracking-tighter text-primary uppercase font-label focus-indicator"
           aria-label="TypeForge Home"
         >
@@ -121,12 +120,17 @@
           {#each navItems as item}
             <a
               href={item.href}
-              class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith(item.href) ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
+              class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith(
+                item.href
+              )
+                ? 'text-primary'
+                : 'text-on-surface/70 hover:text-white'}"
               aria-current={currentPath.startsWith(item.href) ? 'page' : undefined}
             >
               {item.label}
               {#if currentPath.startsWith(item.href)}
-                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
+                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"
+                ></span>
               {/if}
             </a>
           {/each}
@@ -135,15 +139,20 @@
       <div class="flex items-center gap-4">
         <a
           href="/settings"
-          class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith('/settings') ? 'text-primary' : 'text-on-surface/70 hover:text-white'}"
+          class="text-sm font-body transition-colors relative py-1 focus-indicator {currentPath.startsWith(
+            '/settings'
+          )
+            ? 'text-primary'
+            : 'text-on-surface/70 hover:text-white'}"
           aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}
         >
           Settings
           {#if currentPath.startsWith('/settings')}
-            <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
+            <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"
+            ></span>
           {/if}
         </a>
-        
+
         <!-- User menu -->
         {#if isSignedIn && user}
           <div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
@@ -155,11 +164,15 @@
                 role="presentation"
               />
             {:else}
-              <div 
+              <div
                 class="w-8 h-8 bg-primary-container flex items-center justify-center text-on-primary-container font-label text-sm font-bold"
                 aria-hidden="true"
               >
-                {(user.firstName?.[0] || user.emailAddresses?.[0]?.emailAddress?.[0] || 'U').toUpperCase()}
+                {(
+                  user.firstName?.[0] ||
+                  user.emailAddresses?.[0]?.emailAddress?.[0] ||
+                  'U'
+                ).toUpperCase()}
               </div>
             {/if}
             <button
@@ -182,10 +195,10 @@
   </nav>
 
   <!-- Main Content Area -->
-  <main 
+  <main
     id="main-content"
     bind:this={mainContentRef}
-    class="pt-20 outline-none" 
+    class="pt-20 outline-none"
     class:mt-12={showAuthBanner}
     tabindex="-1"
     role="main"
@@ -243,7 +256,7 @@
     .skip-to-content {
       transition: none;
     }
-    
+
     .transition-colors {
       transition: none;
     }

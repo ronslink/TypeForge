@@ -9,7 +9,31 @@
     ".": {
       "types": "./src/index.ts",
       "svelte": "./src/index.ts"
-    }
+    },
+    "./components/MetricsBar.svelte": "./src/components/MetricsBar.svelte",
+    "./components/Keyboard.svelte": "./src/components/Keyboard.svelte",
+    "./components/Button.svelte": "./src/components/Button.svelte",
+    "./components/StatCard.svelte": "./src/components/StatCard.svelte",
+    "./components/TypingInput.svelte": "./src/components/TypingInput.svelte",
+    "./components/ProgressBar.svelte": "./src/components/ProgressBar.svelte",
+    "./components/Badge.svelte": "./src/components/Badge.svelte",
+    "./components/ProgressRing.svelte": "./src/components/ProgressRing.svelte",
+    "./components/LessonCard.svelte": "./src/components/LessonCard.svelte",
+    "./components/EncouragementToast.svelte": "./src/components/EncouragementToast.svelte",
+    "./components/ConfettiCelebration.svelte": "./src/components/ConfettiCelebration.svelte",
+    "./components/MilestoneToast.svelte": "./src/components/MilestoneToast.svelte",
+    "./components/Celebration.svelte": "./src/components/Celebration.svelte",
+    "./components/LevelUp.svelte": "./src/components/LevelUp.svelte",
+    "./components/AchievementBadge.svelte": "./src/components/AchievementBadge.svelte",
+    "./components/OrgDashboard.svelte": "./src/components/OrgDashboard.svelte",
+    "./components/ClassOverview.svelte": "./src/components/ClassOverview.svelte",
+    "./components/StudentRow.svelte": "./src/components/StudentRow.svelte",
+    "./components/StudentProgressReport.svelte": "./src/components/StudentProgressReport.svelte",
+    "./components/ClassRoster.svelte": "./src/components/ClassRoster.svelte",
+    "./components/OrgStatsPanel.svelte": "./src/components/OrgStatsPanel.svelte",
+    "./components/InviteStudentModal.svelte": "./src/components/InviteStudentModal.svelte",
+    "./components/ThemeProvider.svelte": "./src/components/ThemeProvider.svelte",
+    "./components/WeaknessHeatmap.svelte": "./src/components/WeaknessHeatmap.svelte"
   },
   "scripts": {
     "typecheck": "svelte-check --tsconfig ./tsconfig.json",

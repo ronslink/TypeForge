@@ -11,7 +11,7 @@ import { prettyJSON } from 'hono/pretty-json';
 
 // Middleware
 import { authMiddleware } from './middleware/auth.js';
-import { regionalRoutingMiddleware } from './middleware/regional-routing.js';
+import { dbMiddleware } from './middleware/regional-routing.js';
 import { rateLimits } from './middleware/ratelimit.js';
 
 // Routes
@@ -25,22 +25,7 @@ import {
   progressRoutes,
 } from './routes/index.js';
 
-// Environment bindings from wrangler.toml
-interface Env {
-  HYPERDRIVE_EU: Hyperdrive;
-  HYPERDRIVE_US: Hyperdrive;
-  HYPERDRIVE_AF: Hyperdrive;
-  DB: D1Database;
-  ASSETS: R2Bucket;
-  JOBS: Queue;
-  CACHE: KVNamespace;
-  UPSTASH_REDIS_REST_URL: string;
-  UPSTASH_REDIS_REST_TOKEN: string;
-  CLERK_SECRET_KEY: string;
-  ENVIRONMENT: string;
-}
-
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 // Global middleware
 app.use('*', logger());
@@ -48,7 +33,14 @@ app.use('*', secureHeaders());
 app.use(
   '*',
   cors({
-    origin: ['https://typeforge.io', 'https://www.typeforge.io', 'http://localhost:5173'],
+    origin: [
+      'https://typeforge.io',
+      'https://www.typeforge.io',
+      'https://typingscholar.com',
+      'https://www.typingscholar.com',
+      'http://localhost:5173',
+      'http://localhost:8787',
+    ],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'x-region'],
     credentials: true,
@@ -62,8 +54,8 @@ app.use('/api/*', rateLimits.api);
 // Authentication middleware
 app.use('/api/*', authMiddleware);
 
-// Regional database routing (new middleware)
-app.use('/api/*', regionalRoutingMiddleware);
+// Global database middleware
+app.use('/api/*', dbMiddleware);
 
 // Health check (no auth required)
 app.get('/health', (c) => {
@@ -71,7 +63,7 @@ app.get('/health', (c) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '0.0.1',
-    environment: c.env.ENVIRONMENT,
+    environment: process.env.NODE_ENV || 'production',
   });
 });
 
@@ -110,7 +102,7 @@ app.notFound((c) => {
 app.onError((err, c) => {
   console.error('API Error:', err);
 
-  const isDev = c.env.ENVIRONMENT === 'development';
+  const isDev = process.env.NODE_ENV === 'development';
 
   return c.json(
     {

@@ -19,10 +19,8 @@ import {
   selectNextLesson,
   type SessionHistoryEntry,
   type WeakArea,
-} from '@typeforge/curriculum/lesson-selector';
-import type { Env } from '../../../../infra/contracts/bindings.js';
-
-const app = new Hono<{ Bindings: Env }>();
+} from '@typeforge/curriculum';
+const app = new Hono();
 
 /**
  * Type definitions

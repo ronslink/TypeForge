@@ -27,7 +27,7 @@ const INDIVIDUAL_PRICES = {
  * Initialize Stripe client
  */
 function getStripe(c: any): Stripe {
-  const secretKey = c.env.STRIPE_SECRET_KEY;
+  const secretKey = process.env.STRIPE_SECRET_KEY as string;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
@@ -114,8 +114,8 @@ app.post('/checkout', requireAuth, async (c) => {
   
   // Get price ID from environment or use default
   const priceId = interval === 'monthly' 
-    ? ((c.env as any).STRIPE_PRICE_MONTHLY || INDIVIDUAL_PRICES.monthly.priceId)
-    : ((c.env as any).STRIPE_PRICE_ANNUAL || INDIVIDUAL_PRICES.annual.priceId);
+    ? (process.env.STRIPE_PRICE_MONTHLY || INDIVIDUAL_PRICES.monthly.priceId)
+    : (process.env.STRIPE_PRICE_ANNUAL || INDIVIDUAL_PRICES.annual.priceId);
   
   // Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -127,8 +127,8 @@ app.post('/checkout', requireAuth, async (c) => {
       },
     ],
     mode: 'subscription',
-    success_url: successUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing/cancel`,
+    success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/cancel`,
     metadata: {
       userId: auth.userId,
       type: 'individual',
@@ -170,7 +170,7 @@ app.post('/portal', requireAuth, async (c) => {
   // Create portal session
   const session = await stripe.billingPortal.sessions.create({
     customer: userRecord.stripeCustomerId,
-    return_url: `${(c.env as any).APP_URL || 'https://typeforge.io'}/billing`,
+    return_url: `${process.env.APP_URL || 'https://typeforge.io'}/billing`,
   });
   
   return c.json({ 
@@ -201,7 +201,7 @@ app.post('/webhook', async (c) => {
   const stripe = getStripe(c);
   const body = await c.req.text();
   const signature = c.req.header('Stripe-Signature');
-  const webhookSecret = (c.env as any).STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
   
   if (!signature || !webhookSecret) {
     return c.json({ error: 'Missing signature or webhook secret', code: 'INVALID_REQUEST' }, 400);

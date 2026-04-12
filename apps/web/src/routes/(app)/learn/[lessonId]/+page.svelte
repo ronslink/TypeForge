@@ -21,8 +21,8 @@
     WPMCalculator, 
     AccuracyTracker 
   } from '@typeforge/metrics';
-  import { layouts } from '@typeforge/layouts';
-  import { api } from '@typeforge/api/client';
+  import { useClerkContext } from 'svelte-clerk';
+  import { createApiClient } from '@typeforge/api/client';
   import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
   import type { PageData } from './$types';
 
@@ -273,6 +273,15 @@
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
       
+      const ctx = useClerkContext();
+      const token = await ctx?.session?.getToken();
+      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+        const defaultHeaders = new Headers(init?.headers);
+        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
+        return fetch(input, { ...init, headers: defaultHeaders });
+      };
+      const api = createApiClient('/', authFetch);
+
       await api.api.v1.sessions.$post({
         json: {
           wpm: finalWPM,

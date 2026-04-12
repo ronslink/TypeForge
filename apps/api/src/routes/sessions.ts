@@ -14,9 +14,7 @@ import {
   users,
 } from '@typeforge/db';
 import { eq, desc, and } from 'drizzle-orm';
-import type { Env } from '../../../../infra/contracts/bindings.js';
-
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 // All session routes require authentication
 app.use('*', requireAuth);

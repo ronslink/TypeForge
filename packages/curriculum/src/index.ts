@@ -5,6 +5,7 @@
 export { AdaptiveScheduler } from './scheduler.js';
 export { LessonGenerator } from './generator.js';
 export { ProgressTracker } from './progress.js';
+export { selectNextLesson, type SessionHistoryEntry, type WeakArea } from './lesson-selector.js';
 export type {
   Lesson,
   Exercise,

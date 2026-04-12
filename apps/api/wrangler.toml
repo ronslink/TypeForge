@@ -16,11 +16,13 @@ port = 8787
 local_protocol = "http"
 
 # Hyperdrive bindings for regional PostgreSQL databases
-# These are created via: wrangler hyperdrive create typeforge-eu --connection-string="..."
-# [[hyperdrive]]
-# binding = "HYPERDRIVE_EU"
-# id = "hyperdrive-eu-id"
-# 
+# These are created via: wrangler hyperdrive create typeforge-eu --connection-string="postgresql://typeforge_admin@157.180.84.79:5432/typeforge_eu"
+# Note: Use trust auth or ensure password is set correctly in the connection string
+[[hyperdrive]]
+binding = "HYPERDRIVE_EU"
+id = "79f1a50851134da69945dda286307b6f"
+
+# US and Africa Hyperdrive will need to be configured when those databases are provisioned
 # [[hyperdrive]]
 # binding = "HYPERDRIVE_US"
 # id = "hyperdrive-us-id"
@@ -64,9 +66,7 @@ vars = { ENVIRONMENT = "production" }
 [env.staging]
 vars = { ENVIRONMENT = "staging" }
 
-# Build settings
-[build]
-command = "pnpm build"
+# Build settings - removed recursive build command
 
 # Limits
 [limits]

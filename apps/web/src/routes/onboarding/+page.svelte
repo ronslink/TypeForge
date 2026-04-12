@@ -2,8 +2,7 @@
   import { writable } from 'svelte/store';
   import { ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
   import { WPMCalculator, AccuracyCalculator } from '@typeforge/metrics';
-  import MetricsBar from '@typeforge/ui/components/MetricsBar.svelte';
-  import Keyboard from '@typeforge/ui/components/Keyboard.svelte';
+  import { MetricsBar, Keyboard } from '@typeforge/ui';
   import { layouts } from '@typeforge/layouts';
   import { api } from '@typeforge/api/client';
   import { goto } from '$app/navigation';
@@ -11,7 +10,7 @@
   // ============================================================================
   // Types
   // ============================================================================
-  
+
   type LayoutOption = {
     id: string;
     name: string;
@@ -33,7 +32,7 @@
   // ============================================================================
   // Store
   // ============================================================================
-  
+
   const onboardingStore = writable<OnboardingState>({
     currentStep: 1,
     selectedLanguage: null,
@@ -44,7 +43,7 @@
   // ============================================================================
   // Layout Options
   // ============================================================================
-  
+
   const LAYOUT_OPTIONS: LayoutOption[] = [
     {
       id: 'qwerty-us',
@@ -93,7 +92,7 @@
   // ============================================================================
   // Step 1: Language Selection
   // ============================================================================
-  
+
   function selectLanguage(code: string) {
     onboardingStore.update((state) => ({
       ...state,
@@ -110,7 +109,7 @@
   // ============================================================================
   // Step 2: Layout Selection
   // ============================================================================
-  
+
   function selectLayout(layoutId: string) {
     onboardingStore.update((state) => ({
       ...state,
@@ -121,7 +120,7 @@
   // ============================================================================
   // Step 3: Placement Test
   // ============================================================================
-  
+
   let testText = $state('');
   let userInput = $state('');
   let testStarted = $state(false);
@@ -177,26 +176,26 @@
     // Prevent default for printable characters
     if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
       event.preventDefault();
-      
+
       const expectedChar = testText[userInput.length];
       const isCorrect = event.key === expectedChar;
-      
+
       // Update calculators
       wpmCalculator.onKeystroke(event.code, isCorrect, Date.now());
       accuracyCalculator.onKeystroke(event.code, isCorrect);
-      
+
       if (isCorrect) {
         userInput += event.key;
-        
+
         // Highlight next key
         const nextChar = testText[userInput.length];
         if (nextChar) {
           highlightKeys = new Set([nextChar.toLowerCase()]);
         }
       }
-      
+
       updateMetrics();
-      
+
       // Check if test is complete
       if (userInput.length >= testText.length) {
         endTest();
@@ -217,16 +216,16 @@
     }
     testEnded = true;
     testStarted = false;
-    
+
     const finalWPM = currentWPM;
     const finalAccuracy = currentAccuracy;
-    
+
     let level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     if (finalWPM < 30) level = 'beginner';
     else if (finalWPM < 60) level = 'intermediate';
     else if (finalWPM < 90) level = 'advanced';
     else level = 'expert';
-    
+
     onboardingStore.update((state) => ({
       ...state,
       testResults: {
@@ -240,14 +239,13 @@
   // ============================================================================
   // Step 4: Results & Save
   // ============================================================================
-  
+
   async function savePreferences() {
     const state = $onboardingStore;
-    
+
     // Check if user is logged in (Clerk)
-    const isLoggedIn = typeof window !== 'undefined' && 
-      (window as any).Clerk?.user?.id;
-    
+    const isLoggedIn = typeof window !== 'undefined' && (window as any).Clerk?.user?.id;
+
     if (isLoggedIn && state.selectedLanguage && state.selectedLayout) {
       try {
         // Save preferences to API
@@ -265,7 +263,7 @@
         console.error('Failed to save preferences:', error);
       }
     }
-    
+
     // Navigate to learn page
     goto('/learn');
   }
@@ -273,7 +271,7 @@
   // ============================================================================
   // Navigation
   // ============================================================================
-  
+
   function nextStep() {
     onboardingStore.update((state) => {
       const next = Math.min(state.currentStep + 1, 4);
@@ -304,34 +302,48 @@
   // ============================================================================
   // Reactive Computations
   // ============================================================================
-  
+
   let canProceed = $derived.by(() => {
     const state = $onboardingStore;
     switch (state.currentStep) {
-      case 1: return !!state.selectedLanguage;
-      case 2: return !!state.selectedLayout;
-      case 3: return testEnded;
-      default: return true;
+      case 1:
+        return !!state.selectedLanguage;
+      case 2:
+        return !!state.selectedLayout;
+      case 3:
+        return testEnded;
+      default:
+        return true;
     }
   });
 
   let stepTitle = $derived.by(() => {
     switch ($onboardingStore.currentStep) {
-      case 1: return 'Choose Your Language';
-      case 2: return 'Select Keyboard Layout';
-      case 3: return 'Placement Test';
-      case 4: return 'Your Results';
-      default: return '';
+      case 1:
+        return 'Choose Your Language';
+      case 2:
+        return 'Select Keyboard Layout';
+      case 3:
+        return 'Placement Test';
+      case 4:
+        return 'Your Results';
+      default:
+        return '';
     }
   });
 
   let stepDescription = $derived.by(() => {
     switch ($onboardingStore.currentStep) {
-      case 1: return 'Select the language you want to practice typing in';
-      case 2: return 'Choose the keyboard layout you use';
-      case 3: return 'Type the text below to assess your current skill level';
-      case 4: return 'Based on your performance, we recommend the following starting level';
-      default: return '';
+      case 1:
+        return 'Select the language you want to practice typing in';
+      case 2:
+        return 'Choose the keyboard layout you use';
+      case 3:
+        return 'Type the text below to assess your current skill level';
+      case 4:
+        return 'Based on your performance, we recommend the following starting level';
+      default:
+        return '';
     }
   });
 
@@ -361,7 +373,9 @@
     <div class="flex h-1">
       {#each [1, 2, 3, 4] as step}
         <button
-          class="flex-1 transition-all duration-300 {step <= $onboardingStore.currentStep ? 'bg-primary' : 'bg-surface-container-high'}"
+          class="flex-1 transition-all duration-300 {step <= $onboardingStore.currentStep
+            ? 'bg-primary'
+            : 'bg-surface-container-high'}"
           onclick={() => goToStep(step)}
           aria-label="Go to step {step}"
         ></button>
@@ -373,7 +387,8 @@
   <header class="pt-16 pb-8 px-6">
     <div class="max-w-4xl mx-auto text-center">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <span class="font-label text-sm text-primary">Step {$onboardingStore.currentStep} of 4</span>
+        <span class="font-label text-sm text-primary">Step {$onboardingStore.currentStep} of 4</span
+        >
       </div>
       <h1 class="font-headline text-4xl md:text-5xl text-on-background mb-3">
         {stepTitle}
@@ -387,7 +402,6 @@
   <!-- Main Content -->
   <main class="px-6 pb-24">
     <div class="max-w-4xl mx-auto">
-      
       <!-- Step 1: Language Selection -->
       {#if $onboardingStore.currentStep === 1}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -405,12 +419,17 @@
                   {language.englishName}
                 </span>
                 <div class="mt-auto pt-3 border-t border-outline-variant">
-                  <span class="font-body text-sm text-on-surface-variant line-clamp-2" dir={language.rtl ? 'rtl' : 'ltr'}>
+                  <span
+                    class="font-body text-sm text-on-surface-variant line-clamp-2"
+                    dir={language.rtl ? 'rtl' : 'ltr'}
+                  >
                     {language.sampleText}
                   </span>
                 </div>
                 {#if language.rtl}
-                  <span class="absolute top-3 right-3 font-label text-xs text-secondary bg-secondary/10 px-2 py-1">
+                  <span
+                    class="absolute top-3 right-3 font-label text-xs text-secondary bg-secondary/10 px-2 py-1"
+                  >
                     RTL
                   </span>
                 {/if}
@@ -485,23 +504,19 @@
 
             {#if testEnded}
               <div class="text-center py-4">
-                <p class="font-label text-lg text-primary">
-                  Test Complete!
-                </p>
+                <p class="font-label text-lg text-primary">Test Complete!</p>
               </div>
             {/if}
           </div>
 
           <!-- Keyboard Visualization -->
           <div class="keyboard-section">
-            <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 text-center">
+            <p
+              class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 text-center"
+            >
               Keyboard Layout
             </p>
-            <Keyboard 
-              layout={currentLayout} 
-              {highlightKeys}
-              {pressedKey}
-            />
+            <Keyboard layout={currentLayout} {highlightKeys} {pressedKey} />
           </div>
         </div>
       {/if}
@@ -545,18 +560,20 @@
 
           <!-- Level Description -->
           <div class="level-description bg-surface-container p-6">
-            <h3 class="font-headline text-xl text-on-surface mb-3">
-              What this means
-            </h3>
+            <h3 class="font-headline text-xl text-on-surface mb-3">What this means</h3>
             <p class="font-body text-on-surface-variant">
               {#if results?.level === 'beginner'}
-                You're just starting out! We'll guide you through the fundamentals of touch typing, starting with home row keys and proper finger placement.
+                You're just starting out! We'll guide you through the fundamentals of touch typing,
+                starting with home row keys and proper finger placement.
               {:else if results?.level === 'intermediate'}
-                You have a solid foundation! We'll help you build speed and accuracy with more complex patterns and common words.
+                You have a solid foundation! We'll help you build speed and accuracy with more
+                complex patterns and common words.
               {:else if results?.level === 'advanced'}
-                Great typing skills! We'll challenge you with advanced techniques, special characters, and longer passages.
+                Great typing skills! We'll challenge you with advanced techniques, special
+                characters, and longer passages.
               {:else}
-                Excellent! You're already a proficient typist. We'll help you maintain your skills and tackle specialized content.
+                Excellent! You're already a proficient typist. We'll help you maintain your skills
+                and tackle specialized content.
               {/if}
             </p>
           </div>
@@ -577,7 +594,9 @@
 
   <!-- Navigation Footer -->
   {#if $onboardingStore.currentStep < 4}
-    <footer class="fixed bottom-0 left-0 right-0 bg-surface-container-low border-t border-outline-variant px-6 py-4">
+    <footer
+      class="fixed bottom-0 left-0 right-0 bg-surface-container-low border-t border-outline-variant px-6 py-4"
+    >
       <div class="max-w-4xl mx-auto flex justify-between items-center">
         <button
           class="nav-btn font-label text-sm px-6 py-3 transition-all duration-300"
@@ -612,7 +631,14 @@
   .language-card,
   .layout-card {
     background: var(--surface-container-low);
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    clip-path: polygon(
+      0 0,
+      calc(100% - 12px) 0,
+      100% 12px,
+      100% 100%,
+      12px 100%,
+      0 calc(100% - 12px)
+    );
   }
 
   .language-card.selected,
@@ -650,7 +676,14 @@
 
   /* Typing Area */
   .typing-area {
-    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+    clip-path: polygon(
+      0 0,
+      calc(100% - 16px) 0,
+      100% 16px,
+      100% 100%,
+      16px 100%,
+      0 calc(100% - 16px)
+    );
   }
 
   .char {
@@ -672,8 +705,14 @@
   }
 
   @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.5; }
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0.5;
+    }
   }
 
   /* Keyboard Section */
@@ -688,12 +727,26 @@
 
   /* Result Cards */
   .result-card {
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    clip-path: polygon(
+      0 0,
+      calc(100% - 12px) 0,
+      100% 12px,
+      100% 100%,
+      12px 100%,
+      0 calc(100% - 12px)
+    );
   }
 
   /* Level Description */
   .level-description {
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    clip-path: polygon(
+      0 0,
+      calc(100% - 12px) 0,
+      100% 12px,
+      100% 100%,
+      12px 100%,
+      0 calc(100% - 12px)
+    );
   }
 
   /* Buttons */
@@ -859,7 +912,8 @@
 
   /* Animation */
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {

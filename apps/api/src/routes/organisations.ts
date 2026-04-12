@@ -22,7 +22,7 @@ app.use('*', requireAuth);
  * Initialize Stripe client
  */
 function getStripe(c: any): Stripe {
-  const secretKey = (c.env as any).STRIPE_SECRET_KEY;
+  const secretKey = process.env.STRIPE_SECRET_KEY as string;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
@@ -280,7 +280,7 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
   }
   
   // Create checkout session for seats
-  const priceId = (c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID;
+  const priceId = process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID;
   
   const session = await stripe.checkout.sessions.create({
     customer: customerId as string,
@@ -291,8 +291,8 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
       },
     ],
     mode: 'subscription',
-    success_url: successUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${(c.env as any).APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/cancel`,
+    success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/cancel`,
     metadata: {
       orgId,
       type: 'org_seats',
@@ -360,7 +360,7 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === ((c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {
@@ -441,7 +441,7 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === ((c.env as any).STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {

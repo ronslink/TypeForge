@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { useClerkContext } from 'svelte-clerk';
 
   // Script diversity grid data
   const scripts = [
@@ -122,6 +123,8 @@
   };
 
   let mounted = false;
+  const ctx = useClerkContext();
+  let clerk = $derived(ctx?.clerk);
   onMount(() => {
     mounted = true;
   });
@@ -144,9 +147,12 @@
         <a href="#pricing" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Pricing</a>
       </div>
     </div>
-    <button class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95">
-      Start Typing
-    </button>
+      <button 
+        onclick={() => clerk?.openSignUp({ redirectUrl: '/learn' })}
+        class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95"
+      >
+        Start Typing
+      </button>
   </div>
 </nav>
 
@@ -179,7 +185,10 @@
         Adaptive AI. Every script. Every layout.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <button class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all">
+        <button 
+          onclick={() => clerk?.openSignUp({ redirectUrl: '/learn' })}
+          class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all"
+        >
           Start free today
         </button>
         <button class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
@@ -570,99 +579,6 @@
 
   .font-label {
     font-family: 'Space Grotesk', monospace;
-  }
-
-  /* Color utilities using CSS custom properties */
-  .bg-background {
-    background-color: var(--background, #111319);
-  }
-
-  .bg-surface {
-    background-color: var(--surface, #111319);
-  }
-
-  .bg-surface-container {
-    background-color: var(--surface-container, #1d2025);
-  }
-
-  .bg-surface-container-low {
-    background-color: var(--surface-container-low, #191c21);
-  }
-
-  .bg-surface-container-lowest {
-    background-color: var(--surface-container-lowest, #0b0e13);
-  }
-
-  .bg-surface-container-high {
-    background-color: var(--surface-container-high, #272a30);
-  }
-
-  .bg-surface-container-highest {
-    background-color: var(--surface-container-highest, #32353b);
-  }
-
-  .bg-primary {
-    background-color: var(--primary, #ffc56c);
-  }
-
-  .bg-primary-container {
-    background-color: var(--primary-container, #f0a500);
-  }
-
-  .bg-secondary {
-    background-color: var(--secondary, #41e4c0);
-  }
-
-  .bg-secondary-container {
-    background-color: var(--secondary-container, #00c7a5);
-  }
-
-  .bg-error {
-    background-color: var(--error, #ffb4ab);
-  }
-
-  .text-on-background {
-    color: var(--on-background, #e1e2ea);
-  }
-
-  .text-on-surface {
-    color: var(--on-surface, #e1e2ea);
-  }
-
-  .text-on-surface-variant {
-    color: var(--on-surface-variant, #d6c4ac);
-  }
-
-  .text-on-primary {
-    color: var(--on-primary, #442c00);
-  }
-
-  .text-on-primary-container {
-    color: var(--on-primary-container, #5f3f00);
-  }
-
-  .text-primary {
-    color: var(--primary, #ffc56c);
-  }
-
-  .text-primary-container {
-    color: var(--primary-container, #f0a500);
-  }
-
-  .text-secondary {
-    color: var(--secondary, #41e4c0);
-  }
-
-  .text-error {
-    color: var(--error, #ffb4ab);
-  }
-
-  .border-primary {
-    border-color: var(--primary, #ffc56c);
-  }
-
-  .border-outline-variant {
-    border-color: var(--outline-variant, #514533);
   }
 
   /* Animation for pulse */

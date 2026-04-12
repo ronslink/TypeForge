@@ -4,9 +4,9 @@
  */
 
 import type { Context } from 'hono';
-import type { Env } from '../../../infra/contracts/bindings.js';
 import type { Region } from './region.js';
 import { extractRegionFromClaims } from './region.js';
+import { verifyToken } from '@clerk/backend';
 
 export interface ClerkUser {
   id: string;
@@ -41,7 +41,6 @@ export async function validateJWT(
   token: string,
   secretKey: string
 ): Promise<Record<string, unknown>> {
-  const { verifyToken } = await import('@clerk/backend');
   const payload = await verifyToken(token, { secretKey });
   return payload as Record<string, unknown>;
 }
@@ -50,7 +49,7 @@ export async function validateJWT(
  * Get the current user from a Hono context
  * Extracts Bearer token from Authorization header, validates JWT, returns ClerkUser
  */
-export async function getCurrentUser(c: Context<{ Bindings: Env }>): Promise<ClerkUser | null> {
+export async function getCurrentUser(c: Context): Promise<ClerkUser | null> {
   try {
     const authHeader = c.req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -58,7 +57,7 @@ export async function getCurrentUser(c: Context<{ Bindings: Env }>): Promise<Cle
     }
 
     const token = authHeader.slice(7);
-    const claims = await validateJWT(token, c.env.CLERK_SECRET_KEY);
+    const claims = await validateJWT(token, process.env.CLERK_SECRET_KEY as string);
 
     const homeRegion = extractRegionFromClaims({
       home_region: claims.home_region as string | undefined,
@@ -86,7 +85,7 @@ export async function getCurrentUser(c: Context<{ Bindings: Env }>): Promise<Cle
 /**
  * Get the full authentication state from Hono context
  */
-export async function getAuthState(c: Context<{ Bindings: Env }>): Promise<AuthState> {
+export async function getAuthState(c: Context): Promise<AuthState> {
   const user = await getCurrentUser(c);
 
   if (!user) {

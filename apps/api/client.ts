@@ -14,8 +14,11 @@
  *   json: { wpm: 60, accuracy: 95, ... }
  * });
  * ```
+ */
+
 import { hc } from 'hono/client';
 import type { Hono } from 'hono';
+import type { Env } from '../../../infra/contracts/bindings.js';
 
 // ============================================================================
 // Type Definitions for API Responses
@@ -642,7 +645,7 @@ export interface ApiInfoResponse {
  * Type definition for the Sessions API routes
  */
 export type SessionsApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/': {
       $get: {
@@ -710,7 +713,7 @@ export type SessionsApiType = Hono<
  * Type definition for the Lessons API routes
  */
 export type LessonsApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/': {
       $get: {
@@ -761,7 +764,7 @@ export type LessonsApiType = Hono<
  * Type definition for the Users API routes
  */
 export type UsersApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/me': {
       $get: {
@@ -809,7 +812,7 @@ export type UsersApiType = Hono<
  * Type definition for the Organisations API routes
  */
 export type OrganisationsApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/': {
       $get: {
@@ -914,7 +917,7 @@ export type OrganisationsApiType = Hono<
  * Type definition for the Billing API routes
  */
 export type BillingApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/plans': {
       $get: {
@@ -956,7 +959,7 @@ export type BillingApiType = Hono<
  * Type definition for the Admin API routes
  */
 export type AdminApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/stats': {
       $get: {
@@ -1006,7 +1009,7 @@ export type AdminApiType = Hono<
  * Type definition for the Progress API routes
  */
 export type ProgressApiType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/': {
       $get: {
@@ -1025,7 +1028,7 @@ export type ProgressApiType = Hono<
  * Combined API type for all routes
  */
 export type AppType = Hono<
-  any,
+  { Bindings: Env },
   {
     '/health': {
       $get: {
@@ -1063,8 +1066,8 @@ export type AppType = Hono<
  * const response = await client.api.v1.sessions.$get({ query: { limit: '10' } });
  * ```
  */
-export function createApiClient(baseUrl: string = '/', customFetch?: typeof fetch) {
-  return hc<AppType>(baseUrl, { fetch: customFetch });
+export function createApiClient(baseUrl: string = '/') {
+  return hc<AppType>(baseUrl);
 }
 
 /**
@@ -1072,6 +1075,14 @@ export function createApiClient(baseUrl: string = '/', customFetch?: typeof fetc
  * Uses relative URL for same-origin requests
  */
 export const api = createApiClient();
+
+// ============================================================================
+// Re-export types for convenience
+// ============================================================================
+
+export type {
+  Env,
+} from '../../../infra/contracts/bindings.js';
 
 // ============================================================================
 // Helper types for frontend usage
