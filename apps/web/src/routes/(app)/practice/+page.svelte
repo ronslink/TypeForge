@@ -217,6 +217,12 @@
     pressedKey = undefined;
   }
 
+  function formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
   function completePractice() {
     if (isComplete) return;
     isComplete = true;
@@ -369,10 +375,15 @@
     {:else}
       <div class="w-full max-w-4xl mx-auto flex flex-col gap-8 mb-12">
         <MetricsBar 
-          wpm={currentWPM || 0}
-          accuracy={currentAccuracy || 100}
-          streak={currentStreak || 0}
-          timeRemaining={LESSON_TIME_LIMIT - elapsedSeconds}
+          metrics={[
+            { label: 'WPM', value: currentWPM, variant: 'primary' },
+            { label: 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
+            { label: 'Streak', value: currentStreak, variant: 'default' },
+            { label: 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
+            { label: 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' }
+          ]}
+          {currentStreak}
+          previousStreak={previousStreak}
         />
         
         <div class="p-8 bg-surface-container-low rounded-2xl shadow-lg border border-surface-container relative">
