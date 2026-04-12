@@ -1,0 +1,65 @@
+{
+  "id": "dubeolsik",
+  "name": "두벌식 (Dubeolsik)",
+  "language": "ko",
+  "script": "Hangul",
+  "variant": "2-Set Korean",
+  "rows": [
+    [
+      { "code": "Backquote", "char": "`", "charShift": "~" },
+      { "code": "Digit1", "char": "1", "charShift": "!" },
+      { "code": "Digit2", "char": "2", "charShift": "@" },
+      { "code": "Digit3", "char": "3", "charShift": "#" },
+      { "code": "Digit4", "char": "4", "charShift": "$" },
+      { "code": "Digit5", "char": "5", "charShift": "%" },
+      { "code": "Digit6", "char": "6", "charShift": "^" },
+      { "code": "Digit7", "char": "7", "charShift": "&" },
+      { "code": "Digit8", "char": "8", "charShift": "*" },
+      { "code": "Digit9", "char": "9", "charShift": "(" },
+      { "code": "Digit0", "char": "0", "charShift": ")" },
+      { "code": "Minus", "char": "-", "charShift": "_" },
+      { "code": "Equal", "char": "=", "charShift": "+" }
+    ],
+    [
+      { "code": "KeyQ", "char": "ㅂ", "charShift": "ㅃ", "finger": "left-pinky" },
+      { "code": "KeyW", "char": "ㅈ", "charShift": "ㅉ", "finger": "left-ring" },
+      { "code": "KeyE", "char": "ㄷ", "charShift": "ㄸ", "finger": "left-middle" },
+      { "code": "KeyR", "char": "ㄱ", "charShift": "ㄲ", "finger": "left-index" },
+      { "code": "KeyT", "char": "ㅅ", "charShift": "ㅆ", "finger": "left-index" },
+      { "code": "KeyY", "char": "ㅛ", "charShift": "ㅛ", "finger": "right-index" },
+      { "code": "KeyU", "char": "ㅕ", "charShift": "ㅕ", "finger": "right-index" },
+      { "code": "KeyI", "char": "ㅑ", "charShift": "ㅑ", "finger": "right-middle" },
+      { "code": "KeyO", "char": "ㅐ", "charShift": "ㅒ", "finger": "right-ring" },
+      { "code": "KeyP", "char": "ㅔ", "charShift": "ㅖ", "finger": "right-pinky" },
+      { "code": "BracketLeft", "char": "[", "charShift": "{", "finger": "right-pinky" },
+      { "code": "BracketRight", "char": "]", "charShift": "}", "finger": "right-pinky" },
+      { "code": "Backslash", "char": "\\", "charShift": "|", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyA", "char": "ㅁ", "charShift": "ㅁ", "finger": "left-pinky" },
+      { "code": "KeyS", "char": "ㄴ", "charShift": "ㄴ", "finger": "left-ring" },
+      { "code": "KeyD", "char": "ㅇ", "charShift": "ㅇ", "finger": "left-middle" },
+      { "code": "KeyF", "char": "ㄹ", "charShift": "ㄹ", "finger": "left-index" },
+      { "code": "KeyG", "char": "ㅎ", "charShift": "ㅎ", "finger": "left-index" },
+      { "code": "KeyH", "char": "ㅗ", "charShift": "ㅗ", "finger": "right-index" },
+      { "code": "KeyJ", "char": "ㅓ", "charShift": "ㅓ", "finger": "right-index" },
+      { "code": "KeyK", "char": "ㅏ", "charShift": "ㅏ", "finger": "right-middle" },
+      { "code": "KeyL", "char": "ㅣ", "charShift": "ㅣ", "finger": "right-ring" },
+      { "code": "Semicolon", "char": ";", "charShift": ":", "finger": "right-pinky" },
+      { "code": "Quote", "char": "'", "charShift": "\"", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyZ", "char": "ㅋ", "charShift": "ㅋ", "finger": "left-pinky" },
+      { "code": "KeyX", "char": "ㅌ", "charShift": "ㅌ", "finger": "left-ring" },
+      { "code": "KeyC", "char": "ㅊ", "charShift": "ㅊ", "finger": "left-middle" },
+      { "code": "KeyV", "char": "ㅍ", "charShift": "ㅍ", "finger": "left-index" },
+      { "code": "KeyB", "char": "ㅠ", "charShift": "ㅠ", "finger": "left-index" },
+      { "code": "KeyN", "char": "ㅜ", "charShift": "ㅜ", "finger": "right-index" },
+      { "code": "KeyM", "char": "ㅡ", "charShift": "ㅡ", "finger": "right-index" },
+      { "code": "Comma", "char": ",", "charShift": "<", "finger": "right-middle" },
+      { "code": "Period", "char": ".", "charShift": ">", "finger": "right-ring" },
+      { "code": "Slash", "char": "/", "charShift": "?", "finger": "right-pinky" }
+    ],
+    [{ "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }]
+  ]
+}

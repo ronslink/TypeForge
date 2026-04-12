@@ -1,0 +1,65 @@
+{
+  "id": "devanagari-phonetic",
+  "name": "Devanagari Phonetic",
+  "language": "hi",
+  "script": "Devanagari",
+  "variant": "Phonetic",
+  "rows": [
+    [
+      { "code": "Backquote", "char": "`", "charShift": "~" },
+      { "code": "Digit1", "char": "१", "charShift": "1" },
+      { "code": "Digit2", "char": "२", "charShift": "2" },
+      { "code": "Digit3", "char": "३", "charShift": "3" },
+      { "code": "Digit4", "char": "४", "charShift": "4" },
+      { "code": "Digit5", "char": "५", "charShift": "5" },
+      { "code": "Digit6", "char": "६", "charShift": "6" },
+      { "code": "Digit7", "char": "७", "charShift": "7" },
+      { "code": "Digit8", "char": "८", "charShift": "8" },
+      { "code": "Digit9", "char": "९", "charShift": "9" },
+      { "code": "Digit0", "char": "०", "charShift": "0" },
+      { "code": "Minus", "char": "-", "charShift": "_" },
+      { "code": "Equal", "char": "=", "charShift": "+" }
+    ],
+    [
+      { "code": "KeyQ", "char": "ट", "charShift": "ठ", "finger": "left-pinky" },
+      { "code": "KeyW", "char": "ड", "charShift": "ढ", "finger": "left-ring" },
+      { "code": "KeyE", "char": "े", "charShift": "ै", "finger": "left-middle" },
+      { "code": "KeyR", "char": "र", "charShift": "ऋ", "finger": "left-index" },
+      { "code": "KeyT", "char": "त", "charShift": "थ", "finger": "left-index" },
+      { "code": "KeyY", "char": "य", "charShift": "ञ", "finger": "right-index" },
+      { "code": "KeyU", "char": "ु", "charShift": "ू", "finger": "right-index" },
+      { "code": "KeyI", "char": "ि", "charShift": "ी", "finger": "right-middle" },
+      { "code": "KeyO", "char": "ो", "charShift": "ौ", "finger": "right-ring" },
+      { "code": "KeyP", "char": "प", "charShift": "फ", "finger": "right-pinky" },
+      { "code": "BracketLeft", "char": "[", "charShift": "{", "finger": "right-pinky" },
+      { "code": "BracketRight", "char": "]", "charShift": "}", "finger": "right-pinky" },
+      { "code": "Backslash", "char": "\\", "charShift": "|", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyA", "char": "ा", "charShift": "अ", "finger": "left-pinky" },
+      { "code": "KeyS", "char": "स", "charShift": "श", "finger": "left-ring" },
+      { "code": "KeyD", "char": "द", "charShift": "ध", "finger": "left-middle" },
+      { "code": "KeyF", "char": "्", "charShift": "ऽ", "finger": "left-index" },
+      { "code": "KeyG", "char": "ग", "charShift": "घ", "finger": "left-index" },
+      { "code": "KeyH", "char": "ह", "charShift": "ः", "finger": "right-index" },
+      { "code": "KeyJ", "char": "ज", "charShift": "झ", "finger": "right-index" },
+      { "code": "KeyK", "char": "क", "charShift": "ख", "finger": "right-middle" },
+      { "code": "KeyL", "char": "ल", "charShift": "ळ", "finger": "right-ring" },
+      { "code": "Semicolon", "char": ";", "charShift": ":", "finger": "right-pinky" },
+      { "code": "Quote", "char": "'", "charShift": "\"", "finger": "right-pinky" }
+    ],
+    [
+      { "code": "KeyZ", "char": "़", "charShift": "ँ", "finger": "left-pinky" },
+      { "code": "KeyX", "char": "ष", "charShift": "क्ष", "finger": "left-ring" },
+      { "code": "KeyC", "char": "च", "charShift": "छ", "finger": "left-middle" },
+      { "code": "KeyV", "char": "व", "charShift": "ṿ", "finger": "left-index" },
+      { "code": "KeyB", "char": "ब", "charShift": "भ", "finger": "left-index" },
+      { "code": "KeyN", "char": "न", "charShift": "ण", "finger": "right-index" },
+      { "code": "KeyM", "char": "म", "charShift": "ं", "finger": "right-index" },
+      { "code": "Comma", "char": ",", "charShift": "<", "finger": "right-middle" },
+      { "code": "Period", "char": ".", "charShift": ">", "finger": "right-ring" },
+      { "code": "Slash", "char": "", "charShift": "़", "finger": "right-pinky" }
+    ],
+    [{ "code": "Space", "char": " ", "width": "extra-wide", "finger": "thumb" }]
+  ]
+}
