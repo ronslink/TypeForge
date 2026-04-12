@@ -34,48 +34,51 @@
   this={href ? 'a' : 'button'}
   {href}
   type={href ? undefined : 'button'}
-  class="lesson-card block w-full bg-surface-container-low p-6 text-left transition-all hover:bg-surface-container focus-indicator {selected
-    ? 'ring-2 ring-primary'
+  class="lesson-card block w-full bg-surface-container-low p-6 rounded-2xl text-left transition-all focus-indicator {selected
+    ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface'
     : ''}"
   onclick={onclick}
 >
-  <div class="flex items-start justify-between mb-4">
+  <div class="flex items-start justify-between mb-4 relative z-10">
     <div class="flex-1">
-      <h3 class="font-label text-lg font-bold text-on-surface mb-1">
+      <h3 class="font-headline text-xl font-bold text-on-surface mb-1 drop-shadow-sm">
         {lesson.title}
       </h3>
       {#if lesson.description}
-        <p class="text-sm text-on-surface-variant line-clamp-2">
+        <p class="text-sm font-body text-on-surface-variant line-clamp-2">
           {lesson.description}
         </p>
       {/if}
     </div>
     {#if lesson.language}
-      <Badge variant="primary">
+      <Badge variant="primary" class="shadow-sm">
         {lesson.language}
       </Badge>
     {/if}
   </div>
 
-  <div class="flex items-center gap-4 mb-4">
-    <span class="text-xs font-label uppercase text-on-surface-variant">
-      {lesson.duration} min
+  <div class="flex flex-wrap items-center gap-3 mb-4 relative z-10">
+    <span class="text-[0.65rem] tracking-wider font-label uppercase text-on-surface-variant bg-surface-container px-2 py-1 rounded">
+      ⏱️ {lesson.duration} min
     </span>
     <span
-      class="text-xs font-label uppercase px-2 py-0.5 {difficultyColors[
+      class="text-[0.65rem] tracking-wider font-label uppercase px-2 py-1 rounded {difficultyColors[
         lesson.difficulty
       ]}"
     >
+      {lesson.difficulty === 'beginner' ? '🟢 ' : lesson.difficulty === 'intermediate' ? '🟡 ' : '🔴 '}
       {lesson.difficulty}
     </span>
   </div>
 
   {#if lesson.progress !== undefined && lesson.progress > 0}
-    <ProgressBar value={lesson.progress} max={100} variant="primary" />
+    <div class="relative z-10 mt-2">
+      <ProgressBar value={lesson.progress} max={100} variant="primary" />
+    </div>
   {/if}
 
   {#if children}
-    <div class="mt-4">
+    <div class="mt-4 relative z-10 border-t border-surface-container pt-3">
       {@render children()}
     </div>
   {/if}
@@ -83,26 +86,61 @@
 
 <style>
   .lesson-card {
-    border-left: 3px solid transparent;
+    border: 1px solid var(--surface-container-high, #3c4043);
     position: relative;
     overflow: hidden;
+    transform: translateZ(0); /* Force hardware accel for smooth scale */
   }
 
   .lesson-card:hover {
-    border-left-color: #f0a500;
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.6);
+    border-color: var(--surface-variant, #f0a500);
+    background-color: var(--surface-container, #22262c);
   }
 
+  .lesson-card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition: all 0.05s ease;
+  }
+
+  /* Soft glowing top-right orb */
   .lesson-card::before {
     content: '';
     position: absolute;
     top: 0;
     right: 0;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(
-      135deg,
-      transparent 50%,
-      rgba(240, 165, 0, 0.05) 50%
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(
+      circle at 100% 0%,
+      rgba(240, 165, 0, 0.08),
+      transparent 70%
     );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .lesson-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Animated accent border line at the bottom */
+  .lesson-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background-color: var(--primary, #f0a500);
+    transition: width 0.4s cubic-bezier(0.2, 0, 0, 1);
+    z-index: 1;
+  }
+
+  .lesson-card:hover::after {
+    width: 100%;
   }
 </style>
