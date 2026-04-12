@@ -11,6 +11,7 @@ export { default as Keyboard } from './components/Keyboard.svelte';
 export { default as HandGuide } from './components/HandGuide.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';
 export { default as Badge } from './components/Badge.svelte';
+export { default as RaindropEngine } from './components/RaindropEngine.svelte';
 
 // Metrics & Progress Components
 export { default as MetricsBar } from './components/MetricsBar.svelte';

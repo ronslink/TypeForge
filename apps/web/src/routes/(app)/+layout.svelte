@@ -31,6 +31,7 @@
   const navItems = [
     { href: '/learn', label: 'Learn' },
     { href: '/practice', label: 'Practice' },
+    { href: '/games/cascade', label: 'Play' },
     { href: '/progress', label: 'Progress' },
   ];
 
