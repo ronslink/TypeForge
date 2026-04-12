@@ -55,6 +55,38 @@ export interface Lesson {
 }
 
 /**
+ * Helper to generate repetitive character drills
+ */
+function generateDrill(char: string, code: string, finger: Finger, length: number = 60): LessonChar[] {
+  return Array(length).fill(null).map((_, i) => {
+    // Every 5 characters, insert a space
+    if (i > 0 && (i + 1) % 6 === 0) {
+      return { char: ' ', code: 'Space', expectedFinger: 'left_thumb' };
+    }
+    return { char, code, expectedFinger: finger };
+  });
+}
+
+/**
+ * Helper to generate alternating bigram drills
+ */
+function generateBigramDrill(
+  char1: string, code1: string, finger1: Finger,
+  char2: string, code2: string, finger2: Finger,
+  length: number = 60
+): LessonChar[] {
+  return Array(length).fill(null).map((_, i) => {
+    if (i > 0 && (i + 1) % 6 === 0) return { char: ' ', code: 'Space', expectedFinger: 'left_thumb' };
+    const isFirst = i % 2 === 0;
+    return { 
+      char: isFirst ? char1 : char2, 
+      code: isFirst ? code1 : code2, 
+      expectedFinger: isFirst ? finger1 : finger2 
+    };
+  });
+}
+
+/**
  * Complete catalog of lessons organized by difficulty and focus
  */
 export let LESSON_CATALOG: Lesson[] = [
@@ -71,13 +103,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'a',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-    ],
+    content: generateDrill('a', 'KeyA', 'left_pinky'),
   },
   {
     id: 'home-row-left-ring-s',
@@ -91,13 +117,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 's',
       speed: 'accuracy',
     },
-    content: [
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-    ],
+    content: generateDrill('s', 'KeyS', 'left_ring'),
   },
   {
     id: 'home-row-left-middle-d',
@@ -111,13 +131,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'd',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'd', code: 'KeyD', expectedFinger: 'left_middle' },
-      { char: 'd', code: 'KeyD', expectedFinger: 'left_middle' },
-      { char: 'd', code: 'KeyD', expectedFinger: 'left_middle' },
-      { char: 'd', code: 'KeyD', expectedFinger: 'left_middle' },
-      { char: 'd', code: 'KeyD', expectedFinger: 'left_middle' },
-    ],
+    content: generateDrill('d', 'KeyD', 'left_middle'),
   },
   {
     id: 'home-row-left-index-f',
@@ -131,13 +145,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'f',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-    ],
+    content: generateDrill('f', 'KeyF', 'left_index'),
   },
   {
     id: 'home-row-right-index-j',
@@ -151,13 +159,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'j',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-    ],
+    content: generateDrill('j', 'KeyJ', 'right_index'),
   },
   {
     id: 'home-row-right-middle-k',
@@ -171,13 +173,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'k',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'k', code: 'KeyK', expectedFinger: 'right_middle' },
-      { char: 'k', code: 'KeyK', expectedFinger: 'right_middle' },
-      { char: 'k', code: 'KeyK', expectedFinger: 'right_middle' },
-      { char: 'k', code: 'KeyK', expectedFinger: 'right_middle' },
-      { char: 'k', code: 'KeyK', expectedFinger: 'right_middle' },
-    ],
+    content: generateDrill('k', 'KeyK', 'right_middle'),
   },
   {
     id: 'home-row-right-ring-l',
@@ -191,13 +187,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'l',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'l', code: 'KeyL', expectedFinger: 'right_ring' },
-      { char: 'l', code: 'KeyL', expectedFinger: 'right_ring' },
-      { char: 'l', code: 'KeyL', expectedFinger: 'right_ring' },
-      { char: 'l', code: 'KeyL', expectedFinger: 'right_ring' },
-      { char: 'l', code: 'KeyL', expectedFinger: 'right_ring' },
-    ],
+    content: generateDrill('l', 'KeyL', 'right_ring'),
   },
   {
     id: 'home-row-right-pinky-semicolon',
@@ -211,13 +201,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: ';',
       speed: 'accuracy',
     },
-    content: [
-      { char: ';', code: 'Semicolon', expectedFinger: 'right_pinky' },
-      { char: ';', code: 'Semicolon', expectedFinger: 'right_pinky' },
-      { char: ';', code: 'Semicolon', expectedFinger: 'right_pinky' },
-      { char: ';', code: 'Semicolon', expectedFinger: 'right_pinky' },
-      { char: ';', code: 'Semicolon', expectedFinger: 'right_pinky' },
-    ],
+    content: generateDrill(';', 'Semicolon', 'right_pinky'),
   },
   
   // === Difficulty 2: Home Row Combinations ===
@@ -233,14 +217,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'as',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-      { char: 'a', code: 'KeyA', expectedFinger: 'left_pinky' },
-      { char: 's', code: 'KeyS', expectedFinger: 'left_ring' },
-    ],
+    content: generateBigramDrill('a', 'KeyA', 'left_pinky', 's', 'KeyS', 'left_ring'),
   },
   {
     id: 'home-row-fj',
@@ -254,14 +231,7 @@ export let LESSON_CATALOG: Lesson[] = [
       key_bigram: 'fj',
       speed: 'accuracy',
     },
-    content: [
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-      { char: 'f', code: 'KeyF', expectedFinger: 'left_index' },
-      { char: 'j', code: 'KeyJ', expectedFinger: 'right_index' },
-    ],
+    content: generateBigramDrill('f', 'KeyF', 'left_index', 'j', 'KeyJ', 'right_index'),
   },
   {
     id: 'home-row-all',
