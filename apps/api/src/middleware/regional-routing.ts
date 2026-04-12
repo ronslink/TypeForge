@@ -19,10 +19,10 @@ declare module 'hono' {
  * Injects a global Drizzle connection based on DATABASE_URL
  */
 export async function dbMiddleware(c: Context, next: Next) {
-  const dbUrl = process.env.DATABASE_URL;
+  let dbUrl = (c.env as any)?.DATABASE_URL || process.env.DATABASE_URL;
   
   if (!dbUrl) {
-    console.error('Database connection string is missing from process.env.DATABASE_URL');
+    console.error('Database connection string is missing from Hono context block!');
     return c.json(
       {
         error: 'Database configuration error',
@@ -32,6 +32,11 @@ export async function dbMiddleware(c: Context, next: Next) {
     );
   }
   
+  // Ensure unencoded base64 pg passwords resolve correctly for drizzle
+  if (dbUrl.includes('+')) {
+    dbUrl = dbUrl.replace(/\+/g, '%2B');
+  }
+
   // Create database client
   const db = createDb(dbUrl);
   

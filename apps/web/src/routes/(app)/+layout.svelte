@@ -34,6 +34,17 @@
     { href: '/progress', label: 'Progress' },
   ];
 
+  // Focus management -  // Require authentication for all app routes except allowed ones
+  $effect(() => {
+    // TEMPORARILY DISABLED
+    // const isAllowed = ['/onboarding'].includes(currentPath);
+    // if (!isLoading && !isSignedIn && !isAllowed) {
+    //   setTimeout(() => {
+    //     goto(`/sign-in?redirect_url=${encodeURIComponent(currentPath)}`);
+    //   }, 100);
+    // }
+  });
+
   // Focus management - after navigation, focus moves to main content
   let mainContentRef = $state<HTMLElement | null>(null);
 

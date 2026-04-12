@@ -1,6 +1,7 @@
 import { type RequestEvent } from '@sveltejs/kit';
 import app from '@typeforge/api';
 import type { Config } from '@sveltejs/adapter-vercel';
+import { env } from '$env/dynamic/private';
 
 export const config: Config = {
   runtime: 'nodejs22.x',
@@ -9,5 +10,5 @@ export const config: Config = {
 };
 
 export const fallback = async ({ request }: RequestEvent) => {
-  return app.fetch(request);
+  return app.fetch(request, env);
 };
