@@ -1,9 +1,9 @@
 {
   "id": "dubeolsik",
-  "name": "두벌식 (Dubeolsik)",
+  "name": "Dubeolsik (Korean)",
   "language": "ko",
   "script": "Hangul",
-  "variant": "2-Set Korean",
+  "variant": "2-Set",
   "rows": [
     [
       { "code": "Backquote", "char": "`", "charShift": "~" },

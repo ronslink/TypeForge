@@ -3,7 +3,7 @@
   "name": "Romaji",
   "language": "ja",
   "script": "romaji",
-  "variant": "Japanese Latin",
+  "variant": "US",
   "rows": [
     [
       { "code": "Backquote", "char": "`", "charShift": "~" },
