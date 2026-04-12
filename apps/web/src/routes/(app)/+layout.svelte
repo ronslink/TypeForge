@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { LayoutData } from './$types';
-  import { useClerkContext } from 'svelte-clerk';
+  import { useClerkContext, SignInButton, UserButton } from 'svelte-clerk';
   import { page } from '$app/stores';
   import { afterNavigate } from '$app/navigation';
 
@@ -44,17 +44,7 @@
     }
   });
 
-  function handleSignIn() {
-    clerk?.openSignIn({
-      redirectUrl: currentPath,
-    });
-  }
 
-  function handleSignOut() {
-    clerk?.signOut({
-      redirectUrl: '/',
-    });
-  }
 
   // Handle skip to content link
   function handleSkipToContent(event: Event) {
@@ -91,12 +81,13 @@
         <span class="text-sm text-on-surface-variant font-body">
           Sign in to save your progress
         </span>
-        <button
-          onclick={handleSignIn}
-          class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors focus-indicator"
-        >
-          Sign In
-        </button>
+        <SignInButton mode="modal" fallbackRedirectUrl={currentPath}>
+          <button
+            class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors focus-indicator"
+          >
+            Sign In
+          </button>
+        </SignInButton>
       </div>
     </div>
   {/if}
@@ -156,39 +147,16 @@
         <!-- User menu -->
         {#if isSignedIn && user}
           <div class="flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
-            {#if user.imageUrl}
-              <img
-                src={user.imageUrl}
-                alt=""
-                class="w-8 h-8 rounded-none object-cover border border-outline-variant"
-                role="presentation"
-              />
-            {:else}
-              <div
-                class="w-8 h-8 bg-primary-container flex items-center justify-center text-on-primary-container font-label text-sm font-bold"
-                aria-hidden="true"
-              >
-                {(
-                  user.firstName?.[0] ||
-                  user.emailAddresses?.[0]?.emailAddress?.[0] ||
-                  'U'
-                ).toUpperCase()}
-              </div>
-            {/if}
-            <button
-              onclick={handleSignOut}
-              class="text-xs text-on-surface-variant hover:text-white transition-colors font-body focus-indicator"
-            >
-              Sign Out
-            </button>
+            <UserButton afterSignOutUrl="/" />
           </div>
         {:else}
-          <button
-            onclick={handleSignIn}
-            class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 focus-indicator"
-          >
-            Start Typing
-          </button>
+          <SignInButton mode="modal" fallbackRedirectUrl={currentPath}>
+            <button
+              class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 focus-indicator"
+            >
+              Start Typing
+            </button>
+          </SignInButton>
         {/if}
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { useClerkContext } from 'svelte-clerk';
+  import { SignUpButton } from 'svelte-clerk';
 
   // Script diversity grid data
   const scripts = [
@@ -123,8 +123,6 @@
   };
 
   let mounted = false;
-  const ctx = useClerkContext();
-  let clerk = $derived(ctx?.clerk);
   onMount(() => {
     mounted = true;
   });
@@ -147,12 +145,13 @@
         <a href="#pricing" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Pricing</a>
       </div>
     </div>
-      <button 
-        onclick={() => clerk?.openSignUp({ redirectUrl: '/learn' })}
-        class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95"
-      >
-        Start Typing
-      </button>
+      <SignUpButton mode="modal" fallbackRedirectUrl="/learn">
+        <button 
+          class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95"
+        >
+          Start Typing
+        </button>
+      </SignUpButton>
   </div>
 </nav>
 
@@ -185,12 +184,13 @@
         Adaptive AI. Every script. Every layout.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <button 
-          onclick={() => clerk?.openSignUp({ redirectUrl: '/learn' })}
-          class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all"
-        >
-          Start free today
-        </button>
+        <SignUpButton mode="modal" fallbackRedirectUrl="/learn">
+          <button 
+            class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all"
+          >
+            Start free today
+          </button>
+        </SignUpButton>
         <button class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
           Institutional Access
           <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
