@@ -455,3 +455,5 @@ export function getRTLLessons(): Lesson[] {
 // Append Arabic RTL lessons
 LESSON_CATALOG.push(...arabicLessons);
 
+import { germanLessons } from './german-lessons.js';
+LESSON_CATALOG.push(...germanLessons);
