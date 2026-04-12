@@ -42,6 +42,9 @@ export {
 // Hebrew RTL lessons
 export { hebrewLessons } from './hebrew-lessons.js';
 
+// Japanese Romaji lessons
+export { japaneseLessons } from './japanese-lessons.js';
+
 // Greek lessons
 export { greekLessons } from './greek-lessons.js';
 
@@ -53,6 +56,12 @@ export { germanLessons } from './german-lessons.js';
 
 // Russian/Cyrillic lessons
 export { russianLessons } from './cyrillic-lessons.js';
+
+// Korean Hangul lessons
+export { koreanLessons } from './korean-lessons.js';
+
+// Hindi Devanagari lessons
+export { hindiLessons } from './hindi-lessons.js';
 
 // Dvorak lessons
 export { dvorakLessons } from './dvorak-lessons.js';

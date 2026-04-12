@@ -531,6 +531,15 @@ LESSON_CATALOG.push(...russianLessons);
 import { germanLessons } from './german-lessons.js';
 LESSON_CATALOG.push(...germanLessons);
 
+import { koreanLessons } from './korean-lessons.js';
+LESSON_CATALOG.push(...koreanLessons);
+
+import { hindiLessons } from './hindi-lessons.js';
+LESSON_CATALOG.push(...hindiLessons);
+
+import { japaneseLessons } from './japanese-lessons.js';
+LESSON_CATALOG.push(...japaneseLessons);
+
 // Synthesize full curriculum states for every natively mapped language
 const masterLanguages = getSupportedLanguages();
 
