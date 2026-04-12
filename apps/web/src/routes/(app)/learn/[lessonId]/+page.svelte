@@ -59,7 +59,7 @@
   let startTime = $state<number | null>(null);
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
-  const LESSON_TIME_LIMIT = 300; // 5 minutes max
+  const LESSON_TIME_LIMIT = $derived(lessonChars.length > 0 ? Math.max(60, Math.ceil((lessonChars.length / 5) * 4)) : 60);
 
   // Metrics
   let wpmCalculator = $state(new WPMCalculator());
@@ -531,6 +531,8 @@
           { label: 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
           { label: 'Streak', value: currentStreak, variant: 'default' },
           { label: 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
+          { label: 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' },
+          { label: 'Correct', value: keystrokes.filter((k) => k.correct).length, variant: 'default' }
         ]}
         {currentStreak}
         {previousStreak}
