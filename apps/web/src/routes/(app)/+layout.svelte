@@ -110,9 +110,9 @@
         <a
           href="/"
           class="text-xl font-black tracking-tighter text-primary uppercase font-label focus-indicator"
-          aria-label="TypeForge Home"
+          aria-label="TypingScholar Home"
         >
-          TYPEFORGE
+          TYPINGSCHOLAR
         </a>
         <div class="hidden md:flex gap-6 items-center">
           {#each navItems as item}

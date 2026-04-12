@@ -195,7 +195,7 @@
 </script>
 
 <svelte:head>
-  <title>Learn — TypeForge</title>
+  <title>Learn — TypingScholar</title>
 </svelte:head>
 
 <div class="max-w-7xl mx-auto px-6 py-12">

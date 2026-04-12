@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>Settings — TypeForge</title>
+  <title>Settings — TypingScholar</title>
 </svelte:head>
 
 <div class="max-w-3xl mx-auto px-6 py-12">

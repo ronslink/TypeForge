@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Sign Up - TypeForge</title>
+  <title>Sign Up - TypingScholar</title>
 </svelte:head>
 
 <div class="clerk-container w-full">

@@ -391,7 +391,7 @@
 </script>
 
 <svelte:head>
-  <title>{lesson ? `${lesson.title} — TypeForge` : 'Lesson — TypeForge'}</title>
+  <title>{lesson ? `${lesson.title} — TypingScholar` : 'Lesson — TypingScholar'}</title>
   <meta name="description" content={lesson ? `Practice typing: ${lesson.title}` : 'Typing lesson'} />
 </svelte:head>
 

@@ -10,7 +10,7 @@
   <div class="z-10 w-full max-w-md flex flex-col items-center">
     <!-- Optional Logo/Branding -->
     <a href="/" class="mb-8 block hover:scale-105 transition-transform">
-      <span class="text-2xl font-black tracking-tighter text-primary-container uppercase font-label">TYPEFORGE</span>
+      <span class="text-2xl font-black tracking-tighter text-primary-container uppercase font-label">TYPINGSCHOLAR</span>
     </a>
     
     <!-- Auth Component Container -->

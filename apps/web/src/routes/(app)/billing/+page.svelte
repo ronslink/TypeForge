@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>Billing — TypeForge</title>
+  <title>Billing — TypingScholar</title>
 </svelte:head>
 
 <div class="max-w-4xl mx-auto px-6 py-12">

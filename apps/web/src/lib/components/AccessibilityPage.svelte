@@ -5,7 +5,7 @@
 <!-- 
   Accessibility Statement Page Component
   
-  This page documents TypeForge's commitment to accessibility and provides
+  This page documents TypingScholar's commitment to accessibility and provides
   information for users who may encounter accessibility barriers.
   
   WCAG 2.1 AA Compliance Checklist:
@@ -20,7 +20,7 @@
   <header class="mb-12">
     <h1 class="font-headline text-4xl mb-4">Accessibility Statement</h1>
     <p class="text-on-surface-variant text-lg">
-      TypeForge is committed to digital accessibility and ensuring our platform is usable by everyone, 
+      TypingScholar is committed to digital accessibility and ensuring our platform is usable by everyone, 
       regardless of ability or technology.
     </p>
   </header>
@@ -30,7 +30,7 @@
     <h2 id="commitment-heading" class="font-headline text-2xl mb-4 text-primary">Our Commitment</h2>
     <div class="bg-surface-container-low p-6 space-y-4">
       <p>
-        TypeForge is committed to ensuring digital accessibility for people with disabilities. 
+        TypingScholar is committed to ensuring digital accessibility for people with disabilities. 
         We are continually improving the user experience for everyone and applying the relevant 
         accessibility standards to ensure we provide equal access to all users.
       </p>
@@ -46,7 +46,7 @@
     <h2 id="standards-heading" class="font-headline text-2xl mb-4 text-primary">Accessibility Standards</h2>
     <div class="bg-surface-container-low p-6">
       <p class="mb-4">
-        TypeForge aims to conform to the <strong>Web Content Accessibility Guidelines (WCAG) 2.1 Level AA</strong> 
+        TypingScholar aims to conform to the <strong>Web Content Accessibility Guidelines (WCAG) 2.1 Level AA</strong> 
         standard. These guidelines explain how to make web content more accessible for people with disabilities 
         and more user-friendly for everyone.
       </p>
@@ -175,7 +175,7 @@
     <h2 id="compatibility-heading" class="font-headline text-2xl mb-4 text-primary">Assistive Technology Compatibility</h2>
     <div class="bg-surface-container-low p-6">
       <p class="mb-4">
-        TypeForge is designed to work with a wide range of assistive technologies, including:
+        TypingScholar is designed to work with a wide range of assistive technologies, including:
       </p>
       <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-on-surface-variant">
         <li class="flex items-center gap-2">
@@ -254,7 +254,7 @@
     <h2 id="feedback-heading" class="font-headline text-2xl mb-4 text-primary">Feedback & Reporting Issues</h2>
     <div class="bg-surface-container-low p-6">
       <p class="mb-4">
-        We welcome your feedback on the accessibility of TypeForge. If you encounter any accessibility 
+        We welcome your feedback on the accessibility of TypingScholar. If you encounter any accessibility 
         barriers or have suggestions for improvement, please let us know:
       </p>
       
@@ -262,10 +262,10 @@
         <div>
           <h3 class="font-label text-sm uppercase tracking-wider mb-2">Email</h3>
           <a 
-            href="mailto:accessibility@typeforge.app" 
+            href="mailto:accessibility@typingscholar.app" 
             class="text-primary hover:text-primary-container transition-colors focus-indicator"
           >
-            accessibility@typeforge.app
+            accessibility@typingscholar.app
           </a>
         </div>
         <div>

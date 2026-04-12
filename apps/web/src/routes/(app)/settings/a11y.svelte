@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-  <title>Accessibility — TypeForge</title>
-  <meta name="description" content="TypeForge accessibility statement and commitment to digital accessibility for all users." />
+  <title>Accessibility — TypingScholar</title>
+  <meta name="description" content="TypingScholar accessibility statement and commitment to digital accessibility for all users." />
 </svelte:head>
 
 <AccessibilityPage />
