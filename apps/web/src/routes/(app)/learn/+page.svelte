@@ -1,15 +1,46 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { LessonCard, Button, Badge } from '@typeforge/ui';
   import { LESSON_CATALOG, getLessonById, type Lesson } from '@typeforge/curriculum';
   import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
   import type { PageData } from './$types';
+  import { useClerkContext } from 'svelte-clerk';
+  import { createApiClient } from '@typeforge/api/client';
 
   interface Props {
     data: PageData;
   }
 
   let { data }: Props = $props();
+
+  // Auth & Progress Tracking State
+  const ctx = useClerkContext();
+  let isSignedIn = $derived(!!ctx?.user);
+  let completedLessonIds = $state(new Set<string>());
+
+  onMount(async () => {
+    if (!isSignedIn) return;
+    try {
+      const token = await ctx?.session?.getToken();
+      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+        const defaultHeaders = new Headers(init?.headers);
+        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
+        return fetch(input, { ...init, headers: defaultHeaders });
+      };
+      const api = createApiClient('/', authFetch);
+
+      const res = await api.api.v1.progress.lessons.$get();
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload.completedLessons) {
+          completedLessonIds = new Set(payload.completedLessons);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to wire user progression:', e);
+    }
+  });
 
   // User preferences from onboarding (would come from data/user store in production)
   let userLanguage = $state('en');
@@ -128,7 +159,7 @@
       difficulty: difficultyMap[lesson.difficulty] || 'beginner',
       language: '', // Intentionally left blank to avoid redundancy on every card
       duration: Math.max(1, Math.round(lesson.content.length / 100)), // Estimate based on content length
-      progress: undefined,
+      progress: completedLessonIds.has(lesson.id) ? 100 : 0,
     };
   }
 

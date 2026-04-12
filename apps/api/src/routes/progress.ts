@@ -251,4 +251,32 @@ app.get('/stats', async (c) => {
   return c.json(response);
 });
 
+/**
+ * GET /progress/lessons - Get user's completed lessons array
+ * Returns a simple string array of unique lesson IDs the user has completed
+ */
+app.get('/lessons', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+
+  const completedSessions = await db
+    .select({
+      lessonId: typingSessions.lessonId,
+    })
+    .from(typingSessions)
+    .where(
+      and(
+        eq(typingSessions.userId, userId),
+        eq(typingSessions.status, 'completed')
+      )
+    );
+
+  const completedLessonIds = Array.from(
+    new Set(completedSessions.map(s => s.lessonId).filter(Boolean))
+  );
+
+  return c.json({ completedLessons: completedLessonIds as string[] });
+});
+
 export default app;
