@@ -1,0 +1,14 @@
+{
+  "framework": "sveltekit",
+  "buildCommand": "pnpm --filter @typeforge/web build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "regions": ["fra1"],
+  "functions": {
+    "apps/web/src/routes/api/**/*.ts": {
+      "runtime": "nodejs22.x",
+      "memory": 1024,
+      "maxDuration": 15
+    }
+  }
+}
