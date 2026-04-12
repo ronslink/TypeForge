@@ -147,7 +147,8 @@ export function getRandomWords(code: string, count: number, maxDifficulty?: numb
  * @returns Array of supported language codes
  */
 export function getSupportedLanguages(): string[] {
-  return Object.keys(WORDLIST_MAP);
+  // Filter out the full English word aliases to just return the strict ISO-2 layout codes
+  return Object.keys(WORDLIST_MAP).filter(key => key.length === 2);
 }
 
 /**
