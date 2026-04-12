@@ -9,7 +9,8 @@
     StatCard, 
     Button, 
     ConfettiCelebration,
-    Badge 
+    Badge,
+    HandGuide
   } from '@typeforge/ui';
   import { 
     getLessonById, 
@@ -637,28 +638,10 @@
         onWordComplete={handleWordComplete}
       />
       
-      <!-- Focus hint & Intro loop -->
-      {#if showIntroAnimation && introKeys.length > 0}
+      <!-- Focus hint -->
+      {#if !isStarted}
         <div 
-          class="absolute inset-0 flex flex-col items-center justify-center bg-background/85 backdrop-blur-sm z-10 rounded"
-          aria-hidden="true"
-        >
-          {#if introKeyIndex < introKeys.length}
-            {@const currentIntro = introKeys[introKeyIndex]}
-            <p class="text-secondary font-label text-xs uppercase tracking-widest mb-4 animate-pulse">Required Finger Positioning</p>
-            <div class="bg-surface-container-low px-10 py-6 rounded-2xl border border-primary/30 shadow-2xl flex flex-col items-center justify-center gap-3 transition-all duration-300 transform scale-110">
-              <span class="text-5xl text-primary font-mono">{currentIntro.char === ' ' ? 'Space' : currentIntro.char}</span>
-              <span class="text-on-surface-variant font-bold text-sm">Use your <span class="text-background bg-secondary px-2 py-0.5 rounded ml-1">{FingerDescriptions[currentIntro.expectedFinger.replace('_', '-')] || currentIntro.expectedFinger}</span></span>
-            </div>
-            <div class="absolute bottom-6 flex gap-2">
-              <span class="text-on-surface-variant/50 text-xs font-mono uppercase font-bold tracking-widest border border-on-surface-variant/20 px-2 py-1 rounded">ESC</span>
-              <span class="text-on-surface-variant/50 text-[0.65rem] uppercase tracking-widest mt-1.5">to skip intro</span>
-            </div>
-          {/if}
-        </div>
-      {:else if !isStarted}
-        <div 
-          class="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm"
+          class="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-10 rounded"
           aria-hidden="true"
         >
           <p class="text-on-surface-variant font-label">Start typing to begin...</p>
@@ -684,11 +667,35 @@
 
     <!-- Keyboard Visualization with RTL support -->
     <div 
-      class="bg-surface-container p-4" 
+      class="bg-surface-container p-4 relative" 
       dir={isRTL ? 'rtl' : 'ltr'}
       role="region"
       aria-label="Keyboard finger placement guide"
     >
+      <!-- Translucent Intro Overlay -->
+      {#if showIntroAnimation && introKeys.length > 0}
+        <div class="absolute inset-0 bg-background/80 backdrop-blur-md z-20 flex flex-col items-center justify-center overflow-hidden">
+           {#if introKeyIndex < introKeys.length}
+             {@const currentIntro = introKeys[introKeyIndex]}
+             
+             <!-- Floating Hand Guide Overlay -->
+             <div class="absolute inset-x-0 bottom-4 flex justify-center pointer-events-none transform scale-90">
+                 <HandGuide activeFinger={currentIntro.expectedFinger} />
+             </div>
+             
+             <!-- Prominent Highlight Instruction -->
+             <div class="absolute top-8 bg-surface-container-low px-6 py-3 rounded-full border border-primary/30 shadow-2xl flex items-center gap-4 animate-pulse">
+                <span class="text-3xl text-primary font-mono font-bold leading-none">{currentIntro.char === ' ' ? 'Space' : currentIntro.char}</span>
+                <div class="h-6 w-px bg-outline-variant"></div>
+                <span class="text-on-surface-variant font-bold text-sm uppercase tracking-wider">{FingerDescriptions[currentIntro.expectedFinger.replace('_', '-')] || currentIntro.expectedFinger}</span>
+             </div>
+             
+             <div class="absolute top-8 right-8 flex gap-2 opacity-50">
+                <span class="text-xs font-mono uppercase font-bold tracking-widest border px-2 py-1 rounded">ESC</span>
+             </div>
+           {/if}
+        </div>
+      {/if}
       <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
       <Keyboard 
         layout={activeKeyboardLayout} 
