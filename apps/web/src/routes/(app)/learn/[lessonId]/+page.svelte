@@ -280,7 +280,7 @@
     if (lesson?.isTest && finalAccuracy < 90) {
       testFailed = true;
       showCelebration = false;
-      ariaLiveText = `Exam failed. You need at least 90% accuracy. You achieved ${finalAccuracy}%.`;
+      ariaLiveText = `Test failed. You need at least 90% accuracy. You achieved ${finalAccuracy}%.`;
       return;
     }
 
@@ -512,14 +512,14 @@
         >
           {#if testFailed}
             <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Exam Failed!</h2>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Test Failed!</h2>
             <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10">You needed 90% accuracy. You achieved {finalAccuracy}%.</p>
           {:else if lesson.isTest && lesson.id.includes('-test-5')}
             <div class="absolute inset-0 bg-primary/5 z-0 pointer-events-none"></div>
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">Certification Earned!</h2>
             <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">Validating metrics and preparing formal award...</p>
           {:else if lesson.isTest}
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Exam Passed!</h2>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Test Passed!</h2>
             <p id="completion-description" class="text-on-surface-variant mb-8">Stage cleared. You've proven your mechanics.</p>
           {:else}
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>

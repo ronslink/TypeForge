@@ -486,7 +486,7 @@ uniqueLanguages.forEach(lang => {
       const text = words.join(' ');
       LESSON_CATALOG.push({
         id: `${lang}-test-${level}`,
-        title: isFinal ? 'Final Proficiency Exam' : `Stage ${level} Certification Exam`,
+        title: isFinal ? 'Final Proficiency Test' : `Stage ${level} Certification Test`,
         language: lang,
         script: lang === 'ar' ? 'arabic' : 'latin',
         difficulty: level,
