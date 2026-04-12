@@ -138,18 +138,82 @@
     return hand;
   }
 
-  // Update highlight keys based on current character
+  // Finger Tutorial State
+  const FingerDescriptions: Record<string, string> = {
+    left_pinky: "Left Pinky",
+    left_ring: "Left Ring",
+    left_middle: "Left Middle",
+    left_index: "Left Index",
+    left_thumb: "Left Thumb",
+    right_thumb: "Right Thumb",
+    right_index: "Right Index",
+    right_middle: "Right Middle",
+    right_ring: "Right Ring",
+    right_pinky: "Right Pinky",
+    'left-pinky': "Left Pinky",
+    'left-ring': "Left Ring",
+    'left-middle': "Left Middle",
+    'left-index': "Left Index",
+    'left-thumb': "Left Thumb",
+    'right-thumb': "Right Thumb",
+    'right-index': "Right Index",
+    'right-middle': "Right Middle",
+    'right-ring': "Right Ring",
+    'right-pinky': "Right Pinky",
+    all: "Any Finger"
+  };
+
+  let showIntroAnimation = $state(true);
+  let introKeyIndex = $state(0);
+  let introInterval: ReturnType<typeof setInterval> | null = null;
+  
+  const introKeys = $derived.by(() => {
+    if (!lesson) return [];
+    // remove duplicates by character
+    const map = new Map<string, any>();
+    for (const c of lesson.content) {
+      if (!map.has(c.char.toLowerCase())) map.set(c.char.toLowerCase(), c);
+    }
+    return Array.from(map.values());
+  });
+
   $effect(() => {
-    if (currentChar) {
-      highlightKeys = new Set([currentChar.char.toLowerCase()]);
+    if (showIntroAnimation && introKeys.length > 0 && !introInterval) {
+      introInterval = setInterval(() => {
+        introKeyIndex++;
+        if (introKeyIndex >= introKeys.length) stopIntro();
+      }, 1500);
+      return () => { if (introInterval) clearInterval(introInterval); };
+    }
+  });
+
+  function stopIntro() {
+     showIntroAnimation = false;
+     if (introInterval) {
+         clearInterval(introInterval);
+         introInterval = null;
+     }
+     pressedKey = undefined;
+  }
+
+  // Update highlight keys based on current character or intro sequence
+  $effect(() => {
+    if (showIntroAnimation && introKeys.length > 0 && introKeyIndex < introKeys.length) {
+       const charData = introKeys[introKeyIndex];
+       pressedKey = charData.char.toLowerCase();
+       highlightKeys = new Set([charData.char.toLowerCase()]);
     } else {
-      highlightKeys = new Set();
+       if (currentChar) {
+         highlightKeys = new Set([currentChar.char.toLowerCase()]);
+       } else {
+         highlightKeys = new Set();
+       }
     }
   });
 
   // Update metrics periodically
   $effect(() => {
-    if (isStarted && !isComplete) {
+    if (isStarted && !isComplete && !showIntroAnimation) {
       const interval = setInterval(() => {
         const wpmResult = wpmCalculator.getWPM();
         currentWPM = Math.round(wpmResult.netWPM);
@@ -161,7 +225,7 @@
 
   // Announce accuracy changes on word completion
   $effect(() => {
-    if (isStarted && !isComplete) {
+    if (isStarted && !isComplete && !showIntroAnimation) {
       const accuracy = Math.round(accuracyTracker.getAccuracy());
       // Announce when accuracy changes by more than 5%
       if (Math.abs(accuracy - lastAccuracyAnnouncement) >= 5) {
@@ -173,21 +237,23 @@
 
   // Timer effect
   $effect(() => {
-    if (isStarted && !isComplete) {
+    if (isStarted && !isComplete && !showIntroAnimation) {
       timerInterval = setInterval(() => {
         elapsedSeconds++;
-        if (elapsedSeconds >= LESSON_TIME_LIMIT) {
-          completeLesson();
-        }
+        if (elapsedSeconds >= LESSON_TIME_LIMIT) completeLesson();
       }, 1000);
-      return () => {
-        if (timerInterval) clearInterval(timerInterval);
-      };
+      return () => { if (timerInterval) clearInterval(timerInterval); };
     }
   });
 
   // Handle keyboard input
   function handleKeyDown(event: KeyboardEvent) {
+    if (showIntroAnimation) {
+       if (event.key === 'Escape') stopIntro();
+       event.preventDefault();
+       return;
+    }
+    
     if (isComplete) return;
 
     // Prevent default for typing keys
@@ -571,8 +637,26 @@
         onWordComplete={handleWordComplete}
       />
       
-      <!-- Focus hint -->
-      {#if !isStarted}
+      <!-- Focus hint & Intro loop -->
+      {#if showIntroAnimation && introKeys.length > 0}
+        <div 
+          class="absolute inset-0 flex flex-col items-center justify-center bg-background/85 backdrop-blur-sm z-10 rounded"
+          aria-hidden="true"
+        >
+          {#if introKeyIndex < introKeys.length}
+            {@const currentIntro = introKeys[introKeyIndex]}
+            <p class="text-secondary font-label text-xs uppercase tracking-widest mb-4 animate-pulse">Required Finger Positioning</p>
+            <div class="bg-surface-container-low px-10 py-6 rounded-2xl border border-primary/30 shadow-2xl flex flex-col items-center justify-center gap-3 transition-all duration-300 transform scale-110">
+              <span class="text-5xl text-primary font-mono">{currentIntro.char === ' ' ? 'Space' : currentIntro.char}</span>
+              <span class="text-on-surface-variant font-bold text-sm">Use your <span class="text-background bg-secondary px-2 py-0.5 rounded ml-1">{FingerDescriptions[currentIntro.expectedFinger.replace('_', '-')] || currentIntro.expectedFinger}</span></span>
+            </div>
+            <div class="absolute bottom-6 flex gap-2">
+              <span class="text-on-surface-variant/50 text-xs font-mono uppercase font-bold tracking-widest border border-on-surface-variant/20 px-2 py-1 rounded">ESC</span>
+              <span class="text-on-surface-variant/50 text-[0.65rem] uppercase tracking-widest mt-1.5">to skip intro</span>
+            </div>
+          {/if}
+        </div>
+      {:else if !isStarted}
         <div 
           class="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm"
           aria-hidden="true"
