@@ -144,6 +144,23 @@
     selectedTag = 'all';
     searchQuery = '';
   }
+
+  // Define Curriculum Sequence
+  const curriculumStages = [
+    { level: 1, title: 'Stage 1: Home Row Fundamentals', description: 'Master the resting position for ultimate typing efficiency.' },
+    { level: 2, title: 'Stage 2: Core Combinations', description: 'Combine primary fingers to drill cross-key bigrams.' },
+    { level: 3, title: 'Stage 3: Top Row Extensions', description: 'Expand your reach to the top alpha row.' },
+    { level: 4, title: 'Stage 4: Bottom Row Variables', description: 'Learn the lower reaches for complete alpha mastery.' },
+    { level: 5, title: 'Stage 5: Speed & Coordination', description: 'Real words, endurance blocks, and ultimate flow.' }
+  ];
+
+  // Helper to group lessons by difficulty for progressive layout
+  const groupedLessons = $derived(
+    curriculumStages.map(stage => ({
+      ...stage,
+      lessons: filteredLessons.filter(l => l.difficulty === stage.level)
+    })).filter(stage => stage.lessons.length > 0)
+  );
 </script>
 
 <svelte:head>
@@ -267,25 +284,68 @@
     </h2>
     
     {#if filteredLessons.length > 0}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {#each filteredLessons as lesson}
-          <LessonCard
-            lesson={toLessonCardProps(lesson)}
-            href={`/learn/${lesson.id}`}
-          >
-            <div class="flex flex-wrap gap-2 mt-2">
-              {#each getLessonTags(lesson).slice(0, 3) as tag}
-                <span class="text-xs px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-sm">
-                  {tag}
-                </span>
-              {/each}
-            </div>
-            <div class="flex items-center gap-2 mt-3 text-amber-400 text-sm">
-              <span>{getDifficultyStars(lesson.difficulty)}</span>
-              <span class="text-on-surface-variant text-xs">({lesson.content.length} chars)</span>
-            </div>
-          </LessonCard>
-        {/each}
+      <div class="space-y-16">
+        <!-- progressive layout rendering -->
+        {#if selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery}
+          <div class="relative progressive-path pl-4 md:pl-8 border-l-2 border-surface-container-highest">
+            {#each groupedLessons as stage, index}
+              <div class="mb-14 relative">
+                <!-- Timeline node marker -->
+                <div class="absolute -left-[21px] md:-left-[37px] top-1 w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border-4 border-background text-primary font-bold z-10 shadow-lg">
+                  {index + 1}
+                </div>
+                
+                <div class="mb-6 ml-6">
+                  <h3 class="font-headline text-2xl text-primary">{stage.title}</h3>
+                  <p class="text-on-surface-variant text-sm mt-1">{stage.description}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ml-6">
+                  {#each stage.lessons as lesson}
+                    <LessonCard
+                      lesson={toLessonCardProps(lesson)}
+                      href={`/learn/${lesson.id}`}
+                    >
+                      <div class="flex flex-wrap gap-2 mt-2">
+                        {#each getLessonTags(lesson).slice(0, 3) as tag}
+                          <span class="text-xs px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-sm">
+                            {tag}
+                          </span>
+                        {/each}
+                      </div>
+                      <div class="flex items-center gap-2 mt-3 text-amber-400 text-sm">
+                        <span>{getDifficultyStars(lesson.difficulty)}</span>
+                        <span class="text-on-surface-variant text-xs">({Math.round(lesson.content.length)} chars)</span>
+                      </div>
+                    </LessonCard>
+                  {/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <!-- Search UI layout for non-progressive filtered browsing -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {#each filteredLessons as lesson}
+              <LessonCard
+                lesson={toLessonCardProps(lesson)}
+                href={`/learn/${lesson.id}`}
+              >
+                <div class="flex flex-wrap gap-2 mt-2">
+                  {#each getLessonTags(lesson).slice(0, 3) as tag}
+                    <span class="text-xs px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-sm">
+                      {tag}
+                    </span>
+                  {/each}
+                </div>
+                <div class="flex items-center gap-2 mt-3 text-amber-400 text-sm">
+                  <span>{getDifficultyStars(lesson.difficulty)}</span>
+                  <span class="text-on-surface-variant text-xs">({lesson.content.length} chars)</span>
+                </div>
+              </LessonCard>
+            {/each}
+          </div>
+        {/if}
       </div>
     {:else}
       <div class="bg-surface-container-low p-12 text-center">

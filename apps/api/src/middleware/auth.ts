@@ -6,6 +6,9 @@
 import type { Context, Next } from 'hono';
 import { getAuthState, extractBearerToken } from '@typeforge/auth';
 import type { AuthState } from '@typeforge/auth';
+import { getDb } from './regional-routing.js';
+import { users, userProfiles, userPreferences } from '@typeforge/db';
+import { eq } from 'drizzle-orm';
 
 // Extend Hono context with auth state
 declare module 'hono' {
@@ -27,7 +30,49 @@ export async function authMiddleware(c: Context, next: Next) {
     return;
   }
   
-  const authState = await getAuthState(c);
+  let authState = await getAuthState(c);
+  
+  if (authState.isAuthenticated) {
+    const db = getDb(c);
+    const rawClerkId = authState.userId;
+    authState.clerkId = rawClerkId;
+    
+    // Look up internal Postgres UUID 
+    let [internalUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.clerkId, rawClerkId))
+      .limit(1);
+      
+    // JIT Auto-provisioning mechanism
+    if (!internalUser) {
+      if (!authState.user) throw new Error("Clerk User context required for auto-provisioning");
+      
+      const email = authState.user.email || 'unknown@example.com';
+      [internalUser] = await db.insert(users).values({
+        clerkId: rawClerkId,
+        email,
+        emailVerified: authState.user.emailVerified,
+        firstName: authState.user.firstName,
+        lastName: authState.user.lastName,
+        displayName: authState.user.displayName,
+        avatarUrl: authState.user.imageUrl,
+        homeRegion: authState.region,
+        role: authState.role,
+      }).returning({ id: users.id });
+      
+      // Seed default sub-profiles
+      try {
+        await db.insert(userProfiles).values({ userId: internalUser!.id });
+        await db.insert(userPreferences).values({ userId: internalUser!.id });
+      } catch (e) {
+        console.warn("Failed seeding initial user subprofiles: ", e);
+      }
+    }
+    
+    // Override the JWT id with the Native Postgres Internal UUID across the route scope
+    authState.userId = internalUser!.id;
+  }
   
   // Store auth state in context
   c.set('auth', authState);

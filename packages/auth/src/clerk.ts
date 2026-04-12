@@ -25,6 +25,7 @@ export interface ClerkUser {
 
 export interface AuthState {
   userId: string;
+  clerkId?: string;
   user: ClerkUser | null;
   isAuthenticated: boolean;
   isEmailVerified: boolean;

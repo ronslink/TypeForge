@@ -51,11 +51,11 @@ app.use('*', prettyJSON());
 // Rate limiting
 app.use('/api/*', rateLimits.api);
 
-// Authentication middleware
-app.use('/api/*', authMiddleware);
-
 // Global database middleware
 app.use('/api/*', dbMiddleware);
+
+// Authentication middleware
+app.use('/api/*', authMiddleware);
 
 // Health check (no auth required)
 app.get('/health', (c) => {
