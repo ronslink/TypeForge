@@ -137,11 +137,6 @@
     return '★'.repeat(level) + '☆'.repeat(5 - level);
   }
 
-  // Handle lesson card click
-  function handleLessonClick(lessonId: string) {
-    goto(`/learn/${lessonId}`);
-  }
-
   // Clear all filters
   function clearFilters() {
     selectedLanguage = 'all';
@@ -173,7 +168,7 @@
         {#each recommendedLessons as lesson}
           <LessonCard
             lesson={toLessonCardProps(lesson)}
-            onclick={() => handleLessonClick(lesson.id)}
+            href={`/learn/${lesson.id}`}
           >
             <div class="flex flex-wrap gap-2 mt-2">
               {#each getLessonTags(lesson).slice(0, 3) as tag}
@@ -276,7 +271,7 @@
         {#each filteredLessons as lesson}
           <LessonCard
             lesson={toLessonCardProps(lesson)}
-            onclick={() => handleLessonClick(lesson.id)}
+            href={`/learn/${lesson.id}`}
           >
             <div class="flex flex-wrap gap-2 mt-2">
               {#each getLessonTags(lesson).slice(0, 3) as tag}

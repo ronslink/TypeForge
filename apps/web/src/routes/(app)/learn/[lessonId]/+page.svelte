@@ -37,6 +37,9 @@
   const lessonId = $derived($page.params.lessonId);
   const lesson = $derived(getLessonById(lessonId));
 
+  // Get authentication context natively during component initialization
+  const ctx = useClerkContext();
+
   // User preferences (would come from user store in production)
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
@@ -274,7 +277,6 @@
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
       
-      const ctx = useClerkContext();
       const token = await ctx?.session?.getToken();
       const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         const defaultHeaders = new Headers(init?.headers);

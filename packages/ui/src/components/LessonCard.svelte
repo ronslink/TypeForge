@@ -18,9 +18,10 @@
     selected?: boolean;
     children?: Snippet;
     onclick?: () => void;
+    href?: string;
   }
 
-  let { lesson, selected = false, children, onclick }: Props = $props();
+  let { lesson, selected = false, children, onclick, href }: Props = $props();
 
   const difficultyColors = {
     beginner: 'bg-success-container text-on-success-container',
@@ -29,9 +30,11 @@
   };
 </script>
 
-<button
-  type="button"
-  class="lesson-card bg-surface-container-low p-6 text-left transition-all hover:bg-surface-container {selected
+<svelte:element
+  this={href ? 'a' : 'button'}
+  {href}
+  type={href ? undefined : 'button'}
+  class="lesson-card block w-full bg-surface-container-low p-6 text-left transition-all hover:bg-surface-container focus-indicator {selected
     ? 'ring-2 ring-primary'
     : ''}"
   onclick={onclick}
@@ -74,7 +77,7 @@
       {@render children()}
     </div>
   {/if}
-</button>
+</svelte:element>
 
 <style>
   .lesson-card {
