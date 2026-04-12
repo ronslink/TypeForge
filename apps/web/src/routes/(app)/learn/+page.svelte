@@ -192,6 +192,10 @@
       lessons: filteredLessons.filter(l => l.difficulty === stage.level)
     })).filter(stage => stage.lessons.length > 0)
   );
+
+  // Global Course Matrix Tracker
+  const completedForTrack = $derived(filteredLessons.filter(l => completedLessonIds.has(l.id)).length);
+  const trackProgressPercent = $derived(filteredLessons.length > 0 ? Math.round((completedForTrack / filteredLessons.length) * 100) : 0);
 </script>
 
 <svelte:head>
@@ -200,12 +204,29 @@
 
 <div class="max-w-7xl mx-auto px-6 py-12">
   <!-- Interactive Header Panel -->
-  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 p-8 bg-gradient-to-br from-surface-container-low to-surface-container-lowest rounded-2xl shadow-xl border border-surface-container border-b-4 border-b-primary">
-    <div>
+  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 p-8 bg-gradient-to-br from-surface-container-low to-surface-container-lowest rounded-2xl shadow-xl border border-surface-container border-b-4 border-b-primary relative overflow-hidden">
+    <div class="absolute right-0 top-0 opacity-5 pointer-events-none w-64 h-64 -mt-10 -mr-10">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3.5-3.5"/><path d="M15.5 11.5L12 8"/><path d="M6 18h12"/><path d="M7 21h10"/><path d="M3.5 12.5v-7A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5v7C20.5 17 12 21 12 21s-8.5-4-8.5-8.5z"/></svg>
+    </div>
+    <div class="relative z-10 max-w-xl">
       <h1 class="font-headline text-4xl mb-3 flex items-center gap-3">
         Learn ⚡
       </h1>
-      <p class="text-on-surface-variant max-w-md text-sm leading-relaxed">Master your typing sequence with guided curriculum modules specifically tailored to your preferred dialect and hardware structure.</p>
+      <p class="text-on-surface-variant max-w-md text-sm leading-relaxed mb-6">Master your typing sequence with guided curriculum modules specifically tailored to your preferred dialect and hardware structure.</p>
+      
+      <!-- Global Progress Matrix Indicator -->
+      <div class="w-full">
+         <div class="flex justify-between items-end mb-2">
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Course Progression</span>
+            <span class="font-headline text-lg text-primary">{trackProgressPercent}%</span>
+         </div>
+         <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden shadow-inner">
+            <div class="bg-primary h-full transition-all duration-1000 ease-out" style="width: {trackProgressPercent}%;"></div>
+         </div>
+         <div class="mt-2 text-[0.65rem] text-on-surface-variant uppercase tracking-widest font-bold">
+            {completedForTrack} of {filteredLessons.length} Modules Conquered
+         </div>
+      </div>
     </div>
     
     <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">

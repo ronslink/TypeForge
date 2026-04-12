@@ -22,6 +22,7 @@
     currentStep: number;
     selectedLanguage: string | null;
     selectedLayout: string | null;
+    hasPaid: boolean;
     testResults: {
       wpm: number;
       accuracy: number;
@@ -37,6 +38,7 @@
     currentStep: 1,
     selectedLanguage: null,
     selectedLayout: null,
+    hasPaid: false,
     testResults: null,
   });
 
@@ -118,7 +120,20 @@
   }
 
   // ============================================================================
-  // Step 3: Placement Test
+  // Step 3: Payment Handling
+  // ============================================================================
+  let isPaymentProcessing = $state(false);
+  function handleMockPayment() {
+    isPaymentProcessing = true;
+    setTimeout(() => {
+      onboardingStore.update(s => ({ ...s, hasPaid: true }));
+      isPaymentProcessing = false;
+      nextStep();
+    }, 1500);
+  }
+
+  // ============================================================================
+  // Step 4: Placement Test
   // ============================================================================
 
   let testText = $state('');
@@ -167,6 +182,7 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
+    if ($onboardingStore.currentStep !== 4) return;
     if (!testStarted && !testEnded) {
       startTest();
     }
@@ -237,7 +253,7 @@
   }
 
   // ============================================================================
-  // Step 4: Results & Save
+  // Step 5: Results & Save
   // ============================================================================
 
   async function savePreferences() {
@@ -248,7 +264,9 @@
 
     if (isLoggedIn && state.selectedLanguage && state.selectedLayout) {
       try {
-        // Save preferences to API
+        // Save user state explicitly marking them as onboarded so we don't repeat this
+        // Fake onboarding flags since backend user profiles handle progression
+        // Save initial evaluation score to DB
         await api.api.v1.sessions.$post({
           json: {
             wpm: state.testResults?.wpm || 0,
@@ -274,9 +292,8 @@
 
   function nextStep() {
     onboardingStore.update((state) => {
-      const next = Math.min(state.currentStep + 1, 4);
-      if (next === 3) {
-        // Initialize test when entering step 3
+      const next = Math.min(state.currentStep + 1, 5);
+      if (next === 4) {
         setTimeout(initPlacementTest, 0);
       }
       return { ...state, currentStep: next };
@@ -292,7 +309,7 @@
 
   function goToStep(step: number) {
     onboardingStore.update((state) => {
-      if (step === 3) {
+      if (step === 4) {
         setTimeout(initPlacementTest, 0);
       }
       return { ...state, currentStep: step };
@@ -311,6 +328,8 @@
       case 2:
         return !!state.selectedLayout;
       case 3:
+        return state.hasPaid;
+      case 4:
         return testEnded;
       default:
         return true;
@@ -324,8 +343,10 @@
       case 2:
         return 'Select Keyboard Layout';
       case 3:
-        return 'Placement Test';
+        return 'Lifetime Access';
       case 4:
+        return 'Placement Test';
+      case 5:
         return 'Your Results';
       default:
         return '';
@@ -339,8 +360,10 @@
       case 2:
         return 'Choose the keyboard layout you use';
       case 3:
-        return 'Type the text below to assess your current skill level';
+        return 'Unlock unlimited courses, tracking, and certification with a one-time lifetime license.';
       case 4:
+        return 'Type the text below to assess your current skill level';
+      case 5:
         return 'Based on your performance, we recommend the following starting level';
       default:
         return '';
@@ -367,11 +390,11 @@
 
 <svelte:window onkeydown={handleKeydown} onkeyup={handleKeyup} />
 
-<div class="min-h-screen bg-background">
+<div class="min-h-screen bg-background pb-32">
   <!-- Progress Bar -->
   <div class="fixed top-0 left-0 right-0 z-50">
     <div class="flex h-1">
-      {#each [1, 2, 3, 4] as step}
+      {#each [1, 2, 3, 4, 5] as step}
         <button
           class="flex-1 transition-all duration-300 {step <= $onboardingStore.currentStep
             ? 'bg-primary'
@@ -387,8 +410,7 @@
   <header class="pt-16 pb-8 px-6">
     <div class="max-w-4xl mx-auto text-center">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <span class="font-label text-sm text-primary">Step {$onboardingStore.currentStep} of 4</span
-        >
+        <span class="font-label text-sm text-primary uppercase tracking-widest">Step {$onboardingStore.currentStep} of 5</span>
       </div>
       <h1 class="font-headline text-4xl md:text-5xl text-on-background mb-3">
         {stepTitle}
@@ -400,7 +422,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="px-6 pb-24">
+  <main class="px-6 relative z-10">
     <div class="max-w-4xl mx-auto">
       <!-- Step 1: Language Selection -->
       {#if $onboardingStore.currentStep === 1}
@@ -463,8 +485,59 @@
         </div>
       {/if}
 
-      <!-- Step 3: Placement Test -->
+      <!-- Step 3: Payment Lock -->
       {#if $onboardingStore.currentStep === 3}
+         <div class="max-w-lg mx-auto bg-surface-container-low p-8 rounded-2xl border border-surface-container shadow-2xl relative overflow-hidden">
+           <div class="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-primary to-secondary"></div>
+           
+           <!-- Pricing tier presentation -->
+           <div class="text-center mb-8">
+             <div class="inline-flex bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4">No Subscriptions</div>
+             <div class="font-headline text-6xl text-on-surface mb-2">$29.99</div>
+             <div class="text-on-surface-variant text-sm">One-time payment for lifetime access</div>
+           </div>
+
+           <!-- Fake Mock Payment Inputs -->
+           <div class="space-y-4 mb-8">
+             <div>
+               <label for="card" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Card Details</label>
+               <div class="flex flex-col gap-2">
+                 <input id="card" type="text" placeholder="1234 5678 9101 1121" class="w-full bg-surface-container px-4 py-3 rounded-t border border-b-0 border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary font-mono placeholder:opacity-40" />
+                 <div class="flex">
+                    <input type="text" placeholder="MM/YY" class="flex-1 bg-surface-container px-4 py-3 rounded-bl border border-r-0 border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary font-mono placeholder:opacity-40" />
+                    <input type="text" placeholder="CVC" class="flex-1 bg-surface-container px-4 py-3 rounded-br border border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary font-mono placeholder:opacity-40" />
+                 </div>
+               </div>
+             </div>
+             
+             <div>
+               <label for="name" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Name on card</label>
+               <input id="name" type="text" placeholder="Jane Doe" class="w-full bg-surface-container px-4 py-3 rounded border border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary" />
+             </div>
+           </div>
+
+           <button 
+             onclick={handleMockPayment} 
+             disabled={isPaymentProcessing || $onboardingStore.hasPaid}
+             class="w-full py-4 rounded font-bold uppercase tracking-wider transition-all duration-300 relative overflow-hidden flex items-center justify-center 
+              {$onboardingStore.hasPaid ? 'bg-secondary text-background cursor-not-allowed' : (isPaymentProcessing ? 'bg-primary/50 text-background/50 cursor-wait' : 'bg-primary text-background hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(240,165,0,0.3)]')}"
+             >
+             {#if isPaymentProcessing}
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Processing...
+             {:else if $onboardingStore.hasPaid}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="20 6 9 17 4 12"/></svg>
+                Payment Successful
+             {:else}
+                Simulate Payment — $29.99
+             {/if}
+           </button>
+           <p class="text-xs text-center text-on-surface-variant mt-4 opacity-70 italic">Powered by Test. Do not enter real numbers.</p>
+         </div>
+      {/if}
+
+      <!-- Step 4: Placement Test -->
+      {#if $onboardingStore.currentStep === 4}
         <div class="space-y-6">
           <!-- Metrics Bar -->
           <MetricsBar {metrics} />
@@ -521,8 +594,8 @@
         </div>
       {/if}
 
-      <!-- Step 4: Results -->
-      {#if $onboardingStore.currentStep === 4}
+      <!-- Step 5: Results -->
+      {#if $onboardingStore.currentStep === 5}
         {@const results = $onboardingStore.testResults}
         <div class="space-y-8">
           <!-- Results Cards -->
@@ -593,9 +666,9 @@
   </main>
 
   <!-- Navigation Footer -->
-  {#if $onboardingStore.currentStep < 4}
+  {#if $onboardingStore.currentStep < 5 && $onboardingStore.currentStep !== 3}
     <footer
-      class="fixed bottom-0 left-0 right-0 bg-surface-container-low border-t border-outline-variant px-6 py-4"
+      class="fixed bottom-0 left-0 right-0 bg-surface-container-low border-t border-outline-variant px-6 py-4 z-50"
     >
       <div class="max-w-4xl mx-auto flex justify-between items-center">
         <button
@@ -615,7 +688,7 @@
           class:opacity-50={!canProceed}
           class:cursor-not-allowed={!canProceed}
         >
-          {#if $onboardingStore.currentStep === 3}
+          {#if $onboardingStore.currentStep === 4}
             See Results
           {:else}
             Continue
@@ -796,137 +869,4 @@
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
-  @media (min-width: 640px) {
-    .sm\:grid-cols-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .lg\:grid-cols-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .gap-4 {
-    gap: 1rem;
-  }
-
-  .gap-6 {
-    gap: 1.5rem;
-  }
-
-  /* Space utility */
-  .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
-  }
-
-  .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(2rem * var(--tw-space-y-reverse));
-  }
-
-  /* Min height */
-  .min-h-\[120px\] {
-    min-height: 120px;
-  }
-
-  /* Z-index */
-  .z-50 {
-    z-index: 50;
-  }
-
-  /* Fixed positioning */
-  .fixed {
-    position: fixed;
-  }
-
-  .top-0 {
-    top: 0;
-  }
-
-  .left-0 {
-    left: 0;
-  }
-
-  .right-0 {
-    right: 0;
-  }
-
-  .bottom-0 {
-    bottom: 0;
-  }
-
-  /* Border */
-  .border-t {
-    border-top-width: 1px;
-  }
-
-  /* Padding */
-  .pt-16 {
-    padding-top: 4rem;
-  }
-
-  .pt-3 {
-    padding-top: 0.75rem;
-  }
-
-  .pt-4 {
-    padding-top: 1rem;
-  }
-
-  .pt-8 {
-    padding-top: 2rem;
-  }
-
-  .pb-8 {
-    padding-bottom: 2rem;
-  }
-
-  .pb-24 {
-    padding-bottom: 6rem;
-  }
-
-  .px-12 {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
-
-  .py-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  /* Text utilities */
-  .capitalize {
-    text-transform: capitalize;
-  }
-
-  /* Cursor */
-  .cursor-not-allowed {
-    cursor: not-allowed;
-  }
-
-  /* Animation */
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-
-  .animate-pulse {
-    animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Transform */
-  .hover\:translate-y-\[-2px\]:hover {
-    transform: translateY(-2px);
-  }
 </style>
