@@ -306,9 +306,9 @@
         <span>🌎</span> Americas
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {#each [{code:'en',native:'English',text:'The quick brown fox jumps over the lazy dog.',rtl:false},{code:'es',native:'Español',text:'El veloz murciélago hindú comía feliz cardillo y kiwi.',rtl:false},{code:'pt',native:'Português',text:'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',rtl:false}] as lang}
+        {#each [{code:'en',native:'English',text:'The quick brown fox jumps over the lazy dog.',rtl:false,flag:'🇺🇸'},{code:'es',native:'Español',text:'El veloz murciélago hindú comía feliz cardillo y kiwi.',rtl:false,flag:'🇪🇸'},{code:'pt',native:'Português',text:'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',rtl:false,flag:'🇧🇷'}] as lang}
           <div class="bg-surface-container-low p-4 flex items-start gap-4 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
-            <span class="font-label text-2xl text-primary">{lang.native[0]}</span>
+            <span class="text-3xl">{lang.flag}</span>
             <div>
               <div class="font-label text-sm text-primary mb-1">{lang.native}</div>
               <div class="font-label text-xs text-on-surface-variant/60 mb-2">{lang.code.toUpperCase()}</div>
@@ -325,10 +325,10 @@
         <span>🌍</span> Europe
       </h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {#each [{n:'Deutsch',c:'de',s:'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.'},{n:'Français',c:'fr',s:'Portez ce vieux whisky au juge blond qui fume.'},{n:'Italiano',c:'it',s:'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.'},{n:'Nederlands',c:'nl',s:"Pa's wijsje: fox lyophiliseert glad jodiumacetylide."},{n:'Polski',c:'pl',s:'Pchnąć w tę łódź jeża lub ośm skrzyń fig.'},{n:'Ελληνικά',c:'el',s:'Το λαγός και η χελώνα έτρεξαν γρήγορα.',g:true},{n:'Čeština',c:'cs',s:'Příliš žluťoučký kůň úpěl ďábelské kódy.'},{n:'Magyar',c:'hu',s:'Árvízi tölgyért bolygott sírkövet döngetett.'},{n:'Svenska',c:'sv',s:'Gädda prygelnäbba fyrskrift växer franskt.'},{n:'Norsk',c:'no',s:'Kjevveisk mot tre, eg snur og vinker til hunden.'},{n:'Dansk',c:'da',s:'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.'},{n:'Suomi',c:'fi',s:'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.'}] as lang}
+        {#each [{n:'Deutsch',c:'de',s:'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.',f:'🇩🇪'},{n:'Français',c:'fr',s:'Portez ce vieux whisky au juge blond qui fume.',f:'🇫🇷'},{n:'Italiano',c:'it',s:'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.',f:'🇮🇹'},{n:'Nederlands',c:'nl',s:"Pa's wijsje: fox lyophiliseert glad jodiumacetylide.",f:'🇳🇱'},{n:'Polski',c:'pl',s:'Pchnąć w tę łódź jeża lub ośm skrzyń fig.',f:'🇵🇱'},{n:'Ελληνικά',c:'el',s:'Το λαγός και η χελώνα έτρεξαν γρήγορα.',g:true,f:'🇬🇷'},{n:'Čeština',c:'cs',s:'Příliš žluťoučký kůň úpěl ďábelské kódy.',f:'🇨🇿'},{n:'Magyar',c:'hu',s:'Árvízi tölgyért bolygott sírkövet döngetett.',f:'🇭🇺'},{n:'Svenska',c:'sv',s:'Gädda prygelnäbba fyrskrift växer franskt.',f:'🇸🇪'},{n:'Norsk',c:'no',s:'Kjevveisk mot tre, eg snur og vinker til hunden.',f:'🇳🇴'},{n:'Dansk',c:'da',s:'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.',f:'🇩🇰'},{n:'Suomi',c:'fi',s:'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.',f:'🇫🇮'}] as lang}
           <div class="bg-surface-container-low p-3 flex flex-col gap-2 group hover:bg-surface-container transition-colors">
             <div class="flex items-center justify-between">
-              <span class="font-label text-base" class:text-primary={lang.g}>{lang.n}</span>
+              <span class="font-label text-base flex items-center gap-2" class:text-primary={lang.g}><span>{lang.f}</span> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
@@ -343,10 +343,10 @@
         <span>🌏</span> Middle East & Africa
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {#each [{n:'العربية',c:'ar',s:'نص حكيم له سرعان تسري به',rtl:true},{n:'עברית',c:'he',s:'איך בלשון הקודש, ספר צלחת פסיק',rtl:true}] as lang}
+        {#each [{n:'العربية',c:'ar',s:'نص حكيم له سرعان تسري به',rtl:true,f:'🇸🇦'},{n:'עברית',c:'he',s:'איך בלשון הקודש, ספר צלחת פסיק',rtl:true,f:'🇮🇱'}] as lang}
           <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
             <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary">{lang.n}</span>
+              <span class="font-label text-3xl text-primary flex items-center gap-3"><span>{lang.f}</span> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-sm text-on-surface-variant leading-relaxed" dir={lang.rtl ? 'rtl' : 'ltr'}>{lang.s}</div>
@@ -361,10 +361,10 @@
         <span>🌏</span> East Asia
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {#each [{n:'日本語',c:'ja',s:'いろはにほへとちりぬるを わかよたれそつねならむ'},{n:'简体中文',c:'zh',s:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。'},{n:'한국어',c:'ko',s:'다람쥐 헌 쳇바퀴에 타고파.'}] as lang}
+        {#each [{n:'日本語',c:'ja',s:'いろはにほへとちりぬるを わかよたれそつねならむ',f:'🇯🇵'},{n:'简体中文',c:'zh',s:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。',f:'🇨🇳'},{n:'한국어',c:'ko',s:'다람쥐 헌 쳇바퀴에 타고파.',f:'🇰🇷'}] as lang}
           <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors">
             <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary">{lang.n}</span>
+              <span class="font-label text-3xl text-primary flex items-center gap-3"><span>{lang.f}</span> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-xs text-on-surface-variant leading-relaxed">{lang.s}</div>
@@ -380,10 +380,10 @@
           <span>🌏</span> South & Southeast Asia
         </h3>
         <div class="grid grid-cols-2 gap-3">
-          {#each [{n:'हिन्दी',c:'hi',s:'क ख ग घ ङ च छ ज झ'},{n:'ไทย',c:'th',s:'กีฬาวิ่งเร็วสุด'},{n:'Tiếng Việt',c:'vi',s:'Con gà trốn đẹp trai bay qua vịnh.'},{n:'Indonesia',c:'id',s:'Muhammad fox bermimpi dengan wajar.'},{n:'Bahasa Melayu',c:'ms',s:'Lebuh rayanya berliku-liku di antara.'},{n:'Tagalog',c:'tl',s:'Ang magandang paruparo ay lumilipad sa hardin.'}] as lang}
+          {#each [{n:'हिन्दी',c:'hi',s:'क ख ग घ ङ च छ ज झ',f:'🇮🇳'},{n:'ไทย',c:'th',s:'กีฬาวิ่งเร็วสุด',f:'🇹🇭'},{n:'Tiếng Việt',c:'vi',s:'Con gà trốn đẹp trai bay qua vịnh.',f:'🇻🇳'},{n:'Indonesia',c:'id',s:'Muhammad fox bermimpi dengan wajar.',f:'🇮🇩'},{n:'Bahasa Melayu',c:'ms',s:'Lebuh rayanya berliku-liku di antara.',f:'🇲🇾'},{n:'Tagalog',c:'tl',s:'Ang magandang paruparo ay lumilipad sa hardin.',f:'🇵🇭'}] as lang}
             <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary">{lang.n}</span>
+                <span class="font-label text-base text-primary flex items-center gap-2"><span>{lang.f}</span> {lang.n}</span>
                 <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
               </div>
               <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
@@ -396,10 +396,10 @@
           <span>🌏</span> Central & Eastern Europe
         </h3>
         <div class="grid grid-cols-2 gap-3">
-          {#each [{n:'Русский',c:'ru',s:'Эй, жлоб! Где туз? Прячь юных съёмных.'},{n:'Українська',c:'uk',s:'Ей, барсу! Блискавично ховай юних.'},{n:'Türkçe',c:'tr',s:'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.'}] as lang}
+          {#each [{n:'Русский',c:'ru',s:'Эй, жлоб! Где туз? Прячь юных съёмных.',f:'🇷🇺'},{n:'Українська',c:'uk',s:'Ей, барсу! Блискавично ховай юних.',f:'🇺🇦'},{n:'Türkçe',c:'tr',s:'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.',f:'🇹🇷'}] as lang}
             <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary">{lang.n}</span>
+                <span class="font-label text-base text-primary flex items-center gap-2"><span>{lang.f}</span> {lang.n}</span>
                 <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
               </div>
               <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
