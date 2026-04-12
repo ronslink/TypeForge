@@ -263,12 +263,7 @@
     }
 
     if (event.key === 'Backspace') {
-      if (currentIndex > 0) {
-        currentIndex--;
-        errors.delete(currentIndex);
-        errors = new Set(errors);
-      }
-      return;
+      return; // Disabled in strict mode since cursor never advances on error
     }
 
     if (!isStarted) {
@@ -303,6 +298,7 @@
       previousStreak = currentStreak;
       currentStreak++;
       maxStreak = Math.max(maxStreak, currentStreak);
+      currentIndex++; // Only advance on correct keystroke
     } else {
       previousStreak = currentStreak;
       currentStreak = 0;
@@ -311,9 +307,6 @@
       // Announce error for screen readers
       ariaLiveText = `Error: expected ${expectedChar.char}, typed ${typedChar}`;
     }
-
-    // Always advance cursor on typing
-    currentIndex++;
 
     // Check if lesson is complete
     if (currentIndex >= lessonChars.length) {

@@ -180,12 +180,7 @@
     }
 
     if (event.key === 'Backspace') {
-      if (currentIndex > 0) {
-        currentIndex--;
-        errors.delete(currentIndex);
-        errors = new Set(errors);
-      }
-      return;
+      return; // Disabled in strict mode since cursor never advances on error
     }
 
     if (!isStarted) {
@@ -217,6 +212,7 @@
       previousStreak = currentStreak;
       currentStreak++;
       maxStreak = Math.max(maxStreak, currentStreak);
+      currentIndex++; // Only advance on correct keystroke
     } else {
       previousStreak = currentStreak;
       currentStreak = 0;
@@ -224,7 +220,6 @@
       errors = new Set(errors);
     }
 
-    currentIndex++;
     if (currentIndex >= lessonChars.length) completePractice();
   }
 
