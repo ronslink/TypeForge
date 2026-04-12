@@ -21,7 +21,7 @@ app.use('*', requireAuth);
 /**
  * Initialize Stripe client
  */
-function getStripe(c: any): Stripe {
+function getStripe(): Stripe {
   const secretKey = process.env.STRIPE_SECRET_KEY as string;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
@@ -239,7 +239,7 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   
   const body = await c.req.json();
   const { seatCount, successUrl, cancelUrl } = body;
@@ -331,7 +331,7 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   
   const body = await c.req.json();
   const { additionalSeats } = body;
@@ -400,7 +400,7 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   
   const body = await c.req.json();
   const { targetSeats } = body;

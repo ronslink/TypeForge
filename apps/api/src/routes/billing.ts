@@ -26,7 +26,7 @@ const INDIVIDUAL_PRICES = {
 /**
  * Initialize Stripe client
  */
-function getStripe(c: any): Stripe {
+function getStripe(): Stripe {
   const secretKey = process.env.STRIPE_SECRET_KEY as string;
   if (!secretKey) {
     throw new Error('STRIPE_SECRET_KEY not configured');
@@ -74,7 +74,7 @@ app.get('/subscription', requireAuth, async (c) => {
  */
 app.post('/checkout', requireAuth, async (c) => {
   const auth = getAuth(c)!;
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   
   const body = await c.req.json();
   const { interval = 'monthly', successUrl, cancelUrl } = body;
@@ -153,7 +153,7 @@ app.post('/checkout', requireAuth, async (c) => {
  */
 app.post('/portal', requireAuth, async (c) => {
   const auth = getAuth(c)!;
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   const db = getDb(c);
   
   // Get user's Stripe customer ID
@@ -198,7 +198,7 @@ app.get('/invoices', requireAuth, async (c) => {
  * POST /billing/webhook - Stripe webhook handler
  */
 app.post('/webhook', async (c) => {
-  const stripe = getStripe(c);
+  const stripe = getStripe();
   const body = await c.req.text();
   const signature = c.req.header('Stripe-Signature');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
