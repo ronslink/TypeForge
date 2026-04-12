@@ -272,8 +272,10 @@
   });
 
   onDestroy(() => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    }
     if (timerInterval) clearInterval(timerInterval);
   });
 </script>
