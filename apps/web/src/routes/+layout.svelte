@@ -1,15 +1,9 @@
 <script lang="ts">
   import '../app.css';
-  import type { Snippet } from 'svelte';
-  import type { LayoutData } from './$types';
   import { ClerkProvider } from 'svelte-clerk';
+  import type { LayoutProps } from './$types';
 
-  interface Props {
-    children: Snippet;
-    data: LayoutData;
-  }
-
-  let { children, data }: Props = $props();
+  let { children, data }: LayoutProps = $props();
 </script>
 
 <ClerkProvider>

@@ -20,16 +20,14 @@
   } from '@typeforge/metrics';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
-  import { layouts } from '@typeforge/layouts';
-  import type { PageData } from './$types';
+  import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
+  import type { PageProps } from './$types';
   import { FAMOUS_BOOKS } from './books';
   import { getSupportedLanguages } from '@typeforge/curriculum';
+  import { ALL_LANGUAGES } from '$lib/i18n/languages';
 
-  interface Props {
-    data: PageData;
-  }
+  let { data }: PageProps = $props();
 
-  let { data }: Props = $props();
 
   const ctx = useClerkContext();
   let userLanguage = $state('en');
@@ -42,14 +40,14 @@
   let mode = $state<'select' | 'words' | 'sentences' | 'book'>('select');
   
   let currentBooks = $derived(FAMOUS_BOOKS[userLanguage] || FAMOUS_BOOKS['en'] || []);
-  let selectedBookId = $state(currentBooks.length > 0 ? currentBooks[0].id : '');
-  
-  // Keep selection synchronized if languages swap
+  let selectedBookId = $state('');
+  // Keep selection synchronized when language changes
   $effect(() => {
     if (currentBooks.length > 0 && !currentBooks.find(b => b.id === selectedBookId)) {
        selectedBookId = currentBooks[0].id;
     }
   });
+
 
   // Typing Session State
   let lessonChars = $state<LessonChar[]>([]);
@@ -88,6 +86,12 @@
   const currentChar = $derived(lessonChars[currentIndex]);
   const activeKeyboardLayout = $derived(layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']);
 
+  // Auto-select the canonical layout when the practice language changes.
+  $effect(() => {
+    userLayout = getDefaultLayoutForLanguage(userLanguage);
+  });
+
+
   $effect(() => {
     if (currentChar) {
       highlightKeys = new Set([currentChar.char.toLowerCase()]);
@@ -121,18 +125,37 @@
     }
   });
 
-  // Generator Helpers mapping string to LessonChar engine array
+  // Maps Latin characters to their QWERTY finger assignment.
+  // Mirrors DYNAMIC_FINGER_MAP in @typeforge/curriculum for consistency.
+  const PRACTICE_FINGER_MAP: Record<string, { code: string; finger: Finger }> = {
+    'a': { code: 'KeyA', finger: 'left_pinky' }, 'b': { code: 'KeyB', finger: 'left_index' },
+    'c': { code: 'KeyC', finger: 'left_middle' }, 'd': { code: 'KeyD', finger: 'left_middle' },
+    'e': { code: 'KeyE', finger: 'left_middle' }, 'f': { code: 'KeyF', finger: 'left_index' },
+    'g': { code: 'KeyG', finger: 'left_index' }, 'h': { code: 'KeyH', finger: 'right_index' },
+    'i': { code: 'KeyI', finger: 'right_middle' }, 'j': { code: 'KeyJ', finger: 'right_index' },
+    'k': { code: 'KeyK', finger: 'right_middle' }, 'l': { code: 'KeyL', finger: 'right_ring' },
+    'm': { code: 'KeyM', finger: 'right_index' }, 'n': { code: 'KeyN', finger: 'right_index' },
+    'o': { code: 'KeyO', finger: 'right_ring' }, 'p': { code: 'KeyP', finger: 'right_pinky' },
+    'q': { code: 'KeyQ', finger: 'left_pinky' }, 'r': { code: 'KeyR', finger: 'left_index' },
+    's': { code: 'KeyS', finger: 'left_ring' }, 't': { code: 'KeyT', finger: 'left_index' },
+    'u': { code: 'KeyU', finger: 'right_index' }, 'v': { code: 'KeyV', finger: 'left_index' },
+    'w': { code: 'KeyW', finger: 'left_ring' }, 'x': { code: 'KeyX', finger: 'left_ring' },
+    'y': { code: 'KeyY', finger: 'right_index' }, 'z': { code: 'KeyZ', finger: 'left_pinky' },
+    ',': { code: 'Comma', finger: 'right_middle' }, '.': { code: 'Period', finger: 'right_ring' },
+    "'": { code: 'Quote', finger: 'right_pinky' }, '-': { code: 'Minus', finger: 'right_pinky' },
+    ' ': { code: 'Space', finger: 'left_thumb' },
+  };
+
   function generateLessonSequence(text: string): LessonChar[] {
     return text.split('').map(char => {
-      let code = 'Unknown';
-      let expectedFinger: Finger = 'right_index';
-      if (char === ' ') {
-        code = 'Space';
-        expectedFinger = 'left_thumb';
-      }
-      return { char, code, expectedFinger };
+      const lower = char.toLowerCase();
+      const mapped = PRACTICE_FINGER_MAP[lower];
+      if (mapped) return { char, code: mapped.code, expectedFinger: mapped.finger };
+      // Non-Latin/unknown: use left_thumb as neutral fallback
+      return { char, code: 'Unknown', expectedFinger: 'left_thumb' };
     });
   }
+
 
   function mountPracticeMode(selectedMode: 'words' | 'sentences' | 'book') {
     mode = selectedMode;
@@ -308,18 +331,26 @@
     <h1 class="font-headline text-4xl mb-4">Practice</h1>
     <p class="text-on-surface-variant mb-8">Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states.</p>
 
-    <!-- Language Selector Injection -->
-    <div class="mb-6 flex gap-4 max-w-sm">
-      <select class="flex-1 bg-surface-container-low text-on-surface p-3 rounded uppercase font-bold" bind:value={userLanguage}>
-        {#each availableLanguages as lang}
-          <option value={lang}>{lang}</option>
-        {/each}
-      </select>
-      <select class="flex-1 bg-surface-container-low text-on-surface p-3 rounded" bind:value={userLayout}>
-        <option value="qwerty-us">QWERTY</option>
-        <option value="qwertz-de">QWERTZ</option>
-      </select>
+    <!-- Language & Layout Selectors -->
+    <div class="mb-6 flex gap-4 max-w-sm flex-wrap">
+      <div class="flex-1 min-w-[140px] flex flex-col gap-1">
+        <label for="practice-language" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Language</label>
+        <select id="practice-language" class="bg-surface-container-low text-on-surface p-3 font-label text-sm cursor-pointer" bind:value={userLanguage}>
+          {#each ALL_LANGUAGES as lang}
+            <option value={lang.code}>{lang.nativeName} ({lang.englishName})</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex-1 min-w-[140px] flex flex-col gap-1">
+        <label for="practice-layout" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Keyboard Layout</label>
+        <select id="practice-layout" class="bg-surface-container-low text-on-surface p-3 font-label text-sm cursor-pointer" bind:value={userLayout}>
+          {#each Object.entries(layouts) as [id, layout]}
+            <option value={id}>{layout.name}</option>
+          {/each}
+        </select>
+      </div>
     </div>
+
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       <button onclick={() => mountPracticeMode('words')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all flex flex-col gap-3">

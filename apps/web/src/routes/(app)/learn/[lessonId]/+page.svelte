@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
+
   import { 
     TypingInput, 
     Keyboard, 
@@ -25,25 +26,31 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
-  import { layouts } from '@typeforge/layouts';
-  import type { PageData } from './$types';
+  import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
+  import type { PageProps } from './$types';
 
-  interface Props {
-    data: PageData;
-  }
+  let { data }: PageProps = $props();
 
-  let { data }: Props = $props();
 
-  // Get lesson ID from URL params
-  const lessonId = $derived($page.params.lessonId);
+  // Get lesson ID from URL params (typed via page.params)
+  const lessonId = $derived(page.params.lessonId);
   const lesson = $derived(getLessonById(lessonId));
+
 
   // Get authentication context natively during component initialization
   const ctx = useClerkContext();
 
-  // User preferences (would come from user store in production)
+  // User preferences
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
+
+  // Auto-select the canonical keyboard layout whenever the lesson's language changes.
+  // The user can still manually override via the dropdown afterward.
+  $effect(() => {
+    if (lesson?.language) {
+      userLayout = getDefaultLayoutForLanguage(lesson.language);
+    }
+  });
 
   // RTL detection from lesson or language
   const isRTL = $derived(lesson?.rtl || language?.rtl || false);
@@ -524,15 +531,12 @@
           class="w-full bg-surface-container text-on-surface text-sm p-2 outline-none border-b-2 border-primary/50 focus:border-primary focus:ring-0 rounded-t-sm transition-colors cursor-pointer"
           bind:value={userLayout}
         >
-          <option value="qwerty-us">QWERTY (US)</option>
-          <option value="dvorak">Dvorak</option>
-          <option value="azerty-fr">AZERTY (FR)</option>
-          <option value="qwertz-de">QWERTZ (DE)</option>
-          <option value="cyrillic-ru">Cyrillic (RU)</option>
-          <option value="arabic">Arabic</option>
-          <option value="hebrew">Hebrew</option>
+          {#each Object.entries(layouts) as [id, layout]}
+            <option value={id}>{layout.name}</option>
+          {/each}
         </select>
       </div>
+
     </div>
 
     <!-- Progress Bar -->

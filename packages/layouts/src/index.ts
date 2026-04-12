@@ -1,6 +1,7 @@
 /**
  * @typeforge/layouts — Keyboard layout definitions
- * JSON maps for various keyboard layouts and finger assignments
+ * JSON maps for various keyboard layouts and finger assignments.
+ * All layouts follow the row-based `Layout` schema.
  */
 
 import qwertyUs from './layouts/qwerty-us.json' with { type: 'json' };
@@ -11,10 +12,9 @@ import arabic from './layouts/arabic.json' with { type: 'json' };
 import hebrew from './layouts/hebrew.json' with { type: 'json' };
 import dvorak from './layouts/dvorak.json' with { type: 'json' };
 
-export type { KeyboardLayout, KeyDefinition, FingerAssignment, Layout, Key, Finger } from './types.js';
-export { LayoutRegistry } from './registry.js';
+export type { Layout, Key, Finger, Hand, LayoutName } from './types.js';
 
-// Re-export built-in layouts
+/** All built-in layouts keyed by their ID */
 export const layouts = {
   'qwerty-us': qwertyUs,
   'azerty-fr': azertyFr,
@@ -28,29 +28,76 @@ export const layouts = {
 export type LayoutId = keyof typeof layouts;
 
 /**
- * Get a layout by its ID
+ * Get a layout by its ID.
  */
-export function getLayout(id: LayoutId): typeof layouts[LayoutId] {
+export function getLayout(id: LayoutId) {
   return layouts[id];
 }
 
 /**
- * Get all available layouts
+ * Get all available layouts as an array.
  */
-export function getAllLayouts(): typeof layouts[LayoutId][] {
+export function getAllLayouts() {
   return Object.values(layouts);
 }
 
 /**
- * Get layouts by script type
+ * Get layouts matching a specific script type (e.g. 'Latin', 'arabic').
  */
-export function getLayoutByScript(script: string): typeof layouts[LayoutId][] {
+export function getLayoutsByScript(script: string) {
   return Object.values(layouts).filter(layout => layout.script === script);
 }
 
 /**
- * Get layout by language code
+ * Get layouts matching a specific language code.
  */
-export function getLayoutByLanguage(language: string): typeof layouts[LayoutId][] {
+export function getLayoutsByLanguage(language: string) {
   return Object.values(layouts).filter(layout => layout.language === language);
+}
+
+// ---------------------------------------------------------------------------
+// Language → Layout mapping
+// Canonical layout to auto-select when a user switches practice language.
+// ---------------------------------------------------------------------------
+
+/**
+ * Maps BCP-47 language codes to their canonical keyboard layout ID.
+ * Languages not listed here default to 'qwerty-us'.
+ */
+export const LANGUAGE_TO_LAYOUT: Record<string, LayoutId> = {
+  'en': 'qwerty-us',
+  'en-US': 'qwerty-us',
+  'en-GB': 'qwerty-us',
+  'es': 'qwerty-us',
+  'pt': 'qwerty-us',
+  'it': 'qwerty-us',
+  'nl': 'qwerty-us',
+  'sv': 'qwerty-us',
+  'no': 'qwerty-us',
+  'da': 'qwerty-us',
+  'fi': 'qwerty-us',
+  'ms': 'qwerty-us',
+  'tl': 'qwerty-us',
+  'sw': 'qwerty-us',
+  'hi': 'qwerty-us',
+  'id': 'qwerty-us',
+  'ja': 'qwerty-us',
+  'ko': 'qwerty-us',
+  'zh': 'qwerty-us',
+  'fr': 'azerty-fr',
+  'de': 'qwertz-de',
+  'cs': 'qwertz-de',
+  'hu': 'qwertz-de',
+  'ar': 'arabic',
+  'he': 'hebrew',
+  'ru': 'cyrillic-ru',
+  'uk': 'cyrillic-ru',
+};
+
+/**
+ * Returns the canonical keyboard layout ID for a given language code.
+ * Falls back to 'qwerty-us' for unknown languages.
+ */
+export function getDefaultLayoutForLanguage(langCode: string): LayoutId {
+  return LANGUAGE_TO_LAYOUT[langCode] ?? 'qwerty-us';
 }

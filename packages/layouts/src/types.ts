@@ -1,5 +1,6 @@
 /**
  * Layout type definitions
+ * Single, unified type system for keyboard layouts.
  */
 
 export type Finger =
@@ -15,57 +16,10 @@ export type Finger =
 
 export type Hand = 'left' | 'right' | 'thumb';
 
-export interface KeyDefinition {
-  /** Key code (physical position) */
-  code: string;
-  /** Default character */
-  char: string;
-  /** Shift character */
-  shift?: string;
-  /** Alt character */
-  alt?: string;
-  /** Alt+Shift character */
-  altShift?: string;
-  /** Finger assignment */
-  finger: Finger;
-  /** Hand */
-  hand: Hand;
-  /** Row number (0 = number row, 1 = top, 2 = home, 3 = bottom, 4 = space) */
-  row: number;
-  /** Column position */
-  column: number;
-}
+/** Available layout IDs */
+export type LayoutName = 'qwerty-us' | 'azerty-fr' | 'qwertz-de' | 'dvorak' | 'arabic' | 'hebrew' | 'cyrillic-ru';
 
-export interface KeyboardLayout {
-  /** Layout identifier */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Language code (BCP-47) */
-  languageCode: string;
-  /** Layout variant */
-  variant?: string;
-  /** Key definitions */
-  keys: KeyDefinition[];
-  /** Finger map for quick lookup */
-  fingerMap: Record<string, Finger>;
-  /** Dead keys */
-  deadKeys?: Record<string, string>;
-}
-
-export interface FingerAssignment {
-  finger: Finger;
-  keys: string[];
-}
-
-// ============================================================================
-// New Layout Types (Row-based)
-// ============================================================================
-
-/** Available layout names */
-export type LayoutName = 'qwerty-us' | 'azerty-fr' | 'qwertz-de' | 'dvorak' | 'arabic' | 'cyrillic';
-
-/** Key definition in row-based layout */
+/** A single key in a row-based keyboard layout */
 export interface Key {
   /** Key code (physical position, e.g., 'KeyA', 'Digit1') */
   code: string;
@@ -75,6 +29,14 @@ export interface Key {
   charShift?: string;
   /** Whether this key requires AltGr to access the character */
   requiresAltGr?: boolean;
+  /** Finger responsible for this key */
+  finger?: Finger;
+  /** Hand that owns this key */
+  hand?: Hand;
+  /** Whether this key is marked for RTL rendering */
+  rtl?: boolean;
+  /** Visual width hint for special keys */
+  width?: string;
 }
 
 /** Row-based keyboard layout */
@@ -85,8 +47,12 @@ export interface Layout {
   name: string;
   /** Language code (BCP-47) */
   language: string;
-  /** Script (e.g., 'Latin', 'Cyrillic', 'Arabic', 'Hebrew') */
+  /** Optional layout variant description */
+  variant?: string;
+  /** Script family (e.g., 'Latin', 'Cyrillic', 'arabic', 'hebrew') */
   script: string;
-  /** Rows of keys (0 = number row, 1 = top alpha, 2 = home row, 3 = bottom alpha, 4 = space/modifiers) */
+  /** Whether this layout is RTL */
+  rtl?: boolean;
+  /** Rows of keys (0 = number row, 1 = top alpha, 2 = home row, 3 = bottom alpha, 4 = space) */
   rows: Key[][];
 }

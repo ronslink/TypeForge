@@ -1,18 +1,12 @@
 import type { Lesson, Finger, LessonChar } from './lesson-registry.js';
 
-function generateDrill(char: string, code: string, finger: Finger, length: number = 60): LessonChar[] {
-  return Array(length).fill(null).map((_, i) => {
-    if (i > 0 && (i + 1) % 6 === 0) {
-      return { char: ' ', code: 'Space', expectedFinger: 'left_thumb' };
-    }
-    return { char, code, expectedFinger: finger };
-  });
-}
-
 function generateSequence(text: string): LessonChar[] {
   // Simple mapping for common characters (not perfectly accurate for mapping fingers, 
   // but sufficient for basic content rendering)
   const charMap: Record<string, { code: string, finger: Finger }> = {
+    // QWERTZ physical positions (German keyboard layout)
+    // Key codes are the same physical keys as QWERTY but chars differ:
+    //   QWERTZ: Z is on left-side top row (KeyY physical), Y is bottom row (KeyZ physical)
     'a': { code: 'KeyA', finger: 'left_pinky' },
     'b': { code: 'KeyB', finger: 'left_index' },
     'c': { code: 'KeyC', finger: 'left_middle' },
@@ -37,8 +31,10 @@ function generateSequence(text: string): LessonChar[] {
     'v': { code: 'KeyV', finger: 'left_index' },
     'w': { code: 'KeyW', finger: 'left_ring' },
     'x': { code: 'KeyX', finger: 'left_ring' },
-    'y': { code: 'KeyY', finger: 'right_index' }, // On QWERTZ this is left bottom, but keeping semantic for now
-    'z': { code: 'KeyZ', finger: 'left_pinky' }, // On QWERTZ this is top middle
+    // On QWERTZ: Y key is on KeyZ (bottom-row left-pinky)
+    'y': { code: 'KeyZ', finger: 'left_pinky' },
+    // On QWERTZ: Z key is on KeyY (top-row right-index position)
+    'z': { code: 'KeyY', finger: 'right_index' },
     'ä': { code: 'Quote', finger: 'right_pinky' },
     'ö': { code: 'Semicolon', finger: 'right_pinky' },
     'ü': { code: 'BracketLeft', finger: 'right_pinky' },

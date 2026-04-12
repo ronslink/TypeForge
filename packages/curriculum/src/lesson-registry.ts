@@ -519,15 +519,53 @@ LESSON_CATALOG.push(...germanLessons);
 // Synthesize full curriculum states for every natively mapped language
 const masterLanguages = getSupportedLanguages();
 
+// QWERTY finger assignment map for Latin characters.
+// Used by dynamically-generated lessons. Non-Latin scripts fall back to 'all'
+// so the hand guide doesn't show incorrect guidance.
+const DYNAMIC_FINGER_MAP: Record<string, { code: string; finger: Finger }> = {
+  'a': { code: 'KeyA', finger: 'left_pinky' },
+  'b': { code: 'KeyB', finger: 'left_index' },
+  'c': { code: 'KeyC', finger: 'left_middle' },
+  'd': { code: 'KeyD', finger: 'left_middle' },
+  'e': { code: 'KeyE', finger: 'left_middle' },
+  'f': { code: 'KeyF', finger: 'left_index' },
+  'g': { code: 'KeyG', finger: 'left_index' },
+  'h': { code: 'KeyH', finger: 'right_index' },
+  'i': { code: 'KeyI', finger: 'right_middle' },
+  'j': { code: 'KeyJ', finger: 'right_index' },
+  'k': { code: 'KeyK', finger: 'right_middle' },
+  'l': { code: 'KeyL', finger: 'right_ring' },
+  'm': { code: 'KeyM', finger: 'right_index' },
+  'n': { code: 'KeyN', finger: 'right_index' },
+  'o': { code: 'KeyO', finger: 'right_ring' },
+  'p': { code: 'KeyP', finger: 'right_pinky' },
+  'q': { code: 'KeyQ', finger: 'left_pinky' },
+  'r': { code: 'KeyR', finger: 'left_index' },
+  's': { code: 'KeyS', finger: 'left_ring' },
+  't': { code: 'KeyT', finger: 'left_index' },
+  'u': { code: 'KeyU', finger: 'right_index' },
+  'v': { code: 'KeyV', finger: 'left_index' },
+  'w': { code: 'KeyW', finger: 'left_ring' },
+  'x': { code: 'KeyX', finger: 'left_ring' },
+  'y': { code: 'KeyY', finger: 'right_index' },
+  'z': { code: 'KeyZ', finger: 'left_pinky' },
+  ',': { code: 'Comma', finger: 'right_middle' },
+  '.': { code: 'Period', finger: 'right_ring' },
+  ';': { code: 'Semicolon', finger: 'right_pinky' },
+  "'": { code: 'Quote', finger: 'right_pinky' },
+  '-': { code: 'Minus', finger: 'right_pinky' },
+  ' ': { code: 'Space', finger: 'left_thumb' },
+};
+
 function generateDynamicContent(text: string): LessonChar[] {
   return text.split('').map(char => {
-    let code = 'Unknown';
-    let expectedFinger: Finger = 'right_index';
-    if (char === ' ') {
-      code = 'Space';
-      expectedFinger = 'left_thumb';
+    const lower = char.toLowerCase();
+    const mapped = DYNAMIC_FINGER_MAP[lower];
+    if (mapped) {
+      return { char, code: mapped.code, expectedFinger: mapped.finger } as LessonChar;
     }
-    return { char, code, expectedFinger } as LessonChar;
+    // Non-Latin or unmapped: use 'all' so hand guide doesn't show wrong finger
+    return { char, code: 'Unknown', expectedFinger: 'left_thumb' } as LessonChar;
   });
 }
 
