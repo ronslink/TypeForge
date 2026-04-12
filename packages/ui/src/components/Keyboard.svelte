@@ -1,37 +1,25 @@
 <script lang="ts">
-  import type { KeyboardLayout } from '@typeforge/layouts';
+  import type { Layout, Key } from '@typeforge/layouts';
 
   interface Props {
-    layout: KeyboardLayout;
+    layout: Layout;
     highlightKeys?: Set<string>;
     pressedKey?: string;
+    isRTL?: boolean;
   }
 
-  let { layout, highlightKeys = new Set(), pressedKey }: Props = $props();
+  let { layout, highlightKeys = new Set(), pressedKey, isRTL = false }: Props = $props();
 
-  // Group keys by row
-  let rows = $derived(groupByRow(layout.keys));
-
-  function groupByRow(keys: KeyboardLayout['keys']): Map<number, typeof keys> {
-    const map = new Map<number, typeof keys>();
-    for (const key of keys) {
-      const row = map.get(key.row) || [];
-      row.push(key);
-      map.set(key.row, row);
-    }
-    return map;
-  }
-
-  function getKeyClass(key: (typeof layout.keys)[0]): string {
+  function getKeyClass(key: Key): string {
     const classes = ['key'];
-    if (highlightKeys.has(key.char)) classes.push('highlight');
-    if (pressedKey === key.char) classes.push('pressed');
-    classes.push(`finger-${key.finger}`);
+    if (key.char && highlightKeys.has(key.char.toLowerCase())) classes.push('highlight');
+    if (key.char && pressedKey === key.char.toLowerCase()) classes.push('pressed');
+    if ((key as any).finger) classes.push(`finger-${(key as any).finger}`);
     return classes.join(' ');
   }
 
   // Get ARIA label for key
-  function getKeyAriaLabel(key: (typeof layout.keys)[0]): string {
+  function getKeyAriaLabel(key: Key): string {
     const fingerNames: Record<string, string> = {
       'left-pinky': 'Left pinky',
       'left-ring': 'Left ring finger',
@@ -44,12 +32,12 @@
       'thumb': 'Thumb',
     };
     
-    const fingerLabel = fingerNames[key.finger] || key.finger;
-    const isHighlighted = highlightKeys.has(key.char);
+    const fingerLabel = fingerNames[(key as any).finger || 'thumb'] || (key as any).finger || 'thumb';
+    const isHighlighted = key.char && highlightKeys.has(key.char.toLowerCase());
     
-    let label = `${key.char.toUpperCase()} key, use ${fingerLabel}`;
-    if (key.shift && key.shift !== key.char) {
-      label += `, shift produces ${key.shift}`;
+    let label = `${key.char ? key.char.toUpperCase() : key.code} key, use ${fingerLabel}`;
+    if (key.charShift && key.charShift !== key.char) {
+      label += `, shift produces ${key.charShift}`;
     }
     if (isHighlighted) {
       label += ', current target key';
@@ -71,27 +59,26 @@
   class="keyboard bg-surface-container-lowest p-4" 
   role="region" 
   aria-label="Virtual keyboard showing finger placement guide"
+  dir={isRTL ? "rtl" : "ltr"}
 >
-  {#each [0, 1, 2, 3, 4] as rowIndex}
-    {#if rows.has(rowIndex)}
-      <div class="keyboard-row" role="group" aria-label="Row {rowIndex + 1}">
-        {#each rows.get(rowIndex) || [] as key}
-          <button 
-            type="button"
-            class={getKeyClass(key)} 
-            data-code={key.code}
-            aria-label={getKeyAriaLabel(key)}
-            tabindex="-1"
-            disabled
-          >
-            {#if key.shift && key.shift !== key.char}
-              <span class="shift-char" aria-hidden="true">{key.shift}</span>
-            {/if}
-            <span class="main-char" aria-hidden="true">{key.char}</span>
-          </button>
-        {/each}
-      </div>
-    {/if}
+  {#each layout.rows as row, rowIndex}
+    <div class="keyboard-row" role="group" aria-label="Row {rowIndex + 1}">
+      {#each row as key}
+        <button 
+          type="button"
+          class={getKeyClass(key)} 
+          data-code={key.code}
+          aria-label={getKeyAriaLabel(key)}
+          tabindex="-1"
+          disabled
+        >
+          {#if key.charShift && key.charShift !== key.char}
+            <span class="shift-char" aria-hidden="true">{key.charShift}</span>
+          {/if}
+          <span class="main-char" aria-hidden="true">{key.char || ''}</span>
+        </button>
+      {/each}
+    </div>
   {/each}
 </div>
 

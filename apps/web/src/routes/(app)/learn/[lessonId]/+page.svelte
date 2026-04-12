@@ -107,11 +107,11 @@
   // RTL-aware keyboard layout - swaps left/right finger assignments
   const rtlKeyboardLayout = $derived({
     ...keyboardLayout,
-    keys: keyboardLayout.keys.map(key => ({
+    rows: keyboardLayout.rows.map(row => row.map(key => ({
       ...key,
-      finger: swapFingerForRTL(key.finger),
-      hand: swapHandForRTL(key.hand),
-    })),
+      finger: swapFingerForRTL((key as any).finger || 'thumb'),
+      hand: swapHandForRTL((key as any).hand || 'thumb'),
+    }))),
   });
 
   // Use RTL layout when in RTL mode
