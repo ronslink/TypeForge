@@ -1,6 +1,6 @@
 /**
- * TypeForge API — Hono on Cloudflare Workers
- * Regional routing via Cloudflare Hyperdrive to PostgreSQL
+ * TypeForge API — Hono Serverless Runtime
+ * Vercel Edge/Serverless integration via SvelteKit
  */
 
 import { Hono } from 'hono';
@@ -39,7 +39,7 @@ app.use(
       'https://typingscholar.com',
       'https://www.typingscholar.com',
       'http://localhost:5173',
-      'http://localhost:8787',
+      'http://localhost:3000',
     ],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'x-region'],

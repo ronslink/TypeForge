@@ -9,14 +9,10 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:unit": "vitest run",
-    "clean": "rm -rf .wrangler node_modules"
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.0",
