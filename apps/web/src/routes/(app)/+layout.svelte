@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { LayoutData } from './$types';
-  import { useClerkContext, SignInButton, UserButton } from 'svelte-clerk';
+  import { useClerkContext, UserButton } from 'svelte-clerk';
   import { page } from '$app/stores';
   import { afterNavigate } from '$app/navigation';
 
@@ -81,13 +81,9 @@
         <span class="text-sm text-on-surface-variant font-body">
           Sign in to save your progress
         </span>
-        <SignInButton mode="modal" fallbackRedirectUrl={currentPath}>
-          <button
-            class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors focus-indicator"
-          >
-            Sign In
-          </button>
-        </SignInButton>
+        <a href="/sign-in" class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors focus-indicator inline-block">
+          Sign In
+        </a>
       </div>
     </div>
   {/if}
@@ -150,13 +146,9 @@
             <UserButton afterSignOutUrl="/" />
           </div>
         {:else}
-          <SignInButton mode="modal" fallbackRedirectUrl={currentPath}>
-            <button
-              class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 focus-indicator"
-            >
-              Start Typing
-            </button>
-          </SignInButton>
+          <a href="/sign-up" class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 focus-indicator inline-block text-center">
+            Start Typing
+          </a>
         {/if}
       </div>
     </div>
