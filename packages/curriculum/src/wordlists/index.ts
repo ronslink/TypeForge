@@ -13,6 +13,8 @@ import { dutchWordlist } from './nl.js';
 import { polishWordlist } from './pl.js';
 import { finnishWordlist } from './fi.js';
 import { greekWordlist } from './el.js';
+import { hebrewWordlist } from './he.js';
+import { russianWordlist } from './ru.js';
 import { czechWordlist } from './cs.js';
 import { danishWordlist } from './da.js';
 import { hindiWordlist } from './hi.js';
@@ -41,6 +43,8 @@ export {
   polishWordlist,
   finnishWordlist,
   greekWordlist,
+  hebrewWordlist,
+  russianWordlist,
   czechWordlist,
   danishWordlist,
   hindiWordlist,
@@ -77,6 +81,10 @@ const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
   finnish: finnishWordlist,
   el: greekWordlist,
   greek: greekWordlist,
+  he: hebrewWordlist,
+  hebrew: hebrewWordlist,
+  ru: russianWordlist,
+  russian: russianWordlist,
   cs: czechWordlist,
   czech: czechWordlist,
   da: danishWordlist,

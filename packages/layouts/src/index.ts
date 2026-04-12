@@ -11,6 +11,10 @@ import cyrillicRu from './layouts/cyrillic-ru.json' with { type: 'json' };
 import arabic from './layouts/arabic.json' with { type: 'json' };
 import hebrew from './layouts/hebrew.json' with { type: 'json' };
 import dvorak from './layouts/dvorak.json' with { type: 'json' };
+import greek from './layouts/greek.json' with { type: 'json' };
+import dubeolsik from './layouts/dubeolsik.json' with { type: 'json' };
+import devanagariPhonetic from './layouts/devanagari-phonetic.json' with { type: 'json' };
+import romaji from './layouts/romaji.json' with { type: 'json' };
 
 export type { Layout, Key, Finger, Hand, LayoutName } from './types.js';
 
@@ -23,6 +27,10 @@ export const layouts = {
   'arabic': arabic,
   'hebrew': hebrew,
   'dvorak': dvorak,
+  'greek': greek,
+  'dubeolsik': dubeolsik,
+  'devanagari-phonetic': devanagariPhonetic,
+  'romaji': romaji,
 } as const;
 
 export type LayoutId = keyof typeof layouts;
@@ -79,10 +87,10 @@ export const LANGUAGE_TO_LAYOUT: Record<string, LayoutId> = {
   'ms': 'qwerty-us',
   'tl': 'qwerty-us',
   'sw': 'qwerty-us',
-  'hi': 'qwerty-us',
+  'hi': 'devanagari-phonetic',
   'id': 'qwerty-us',
-  'ja': 'qwerty-us',
-  'ko': 'qwerty-us',
+  'ja': 'romaji',
+  'ko': 'dubeolsik',
   'zh': 'qwerty-us',
   'fr': 'azerty-fr',
   'de': 'qwertz-de',
@@ -92,6 +100,7 @@ export const LANGUAGE_TO_LAYOUT: Record<string, LayoutId> = {
   'he': 'hebrew',
   'ru': 'cyrillic-ru',
   'uk': 'cyrillic-ru',
+  'el': 'greek',
 };
 
 /**

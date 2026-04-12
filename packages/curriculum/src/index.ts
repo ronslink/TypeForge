@@ -39,6 +39,24 @@ export {
   arabicPhraseLessons,
 } from './rtl-lessons.js';
 
+// Hebrew RTL lessons
+export { hebrewLessons } from './hebrew-lessons.js';
+
+// Greek lessons
+export { greekLessons } from './greek-lessons.js';
+
+// French AZERTY lessons
+export { azertyLessons } from './azerty-lessons.js';
+
+// German QWERTZ lessons
+export { germanLessons } from './german-lessons.js';
+
+// Russian/Cyrillic lessons
+export { russianLessons } from './cyrillic-lessons.js';
+
+// Dvorak lessons
+export { dvorakLessons } from './dvorak-lessons.js';
+
 // Wordlist exports
 export {
   frenchWordlist,

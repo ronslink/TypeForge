@@ -513,6 +513,21 @@ export function getRTLLessons(): Lesson[] {
 // Append Arabic RTL lessons
 LESSON_CATALOG.push(...arabicLessons);
 
+import { hebrewLessons } from './hebrew-lessons.js';
+LESSON_CATALOG.push(...hebrewLessons);
+
+import { azertyLessons } from './azerty-lessons.js';
+LESSON_CATALOG.push(...azertyLessons);
+
+import { greekLessons } from './greek-lessons.js';
+LESSON_CATALOG.push(...greekLessons);
+
+import { dvorakLessons } from './dvorak-lessons.js';
+LESSON_CATALOG.push(...dvorakLessons);
+
+import { russianLessons } from './cyrillic-lessons.js';
+LESSON_CATALOG.push(...russianLessons);
+
 import { germanLessons } from './german-lessons.js';
 LESSON_CATALOG.push(...germanLessons);
 
