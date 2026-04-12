@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { UserProfile } from 'svelte-clerk';
   import { Keyboard } from '@typeforge/ui';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import type { Layout } from '@typeforge/layouts';
@@ -199,16 +200,8 @@
     <h2 id="account-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-6">
       Account
     </h2>
-    <div class="settings-card flex-col items-start gap-3">
-      <p class="text-on-surface-variant text-sm font-body">
-        Manage your profile, subscription, and connected accounts via the Clerk user portal.
-      </p>
-      <a
-        href="/billing"
-        class="notched-button bg-surface-container text-on-surface px-5 py-2.5 font-label text-sm hover:bg-surface-container-high transition-colors inline-block"
-      >
-        Billing &amp; Subscription →
-      </a>
+    <div class="clerk-theme-override bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/30 flex justify-center">
+      <UserProfile routing="hash" appearance={{ elements: { rootBox: "w-full shadow-none", card: "shadow-none border-0 rounded-none w-full bg-transparent" } }} />
     </div>
   </section>
 </div>

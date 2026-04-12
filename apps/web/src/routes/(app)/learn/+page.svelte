@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { LessonCard, Button, Badge } from '@typeforge/ui';
+  import { LessonCard, Button } from '@typeforge/ui';
   import { LESSON_CATALOG, getLessonById, type Lesson } from '@typeforge/curriculum';
   import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
   import type { PageData } from './$types';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import SideNavBar from '$lib/components/SideNavBar.svelte';
 
   interface Props {
     data: PageData;
@@ -202,9 +203,103 @@
   <title>Learn — TypingScholar</title>
 </svelte:head>
 
-<div class="max-w-7xl mx-auto px-6 py-12">
-  <!-- Interactive Header Panel -->
-  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 p-8 bg-gradient-to-br from-surface-container-low to-surface-container-lowest rounded-2xl shadow-xl border border-surface-container border-b-4 border-b-primary relative overflow-hidden">
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">
+  <SideNavBar title="Course Settings">
+    <!-- Search -->
+    <div class="relative w-full">
+      <input
+        type="text"
+        placeholder="Search lessons..."
+        bind:value={searchQuery}
+        class="bg-surface-container px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary w-full shadow-inner tracking-wide"
+      />
+      {#if searchQuery}
+        <button
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
+          onclick={() => searchQuery = ''}
+        >
+          ✕
+        </button>
+      {/if}
+    </div>
+
+    <div class="flex flex-col gap-1.5 w-full mt-4">
+      <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Target Language</label>
+      <select
+        id="lang-select"
+        bind:value={selectedLanguage}
+        class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
+      >
+        <option value="all">All Languages</option>
+        {#each languages as lang}
+          <option value={lang.code}>{lang.nativeName}</option>
+        {/each}
+      </select>
+    </div>
+
+    <!-- Global Layout Selector -->
+    <div class="flex flex-col gap-1.5 w-full">
+      <label for="global-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Hardware Layout</label>
+      <select 
+        id="global-layout"
+        class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
+        bind:value={userLayout}
+      >
+        <option value="qwerty-us">QWERTY (US)</option>
+        <option value="dvorak">Dvorak</option>
+        <option value="azerty-fr">AZERTY (FR)</option>
+        <option value="qwertz-de">QWERTZ (DE)</option>
+        <option value="cyrillic-ru">Cyrillic (RU)</option>
+        <option value="arabic">Arabic</option>
+        <option value="hebrew">Hebrew</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1.5 w-full mt-4">
+       <label for="diff-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Mastery Level</label>
+       <select
+          id="diff-select"
+          bind:value={selectedDifficulty}
+          class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
+        >
+          <option value="all">All Levels</option>
+          {#each difficultyLevels as level}
+            <option value={level.value}>{level.label}</option>
+          {/each}
+        </select>
+    </div>
+
+    <!-- Tag Filter -->
+    <div class="flex flex-col gap-1.5 w-full">
+       <label for="tag-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Focus Area</label>
+       <select
+          id="tag-select"
+          bind:value={selectedTag}
+          class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
+        >
+          <option value="all">All Focus Tags</option>
+          {#each tags as tag}
+            <option value={tag}>{tag}</option>
+          {/each}
+        </select>
+    </div>
+
+    <!-- Clear Filters -->
+    {#if selectedLanguage !== 'all' || selectedDifficulty !== 'all' || selectedTag !== 'all' || searchQuery}
+      <button
+        class="mt-4 text-xs font-bold text-secondary hover:text-primary transition-colors tracking-widest uppercase border border-secondary/20 hover:border-primary/50 py-2 w-full text-center"
+        onclick={clearFilters}
+      >
+        Reset Filters
+      </button>
+    {/if}
+  </SideNavBar>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 w-full max-w-6xl mx-auto px-4 md:px-8 py-8 lg:py-12">
+    <!-- Interactive Header Panel -->
+    <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 p-8 bg-gradient-to-br from-surface-container-low to-surface-container-lowest shadow-xl border border-surface-container border-b-4 border-b-primary relative overflow-hidden">
+
     <div class="absolute right-0 top-0 opacity-5 pointer-events-none w-64 h-64 -mt-10 -mr-10">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3.5-3.5"/><path d="M15.5 11.5L12 8"/><path d="M6 18h12"/><path d="M7 21h10"/><path d="M3.5 12.5v-7A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5v7C20.5 17 12 21 12 21s-8.5-4-8.5-8.5z"/></svg>
     </div>
@@ -228,41 +323,6 @@
          </div>
       </div>
     </div>
-    
-    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-        <!-- Global Language Selector -->
-        <div class="flex flex-col gap-1.5 flex-1">
-          <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Target Language</label>
-          <select
-            id="lang-select"
-            bind:value={selectedLanguage}
-            class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container rounded-lg border border-transparent shadow-inner cursor-pointer transition-colors"
-          >
-            <option value="all">All Languages</option>
-            {#each languages as lang}
-              <option value={lang.code}>{lang.nativeName}</option>
-            {/each}
-          </select>
-        </div>
-
-        <!-- Global Layout Selector -->
-        <div class="flex flex-col gap-1.5 flex-1">
-          <label for="global-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Hardware Layout</label>
-          <select 
-            id="global-layout"
-            class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container rounded-lg border border-transparent shadow-inner cursor-pointer transition-colors"
-            bind:value={userLayout}
-          >
-            <option value="qwerty-us">QWERTY (US)</option>
-            <option value="dvorak">Dvorak</option>
-            <option value="azerty-fr">AZERTY (FR)</option>
-            <option value="qwertz-de">QWERTZ (DE)</option>
-            <option value="cyrillic-ru">Cyrillic (RU)</option>
-            <option value="arabic">Arabic</option>
-            <option value="hebrew">Hebrew</option>
-          </select>
-        </div>
-    </div>
   </div>
 
   <!-- Recommended Section -->
@@ -270,7 +330,9 @@
     <section class="mb-12">
       <div class="flex items-center gap-3 mb-6">
         <h2 class="font-headline text-2xl">Recommended for You</h2>
-        <Badge variant="solid" size="sm">{getLanguageByCode(userLanguage)?.nativeName}</Badge>
+        {#if getLanguageByCode(userLanguage)?.nativeName}
+          <span class="bg-primary/20 text-primary text-xs px-2 py-1 rounded shadow-sm font-label uppercase tracking-widest">{getLanguageByCode(userLanguage)?.nativeName}</span>
+        {/if}
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each recommendedLessons as lesson}
@@ -295,68 +357,7 @@
   {/if}
 
   <!-- Filter Bar -->
-  <section class="mb-8">
-    <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between bg-surface-container-low p-4">
-      <div class="flex flex-wrap gap-4 items-center">
-        <!-- Search -->
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="Search lessons..."
-            bind:value={searchQuery}
-            class="bg-surface-container px-4 py-2 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary w-48"
-          />
-          {#if searchQuery}
-            <button
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
-              onclick={() => searchQuery = ''}
-            >
-              ✕
-            </button>
-          {/if}
-        </div>
-
-        <!-- Remove inline Language selector to rely cleanly on the Header setup -->
-
-        <!-- Difficulty Filter -->
-        <select
-          bind:value={selectedDifficulty}
-          class="bg-surface-container px-4 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-        >
-          <option value="all">All Levels</option>
-          {#each difficultyLevels as level}
-            <option value={level.value}>{level.label}</option>
-          {/each}
-        </select>
-
-        <!-- Tag Filter -->
-        <select
-          bind:value={selectedTag}
-          class="bg-surface-container px-4 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-        >
-          <option value="all">All Tags</option>
-          {#each tags as tag}
-            <option value={tag}>{tag}</option>
-          {/each}
-        </select>
-
-        <!-- Clear Filters -->
-        {#if selectedLanguage !== 'all' || selectedDifficulty !== 'all' || selectedTag !== 'all' || searchQuery}
-          <button
-            class="text-sm text-secondary hover:text-secondary-container transition-colors"
-            onclick={clearFilters}
-          >
-            Clear filters
-          </button>
-        {/if}
-      </div>
-
-      <div class="text-sm text-on-surface-variant">
-        {filteredLessons.length} lesson{filteredLessons.length !== 1 ? 's' : ''}
-      </div>
-    </div>
-  </section>
-
+  <!-- Filter Bar Moved to SideNavBar -->
   <!-- Lesson Grid -->
   <section>
     <h2 class="font-headline text-2xl mb-6">
@@ -470,10 +471,11 @@
         {/if}
       </div>
     {:else}
-      <div class="bg-surface-container-low p-12 text-center">
-        <p class="text-on-surface-variant mb-4">No lessons found matching your filters.</p>
-        <Button variant="secondary" onclick={clearFilters}>Clear Filters</Button>
+      <div class="bg-surface-container-low p-12 text-center mt-12 lg:mt-24">
+        <p class="text-on-surface-variant mb-4 font-body">No precision templates found matching your strict criteria.</p>
+        <Button variant="secondary" onclick={clearFilters}>Reset Directives</Button>
       </div>
     {/if}
   </section>
+  </div>
 </div>

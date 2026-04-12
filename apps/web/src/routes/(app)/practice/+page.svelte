@@ -9,6 +9,7 @@
     Button, 
     ConfettiCelebration 
   } from '@typeforge/ui';
+  import SideNavBar from '$lib/components/SideNavBar.svelte';
   import { 
     getRandomWords, 
     type LessonChar, 
@@ -325,31 +326,33 @@
 
 <ConfettiCelebration trigger={showCelebration} duration={3000} />
 
-<div class="max-w-7xl mx-auto px-6 py-12">
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">
+  <SideNavBar title="Practice Config">
+    <div class="flex flex-col gap-1.5 w-full">
+      <label for="practice-language" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Language</label>
+      <select id="practice-language" class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full" bind:value={userLanguage}>
+        {#each ALL_LANGUAGES as lang}
+          <option value={lang.code}>{lang.nativeName} ({lang.englishName})</option>
+        {/each}
+      </select>
+    </div>
+    
+    <div class="flex flex-col gap-1.5 w-full">
+      <label for="practice-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Keyboard Layout</label>
+      <select id="practice-layout" class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full" bind:value={userLayout}>
+        {#each Object.entries(layouts) as [id, layout]}
+          <option value={id}>{layout.name}</option>
+        {/each}
+      </select>
+    </div>
+  </SideNavBar>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 w-full max-w-6xl mx-auto px-4 md:px-8 py-8 lg:py-12">
   
   {#if mode === 'select'}
-    <h1 class="font-headline text-4xl mb-4">Practice</h1>
-    <p class="text-on-surface-variant mb-8">Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states.</p>
-
-    <!-- Language & Layout Selectors -->
-    <div class="mb-6 flex gap-4 max-w-sm flex-wrap">
-      <div class="flex-1 min-w-[140px] flex flex-col gap-1">
-        <label for="practice-language" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Language</label>
-        <select id="practice-language" class="bg-surface-container-low text-on-surface p-3 font-label text-sm cursor-pointer" bind:value={userLanguage}>
-          {#each ALL_LANGUAGES as lang}
-            <option value={lang.code}>{lang.nativeName} ({lang.englishName})</option>
-          {/each}
-        </select>
-      </div>
-      <div class="flex-1 min-w-[140px] flex flex-col gap-1">
-        <label for="practice-layout" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Keyboard Layout</label>
-        <select id="practice-layout" class="bg-surface-container-low text-on-surface p-3 font-label text-sm cursor-pointer" bind:value={userLayout}>
-          {#each Object.entries(layouts) as [id, layout]}
-            <option value={id}>{layout.name}</option>
-          {/each}
-        </select>
-      </div>
-    </div>
+    <h1 class="font-headline text-4xl mb-4 text-primary">Practice Sandbox</h1>
+    <p class="text-on-surface-variant mb-12 max-w-2xl text-sm">Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states. Select your drill sequence below.</p>
 
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -449,4 +452,5 @@
       </div>
     {/if}
   {/if}
+  </div>
 </div>

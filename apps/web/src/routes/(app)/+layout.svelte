@@ -23,14 +23,7 @@
     !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
   );
 
-  // Auth gating — redirect to sign-in for protected routes
-  $effect(() => {
-    const isPublic = publicRoutes.some((r) => currentPath.startsWith(r));
-    const isSoft   = softAuthPages.some((r) => currentPath.startsWith(r));
-    if (!isLoading && !isSignedIn && !isPublic && !isSoft) {
-      goto(`/sign-in?redirect_url=${encodeURIComponent(currentPath)}`);
-    }
-  });
+  // Removed client-side auth gating — this is now strictly enforced server-side inside `hooks.server.ts`
 
   // Move focus to main content after each navigation
   let mainContentRef = $state<HTMLElement | null>(null);
