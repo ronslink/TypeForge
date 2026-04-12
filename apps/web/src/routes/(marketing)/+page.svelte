@@ -308,7 +308,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {#each [{code:'en',native:'English',text:'The quick brown fox jumps over the lazy dog.',rtl:false,flag:'us'},{code:'es',native:'Español',text:'El veloz murciélago hindú comía feliz cardillo y kiwi.',rtl:false,flag:'es'},{code:'pt',native:'Português',text:'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',rtl:false,flag:'br'}] as lang}
           <div class="bg-surface-container-low p-4 flex items-start gap-4 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
-            <img src="https://flagcdn.com/{lang.flag}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="{lang.native} flag" aria-hidden="true">
+            <img src="/flags/{lang.flag}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="{lang.native} flag" aria-hidden="true">
             <div>
               <div class="font-label text-sm text-primary mb-1">{lang.native}</div>
               <div class="font-label text-xs text-on-surface-variant/60 mb-2">{lang.code.toUpperCase()}</div>
@@ -328,7 +328,7 @@
         {#each [{n:'Deutsch',c:'de',s:'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.',f:'de'},{n:'Français',c:'fr',s:'Portez ce vieux whisky au juge blond qui fume.',f:'fr'},{n:'Italiano',c:'it',s:'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.',f:'it'},{n:'Nederlands',c:'nl',s:"Pa's wijsje: fox lyophiliseert glad jodiumacetylide.",f:'nl'},{n:'Polski',c:'pl',s:'Pchnąć w tę łódź jeża lub ośm skrzyń fig.',f:'pl'},{n:'Ελληνικά',c:'el',s:'Το λαγός και η χελώνα έτρεξαν γρήγορα.',g:true,f:'gr'},{n:'Čeština',c:'cs',s:'Příliš žluťoučký kůň úpěl ďábelské kódy.',f:'cz'},{n:'Magyar',c:'hu',s:'Árvízi tölgyért bolygott sírkövet döngetett.',f:'hu'},{n:'Svenska',c:'sv',s:'Gädda prygelnäbba fyrskrift växer franskt.',f:'se'},{n:'Norsk',c:'no',s:'Kjevveisk mot tre, eg snur og vinker til hunden.',f:'no'},{n:'Dansk',c:'da',s:'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.',f:'dk'},{n:'Suomi',c:'fi',s:'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.',f:'fi'}] as lang}
           <div class="bg-surface-container-low p-3 flex flex-col gap-2 group hover:bg-surface-container transition-colors">
             <div class="flex items-center justify-between">
-              <span class="font-label text-base flex items-center gap-2.5" class:text-primary={lang.g}><img src="https://flagcdn.com/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
+              <span class="font-label text-base flex items-center gap-2.5" class:text-primary={lang.g}><img src="/flags/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
@@ -346,7 +346,7 @@
         {#each [{n:'العربية',c:'ar',s:'نص حكيم له سرعان تسري به',rtl:true,f:'sa'},{n:'עברית',c:'he',s:'איך בלשון הקודש, ספר צלחת פסיק',rtl:true,f:'il'}] as lang}
           <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors" dir={lang.rtl ? 'rtl' : 'ltr'}>
             <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary flex items-center gap-3"><img src="https://flagcdn.com/{lang.f}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
+              <span class="font-label text-3xl text-primary flex items-center gap-3"><img src="/flags/{lang.f}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-sm text-on-surface-variant leading-relaxed" dir={lang.rtl ? 'rtl' : 'ltr'}>{lang.s}</div>
@@ -364,7 +364,7 @@
         {#each [{n:'日本語',c:'ja',s:'いろはにほへとちりぬるを わかよたれそつねならむ',f:'jp'},{n:'简体中文',c:'zh',s:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。',f:'cn'},{n:'한국어',c:'ko',s:'다람쥐 헌 쳇바퀴에 타고파.',f:'kr'}] as lang}
           <div class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors">
             <div class="flex items-center justify-between mb-3">
-              <span class="font-label text-3xl text-primary flex items-center gap-3"><img src="https://flagcdn.com/{lang.f}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
+              <span class="font-label text-3xl text-primary flex items-center gap-3"><img src="/flags/{lang.f}.svg" class="w-8 h-6 rounded-sm shadow-[0_0_8px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
               <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
             </div>
             <div class="font-label text-xs text-on-surface-variant leading-relaxed">{lang.s}</div>
@@ -383,7 +383,7 @@
           {#each [{n:'हिन्दी',c:'hi',s:'क ख ग घ ङ च छ ज झ',f:'in'},{n:'ไทย',c:'th',s:'กีฬาวิ่งเร็วสุด',f:'th'},{n:'Tiếng Việt',c:'vi',s:'Con gà trốn đẹp trai bay qua vịnh.',f:'vn'},{n:'Indonesia',c:'id',s:'Muhammad fox bermimpi dengan wajar.',f:'id'},{n:'Bahasa Melayu',c:'ms',s:'Lebuh rayanya berliku-liku di antara.',f:'my'},{n:'Tagalog',c:'tl',s:'Ang magandang paruparo ay lumilipad sa hardin.',f:'ph'}] as lang}
             <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary flex items-center gap-2.5"><img src="https://flagcdn.com/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
+                <span class="font-label text-base text-primary flex items-center gap-2.5"><img src="/flags/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
                 <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
               </div>
               <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
@@ -399,7 +399,7 @@
           {#each [{n:'Русский',c:'ru',s:'Эй, жлоб! Где туз? Прячь юных съёмных.',f:'ru'},{n:'Українська',c:'uk',s:'Ей, барсу! Блискавично ховай юних.',f:'ua'},{n:'Türkçe',c:'tr',s:'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.',f:'tr'}] as lang}
             <div class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-label text-base text-primary flex items-center gap-2.5"><img src="https://flagcdn.com/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
+                <span class="font-label text-base text-primary flex items-center gap-2.5"><img src="/flags/{lang.f}.svg" class="w-5 h-[14px] rounded-[2px] shadow-[0_0_4px_rgba(255,255,255,0.05)] object-cover bg-black/20" alt="" aria-hidden="true"> {lang.n}</span>
                 <span class="font-label text-[10px] text-on-surface-variant/40">{lang.c.toUpperCase()}</span>
               </div>
               <div class="font-label text-[10px] text-on-surface-variant leading-tight">{lang.s}</div>
