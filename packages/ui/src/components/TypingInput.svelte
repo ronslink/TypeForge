@@ -166,6 +166,7 @@
   {#each chars as char, i}
     <span
       class="char"
+      class:is-space={char === ' '}
       class:correct={i < currentIndex && !errors.has(i)}
       class:error={errors.has(i)}
       class:current={i === currentIndex}
@@ -175,7 +176,7 @@
       {#if i === currentIndex}
         <span class="cursor" aria-hidden="true"></span>
       {/if}
-      {char}
+      {char === ' ' ? '·' : char}
     </span>
   {/each}
 </div>
