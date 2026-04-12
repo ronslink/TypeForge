@@ -258,6 +258,8 @@
     pressedKey = undefined;
   }
 
+  let testFailed = $state(false);
+
   function completeLesson() {
     if (isComplete) return;
     
@@ -275,11 +277,22 @@
     finalAccuracy = Math.round(accuracyTracker.getAccuracy());
     finalDuration = elapsedSeconds;
 
+    if (lesson?.isTest && finalAccuracy < 90) {
+      testFailed = true;
+      showCelebration = false;
+      ariaLiveText = `Exam failed. You need at least 90% accuracy. You achieved ${finalAccuracy}%.`;
+      return;
+    }
+
     // Announce completion for screen readers
     ariaLiveText = `Lesson complete! WPM: ${finalWPM}, Accuracy: ${finalAccuracy}%. Great job!`;
 
     // Submit session to API
     submitSession();
+
+    if (lesson?.isTest && lesson.id.includes('-test-5')) {
+      setTimeout(() => { goto('/certificate'); }, 4000);
+    }
   }
 
   async function submitSession() {
@@ -494,14 +507,27 @@
         aria-describedby="completion-description"
       >
         <div 
-          class="bg-surface-container-low p-8 max-w-md w-full text-center"
+          class="bg-surface-container-low p-8 max-w-md w-full text-center border-t-4 {testFailed ? 'border-error' : 'border-primary'} rounded-2xl shadow-2xl relative overflow-hidden"
           role="document"
         >
-          <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>
-          <p id="completion-description" class="text-on-surface-variant mb-8">Great job finishing this lesson!</p>
+          {#if testFailed}
+            <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Exam Failed!</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10">You needed 90% accuracy. You achieved {finalAccuracy}%.</p>
+          {:else if lesson.isTest && lesson.id.includes('-test-5')}
+            <div class="absolute inset-0 bg-primary/5 z-0 pointer-events-none"></div>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">Certification Earned!</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">Validating metrics and preparing formal award...</p>
+          {:else if lesson.isTest}
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Exam Passed!</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8">Stage cleared. You've proven your mechanics.</p>
+          {:else}
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8">Great job finishing this lesson!</p>
+          {/if}
           
           <!-- Results Grid -->
-          <div class="grid grid-cols-3 gap-4 mb-8" role="region" aria-label="Your results">
+          <div class="grid grid-cols-3 gap-4 mb-8 relative z-10" role="region" aria-label="Your results">
             <div class="bg-surface-container p-4">
               <div class="text-2xl font-bold text-secondary" aria-label="Words per minute">{finalWPM}</div>
               <div class="text-xs text-on-surface-variant uppercase">WPM</div>
@@ -517,11 +543,11 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            {#if getNextLessonId()}
+          <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+            {#if getNextLessonId() && !testFailed}
               <Button variant="primary" onclick={goToNextLesson}>Next Lesson →</Button>
             {/if}
-            <Button variant="secondary" onclick={() => goto('/learn')}>Back to Browser</Button>
+            <Button variant="secondary" onclick={() => goto('/learn')}>Back to Curriculum</Button>
             <Button variant="ghost" onclick={restartLesson}>Retry</Button>
           </div>
         </div>

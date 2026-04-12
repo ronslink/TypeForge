@@ -52,6 +52,10 @@ export interface Lesson {
   };
   /** Lesson content - characters to practice */
   content: LessonChar[];
+  /** RTL text direction flag */
+  rtl?: boolean;
+  /** Marks if this module is an Exam hurdle */
+  isTest?: boolean;
 }
 
 /**
@@ -457,3 +461,45 @@ LESSON_CATALOG.push(...arabicLessons);
 
 import { germanLessons } from './german-lessons.js';
 LESSON_CATALOG.push(...germanLessons);
+
+// Synthesize Certification Exams for every loaded language
+const uniqueLanguages = Array.from(new Set(LESSON_CATALOG.map(l => l.language)));
+
+function generateExamContent(text: string): LessonChar[] {
+  return text.split('').map(char => {
+    let code = 'Unknown';
+    let expectedFinger: Finger = 'right_index';
+    if (char === ' ') {
+      code = 'Space';
+      expectedFinger = 'left_thumb';
+    }
+    return { char, code, expectedFinger } as LessonChar;
+  });
+}
+
+uniqueLanguages.forEach(lang => {
+  for (let level = 1; level <= 5; level++) {
+    const isFinal = level === 5;
+    const wordCount = isFinal ? 100 : 30 + (level * 10);
+    const words = getRandomWords(lang, wordCount) || [];
+    if (words.length > 0) {
+      const text = words.join(' ');
+      LESSON_CATALOG.push({
+        id: `${lang}-test-${level}`,
+        title: isFinal ? 'Final Proficiency Exam' : `Stage ${level} Certification Exam`,
+        language: lang,
+        script: lang === 'ar' ? 'arabic' : 'latin',
+        difficulty: level,
+        rtl: lang === 'ar',
+        isTest: true,
+        tags: {
+          hand: 'both',
+          finger: 'all',
+          key_bigram: 'comprehensive',
+          speed: isFinal ? 'speed' : 'accuracy',
+        },
+        content: generateExamContent(text)
+      });
+    }
+  }
+});

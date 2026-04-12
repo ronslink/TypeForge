@@ -368,22 +368,57 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ml-6">
                   {#each stage.lessons as lesson}
-                    <LessonCard
-                      lesson={toLessonCardProps(lesson)}
-                      href={`/learn/${lesson.id}`}
-                    >
-                      <div class="flex flex-wrap gap-2 mt-2">
-                        {#each getLessonTags(lesson).slice(0, 3) as tag}
-                          <span class="text-xs px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-sm">
-                            {tag}
-                          </span>
-                        {/each}
+                    {#if lesson.isTest}
+                      <div class="md:col-span-2 lg:col-span-3 w-full group relative transition-transform hover:-translate-y-1">
+                        <div class="absolute inset-0 bg-primary/5 rounded-2xl border-2 border-primary/50 group-hover:border-primary shadow-[0_0_25px_rgba(240,165,0,0.15)] transition-all"></div>
+                        <div class="relative p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                          <div class="flex-1 flex items-start gap-4">
+                            <div class="bg-primary text-background p-3 rounded-full shadow-lg">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3.5-3.5"/><path d="M15.5 11.5L12 8"/><path d="M6 18h12"/><path d="M7 21h10"/><path d="M3.5 12.5v-7A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5v7C20.5 17 12 21 12 21s-8.5-4-8.5-8.5z"/></svg>
+                            </div>
+                            <div>
+                              <h4 class="font-headline text-xl text-primary font-bold uppercase tracking-widest">{lesson.title}</h4>
+                              <p class="text-on-surface-variant text-sm mt-1">Unlock this strict evaluation node verifying your mastery over all preceding mechanics to advance.</p>
+                              <div class="flex gap-4 mt-3">
+                                <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">Min Accuracy 90%</span>
+                                <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-1 rounded">{lesson.content.length} words</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="flex flex-col items-center gap-2">
+                             {#if completedLessonIds.has(lesson.id)}
+                                <div class="text-primary text-sm font-bold uppercase tracking-widest bg-primary/20 px-4 py-2 rounded-lg border border-primary/30 flex items-center gap-2">
+                                  <span>Passed</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                {#if lesson.id.includes('-test-5')}
+                                  <a href="/certificate" class="text-xs hover:text-primary transition-colors underline opacity-70 mt-1 cursor-pointer">View Certification</a>
+                                {/if}
+                             {:else}
+                                <a href={`/learn/${lesson.id}`} class="bg-primary hover:bg-opacity-90 text-background font-bold px-8 py-3 rounded uppercase tracking-wider text-sm transition-all focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background outline-none hover:shadow-[0_0_15px_rgba(240,165,0,0.5)]">Start Exam</a>
+                             {/if}
+                          </div>
+                        </div>
                       </div>
-                      <div class="flex items-center gap-2 mt-3 text-amber-400 text-sm">
-                        <span>{getDifficultyStars(lesson.difficulty)}</span>
-                        <span class="text-on-surface-variant text-xs">({Math.round(lesson.content.length)} chars)</span>
-                      </div>
-                    </LessonCard>
+                    {:else}
+                      <LessonCard
+                        lesson={toLessonCardProps(lesson)}
+                        href={`/learn/${lesson.id}`}
+                      >
+                        <div class="flex flex-wrap gap-2 mt-2">
+                          {#each getLessonTags(lesson).slice(0, 3) as tag}
+                            <span class="text-xs px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-sm">
+                              {tag}
+                            </span>
+                          {/each}
+                        </div>
+                        <div class="flex items-center gap-2 mt-3 text-amber-400 text-sm">
+                          <span>{getDifficultyStars(lesson.difficulty)}</span>
+                          <span class="text-on-surface-variant text-xs">({Math.round(lesson.content.length)} chars)</span>
+                        </div>
+                      </LessonCard>
+                    {/if}
                   {/each}
                 </div>
               </div>
