@@ -4,8 +4,8 @@
 
 // Import RTL lessons and wordlists
 import { arabicLessons } from './rtl-lessons.js';
-import { getRandomWords } from './wordlists/index.js';
-export { getRandomWords };
+import { getRandomWords, getSupportedLanguages } from './wordlists/index.js';
+export { getRandomWords, getSupportedLanguages };
 
 export type Finger =
   | 'left_pinky'
@@ -516,10 +516,10 @@ LESSON_CATALOG.push(...arabicLessons);
 import { germanLessons } from './german-lessons.js';
 LESSON_CATALOG.push(...germanLessons);
 
-// Synthesize Certification Exams for every loaded language
-const uniqueLanguages = Array.from(new Set(LESSON_CATALOG.map(l => l.language)));
+// Synthesize full curriculum states for every natively mapped language
+const masterLanguages = getSupportedLanguages();
 
-function generateExamContent(text: string): LessonChar[] {
+function generateDynamicContent(text: string): LessonChar[] {
   return text.split('').map(char => {
     let code = 'Unknown';
     let expectedFinger: Finger = 'right_index';
@@ -531,7 +531,38 @@ function generateExamContent(text: string): LessonChar[] {
   });
 }
 
-uniqueLanguages.forEach(lang => {
+masterLanguages.forEach(lang => {
+  // 1. Synthesize Basic Practice Modules if not hardcoded
+  const existingLessons = LESSON_CATALOG.filter(l => l.language === lang && !l.isTest);
+  if (existingLessons.length === 0) {
+    const basicWords = getRandomWords(lang, 25) || [];
+    const speedWords = getRandomWords(lang, 50) || [];
+    
+    if (basicWords.length > 0) {
+       LESSON_CATALOG.push({
+         id: `${lang}-basic-1`,
+         title: `Basic Words Drill`,
+         language: lang,
+         script: lang === 'ar' ? 'arabic' : 'latin',
+         difficulty: 1,
+         rtl: lang === 'ar',
+         tags: { hand: 'both', finger: 'all', key_bigram: 'basic', speed: 'accuracy' },
+         content: generateDynamicContent(basicWords.join(' '))
+       });
+       LESSON_CATALOG.push({
+         id: `${lang}-speed-1`,
+         title: `Speed & Endurance Run`,
+         language: lang,
+         script: lang === 'ar' ? 'arabic' : 'latin',
+         difficulty: 3,
+         rtl: lang === 'ar',
+         tags: { hand: 'both', finger: 'all', key_bigram: 'speed', speed: 'speed' },
+         content: generateDynamicContent(speedWords.join(' '))
+       });
+    }
+  }
+
+  // 2. Synthesize Certification Exams mapping Stages 1-5
   for (let level = 1; level <= 5; level++) {
     const isFinal = level === 5;
     const wordCount = isFinal ? 100 : 30 + (level * 10);
@@ -552,7 +583,7 @@ uniqueLanguages.forEach(lang => {
           key_bigram: 'comprehensive',
           speed: isFinal ? 'speed' : 'accuracy',
         },
-        content: generateExamContent(text)
+        content: generateDynamicContent(text)
       });
     }
   }

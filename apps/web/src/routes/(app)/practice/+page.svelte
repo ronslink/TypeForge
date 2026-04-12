@@ -23,6 +23,7 @@
   import { layouts } from '@typeforge/layouts';
   import type { PageData } from './$types';
   import { FAMOUS_BOOKS } from './books';
+  import { getSupportedLanguages } from '@typeforge/curriculum';
 
   interface Props {
     data: PageData;
@@ -34,9 +35,21 @@
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
 
+  // Load backend localization metrics
+  let availableLanguages = getSupportedLanguages();
+
   // Practice Modes State
   let mode = $state<'select' | 'words' | 'sentences' | 'book'>('select');
-  let selectedBookId = $state(FAMOUS_BOOKS[0].id);
+  
+  let currentBooks = $derived(FAMOUS_BOOKS[userLanguage] || FAMOUS_BOOKS['en'] || []);
+  let selectedBookId = $state(currentBooks.length > 0 ? currentBooks[0].id : '');
+  
+  // Keep selection synchronized if languages swap
+  $effect(() => {
+    if (currentBooks.length > 0 && !currentBooks.find(b => b.id === selectedBookId)) {
+       selectedBookId = currentBooks[0].id;
+    }
+  });
 
   // Typing Session State
   let lessonChars = $state<LessonChar[]>([]);
@@ -137,8 +150,8 @@
         text = text.trim();
         lessonChars = generateLessonSequence(text);
     } else if (selectedMode === 'book') {
-        const book = FAMOUS_BOOKS.find(b => b.id === selectedBookId) || FAMOUS_BOOKS[0];
-        lessonChars = generateLessonSequence(book.excerpt);
+        const book = currentBooks.find(b => b.id === selectedBookId) || currentBooks[0];
+        if (book) lessonChars = generateLessonSequence(book.excerpt);
     }
     
     // Reset state
@@ -302,12 +315,10 @@
 
     <!-- Language Selector Injection -->
     <div class="mb-6 flex gap-4 max-w-sm">
-      <select class="flex-1 bg-surface-container-low text-on-surface p-3 rounded" bind:value={userLanguage}>
-        <option value="en">English</option>
-        <option value="es">Spanish</option>
-        <option value="fr">French</option>
-        <option value="de">German</option>
-        <option value="ar">Arabic</option>
+      <select class="flex-1 bg-surface-container-low text-on-surface p-3 rounded uppercase font-bold" bind:value={userLanguage}>
+        {#each availableLanguages as lang}
+          <option value={lang}>{lang}</option>
+        {/each}
       </select>
       <select class="flex-1 bg-surface-container-low text-on-surface p-3 rounded" bind:value={userLayout}>
         <option value="qwerty-us">QWERTY</option>
@@ -329,10 +340,14 @@
       <div class="bg-surface-container-low p-6 rounded-2xl border border-transparent filter-none flex flex-col gap-3">
         <h3 class="font-headline text-xl">Literature</h3>
         <p class="text-on-surface-variant text-sm flex-1">Practice pacing using heavy formatting loaded from public domain excerpts.</p>
-        <select bind:value={selectedBookId} class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-2 font-body font-bold shadow-inner">
-           {#each FAMOUS_BOOKS as book}
-             <option value={book.id}>{book.title} ({book.author})</option>
-           {/each}
+        <select bind:value={selectedBookId} class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-2 font-body font-bold shadow-inner" disabled={currentBooks.length === 0}>
+           {#if currentBooks.length === 0}
+             <option value="">No books available natively</option>
+           {:else}
+             {#each currentBooks as book}
+               <option value={book.id}>{book.title} ({book.author})</option>
+             {/each}
+           {/if}
         </select>
         <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">Start Book Drill</button>
       </div>

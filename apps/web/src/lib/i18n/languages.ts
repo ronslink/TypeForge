@@ -209,6 +209,16 @@ export const MIDDLE_EAST_AFRICA: Language[] = [
     rtl: true,
     sampleText: 'איך בלשון הקודש, ספר צלחת פסיק',
   },
+  {
+    code: 'sw',
+    nativeName: 'Kiswahili',
+    englishName: 'Swahili',
+    region: 'Middle East & Africa',
+    script: 'Latin',
+    keyboard: 'QWERTY',
+    rtl: false,
+    sampleText: 'Fisi wa jua huamka mapema kula nyama.',
+  },
 ];
 
 export const EAST_ASIA: Language[] = [
