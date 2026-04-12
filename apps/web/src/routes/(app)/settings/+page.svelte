@@ -21,20 +21,25 @@
     
     <div class="space-y-6">
       <div class="bg-surface-container-low p-6">
-        <label class="block font-label text-sm mb-2">Keyboard Layout</label>
-        <select class="w-full bg-surface-container text-on-surface p-3">
-          <option>QWERTY (US)</option>
-          <option>AZERTY (French)</option>
-          <option>QWERTZ (German)</option>
+        <label for="keyboard-layout" class="block font-label text-sm mb-2">Keyboard Layout</label>
+        <select id="keyboard-layout" class="w-full bg-surface-container text-on-surface p-3 cursor-pointer">
+          <option value="qwerty-us">QWERTY (US)</option>
+          <option value="dvorak">Dvorak</option>
+          <option value="azerty-fr">AZERTY (FR)</option>
+          <option value="qwertz-de">QWERTZ (DE)</option>
+          <option value="cyrillic-ru">Cyrillic (RU)</option>
+          <option value="arabic">Arabic</option>
+          <option value="hebrew">Hebrew</option>
         </select>
       </div>
 
       <div class="bg-surface-container-low p-6">
-        <label class="block font-label text-sm mb-2">Language</label>
-        <select class="w-full bg-surface-container text-on-surface p-3">
+        <label for="display-language" class="block font-label text-sm mb-2">Language</label>
+        <select id="display-language" class="w-full bg-surface-container text-on-surface p-3 cursor-pointer">
           <option>English</option>
           <option>French</option>
           <option>German</option>
+          <option>Spanish</option>
         </select>
       </div>
 

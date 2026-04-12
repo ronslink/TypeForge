@@ -102,7 +102,7 @@
   const lessonChars = $derived(lesson?.content || []);
   const currentChar = $derived(lessonChars[currentIndex]);
   const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
-  const keyboardLayout = $derived(layouts['qwerty-us']); // Default to QWERTY for now
+  const keyboardLayout = $derived(layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']);
 
   // RTL-aware keyboard layout - swaps left/right finger assignments
   const rtlKeyboardLayout = $derived({
@@ -195,6 +195,15 @@
       event.preventDefault();
     }
 
+    if (event.key === 'Backspace') {
+      if (currentIndex > 0) {
+        currentIndex--;
+        errors.delete(currentIndex);
+        errors = new Set(errors);
+      }
+      return;
+    }
+
     if (!isStarted) {
       isStarted = true;
       startTime = Date.now();
@@ -227,12 +236,6 @@
       previousStreak = currentStreak;
       currentStreak++;
       maxStreak = Math.max(maxStreak, currentStreak);
-      currentIndex++;
-
-      // Check if lesson is complete
-      if (currentIndex >= lessonChars.length) {
-        completeLesson();
-      }
     } else {
       previousStreak = currentStreak;
       currentStreak = 0;
@@ -240,6 +243,14 @@
       errors = new Set(errors);
       // Announce error for screen readers
       ariaLiveText = `Error: expected ${expectedChar.char}, typed ${typedChar}`;
+    }
+
+    // Always advance cursor on typing
+    currentIndex++;
+
+    // Check if lesson is complete
+    if (currentIndex >= lessonChars.length) {
+      completeLesson();
     }
   }
 
@@ -416,17 +427,37 @@
     </div>
 
     <!-- Lesson Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2 flex-wrap">
-        <h1 class="font-headline text-3xl" id="lesson-title">
-          {language?.nativeName || lesson.language}
-        </h1>
-        <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
-        {#if isRTL}
-          <span class="rtl-badge" role="note" aria-label="Right-to-left language">RTL</span>
-        {/if}
+    <div class="mb-8 flex justify-between items-start">
+      <div>
+        <div class="flex items-center gap-3 mb-2 flex-wrap">
+          <h1 class="font-headline text-3xl" id="lesson-title">
+            {language?.nativeName || lesson.language}
+          </h1>
+          <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
+          {#if isRTL}
+            <span class="rtl-badge" role="note" aria-label="Right-to-left language">RTL</span>
+          {/if}
+        </div>
+        <p class="text-on-surface-variant" id="lesson-description">{lesson.title}</p>
       </div>
-      <p class="text-on-surface-variant" id="lesson-description">{lesson.title}</p>
+
+      <!-- Keyboard Layout Selector -->
+      <div class="flex flex-col gap-1 items-end min-w-[140px]">
+        <label for="keyboard-layout" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Layout</label>
+        <select 
+          id="keyboard-layout"
+          class="w-full bg-surface-container text-on-surface text-sm p-2 outline-none border-b-2 border-primary/50 focus:border-primary focus:ring-0 rounded-t-sm transition-colors cursor-pointer"
+          bind:value={userLayout}
+        >
+          <option value="qwerty-us">QWERTY (US)</option>
+          <option value="dvorak">Dvorak</option>
+          <option value="azerty-fr">AZERTY (FR)</option>
+          <option value="qwertz-de">QWERTZ (DE)</option>
+          <option value="cyrillic-ru">Cyrillic (RU)</option>
+          <option value="arabic">Arabic</option>
+          <option value="hebrew">Hebrew</option>
+        </select>
+      </div>
     </div>
 
     <!-- Progress Bar -->
