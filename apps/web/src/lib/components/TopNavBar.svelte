@@ -13,6 +13,7 @@
   ];
 
   const ctx = useClerkContext();
+  let loaded     = $derived(ctx?.loaded);
   let isSignedIn = $derived(!!ctx?.user);
   let user       = $derived(ctx?.user);
 
@@ -72,7 +73,10 @@
         {/if}
       </a>
 
-      {#if isSignedIn && user}
+      {#if !loaded}
+        <!-- Loading stub to reserve space -->
+        <div class="hidden md:block w-24 h-8 bg-surface-container/50 rounded animate-pulse ml-4"></div>
+      {:else if isSignedIn && user}
         <div class="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
           <UserButton afterSignOutUrl="/" />
         </div>
@@ -141,7 +145,10 @@
       {/each}
     </nav>
     <div class="mt-auto pt-6 border-t border-outline-variant/20">
-      {#if isSignedIn && user}
+      {#if !loaded}
+         <!-- Load spacing -->
+         <div class="w-full py-6 bg-transparent"></div>
+      {:else if isSignedIn && user}
         <div class="flex items-center gap-3">
           <UserButton afterSignOutUrl="/" />
           <span class="font-label text-sm text-on-surface-variant">{user.firstName || user.username}</span>

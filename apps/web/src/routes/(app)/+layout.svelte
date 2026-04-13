@@ -20,7 +20,7 @@
   const softAuthPages = ['/learn', '/progress', '/practice'];
 
   let showAuthBanner = $derived(
-    !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
+    ctx?.loaded && !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
   );
 
   // Removed client-side auth gating — this is now strictly enforced server-side inside `hooks.server.ts`
