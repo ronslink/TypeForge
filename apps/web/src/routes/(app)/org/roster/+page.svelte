@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Class Roster — TypingScholar</title>
+  <title>Class Roster — TypeForge</title>
 </svelte:head>
 
 <div class="px-4">

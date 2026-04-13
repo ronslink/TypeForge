@@ -33,9 +33,9 @@
         <a
           href="/"
           class="text-xl font-black tracking-tighter text-primary uppercase font-label block mb-4"
-          aria-label="TypingScholar Home"
+          aria-label="TypeForge Home"
         >
-          TYPINGSCHOLAR
+          TYPEFORGE
         </a>
         <p class="text-on-surface-variant text-sm font-body leading-relaxed max-w-[220px]">
           Multilingual adaptive typing — from home row to fluency, in any script.
@@ -67,7 +67,7 @@
     <!-- Bottom row: copyright + scripts badge -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-8 border-t border-outline-variant/10">
       <p class="text-xs text-on-surface-variant font-body">
-        © {year} TypingScholar. All rights reserved.
+        © {year} TypeForge. All rights reserved.
       </p>
       <div class="flex gap-2 flex-wrap">
         {#each ['Latin', 'Arabic', 'Cyrillic', 'Hebrew', 'CJK', 'Devanagari', 'Thai', 'Korean'] as script}

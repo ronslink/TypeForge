@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Sign In - TypingScholar</title>
+  <title>Sign In - TypeForge</title>
 </svelte:head>
 
 <!-- We apply some CSS overrides to match our design system -->

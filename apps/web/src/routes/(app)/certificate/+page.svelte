@@ -50,7 +50,7 @@
 </script>
 
 <svelte:head>
-  <title>Your Certification — TypingScholar</title>
+  <title>Your Certification — TypeForge</title>
 </svelte:head>
 
 <!-- Generate Confetti celebration on load -->
@@ -86,7 +86,7 @@
         <h3 class="font-label text-xl tracking-[0.5em] text-[#808080] uppercase mb-4">Official Certification</h3>
         
         <h1 class="font-headline text-6xl md:text-8xl text-[#1A1A1A] mb-8 font-serif leading-none tracking-tight">
-          TypingScholar
+          TypeForge
         </h1>
 
         <div class="w-24 h-1 bg-[#D4AF37] mb-12"></div>

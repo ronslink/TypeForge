@@ -92,7 +92,7 @@
   // Testimonials
   const testimonials = [
     {
-      quote: "TypingScholar has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
+      quote: "TypeForge has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
       author: 'Julianne H.',
       role: 'Tech Coordinator, St. Jude Academy',
       initials: 'JH',
@@ -128,7 +128,7 @@
 </script>
 
 <svelte:head>
-  <title>TypingScholar — Master typing in any language</title>
+  <title>TypeForge — Master typing in any language</title>
   <meta name="description" content="Adaptive AI. Every script. Every layout. The definitive typing platform for modern explorers." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </svelte:head>
@@ -137,7 +137,7 @@
 <nav class="fixed inset-block-start-0 w-full z-50 glass-panel border-b border-outline-variant/10">
   <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
     <div class="flex items-center gap-8">
-      <span class="text-xl font-black tracking-tighter text-primary-container uppercase font-label">TYPINGSCHOLAR</span>
+      <span class="text-xl font-black tracking-tighter text-primary-container uppercase font-label">TYPEFORGE</span>
       <div class="hidden md:flex gap-6 items-center">
         <a href="#features" class="text-primary border-b-2 border-primary pb-1 font-body text-sm">Features</a>
         <a href="#languages" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Languages</a>
@@ -505,7 +505,7 @@
 <footer class="bg-surface-container-lowest border-t border-outline-variant/10">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 md:px-8 py-12 max-w-screen-2xl mx-auto">
     <div>
-      <span class="text-lg font-bold text-primary-container font-label">TYPINGSCHOLAR</span>
+      <span class="text-lg font-bold text-primary-container font-label">TYPEFORGE</span>
       <p class="mt-4 text-xs text-on-surface/50 leading-relaxed font-body">Engineered for accuracy. Built for the foundry. The definitive typing platform for modern explorers.</p>
     </div>
     <div class="flex flex-col gap-3">
@@ -528,7 +528,7 @@
     </div>
   </div>
   <div class="max-w-screen-2xl mx-auto px-6 md:px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2024 TYPINGSCHOLAR KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
+    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2024 TYPEFORGE KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
     <div class="flex gap-6">
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">language</span>
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">terminal</span>

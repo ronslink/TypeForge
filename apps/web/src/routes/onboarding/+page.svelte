@@ -385,7 +385,7 @@
 </script>
 
 <svelte:head>
-  <title>Onboarding — TypingScholar</title>
+  <title>Onboarding — TypeForge</title>
 </svelte:head>
 
 <svelte:window onkeydown={handleKeydown} onkeyup={handleKeyup} />

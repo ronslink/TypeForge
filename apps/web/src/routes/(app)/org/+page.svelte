@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Org Overview — TypingScholar</title>
+  <title>Org Overview — TypeForge</title>
 </svelte:head>
 
 <!-- Stubbed data for initial presentation, to be wired to backend later -->

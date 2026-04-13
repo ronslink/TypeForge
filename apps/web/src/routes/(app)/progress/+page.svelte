@@ -238,7 +238,7 @@
 </script>
 
 <svelte:head>
-  <title>Progress — TypingScholar</title>
+  <title>Progress — TypeForge</title>
 </svelte:head>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
@@ -330,8 +330,10 @@
         {#if progress?.history && progress.history.length > 0}
           <canvas bind:this={chartCanvas} width={800} height={256} class="w-full h-full"></canvas>
         {:else}
-          <div class="h-full flex items-center justify-center text-on-surface-variant">
-            Complete some sessions to see your WPM history
+          <div class="h-full flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/30 bg-surface-container-low min-h-[200px] mt-2">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-4">monitoring</span>
+            <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/60">No Kinetic Data Found</p>
+            <p class="font-body text-xs text-on-surface-variant mt-2 max-w-xs text-center">Complete your first practice session to initialize your WPM telemetry graph.</p>
           </div>
         {/if}
       </div>

@@ -33,9 +33,9 @@
       <a
         href="/"
         class="text-xl font-black tracking-tighter text-primary uppercase font-label focus-visible:outline-2 focus-visible:outline-primary"
-        aria-label="TypingScholar Home"
+        aria-label="TypeForge Home"
       >
-        TYPINGSCHOLAR
+        TYPEFORGE
       </a>
 
       <!-- Desktop nav links -->

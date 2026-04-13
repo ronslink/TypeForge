@@ -321,7 +321,7 @@
 </script>
 
 <svelte:head>
-  <title>Practice — TypingScholar</title>
+  <title>Practice — TypeForge</title>
 </svelte:head>
 
 <ConfettiCelebration trigger={showCelebration} duration={3000} />

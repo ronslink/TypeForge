@@ -87,7 +87,7 @@
         'Priority support with SLA',
       ],
       cta: 'Contact Sales',
-      externalHref: 'mailto:sales@typingscholar.com',
+      externalHref: 'mailto:sales@typeforge.com',
     },
   ];
 
@@ -115,7 +115,7 @@
   async function handleUpgrade(planId: PlanTier) {
     if (planId === 'free') return;
     if (planId === 'team') {
-      window.location.href = 'mailto:sales@typingscholar.com';
+      window.location.href = 'mailto:sales@typeforge.com';
       return;
     }
     isCheckingOut = true;
@@ -182,7 +182,7 @@
 </script>
 
 <svelte:head>
-  <title>Billing — TypingScholar</title>
+  <title>Billing — TypeForge</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-6 py-12">

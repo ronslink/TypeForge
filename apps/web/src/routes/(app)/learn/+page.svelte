@@ -200,7 +200,7 @@
 </script>
 
 <svelte:head>
-  <title>Learn — TypingScholar</title>
+  <title>Learn — TypeForge</title>
 </svelte:head>
 
 <div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">

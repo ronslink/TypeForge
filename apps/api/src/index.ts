@@ -36,8 +36,8 @@ app.use(
     origin: [
       'https://typeforge.io',
       'https://www.typeforge.io',
-      'https://typingscholar.com',
-      'https://www.typingscholar.com',
+      'https://typeforge.com',
+      'https://www.typeforge.com',
       'http://localhost:5173',
       'http://localhost:3000',
     ],
