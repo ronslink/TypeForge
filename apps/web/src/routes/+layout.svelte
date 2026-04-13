@@ -6,7 +6,7 @@
   let { children, data }: LayoutProps = $props();
 </script>
 
-<ClerkProvider>
+<ClerkProvider {...data}>
   <div class="min-h-screen bg-background text-on-background">
     {@render children()}
   </div>

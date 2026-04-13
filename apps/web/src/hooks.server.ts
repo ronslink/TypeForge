@@ -10,7 +10,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const currentPath = event.url.pathname;
 
   // Paths that do not enforce login wall
-  const publicRoutes = ['/onboarding', '/games/cascade'];
+  const publicRoutes = ['/onboarding', '/games/cascade', '/api'];
   const softAuthPages = ['/learn', '/progress', '/practice', '/sign-in', '/sign-up'];
   
   const isPublic = publicRoutes.some((r) => currentPath.startsWith(r));

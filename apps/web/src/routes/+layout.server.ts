@@ -1,6 +1,7 @@
 import type { LayoutServerLoad } from './$types';
+import { buildClerkProps } from 'svelte-clerk/server';
 
-export const load: LayoutServerLoad = async () => {
+export const load: LayoutServerLoad = async ({ locals }) => {
   // Preload critical fonts for better performance
   const fontPreloads = [
     {
@@ -22,6 +23,7 @@ export const load: LayoutServerLoad = async () => {
   ];
 
   return {
-    fontPreloads
+    fontPreloads,
+    ...buildClerkProps(locals.auth)
   };
 };
