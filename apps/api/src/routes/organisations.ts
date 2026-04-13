@@ -5,8 +5,8 @@
 
 import { Hono } from 'hono';
 import { requireAuth, requireRole, getAuth, getDb } from '../middleware/index.js';
-import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users } from '@typeforge/db';
-import { eq, and, sql } from 'drizzle-orm';
+import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks } from '@typeforge/db';
+import { eq, and, sql, inArray } from 'drizzle-orm';
 import Stripe from 'stripe';
 
 const app = new Hono();
@@ -168,14 +168,79 @@ app.get('/:id/classes', async (c) => {
 });
 
 /**
- * GET /organisations/:id/members - List organisation members
+ * GET /organisations/:id/dashboard - Get statistical aggregates for org
  */
-app.get('/:id/members', async (c) => {
-  getAuth(c);
+app.get('/:id/dashboard', async (c) => {
+  const auth = getAuth(c)!;
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
   
-  const members = await db
+  const [membership] = await db
+    .select()
+    .from(orgMembers)
+    .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, auth.userId)))
+    .limit(1);
+    
+  if (!membership) {
+    return c.json({ error: 'Access denied', code: 'FORBIDDEN' }, 403);
+  }
+
+  // Get active members count
+  const allMembers = await db
+    .select({ status: orgMembers.status, userId: orgMembers.userId })
+    .from(orgMembers)
+    .where(eq(orgMembers.orgId, orgId));
+    
+  const totalMembers = allMembers.length;
+  const activeMembers = allMembers.filter(m => m.status === 'active').length;
+  const userIds = allMembers.map(m => m.userId).filter(Boolean) as string[];
+
+  let averageAccuracy = 0;
+  let totalLessonsCompleted = 0;
+
+  if (userIds.length > 0) {
+    const stats = await db.select({
+        avgAccuracy: sql<number>`AVG(${dailyStats.avgAccuracy})`,
+        lessonsCompleted: sql<number>`SUM(${dailyStats.lessonsCompleted})`
+      })
+      .from(dailyStats)
+      .where(inArray(dailyStats.userId, userIds));
+
+    if (stats.length > 0 && stats[0]) {
+      averageAccuracy = Math.round(Number(stats[0].avgAccuracy) || 0);
+      totalLessonsCompleted = Number(stats[0].lessonsCompleted) || 0;
+    }
+  }
+
+  return c.json({ 
+    stats: {
+      totalMembers,
+      activeMembers,
+      averageAccuracy,
+      totalLessonsCompleted
+    }
+  });
+});
+
+/**
+ * GET /organisations/:id/members - List organisation members
+ */
+app.get('/:id/members', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const orgId = c.req.param('id') as string;
+  
+  const [membership] = await db
+    .select()
+    .from(orgMembers)
+    .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, auth.userId)))
+    .limit(1);
+    
+  if (!membership) {
+    return c.json({ error: 'Access denied', code: 'FORBIDDEN' }, 403);
+  }
+
+  const rawMembers = await db
     .select({
       member: orgMembers,
       user: users,
@@ -183,6 +248,43 @@ app.get('/:id/members', async (c) => {
     .from(orgMembers)
     .innerJoin(users, eq(orgMembers.userId, users.id))
     .where(eq(orgMembers.orgId, orgId));
+
+  const userIds = rawMembers.map(m => m.user.id);
+  
+  const stats = userIds.length > 0 
+    ? await db.select({
+        userId: dailyStats.userId,
+        avgWpm: sql<number>`AVG(${dailyStats.avgWpm})`,
+        avgAccuracy: sql<number>`AVG(${dailyStats.avgAccuracy})`,
+        lessonsCompleted: sql<number>`SUM(${dailyStats.lessonsCompleted})`
+      })
+      .from(dailyStats)
+      .where(inArray(dailyStats.userId, userIds))
+      .groupBy(dailyStats.userId)
+    : [];
+
+  const userStreaks = userIds.length > 0
+    ? await db.select()
+      .from(streaks)
+      .where(and(inArray(streaks.userId, userIds), eq(streaks.type, 'daily')))
+    : [];
+
+  const members = rawMembers.map(m => {
+    const userStat = stats.find(s => s.userId === m.user.id);
+    const userStreak = userStreaks.find(s => s.userId === m.user.id);
+    return {
+      id: m.user.id,
+      name: m.user.displayName || m.user.firstName || m.user.email?.split('@')[0] || 'Unknown',
+      email: m.user.email,
+      status: m.member.status,
+      lastActive: m.user.lastActiveAt,
+      role: m.member.role,
+      wpm: userStat ? Math.round(Number(userStat.avgWpm) || 0) : 0,
+      accuracy: userStat ? Math.round(Number(userStat.avgAccuracy) || 0) : 0,
+      lessonsCompleted: userStat ? Number(userStat.lessonsCompleted) || 0 : 0,
+      streak: userStreak ? userStreak.currentStreak : 0,
+    };
+  });
   
   return c.json({ members });
 });

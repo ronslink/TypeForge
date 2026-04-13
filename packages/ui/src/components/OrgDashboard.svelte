@@ -8,7 +8,6 @@
     activeMembers: number;
     totalLessonsCompleted: number;
     averageAccuracy: number;
-    averageWpm: number;
   }
 
   interface Member {
@@ -18,7 +17,7 @@
     lessonsCompleted: number;
     accuracy: number;
     wpm: number;
-    lastActive: Date;
+    lastActive: Date | string | null;
   }
 
   interface Props {
@@ -63,10 +62,6 @@
       </span>
     </div>
     <div class="flex gap-8 text-sm">
-      <div>
-        <span class="text-on-surface-variant">Avg. WPM:</span>
-        <span class="font-bold text-primary ml-2">{stats.averageWpm}</span>
-      </div>
       <div>
         <span class="text-on-surface-variant">Avg. Accuracy:</span>
         <span class="font-bold text-secondary ml-2">{stats.averageAccuracy}%</span>
