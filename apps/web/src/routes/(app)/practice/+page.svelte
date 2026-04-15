@@ -26,6 +26,7 @@
   import { FAMOUS_BOOKS } from './books';
   import { getSupportedLanguages } from '@typeforge/curriculum';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
+  import { t } from '$lib/stores/locale';
 
   let { data }: PageProps = $props();
 
@@ -327,9 +328,9 @@
 <ConfettiCelebration trigger={showCelebration} duration={3000} />
 
 <div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">
-  <SideNavBar title="Practice Config">
+  <SideNavBar title={$t('nav_practice') || 'Practice Mode'}>
     <div class="flex flex-col gap-1.5 w-full">
-      <label for="practice-language" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Language</label>
+      <label for="practice-language" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('lang_ui_label') || 'Language'}</label>
       <select id="practice-language" class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full" bind:value={userLanguage}>
         {#each ALL_LANGUAGES as lang}
           <option value={lang.code}>{lang.nativeName} ({lang.englishName})</option>
@@ -338,7 +339,7 @@
     </div>
     
     <div class="flex flex-col gap-1.5 w-full">
-      <label for="practice-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Keyboard Layout</label>
+      <label for="practice-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('practice_layout') || 'Keyboard Layout'}</label>
       <select id="practice-layout" class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full" bind:value={userLayout}>
         {#each Object.entries(layouts) as [id, layout]}
           <option value={id}>{layout.name}</option>
@@ -351,34 +352,34 @@
   <div class="flex-1 w-full max-w-6xl mx-auto px-4 md:px-8 py-8 lg:py-12">
   
   {#if mode === 'select'}
-    <h1 class="font-headline text-4xl mb-4 text-primary">Practice Sandbox</h1>
-    <p class="text-on-surface-variant mb-12 max-w-2xl text-sm">Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states. Select your drill sequence below.</p>
+    <h1 class="font-headline text-4xl mb-4 text-primary">{$t('practice_sandbox_title') || 'Practice Sandbox'}</h1>
+    <p class="text-on-surface-variant mb-12 max-w-2xl text-sm">{$t('practice_sandbox_desc') || 'Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states. Select your drill sequence below.'}</p>
 
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       <button onclick={() => mountPracticeMode('words')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all flex flex-col gap-3">
-        <h3 class="font-headline text-xl mb-2">Words</h3>
-        <p class="text-on-surface-variant text-sm flex-1">Practice common words pulled natively from localized arrays</p>
+        <h3 class="font-headline text-xl mb-2">{$t('practice_mode_words') || 'Words'}</h3>
+        <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_words_desc') || 'Practice common words pulled natively from localized arrays'}</p>
       </button>
       
       <button onclick={() => mountPracticeMode('sentences')} class="bg-surface-container-low p-6 rounded-2xl border border-transparent text-left hover:border-primary hover:-translate-y-1 transition-all flex flex-col gap-3">
-        <h3 class="font-headline text-xl mb-2">Sentences</h3>
-        <p class="text-on-surface-variant text-sm flex-1">Synthesized punctuated sentence blocks</p>
+        <h3 class="font-headline text-xl mb-2">{$t('practice_mode_sentences') || 'Sentences'}</h3>
+        <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_sentences_desc') || 'Synthesized punctuated sentence blocks'}</p>
       </button>
       
       <div class="bg-surface-container-low p-6 rounded-2xl border border-transparent filter-none flex flex-col gap-3">
-        <h3 class="font-headline text-xl">Literature</h3>
-        <p class="text-on-surface-variant text-sm flex-1">Practice pacing using heavy formatting loaded from public domain excerpts.</p>
+        <h3 class="font-headline text-xl">{$t('practice_mode_literature') || 'Literature'}</h3>
+        <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_literature_desc') || 'Practice pacing using heavy formatting loaded from public domain excerpts.'}</p>
         <select bind:value={selectedBookId} class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-2 font-body font-bold shadow-inner" disabled={currentBooks.length === 0}>
            {#if currentBooks.length === 0}
-             <option value="">No books available natively</option>
+             <option value="">{$t('practice_no_books') || 'No books available natively'}</option>
            {:else}
              {#each currentBooks as book}
                <option value={book.id}>{book.title} ({book.author})</option>
              {/each}
            {/if}
         </select>
-        <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">Start Book Drill</button>
+        <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">{$t('practice_start_book') || 'Start Book Drill'}</button>
       </div>
     </div>
   {:else}
@@ -390,7 +391,7 @@
         <span>← Back to select</span>
       </button>
       <h2 class="font-headline text-xl uppercase tracking-widest text-primary font-bold">
-        {mode} Practice
+        {mode} {$t('nav_practice') || 'Practice'}
       </h2>
     </div>
 
@@ -403,34 +404,34 @@
 
     {#if isComplete}
       <div class="bg-surface-container-low p-8 max-w-md mx-auto text-center rounded-2xl shadow-xl border border-primary/20">
-        <h2 class="font-headline text-3xl mb-2 text-primary">Drill Complete!</h2>
-        <p class="text-on-surface-variant mb-6 text-sm">Your session has been logged to your daily streak.</p>
+        <h2 class="font-headline text-3xl mb-2 text-primary">{$t('lesson_complete') || 'Drill Complete!'}</h2>
+        <p class="text-on-surface-variant mb-6 text-sm">{$t('practice_logged') || 'Your session has been logged to your daily streak.'}</p>
         
         <div class="grid grid-cols-2 gap-4 mb-8">
           <div class="bg-surface-container p-4 rounded text-center">
-            <span class="block font-label text-sm text-on-surface-variant mb-1">Speed</span>
-            <span class="font-headline text-4xl text-on-surface">{finalWPM} <span class="text-base text-primary">WPM</span></span>
+            <span class="block font-label text-sm text-on-surface-variant mb-1">{$t('lesson_speed') || 'Speed'}</span>
+            <span class="font-headline text-4xl text-on-surface">{finalWPM} <span class="text-base text-primary">{$t('lesson_wpm') || 'WPM'}</span></span>
           </div>
           <div class="bg-surface-container p-4 rounded text-center">
-            <span class="block font-label text-sm text-on-surface-variant mb-1">Accuracy</span>
+            <span class="block font-label text-sm text-on-surface-variant mb-1">{$t('lesson_accuracy') || 'Accuracy'}</span>
             <span class="font-headline text-4xl text-on-surface">{finalAccuracy}<span class="text-base text-secondary">%</span></span>
           </div>
         </div>
         
         <div class="flex gap-4 w-full">
-          <button onclick={() => { mode = 'select'; lessonChars = []; }} class="flex-1 bg-surface-container hover:bg-surface-container-highest text-white font-bold py-3 rounded transition-colors uppercase tracking-wider text-sm font-label">Done</button>
-          <button onclick={() => mountPracticeMode(mode as any)} class="flex-1 bg-primary hover:bg-opacity-80 text-background font-bold py-3 rounded transition-colors uppercase tracking-wider text-sm font-label">Retry Mode</button>
+          <button onclick={() => { mode = 'select'; lessonChars = []; }} class="flex-1 bg-surface-container hover:bg-surface-container-highest text-white font-bold py-3 rounded transition-colors uppercase tracking-wider text-sm font-label">{$t('practice_done') || 'Done'}</button>
+          <button onclick={() => mountPracticeMode(mode as any)} class="flex-1 bg-primary hover:bg-opacity-80 text-background font-bold py-3 rounded transition-colors uppercase tracking-wider text-sm font-label">{$t('lesson_retry') || 'Retry Mode'}</button>
         </div>
       </div>
     {:else}
       <div class="w-full max-w-4xl mx-auto flex flex-col gap-8 mb-12">
         <MetricsBar 
           metrics={[
-            { label: 'WPM', value: currentWPM, variant: 'primary' },
-            { label: 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
-            { label: 'Streak', value: currentStreak, variant: 'default' },
-            { label: 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
-            { label: 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' }
+            { label: $t('lesson_wpm') || 'WPM', value: currentWPM, variant: 'primary' },
+            { label: $t('lesson_accuracy') || 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
+            { label: $t('progress_streak') || 'Streak', value: currentStreak, variant: 'default' },
+            { label: $t('lesson_time') || 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
+            { label: $t('practice_errors') || 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' }
           ]}
           {currentStreak}
           previousStreak={previousStreak}

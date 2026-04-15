@@ -1,23 +1,25 @@
 <script lang="ts">
+  import { t } from '$lib/stores/locale';
+
   // Footer links grouped by section
-  const links = {
-    Product: [
-      { href: '/learn',         label: 'Learn'      },
-      { href: '/practice',      label: 'Practice'   },
-      { href: '/games/cascade', label: 'Cascade'    },
-      { href: '/progress',      label: 'Progress'   },
+  const links = $derived({
+    [$t('footer_product') || 'Product']: [
+      { href: '/learn',         label: $t('nav_learn') || 'Learn'      },
+      { href: '/practice',      label: $t('nav_practice') || 'Practice'   },
+      { href: '/games/cascade', label: $t('nav_play') || 'Games'    },
+      { href: '/progress',      label: $t('nav_progress') || 'Progress'   },
     ],
-    Company: [
-      { href: '/#features',     label: 'Features'   },
-      { href: '/#pricing',      label: 'Pricing'    },
-      { href: '/billing',       label: 'Billing'    },
+    [$t('footer_company') || 'Company']: [
+      { href: '/#features',     label: $t('company_features') || 'Features'   },
+      { href: '/#pricing',      label: $t('company_pricing') || 'Pricing'    },
+      { href: '/billing',       label: $t('company_billing') || 'Billing'    },
     ],
-    Account: [
-      { href: '/settings',      label: 'Settings'   },
-      { href: '/sign-in',       label: 'Sign In'    },
-      { href: '/sign-up',       label: 'Sign Up'    },
+    [$t('footer_account') || 'Account']: [
+      { href: '/settings',      label: $t('nav_settings') || 'Settings'   },
+      { href: '/sign-in',       label: $t('nav_sign_in') || 'Sign In'    },
+      { href: '/sign-up',       label: $t('nav_sign_up') || 'Sign Up'    },
     ],
-  } as const;
+  });
 
   const year = new Date().getFullYear();
 </script>
@@ -38,7 +40,7 @@
           TYPEFORGE
         </a>
         <p class="text-on-surface-variant text-sm font-body leading-relaxed max-w-[220px]">
-          Multilingual adaptive typing — from home row to fluency, in any script.
+          {$t('footer_tagline') || 'Forge your keystrokes. Master your craft.'}
         </p>
       </div>
 
@@ -67,7 +69,7 @@
     <!-- Bottom row: copyright + scripts badge -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-8 border-t border-outline-variant/10">
       <p class="text-xs text-on-surface-variant font-body">
-        © {year} TypeForge. All rights reserved.
+        {$t('footer_copyright', { year }) || '© ' + year + ' TypeForge. All rights reserved.'}
       </p>
       <div class="flex gap-2 flex-wrap">
         {#each ['Latin', 'Arabic', 'Cyrillic', 'Hebrew', 'CJK', 'Devanagari', 'Thai', 'Korean'] as script}

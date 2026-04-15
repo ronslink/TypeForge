@@ -6,6 +6,7 @@
   import type { Layout } from '@typeforge/layouts';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
   import type { PageProps } from './$types';
+  import { t } from '$lib/stores/locale';
 
   let { data }: PageProps = $props();
 
@@ -57,8 +58,8 @@
 
 <div class="max-w-3xl mx-auto px-6 py-12">
   <header class="mb-10">
-    <h1 class="font-headline text-4xl mb-2">Settings</h1>
-    <p class="text-on-surface-variant font-body">Preferences are saved automatically to your browser.</p>
+    <h1 class="font-headline text-4xl mb-2">{$t('nav_settings') || 'Settings'}</h1>
+    <p class="text-on-surface-variant font-body">{$t('settings_subtitle') || 'Preferences are saved automatically to your browser.'}</p>
   </header>
 
   <!-- -----------------------------------------------------------------------
@@ -66,7 +67,7 @@
   ------------------------------------------------------------------------ -->
   <section class="mb-12" aria-labelledby="typing-prefs-heading">
     <h2 id="typing-prefs-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-6">
-      Typing Preferences
+      {$t('settings_typing_prefs') || 'Typing Preferences'}
     </h2>
 
     <div class="space-y-4">
@@ -74,8 +75,8 @@
       <!-- Language -->
       <div class="settings-card">
         <div class="settings-card-label">
-          <label for="setting-language" class="font-label text-sm">Practice Language</label>
-          <p class="text-on-surface-variant text-xs mt-0.5">Sets the default wordlist and auto-selects the matching keyboard layout.</p>
+          <label for="setting-language" class="font-label text-sm">{$t('lang_ui_label') || 'Practice Language'}</label>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_language_desc') || 'Sets the default wordlist and auto-selects the matching keyboard layout.'}</p>
         </div>
         <select
           id="setting-language"
@@ -91,8 +92,8 @@
       <!-- Keyboard Layout -->
       <div class="settings-card">
         <div class="settings-card-label">
-          <label for="setting-layout" class="font-label text-sm">Keyboard Layout</label>
-          <p class="text-on-surface-variant text-xs mt-0.5">Drives the hand guide and key highlighting during lessons.</p>
+          <label for="setting-layout" class="font-label text-sm">{$t('practice_layout') || 'Keyboard Layout'}</label>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_layout_desc') || 'Drives the hand guide and key highlighting during lessons.'}</p>
         </div>
         <select
           id="setting-layout"
@@ -108,8 +109,8 @@
       <!-- Show Keyboard Visual -->
       <div class="settings-card">
         <div class="settings-card-label">
-          <span class="font-label text-sm" id="toggle-keyboard-label">Show Keyboard Visual</span>
-          <p class="text-on-surface-variant text-xs mt-0.5">Display the keyboard diagram while typing in lessons.</p>
+          <span class="font-label text-sm" id="toggle-keyboard-label">{$t('settings_show_keyboard') || 'Show Keyboard Visual'}</span>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_keyboard_desc') || 'Display the keyboard diagram while typing in lessons.'}</p>
         </div>
         <label class="kf-toggle" aria-labelledby="toggle-keyboard-label">
           <input
@@ -127,8 +128,8 @@
       <!-- Sound Effects -->
       <div class="settings-card">
         <div class="settings-card-label">
-          <span class="font-label text-sm" id="toggle-sound-label">Sound Effects</span>
-          <p class="text-on-surface-variant text-xs mt-0.5">Play a click on each keystroke.</p>
+          <span class="font-label text-sm" id="toggle-sound-label">{$t('settings_sound_effects') || 'Sound Effects'}</span>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_sound_desc') || 'Play a click on each keystroke.'}</p>
         </div>
         <label class="kf-toggle" aria-labelledby="toggle-sound-label">
           <input
@@ -146,8 +147,8 @@
       <!-- Strict Mode -->
       <div class="settings-card">
         <div class="settings-card-label">
-          <span class="font-label text-sm" id="toggle-strict-label">Strict Mode</span>
-          <p class="text-on-surface-variant text-xs mt-0.5">Prevents advancing on errors — you must type the correct key to continue.</p>
+          <span class="font-label text-sm" id="toggle-strict-label">{$t('settings_strict_mode') || 'Strict Mode'}</span>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_strict_desc') || 'Prevents advancing on errors — you must type the correct key to continue.'}</p>
         </div>
         <label class="kf-toggle" aria-labelledby="toggle-strict-label">
           <input
@@ -170,12 +171,12 @@
   ------------------------------------------------------------------------ -->
   <section class="mb-12" aria-labelledby="keyboard-preview-heading">
     <h2 id="keyboard-preview-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-4">
-      Keyboard Preview
+      {$t('settings_preview') || 'Keyboard Preview'}
     </h2>
     <p class="text-on-surface-variant text-sm mb-6 font-body">
-      This is how your selected layout will appear during lessons.
+      {$t('settings_preview_desc') || 'This is how your selected layout will appear during lessons.'}
       {#if previewLayout.rtl}
-        <span class="text-secondary font-label ml-1">↩ RTL Layout</span>
+        <span class="text-secondary font-label ml-1">{$t('settings_preview_rtl') || '↩ RTL Layout'}</span>
       {/if}
     </p>
     <div class="bg-surface-container-low p-6 overflow-x-auto">
@@ -187,9 +188,9 @@
       />
     </div>
     <p class="text-xs text-on-surface-variant mt-3 font-body">
-      Layout: <strong class="text-on-surface font-label">{previewLayout.name}</strong>
+      {$t('settings_preview_layout') || 'Layout:'} <strong class="text-on-surface font-label">{previewLayout.name}</strong>
       &nbsp;·&nbsp;
-      Script: <strong class="text-on-surface font-label">{previewLayout.script}</strong>
+      {$t('settings_preview_script') || 'Script:'} <strong class="text-on-surface font-label">{previewLayout.script}</strong>
     </p>
   </section>
 
@@ -198,7 +199,7 @@
   ------------------------------------------------------------------------ -->
   <section aria-labelledby="account-heading">
     <h2 id="account-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-6">
-      Account
+      {$t('footer_account') || 'Account'}
     </h2>
     <div class="clerk-theme-override bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/30 flex justify-center">
       <UserProfile routing="hash" appearance={{ elements: { rootBox: "w-full shadow-none", card: "shadow-none border-0 rounded-none w-full bg-transparent" } }} />
