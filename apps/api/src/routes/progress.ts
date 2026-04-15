@@ -6,8 +6,13 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
+<<<<<<< HEAD
 import { typingSessions, userXp, streaks, userPlacementResults } from '@typeforge/db';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
+=======
+import { typingSessions, userXp, streaks, keyMastery } from '@typeforge/db';
+import { eq, desc, and, gte, lte, lt } from 'drizzle-orm';
+>>>>>>> 0dfdd4f (feat(ui+lesson): animated HandGuide, LessonIntroModal explainer, live finger guide, error flash, segmented progress bar + feat(api): GET /progress/weakness endpoint)
 const app = new Hono();
 
 // All progress routes require authentication
@@ -327,6 +332,48 @@ app.get('/placement', async (c) => {
     .orderBy(desc(userPlacementResults.createdAt));
 
   return c.json({ results });
+});
+
+/**
+ * GET /progress/weakness - Get user's weak keys
+ * Returns keys with mastery level below 85% that need more practice
+ */
+app.get('/weakness', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+  const layoutId = c.req.query('layout') || 'qwerty-us';
+
+  const weakKeys = await db
+    .select({
+      key: keyMastery.key,
+      masteryLevel: keyMastery.masteryLevel,
+      totalAttempts: keyMastery.totalAttempts,
+      correctAttempts: keyMastery.correctAttempts,
+      avgDwellTime: keyMastery.avgDwellTime,
+      lastPracticedAt: keyMastery.lastPracticedAt,
+    })
+    .from(keyMastery)
+    .where(
+      and(
+        eq(keyMastery.userId, userId),
+        eq(keyMastery.layoutId, layoutId),
+        lt(keyMastery.masteryLevel, 85)
+      )
+    )
+    .orderBy(keyMastery.masteryLevel);
+
+  return c.json({
+    weakKeys: weakKeys.map((k) => ({
+      key: k.key,
+      accuracy: k.totalAttempts > 0
+        ? Math.round((k.correctAttempts / k.totalAttempts) * 100)
+        : 0,
+      masteryLevel: k.masteryLevel,
+      totalAttempts: k.totalAttempts,
+      lastPracticedAt: k.lastPracticedAt,
+    })),
+  });
 });
 
 export default app;

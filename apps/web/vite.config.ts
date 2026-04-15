@@ -44,6 +44,10 @@ export default defineConfig({
         __dirname,
         '../../packages/ui/src/components/LessonCard.svelte'
       ),
+      '@typeforge/ui/components/LessonIntroModal.svelte': path.resolve(
+        __dirname,
+        '../../packages/ui/src/components/LessonIntroModal.svelte'
+      ),
       '@typeforge/ui/components/EncouragementToast.svelte': path.resolve(
         __dirname,
         '../../packages/ui/src/components/EncouragementToast.svelte'

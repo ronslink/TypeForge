@@ -11,7 +11,8 @@
     Button, 
     ConfettiCelebration,
     Badge,
-    HandGuide
+    HandGuide,
+    LessonIntroModal
   } from '@typeforge/ui';
   import { 
     getLessonById, 
@@ -61,6 +62,7 @@
   let isComplete = $state(false);
   let isStarted = $state(false);
   let showCelebration = $state(false);
+  let errorFlash = $state(false);
   let sessionSubmitted = $state(false);
 
   // Timer state
@@ -171,13 +173,20 @@
     all: "Any Finger"
   };
 
+  // Check sessionStorage to skip intro for returning users
   let showIntroAnimation = $state(true);
-  let introKeyIndex = $state(0);
-  let introInterval: ReturnType<typeof setInterval> | null = null;
-  
+
+  $effect(() => {
+    if (lesson) {
+      try {
+        const seen = sessionStorage.getItem(`tf_intro_seen_${lesson.id}`);
+        if (seen) showIntroAnimation = false;
+      } catch {}
+    }
+  });
+
   const introKeys = $derived.by(() => {
     if (!lesson) return [];
-    // remove duplicates by character
     const map = new Map<string, any>();
     for (const c of lesson.content) {
       if (!map.has(c.char.toLowerCase())) map.set(c.char.toLowerCase(), c);
@@ -185,23 +194,10 @@
     return Array.from(map.values());
   });
 
-  $effect(() => {
-    if (showIntroAnimation && introKeys.length > 0 && !introInterval) {
-      introInterval = setInterval(() => {
-        introKeyIndex++;
-        if (introKeyIndex >= introKeys.length) stopIntro();
-      }, 1500);
-      return () => { if (introInterval) clearInterval(introInterval); };
-    }
-  });
-
   function stopIntro() {
-     showIntroAnimation = false;
-     if (introInterval) {
-         clearInterval(introInterval);
-         introInterval = null;
-     }
-     pressedKey = undefined;
+    showIntroAnimation = false;
+    pressedKey = undefined;
+    try { sessionStorage.setItem(`tf_intro_seen_${lesson?.id}`, '1'); } catch {}
   }
 
   // Update highlight keys based on current character or intro sequence
@@ -311,6 +307,9 @@
       currentStreak = 0;
       errors.add(currentIndex);
       errors = new Set(errors);
+      // Error flash
+      errorFlash = true;
+      setTimeout(() => { errorFlash = false; }, 160);
       // Announce error for screen readers
       ariaLiveText = `Error: expected ${expectedChar.char}, typed ${typedChar}`;
     }
@@ -539,21 +538,29 @@
 
     </div>
 
-    <!-- Progress Bar -->
+    <!-- Segmented Progress Bar -->
     <div class="mb-8" role="region" aria-label="Lesson progress">
-      <div 
-        class="h-1 bg-surface-container-highest relative overflow-hidden"
+      <div
+        class="segmented-bar"
         role="progressbar"
         aria-valuenow={currentIndex}
         aria-valuemin={0}
         aria-valuemax={lessonChars.length}
         aria-label="Typing progress"
       >
-        <div 
-          class="h-full bg-secondary transition-all duration-300"
-          class:reduced-motion={false}
-          style="width: {(currentIndex / lessonChars.length) * 100}%"
-        ></div>
+        {#each Array(Math.ceil(lessonChars.length / 10)) as _, i}
+          {@const segStart = i * 10}
+          {@const segEnd   = Math.min((i + 1) * 10, lessonChars.length)}
+          {@const segDone  = Math.min(Math.max(currentIndex - segStart, 0), segEnd - segStart)}
+          {@const pct      = Math.round((segDone / (segEnd - segStart)) * 100)}
+          <div class="seg-track">
+            <div
+              class="seg-fill"
+              class:complete={pct === 100}
+              style="width: {pct}%"
+            ></div>
+          </div>
+        {/each}
       </div>
       <div class="flex justify-between mt-2 text-xs text-on-surface-variant">
         <span aria-label="Characters typed">{currentIndex} / {lessonChars.length} characters</span>
@@ -620,11 +627,21 @@
 
     <!-- Typing Area with RTL support -->
     <div 
-      class="bg-surface-container-lowest p-8 mb-8 relative" 
+      class="typing-area-wrapper mb-8 relative"
+      class:error-flash={errorFlash}
       dir={isRTL ? 'rtl' : 'ltr'}
       role="region"
       aria-label="Typing area"
     >
+      {#if showIntroAnimation && introKeys.length > 0}
+        <LessonIntroModal
+          lessonId={lesson.id}
+          {introKeys}
+          {highlightKeys}
+          onStart={stopIntro}
+        />
+      {/if}
+
       <TypingInput 
         text={lessonText} 
         {currentIndex} 
@@ -636,12 +653,13 @@
       />
       
       <!-- Focus hint -->
-      {#if !isStarted}
+      {#if !isStarted && !showIntroAnimation}
         <div 
-          class="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-10 rounded"
+          class="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm z-10"
           aria-hidden="true"
         >
-          <p class="text-on-surface-variant font-label">Start typing to begin...</p>
+          <span class="hint-icon" aria-hidden="true">⌨️</span>
+          <p class="text-on-surface-variant font-label text-sm mt-2">Start typing to begin...</p>
         </div>
       {/if}
     </div>
@@ -669,30 +687,6 @@
       role="region"
       aria-label="Keyboard finger placement guide"
     >
-      <!-- Translucent Intro Overlay -->
-      {#if showIntroAnimation && introKeys.length > 0}
-        <div class="absolute inset-0 bg-background/80 backdrop-blur-md z-20 flex flex-col items-center justify-center overflow-hidden">
-           {#if introKeyIndex < introKeys.length}
-             {@const currentIntro = introKeys[introKeyIndex]}
-             
-             <!-- Floating Hand Guide Overlay -->
-             <div class="absolute inset-x-0 bottom-4 flex justify-center pointer-events-none transform scale-90">
-                 <HandGuide activeFinger={currentIntro.expectedFinger} />
-             </div>
-             
-             <!-- Prominent Highlight Instruction -->
-             <div class="absolute top-8 bg-surface-container-low px-6 py-3 rounded-full border border-primary/30 shadow-2xl flex items-center gap-4 animate-pulse">
-                <span class="text-3xl text-primary font-mono font-bold leading-none">{currentIntro.char === ' ' ? 'Space' : currentIntro.char}</span>
-                <div class="h-6 w-px bg-outline-variant"></div>
-                <span class="text-on-surface-variant font-bold text-sm uppercase tracking-wider">{FingerDescriptions[currentIntro.expectedFinger.replace('_', '-')] || currentIntro.expectedFinger}</span>
-             </div>
-             
-             <div class="absolute top-8 right-8 flex gap-2 opacity-50">
-                <span class="text-xs font-mono uppercase font-bold tracking-widest border px-2 py-1 rounded">ESC</span>
-             </div>
-           {/if}
-        </div>
-      {/if}
       <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
       <Keyboard 
         layout={activeKeyboardLayout} 
@@ -701,24 +695,19 @@
         {isRTL}
       />
       
-      <!-- Finger Guide with logical properties for RTL -->
+      <!-- Live Finger Guide — always visible during lesson -->
+      {#if isStarted && currentChar}
+        <div class="live-hand-guide mt-4">
+          <HandGuide activeFinger={currentChar.expectedFinger} showLabels={true} />
+        </div>
+      {/if}
+
+      <!-- Finger colour legend -->
       <div class="finger-guide">
-        <div class="finger-item">
-          <span class="finger-indicator finger-pinky" aria-hidden="true"></span>
-          <span>Pinky</span>
-        </div>
-        <div class="finger-item">
-          <span class="finger-indicator finger-ring" aria-hidden="true"></span>
-          <span>Ring</span>
-        </div>
-        <div class="finger-item">
-          <span class="finger-indicator finger-middle" aria-hidden="true"></span>
-          <span>Middle</span>
-        </div>
-        <div class="finger-item">
-          <span class="finger-indicator finger-index" aria-hidden="true"></span>
-          <span>Index</span>
-        </div>
+        <div class="finger-item"><span class="finger-indicator finger-pinky" aria-hidden="true"></span><span>Pinky</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-ring" aria-hidden="true"></span><span>Ring</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-middle" aria-hidden="true"></span><span>Middle</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-index" aria-hidden="true"></span><span>Index</span></div>
       </div>
     </div>
 
@@ -757,6 +746,61 @@
 </div>
 
 <style>
+  /* Typing area wrapper with amber glow on focus-active state */
+  .typing-area-wrapper {
+    background: var(--surface-container-lowest, #0c0d10);
+    padding: 2rem;
+    border: 1px solid var(--outline-variant, #48464f);
+    border-radius: 4px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .typing-area-wrapper:focus-within {
+    border-color: rgba(255, 197, 108, 0.4);
+    box-shadow: 0 0 0 1px rgba(255, 197, 108, 0.15), inset 0 0 30px rgba(255, 197, 108, 0.04);
+  }
+
+  /* Error flash */
+  .error-flash {
+    animation: flash-red 0.16s ease-out;
+  }
+  @keyframes flash-red {
+    0%   { border-color: rgba(255, 100, 80, 0.7); box-shadow: 0 0 0 2px rgba(255, 80, 60, 0.3); }
+    100% { border-color: var(--outline-variant, #48464f); box-shadow: none; }
+  }
+
+  /* Hint icon */
+  .hint-icon { font-size: 2rem; }
+
+  /* Segmented progress bar */
+  .segmented-bar { display: flex; gap: 3px; height: 6px; }
+  .seg-track {
+    flex: 1;
+    background: var(--surface-container-highest, #36343b);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .seg-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffc56c, #ffb13e);
+    border-radius: 3px;
+    transition: width 0.25s ease;
+  }
+  .seg-fill.complete {
+    background: linear-gradient(90deg, #69db7c, #51cf66);
+  }
+
+  /* Live hand guide */
+  .live-hand-guide {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
+    animation: guide-in 0.3s ease;
+  }
+  @keyframes guide-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* RTL Badge */
   .rtl-badge {
     display: inline-flex;

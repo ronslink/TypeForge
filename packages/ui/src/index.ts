@@ -19,6 +19,7 @@ export { default as ProgressRing } from './components/ProgressRing.svelte';
 
 // Lesson Components
 export { default as LessonCard } from './components/LessonCard.svelte';
+export { default as LessonIntroModal } from './components/LessonIntroModal.svelte';
 
 // Feedback Components
 export { default as EncouragementToast } from './components/EncouragementToast.svelte';
