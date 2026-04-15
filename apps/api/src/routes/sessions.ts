@@ -12,8 +12,11 @@ import {
   userXp,
   streaks,
   users,
+  keyMastery,
+  dailyStats,
+  userProgress,
 } from '@typeforge/db';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, sql } from 'drizzle-orm';
 const app = new Hono();
 
 // All session routes require authentication
@@ -298,6 +301,109 @@ app.post('/', async (c) => {
 
     await db.insert(keystrokeEvents).values(events);
   }
+
+  // Aggregate per-key stats from keystrokes
+  const keyStats = new Map<string, { total: number; correct: number }>();
+  for (const k of payload.keystrokes || []) {
+    const stats = keyStats.get(k.expected) || { total: 0, correct: 0 };
+    stats.total += 1;
+    if (k.correct) stats.correct += 1;
+    keyStats.set(k.expected, stats);
+  }
+
+  // Build today date (midnight UTC)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const totalChars = payload.totalCharacters || payload.keystrokes.length;
+  const sessionMinutes = Math.floor(payload.duration / 60);
+  const lessonCompleted = payload.lessonId ? 1 : 0;
+
+  await Promise.all([
+    // Operation A — keyMastery upsert
+    ...Array.from(keyStats.entries()).map(([key, stats]) =>
+      db
+        .insert(keyMastery)
+        .values({
+          userId,
+          layoutId: payload.layout,
+          key,
+          totalAttempts: stats.total,
+          correctAttempts: stats.correct,
+          masteryLevel: Math.min(100, Math.floor((stats.correct / stats.total) * 100)),
+          lastPracticedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [keyMastery.userId, keyMastery.layoutId, keyMastery.key],
+          set: {
+            totalAttempts: sql.raw(`key_mastery.total_attempts + ${stats.total}`),
+            correctAttempts: sql.raw(`key_mastery.correct_attempts + ${stats.correct}`),
+            masteryLevel: sql.raw(
+              `LEAST(100, GREATEST(0, FLOOR((key_mastery.correct_attempts + ${stats.correct}) * 100.0 / NULLIF(key_mastery.total_attempts + ${stats.total}, 0))))`
+            ),
+            lastPracticedAt: now,
+            updatedAt: now,
+          },
+        })
+    ),
+
+    // Operation B — dailyStats upsert
+    db
+      .insert(dailyStats)
+      .values({
+        userId,
+        date: today,
+        languageCode: payload.language,
+        totalSessions: 1,
+        totalMinutes: sessionMinutes,
+        totalCharacters: totalChars,
+        avgWpm: payload.wpm,
+        avgAccuracy: payload.accuracy,
+        bestWpm: payload.wpm,
+        lessonsCompleted: lessonCompleted,
+      })
+      .onConflictDoUpdate({
+        target: [dailyStats.userId, dailyStats.date, dailyStats.languageCode],
+        set: {
+          totalSessions: sql.raw('daily_stats.total_sessions + 1'),
+          totalMinutes: sql.raw(`daily_stats.total_minutes + ${sessionMinutes}`),
+          totalCharacters: sql.raw(`daily_stats.total_characters + ${totalChars}`),
+          avgWpm: sql.raw(
+            `(daily_stats.avg_wpm * daily_stats.total_sessions + ${payload.wpm}) / (daily_stats.total_sessions + 1)`
+          ),
+          avgAccuracy: sql.raw(
+            `(daily_stats.avg_accuracy * daily_stats.total_sessions + ${payload.accuracy}) / (daily_stats.total_sessions + 1)`
+          ),
+          bestWpm: sql.raw(`GREATEST(daily_stats.best_wpm, ${payload.wpm})`),
+          lessonsCompleted: sql.raw(`daily_stats.lessons_completed + ${lessonCompleted}`),
+        },
+      }),
+
+    // Operation C — userProgress upsert (only if lessonId present)
+    payload.lessonId
+      ? db
+          .insert(userProgress)
+          .values({
+            userId,
+            lessonId: payload.lessonId,
+            status: 'completed',
+            bestWpm: payload.wpm,
+            bestAccuracy: payload.accuracy,
+            attempts: 1,
+            completedAt: now,
+            updatedAt: now,
+          })
+          .onConflictDoUpdate({
+            target: [userProgress.userId, userProgress.lessonId],
+            set: {
+              status: 'completed',
+              bestWpm: sql.raw(`GREATEST(user_progress.best_wpm, ${payload.wpm})`),
+              bestAccuracy: sql.raw(`GREATEST(user_progress.best_accuracy, ${payload.accuracy})`),
+              attempts: sql.raw('user_progress.attempts + 1'),
+              completedAt: now,
+              updatedAt: now,
+            },
+          })
+      : Promise.resolve(),
+  ]);
 
   // Calculate and award XP
   const xpEarned = calculateSessionXP(payload);
