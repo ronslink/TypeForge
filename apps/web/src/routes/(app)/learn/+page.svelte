@@ -19,6 +19,9 @@
   const ctx = useClerkContext();
   let isSignedIn = $derived(!!ctx?.user);
   let completedLessonIds = $state(new Set<string>());
+  // Weak keys for the adaptive drill banner
+  let weakKeys = $state<string[]>([]);
+  let bannerDismissed = $state(false);
 
   onMount(async () => {
     if (!isSignedIn) return;
@@ -31,17 +34,36 @@
       };
       const api = createApiClient('/', authFetch);
 
-      const res = await api.api.v1.progress.lessons.$get();
-      if (res.ok) {
-        const payload = await res.json();
+      // Fetch completed lessons + weak keys in parallel
+      const [progressRes, weakRes] = await Promise.all([
+        api.api.v1.progress.lessons.$get(),
+        authFetch('/api/v1/progress/weakness'),
+      ]);
+
+      if (progressRes.ok) {
+        const payload = await progressRes.json();
         if (payload.completedLessons) {
           completedLessonIds = new Set(payload.completedLessons);
         }
+      }
+
+      if (weakRes.ok) {
+        const w = await weakRes.json();
+        weakKeys = (w.weakKeys ?? []).slice(0, 5).map((k: { key: string }) => k.key.toUpperCase());
+        // Restore dismissed state per session
+        try {
+          if (sessionStorage.getItem('tf_adaptive_banner_dismissed')) bannerDismissed = true;
+        } catch {}
       }
     } catch (e) {
       console.error('Failed to wire user progression:', e);
     }
   });
+
+  function dismissBanner() {
+    bannerDismissed = true;
+    try { sessionStorage.setItem('tf_adaptive_banner_dismissed', '1'); } catch {}
+  }
 
   // User preferences from onboarding (would come from data/user store in production)
   let userLanguage = $state('en');
@@ -325,6 +347,31 @@
     </div>
   </div>
 
+  <!-- ── Adaptive Drill Banner ────────────────────────────────────────── -->
+  <!-- Show when: signed in, has weak keys, not searching/filtering, not dismissed -->
+  {#if isSignedIn && weakKeys.length > 0 && !bannerDismissed && !searchQuery && selectedDifficulty === 'all' && selectedTag === 'all'}
+    <div class="adaptive-banner" role="alert" aria-label="Adaptive drill recommendation">
+      <div class="adaptive-banner-left">
+        <span class="adaptive-icon" aria-hidden="true">📈</span>
+        <div>
+          <p class="adaptive-title">Adaptive Drill Available</p>
+          <p class="adaptive-body">
+            You have <strong>{weakKeys.length}</strong> key{weakKeys.length > 1 ? 's' : ''} below mastery:
+            {#each weakKeys as k, i}<span class="key-chip">{k}</span>{#if i < weakKeys.length - 1} {/if}{/each}
+          </p>
+        </div>
+      </div>
+      <div class="adaptive-banner-actions">
+        <a href="/practice" class="drill-btn">Start Drill →</a>
+        <button
+          onclick={dismissBanner}
+          class="dismiss-btn"
+          aria-label="Dismiss adaptive drill banner"
+        >✕</button>
+      </div>
+    </div>
+  {/if}
+
   <!-- Recommended Section -->
   {#if recommendedLessons.length > 0 && selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery}
     <section class="mb-12">
@@ -479,3 +526,123 @@
   </section>
   </div>
 </div>
+
+<style>
+  /* ─── Adaptive Drill Banner ─── */
+  .adaptive-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.75rem;
+    background: linear-gradient(135deg, rgba(255,197,108,0.1) 0%, rgba(255,197,108,0.04) 100%);
+    border: 1px solid rgba(255,197,108,0.3);
+    border-left: 4px solid #ffc56c;
+    border-radius: 6px;
+    animation: banner-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes banner-slide-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .adaptive-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .adaptive-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .adaptive-title {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffc56c;
+    margin-bottom: 0.2rem;
+  }
+
+  .adaptive-body {
+    font-size: 0.83rem;
+    color: var(--on-surface-variant, #cac4d0);
+    line-height: 1.4;
+  }
+
+  .adaptive-body strong {
+    color: var(--on-surface, #e3e2e6);
+  }
+
+  .key-chip {
+    display: inline-block;
+    background: rgba(255,197,108,0.15);
+    color: #ffc56c;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    border: 1px solid rgba(255,197,108,0.3);
+    letter-spacing: 0.05em;
+  }
+
+  .adaptive-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .drill-btn {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: #ffc56c;
+    color: #111319;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .drill-btn:hover {
+    background: #ffba44;
+    box-shadow: 0 0 14px rgba(255,197,108,0.4);
+    transform: translateY(-1px);
+  }
+
+  .dismiss-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--outline-variant, #48464f);
+    border-radius: 50%;
+    color: var(--on-surface-variant, #cac4d0);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .dismiss-btn:hover {
+    background: var(--surface-container-high, #2a2d35);
+    border-color: var(--on-surface-variant, #cac4d0);
+    color: var(--on-surface, #e3e2e6);
+  }
+</style>
+
