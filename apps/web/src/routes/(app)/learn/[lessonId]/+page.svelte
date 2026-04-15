@@ -325,10 +325,13 @@
   }
 
   let testFailed = $state(false);
-  // Org membership flag — institutions can have a retry cooldown, individuals always get unlimited
+  // Org membership flag
   let isOrgMember = $state(false);
-  // The org-defined cooldown in hours (0 = unlimited). Fetched from org settings.
+  // The org-defined cooldown in hours
   let orgRetryPolicy = $state<{ cooldownHours: number } | null>(null);
+  // 429 cooldown state — set when the API rejects a placement retry
+  let cooldownActive = $state(false);
+  let cooldownHoursRemaining = $state(0);
 
   // ── Reset all session state when lessonId changes (Next Lesson navigation) ──
   // SvelteKit reuses the component when navigating between [lessonId] routes,
@@ -420,7 +423,7 @@
 
       // If this is a placement test, record the result separately
       if (lesson.isTest) {
-        await authFetch('/api/v1/progress/placement', {
+        const placementRes = await authFetch('/api/v1/progress/placement', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -430,6 +433,15 @@
             wpm: finalWPM,
           }),
         });
+
+        if (placementRes.status === 429) {
+          // Org cooldown is active — show a user-friendly error, stop here
+          const body = await placementRes.json().catch(() => ({}));
+          cooldownHoursRemaining = body.hoursRemaining ?? (orgRetryPolicy?.cooldownHours ?? 24);
+          cooldownActive = true;
+          sessionSubmitted = false; // allow retry once cooldown lifts
+          return;
+        }
       }
 
       await api.api.v1.sessions.$post({
@@ -647,10 +659,49 @@
         aria-describedby="completion-description"
       >
         <div 
-          class="bg-surface-container-low p-8 max-w-md w-full text-center border-t-4 {testFailed ? 'border-error' : 'border-primary'} rounded-2xl shadow-2xl relative overflow-hidden"
+          class="bg-surface-container-low p-8 max-w-md w-full text-center border-t-4 {cooldownActive ? 'border-warning' : testFailed ? 'border-error' : 'border-primary'} rounded-2xl shadow-2xl relative overflow-hidden"
           role="document"
         >
-          {#if testFailed}
+
+          {#if cooldownActive}
+            <!-- ─── Cooldown card ─── -->
+            <div class="absolute inset-0 bg-warning/5 z-0 pointer-events-none"></div>
+            <div class="cooldown-icon" aria-hidden="true">⏳</div>
+            <h2 id="completion-title" class="font-headline text-2xl mb-2 text-warning relative z-10">Retry Cooldown Active</h2>
+            <p id="completion-description" class="text-on-surface-variant text-sm mb-6 relative z-10">
+              Your institution has set a <strong class="text-on-surface">{orgRetryPolicy?.cooldownHours ?? cooldownHoursRemaining}h</strong> cooldown between placement test attempts.
+            </p>
+
+            <div class="cooldown-pill" role="status" aria-label="Time remaining">
+              <span class="cooldown-timer" aria-live="polite">{cooldownHoursRemaining}h remaining</span>
+            </div>
+
+            <p class="text-xs text-on-surface-variant mt-4 mb-8 relative z-10">
+              Use this time to practise with regular lessons and drill your weak keys.
+            </p>
+
+            <!-- Results still shown, greyed slightly -->
+            <div class="grid grid-cols-3 gap-4 mb-8 relative z-10 opacity-70">
+              <div class="bg-surface-container p-4">
+                <div class="text-2xl font-bold text-secondary">{finalWPM}</div>
+                <div class="text-xs text-on-surface-variant uppercase">WPM</div>
+              </div>
+              <div class="bg-surface-container p-4">
+                <div class="text-2xl font-bold text-primary">{finalAccuracy}%</div>
+                <div class="text-xs text-on-surface-variant uppercase">Accuracy</div>
+              </div>
+              <div class="bg-surface-container p-4">
+                <div class="text-2xl font-bold text-on-surface">{formatTime(finalDuration)}</div>
+                <div class="text-xs text-on-surface-variant uppercase">Time</div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+              <a href="/learn" class="btn-secondary">Back to Curriculum</a>
+              <a href="/practice" class="btn-primary-outline">Drill Weak Keys →</a>
+            </div>
+
+          {:else if testFailed}
             <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Test Failed</h2>
             <p id="completion-description" class="text-on-surface-variant mb-2 relative z-10">
@@ -824,6 +875,78 @@
 </div>
 
 <style>
+  /* ─── Cooldown overlay ─── */
+  .border-warning { border-color: #f59e0b; }
+
+  .cooldown-icon {
+    font-size: 3rem;
+    display: block;
+    margin: 0 auto 0.75rem;
+    animation: hourglass-spin 3s ease-in-out infinite;
+  }
+  @keyframes hourglass-spin {
+    0%,100% { transform: rotate(0deg); }
+    45%      { transform: rotate(0deg); }
+    55%      { transform: rotate(180deg); }
+  }
+
+  .cooldown-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.35);
+    border-radius: 100px;
+    padding: 0.4rem 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .cooldown-timer {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #f59e0b;
+    letter-spacing: 0.05em;
+  }
+
+  /* Inline button styles for cooldown card */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.25rem;
+    background: var(--surface-container-high, #2a2d35);
+    color: var(--on-surface, #e3e2e6);
+    border: 1px solid var(--outline-variant, #48464f);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-secondary:hover { background: var(--surface-container-highest, #36343b); border-color: var(--on-surface-variant, #cac4d0); }
+
+  .btn-primary-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.25rem;
+    background: transparent;
+    color: var(--primary, #ffc56c);
+    border: 1px solid var(--primary, #ffc56c);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary-outline:hover { background: rgba(255,197,108,0.1); box-shadow: 0 0 12px rgba(255,197,108,0.25); }
+
   /* Typing area wrapper with amber glow on focus-active state */
   .typing-area-wrapper {
     background: var(--surface-container-lowest, #0c0d10);
