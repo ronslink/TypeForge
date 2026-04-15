@@ -10,7 +10,7 @@
 
   const ctx = useClerkContext();
 
-  // Initialise UI locale on boot — runs once in the browser
+  // Initialise UI locale on app boot — runs once in the browser
   onMount(async () => {
     let dbLocale: string | null = null;
     let orgLocale: string | null = null;
@@ -30,7 +30,8 @@
       }
     } catch {}
 
-    await initLocale(dbLocale, orgLocale);
+    // initLocale is now synchronous
+    initLocale(dbLocale, orgLocale);
   });
 </script>
 

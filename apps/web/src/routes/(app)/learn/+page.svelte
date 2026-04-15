@@ -4,6 +4,7 @@
   import { LessonCard, Button } from '@typeforge/ui';
   import { LESSON_CATALOG, getLessonById, type Lesson } from '@typeforge/curriculum';
   import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
+  import { t } from '$lib/stores/locale';
   import type { PageData } from './$types';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
@@ -231,7 +232,7 @@
     <div class="relative w-full">
       <input
         type="text"
-        placeholder="Search lessons..."
+        placeholder={$t('learn_search_placeholder')}
         bind:value={searchQuery}
         class="bg-surface-container px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary w-full shadow-inner tracking-wide"
       />
@@ -312,7 +313,7 @@
         class="mt-4 text-xs font-bold text-secondary hover:text-primary transition-colors tracking-widest uppercase border border-secondary/20 hover:border-primary/50 py-2 w-full text-center"
         onclick={clearFilters}
       >
-        Reset Filters
+        {$t('learn_reset_filters')}
       </button>
     {/if}
   </SideNavBar>
@@ -327,21 +328,21 @@
     </div>
     <div class="relative z-10 max-w-xl">
       <h1 class="font-headline text-4xl mb-3 flex items-center gap-3">
-        Learn ⚡
+        {$t('learn_heading')}
       </h1>
-      <p class="text-on-surface-variant max-w-md text-sm leading-relaxed mb-6">Master your typing sequence with guided curriculum modules specifically tailored to your preferred dialect and hardware structure.</p>
+      <p class="text-on-surface-variant max-w-md text-sm leading-relaxed mb-6">{$t('learn_subheading')}</p>
       
       <!-- Global Progress Matrix Indicator -->
       <div class="w-full">
          <div class="flex justify-between items-end mb-2">
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Course Progression</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">{$t('learn_course_progression')}</span>
             <span class="font-headline text-lg text-primary">{trackProgressPercent}%</span>
          </div>
          <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden shadow-inner">
             <div class="bg-primary h-full transition-all duration-1000 ease-out" style="width: {trackProgressPercent}%;"></div>
          </div>
          <div class="mt-2 text-[0.65rem] text-on-surface-variant uppercase tracking-widest font-bold">
-            {completedForTrack} of {filteredLessons.length} Modules Conquered
+            {$t('learn_modules_conquered', { completed: completedForTrack, total: filteredLessons.length })}
          </div>
       </div>
     </div>
@@ -354,15 +355,16 @@
       <div class="adaptive-banner-left">
         <span class="adaptive-icon" aria-hidden="true">📈</span>
         <div>
-          <p class="adaptive-title">Adaptive Drill Available</p>
+          <p class="adaptive-title">{$t('adaptive_banner_title')}</p>
           <p class="adaptive-body">
-            You have <strong>{weakKeys.length}</strong> key{weakKeys.length > 1 ? 's' : ''} below mastery:
+            <!-- Cannot use explicit plural rule easily with derived store, but we set a {count} key and use simple replace -->
+            {@html $t('adaptive_banner_body', { count: weakKeys.length })}
             {#each weakKeys as k, i}<span class="key-chip">{k}</span>{#if i < weakKeys.length - 1} {/if}{/each}
           </p>
         </div>
       </div>
       <div class="adaptive-banner-actions">
-        <a href="/practice" class="drill-btn">Start Drill →</a>
+        <a href="/practice" class="drill-btn">{$t('adaptive_banner_cta')}</a>
         <button
           onclick={dismissBanner}
           class="dismiss-btn"
@@ -376,7 +378,7 @@
   {#if recommendedLessons.length > 0 && selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery}
     <section class="mb-12">
       <div class="flex items-center gap-3 mb-6">
-        <h2 class="font-headline text-2xl">Recommended for You</h2>
+        <h2 class="font-headline text-2xl">{$t('learn_recommended')}</h2>
         {#if getLanguageByCode(userLanguage)?.nativeName}
           <span class="bg-primary/20 text-primary text-xs px-2 py-1 rounded shadow-sm font-label uppercase tracking-widest">{getLanguageByCode(userLanguage)?.nativeName}</span>
         {/if}
@@ -409,7 +411,7 @@
   <section>
     <h2 class="font-headline text-2xl mb-6">
       {selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery
-        ? 'All Lessons'
+        ? $t('learn_all_difficulties')
         : 'Filtered Lessons'}
     </h2>
     
@@ -427,7 +429,7 @@
                 
                 <div class="mb-6 ml-6 p-6 bg-surface-container-low/50 backdrop-blur-sm rounded-xl border border-surface-container shadow-sm flex items-center justify-between">
                   <div>
-                    <h3 class="font-headline text-2xl text-on-surface">{stage.title}</h3>
+                    <h3 class="font-headline text-2xl text-on-surface">{$t('learn_stage_label', { level: stage.level })}: {stage.title.split(': ')[1] || stage.title}</h3>
                     <p class="text-on-surface-variant text-sm mt-1.5">{stage.description}</p>
                   </div>
                   <div class="hidden sm:block text-primary/20">
@@ -519,8 +521,8 @@
       </div>
     {:else}
       <div class="bg-surface-container-low p-12 text-center mt-12 lg:mt-24">
-        <p class="text-on-surface-variant mb-4 font-body">No precision templates found matching your strict criteria.</p>
-        <Button variant="secondary" onclick={clearFilters}>Reset Directives</Button>
+        <p class="text-on-surface-variant mb-4 font-body">{$t('learn_no_results')}</p>
+        <Button variant="secondary" onclick={clearFilters}>{$t('learn_reset_filters')}</Button>
       </div>
     {/if}
   </section>

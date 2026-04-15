@@ -2,15 +2,15 @@
   import { page } from '$app/state';
   import { afterNavigate } from '$app/navigation';
   import { useClerkContext, UserButton } from 'svelte-clerk';
-  import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, type UiLocale } from '$lib/stores/locale';
+  import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, t, type UiLocale } from '$lib/stores/locale';
 
-  // Navigation items
-  const navItems = [
-    { href: '/learn',          label: 'Learn'    },
-    { href: '/practice',       label: 'Practice' },
-    { href: '/games/cascade',  label: 'Play'     },
-    { href: '/progress',       label: 'Progress' },
-  ];
+  // Navigation items using reactive translation keys
+  const navItems = $derived([
+    { href: '/learn',          label: $t('nav_learn')    },
+    { href: '/practice',       label: $t('nav_practice') },
+    { href: '/games/cascade',  label: $t('nav_play')     },
+    { href: '/progress',       label: $t('nav_progress') },
+  ]);
 
   const ctx = useClerkContext();
   let loaded     = $derived(ctx?.loaded);
@@ -136,7 +136,7 @@
           href="/sign-up"
           class="hidden md:inline-block notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 text-center"
         >
-          Start Typing
+          {$t('lesson_start_cta')}
         </a>
       {/if}
 
@@ -206,7 +206,7 @@
         </div>
       {:else}
         <a href="/sign-up" class="notched-button bg-primary text-on-primary w-full py-3 font-label font-bold text-sm uppercase tracking-widest text-center block">
-          Start Typing
+          {$t('lesson_start_cta')}
         </a>
       {/if}
     </div>

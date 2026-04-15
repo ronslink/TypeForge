@@ -27,6 +27,7 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
+  import { t } from '$lib/stores/locale';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import type { PageProps } from './$types';
 
@@ -581,10 +582,10 @@
       <a 
         href="/learn" 
         class="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2 focus-indicator"
-        aria-label="Back to lessons list"
+        aria-label={$t('lesson_back')}
       >
         <span aria-hidden="true">←</span>
-        <span>Back to lessons</span>
+        <span>{$t('lesson_back')}</span>
       </a>
     </div>
 
@@ -605,7 +606,7 @@
 
       <!-- Keyboard Layout Selector -->
       <div class="flex flex-col gap-1 items-end min-w-[140px]">
-        <label for="keyboard-layout" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">Layout</label>
+        <label for="keyboard-layout" class="text-xs font-label text-on-surface-variant uppercase tracking-widest">{$t('lesson_layout')}</label>
         <select 
           id="keyboard-layout"
           class="w-full bg-surface-container text-on-surface text-sm p-2 outline-none border-b-2 border-primary/50 focus:border-primary focus:ring-0 rounded-t-sm transition-colors cursor-pointer"
@@ -667,17 +668,17 @@
             <!-- ─── Cooldown card ─── -->
             <div class="absolute inset-0 bg-warning/5 z-0 pointer-events-none"></div>
             <div class="cooldown-icon" aria-hidden="true">⏳</div>
-            <h2 id="completion-title" class="font-headline text-2xl mb-2 text-warning relative z-10">Retry Cooldown Active</h2>
+            <h2 id="completion-title" class="font-headline text-2xl mb-2 text-warning relative z-10">{$t('lesson_cooldown_active')}</h2>
             <p id="completion-description" class="text-on-surface-variant text-sm mb-6 relative z-10">
-              Your institution has set a <strong class="text-on-surface">{orgRetryPolicy?.cooldownHours ?? cooldownHoursRemaining}h</strong> cooldown between placement test attempts.
+              {@html $t('lesson_cooldown_desc', { hours: orgRetryPolicy?.cooldownHours ?? cooldownHoursRemaining })}
             </p>
 
             <div class="cooldown-pill" role="status" aria-label="Time remaining">
-              <span class="cooldown-timer" aria-live="polite">{cooldownHoursRemaining}h remaining</span>
+              <span class="cooldown-timer" aria-live="polite">{$t('lesson_cooldown_timer', { hours: cooldownHoursRemaining })}</span>
             </div>
 
             <p class="text-xs text-on-surface-variant mt-4 mb-8 relative z-10">
-              Use this time to practise with regular lessons and drill your weak keys.
+              {$t('lesson_cooldown_advice')}
             </p>
 
             <!-- Results still shown, greyed slightly -->
@@ -697,33 +698,33 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-              <a href="/learn" class="btn-secondary">Back to Curriculum</a>
-              <a href="/practice" class="btn-primary-outline">Drill Weak Keys →</a>
+              <a href="/learn" class="btn-secondary">{$t('lesson_back_curriculum')}</a>
+              <a href="/practice" class="btn-primary-outline">{$t('lesson_drill_weak')}</a>
             </div>
 
           {:else if testFailed}
             <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Test Failed</h2>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">{$t('lesson_test_failed')}</h2>
             <p id="completion-description" class="text-on-surface-variant mb-2 relative z-10">
-              You needed 90% accuracy. You scored {finalAccuracy}%.
+              {$t('lesson_test_failed_desc', { accuracy: finalAccuracy })}
             </p>
             {#if !isOrgMember}
-              <p class="text-xs text-primary mb-6 relative z-10">↻ Retries are <strong>unlimited</strong> — try again whenever you're ready.</p>
+              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retries_unlimited')}</p>
             {:else if orgRetryPolicy && orgRetryPolicy.cooldownHours > 0}
-              <p class="text-xs text-on-surface-variant mb-6 relative z-10">Your institution requires a <strong>{orgRetryPolicy.cooldownHours}h</strong> cooldown between attempts.</p>
+              <p class="text-xs text-on-surface-variant mb-6 relative z-10">{@html $t('lesson_cooldown_org_desc', { hours: orgRetryPolicy.cooldownHours })}</p>
             {:else}
-              <p class="text-xs text-primary mb-6 relative z-10">↻ Retries are <strong>unlimited</strong> for your organisation.</p>
+              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retries_org_unlimited')}</p>
             {/if}
           {:else if lesson.isTest && lesson.id.includes('-test-5')}
             <div class="absolute inset-0 bg-primary/5 z-0 pointer-events-none"></div>
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">Certification Earned!</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">Validating metrics and preparing formal award...</p>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">{$t('lesson_cert_earned')}</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">{$t('lesson_cert_desc')}</p>
           {:else if lesson.isTest}
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Test Passed!</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8">Stage cleared. You've proven your mechanics.</p>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">{$t('lesson_test_passed')}</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_test_passed_desc')}</p>
           {:else}
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">Lesson Complete!</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8">Great job finishing this lesson!</p>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">{$t('lesson_complete')}</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_complete_desc')}</p>
           {/if}
           
           <!-- Results Grid -->
@@ -745,10 +746,10 @@
           <!-- Action Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             {#if getNextLessonId() && !testFailed}
-              <Button variant="primary" onclick={goToNextLesson}>Next Lesson →</Button>
+              <Button variant="primary" onclick={goToNextLesson}>{$t('lesson_next')} →</Button>
             {/if}
-            <Button variant="secondary" onclick={() => goto('/learn')}>Back to Curriculum</Button>
-            <Button variant="ghost" onclick={restartLesson}>Retry</Button>
+            <Button variant="secondary" onclick={() => goto('/learn')}>{$t('lesson_back_curriculum')}</Button>
+            <Button variant="ghost" onclick={restartLesson}>{$t('lesson_retry')}</Button>
           </div>
         </div>
       </div>
@@ -788,7 +789,7 @@
           aria-hidden="true"
         >
           <span class="hint-icon" aria-hidden="true">⌨️</span>
-          <p class="text-on-surface-variant font-label text-sm mt-2">Start typing to begin...</p>
+          <p class="text-on-surface-variant font-label text-sm mt-2">{$t('lesson_start_hint')}</p>
         </div>
       {/if}
     </div>
@@ -816,7 +817,7 @@
       role="region"
       aria-label="Keyboard finger placement guide"
     >
-      <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">Keyboard Guide</h3>
+      <h3 class="font-label text-sm text-on-surface-variant mb-4 text-center">{$t('lesson_keyboard_guide')}</h3>
       <Keyboard 
         layout={activeKeyboardLayout} 
         {highlightKeys}
@@ -833,17 +834,17 @@
 
       <!-- Finger colour legend -->
       <div class="finger-guide">
-        <div class="finger-item"><span class="finger-indicator finger-pinky" aria-hidden="true"></span><span>Pinky</span></div>
-        <div class="finger-item"><span class="finger-indicator finger-ring" aria-hidden="true"></span><span>Ring</span></div>
-        <div class="finger-item"><span class="finger-indicator finger-middle" aria-hidden="true"></span><span>Middle</span></div>
-        <div class="finger-item"><span class="finger-indicator finger-index" aria-hidden="true"></span><span>Index</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-pinky" aria-hidden="true"></span><span>{$t('finger_pinky')}</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-ring" aria-hidden="true"></span><span>{$t('finger_ring')}</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-middle" aria-hidden="true"></span><span>{$t('finger_middle')}</span></div>
+        <div class="finger-item"><span class="finger-indicator finger-index" aria-hidden="true"></span><span>{$t('finger_index')}</span></div>
       </div>
     </div>
 
     <!-- Lesson Info -->
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-surface-container-low p-6">
-        <h3 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4">Focus Keys</h3>
+        <h3 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4">{$t('lesson_focus_keys')}</h3>
         <div class="flex flex-wrap gap-2">
           {#each lesson.tags.key_bigram.split('') as key}
             <span 
@@ -855,21 +856,21 @@
       </div>
       
       <div class="bg-surface-container-low p-6">
-        <h3 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4">Lesson Details</h3>
+        <h3 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4">{$t('lesson_details')}</h3>
         <ul class="space-y-2 text-sm text-on-surface-variant">
-          <li><span class="text-on-surface">Hand:</span> {lesson.tags.hand}</li>
-          <li><span class="text-on-surface">Focus:</span> {lesson.tags.finger}</li>
-          <li><span class="text-on-surface">Speed:</span> {lesson.tags.speed}</li>
-          <li><span class="text-on-surface">Characters:</span> {lesson.content.length}</li>
+          <li><span class="text-on-surface">{$t('lesson_hand')}:</span> {lesson.tags.hand}</li>
+          <li><span class="text-on-surface">{$t('lesson_focus')}:</span> {lesson.tags.finger}</li>
+          <li><span class="text-on-surface">{$t('lesson_speed')}:</span> {lesson.tags.speed}</li>
+          <li><span class="text-on-surface">{$t('lesson_characters')}:</span> {lesson.content.length}</li>
         </ul>
       </div>
     </div>
   {:else}
     <!-- Lesson Not Found -->
     <div class="text-center py-20" role="alert">
-      <h1 class="font-headline text-3xl mb-4">Lesson Not Found</h1>
-      <p class="text-on-surface-variant mb-8">The lesson you're looking for doesn't exist.</p>
-      <Button variant="primary" onclick={() => goto('/learn')}>Browse Lessons</Button>
+      <h1 class="font-headline text-3xl mb-4">{$t('error_heading')}</h1>
+      <p class="text-on-surface-variant mb-8">{$t('error_subheading')}</p>
+      <Button variant="primary" onclick={() => goto('/learn')}>{$t('lesson_back')}</Button>
     </div>
   {/if}
 </div>
