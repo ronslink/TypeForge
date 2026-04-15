@@ -15,6 +15,7 @@ import {
   char,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { userPlacementResults } from './sessions.js';
 
 // Enums
 export const userStatusEnum = pgEnum('user_status', [
@@ -135,6 +136,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     references: [userPreferences.userId],
   }),
   devices: many(userDevices),
+  placementResults: many(userPlacementResults),
 }));
 
 export const userProfilesRelations = relations(userProfiles, ({ one }) => ({

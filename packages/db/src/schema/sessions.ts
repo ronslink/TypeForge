@@ -138,6 +138,19 @@ export const keyMastery = pgTable(
   })
 );
 
+// User placement test results table
+export const userPlacementResults = pgTable('user_placement_results', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  testId: text('test_id').notNull(),
+  passed: boolean('passed').notNull(),
+  accuracy: real('accuracy'),
+  wpm: real('wpm'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Relations
 export const typingSessionsRelations = relations(typingSessions, ({ one, many }) => ({
   user: one(users, {
@@ -183,6 +196,13 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
 export const keyMasteryRelations = relations(keyMastery, ({ one }) => ({
   user: one(users, {
     fields: [keyMastery.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userPlacementResultsRelations = relations(userPlacementResults, ({ one }) => ({
+  user: one(users, {
+    fields: [userPlacementResults.userId],
     references: [users.id],
   }),
 }));

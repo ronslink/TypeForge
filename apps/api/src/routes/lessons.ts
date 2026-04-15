@@ -19,6 +19,7 @@ import {
   selectNextLesson,
   type SessionHistoryEntry,
   type WeakArea,
+  generateAdaptiveLesson,
 } from '@typeforge/curriculum';
 const app = new Hono();
 
@@ -184,6 +185,19 @@ app.get('/next', requireAuth, async (c) => {
   return c.json({
     lesson: response,
   });
+});
+
+/**
+ * POST /lessons/adaptive - Generate an ephemeral adaptive lesson for weak keys
+ */
+app.post('/adaptive', requireAuth, async (c) => {
+  const body = await c.req.json();
+  const weakKeys = Array.isArray(body.weakKeys) ? (body.weakKeys as string[]) : [];
+  const language = typeof body.language === 'string' ? body.language : 'en';
+
+  const lesson = generateAdaptiveLesson({ weakKeys, language });
+
+  return c.json({ lesson });
 });
 
 /**

@@ -6,7 +6,7 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
-import { typingSessions, userXp, streaks } from '@typeforge/db';
+import { typingSessions, userXp, streaks, userPlacementResults } from '@typeforge/db';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 const app = new Hono();
 
@@ -277,6 +277,56 @@ app.get('/lessons', async (c) => {
   );
 
   return c.json({ completedLessons: completedLessonIds as string[] });
+});
+
+/**
+ * POST /progress/placement - Record a placement test result
+ * Body: { testId, passed, accuracy, wpm? }
+ */
+app.post('/placement', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+
+  const body = await c.req.json<{ testId: string; passed: boolean; accuracy?: number; wpm?: number }>();
+
+  await db.insert(userPlacementResults).values({
+    userId,
+    testId: body.testId,
+    passed: body.passed,
+    accuracy: body.accuracy ?? null,
+    wpm: body.wpm ?? null,
+  });
+
+  return c.json({
+    recorded: true,
+    testId: body.testId,
+    passed: body.passed,
+  });
+});
+
+/**
+ * GET /progress/placement - Get all placement test results for the authenticated user
+ */
+app.get('/placement', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+
+  const results = await db
+    .select({
+      id: userPlacementResults.id,
+      testId: userPlacementResults.testId,
+      passed: userPlacementResults.passed,
+      accuracy: userPlacementResults.accuracy,
+      wpm: userPlacementResults.wpm,
+      createdAt: userPlacementResults.createdAt,
+    })
+    .from(userPlacementResults)
+    .where(eq(userPlacementResults.userId, userId))
+    .orderBy(desc(userPlacementResults.createdAt));
+
+  return c.json({ results });
 });
 
 export default app;

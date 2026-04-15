@@ -79,3 +79,10 @@ export {
   getWordsByTag,
   type WordlistEntry,
 } from './wordlists/index.js';
+
+// Adaptive lesson generator
+export {
+  generateAdaptiveLesson,
+  type AdaptiveLessonRequest,
+  type AdaptiveLesson,
+} from './adaptive.js';

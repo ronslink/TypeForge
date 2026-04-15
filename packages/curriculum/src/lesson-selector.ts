@@ -13,6 +13,44 @@ import { calculateNextReview, accuracyToQuality } from './sm2.js';
 /** Weak area threshold - accuracy below this triggers priority practice */
 const WEAK_AREA_THRESHOLD = 85;
 
+/**
+ * Extract language code from a placement test id.
+ * Assumes test ids follow patterns like `{language}-5` or `{language}-level-5`.
+ */
+function getLanguageFromTestId(testId: string): string | null {
+  // Handle formats: en-5, en-level-5, en-placement-5, etc.
+  const match = testId.match(/^([a-z]{2})(?:-.*)?-5$/i);
+  if (match) {
+    return match[1]!.toLowerCase();
+  }
+  // Handle format without hyphen before 5: en5
+  const simpleMatch = testId.match(/^([a-z]{2})5$/i);
+  if (simpleMatch) {
+    return simpleMatch[1]!.toLowerCase();
+  }
+  return null;
+}
+
+/**
+ * Determine which languages should have beginner lessons skipped based on
+ * passed level-5 placement tests.
+ */
+function getSkippedLanguagesFromPlacement(
+  placementResults?: Array<{ testId: string; passed: boolean }>
+): Set<string> {
+  const skipped = new Set<string>();
+  if (!placementResults) return skipped;
+  for (const result of placementResults) {
+    if (result.passed) {
+      const lang = getLanguageFromTestId(result.testId);
+      if (lang) {
+        skipped.add(lang);
+      }
+    }
+  }
+  return skipped;
+}
+
 /** Session history entry */
 export interface SessionHistoryEntry {
   lessonId: string;
@@ -58,12 +96,16 @@ export interface SelectedLesson {
 export async function selectNextLesson(
   _userId: string,
   sessionHistory: SessionHistoryEntry[],
-  weakAreas: Map<string, WeakArea>
+  weakAreas: Map<string, WeakArea>,
+  placementResults?: Array<{ testId: string; passed: boolean }>
 ): Promise<Lesson> {
   const now = new Date();
 
   // Build lesson progress map from session history
   const lessonProgressMap = buildLessonProgressMap(sessionHistory);
+
+  // Determine languages where a level-5 placement test was passed
+  const skippedLanguages = getSkippedLanguagesFromPlacement(placementResults);
 
   // Calculate priority scores for all lessons
   const scoredLessons: Array<{
@@ -73,7 +115,7 @@ export async function selectNextLesson(
   }> = [];
 
   for (const lesson of LESSON_CATALOG) {
-    const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now);
+    const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now, skippedLanguages);
     if (score.priority > 0) {
       scoredLessons.push(score);
     }
@@ -153,10 +195,20 @@ function calculateLessonPriority(
   lesson: Lesson,
   weakAreas: Map<string, WeakArea>,
   lessonProgressMap: Map<string, LessonProgress>,
-  now: Date
+  now: Date,
+  skippedLanguages: Set<string> = new Set()
 ): SelectedLesson {
   const lessonProgress = lessonProgressMap.get(lesson.id);
   const keyBigram = lesson.tags.key_bigram;
+
+  // Skip beginner lessons for languages where a level-5 placement test was passed
+  if (lesson.difficulty === 1 && skippedLanguages.has(lesson.language)) {
+    return {
+      lesson,
+      reason: 'new_lesson',
+      priority: 0,
+    };
+  }
 
   // 1. Check for weak areas (highest priority)
   const weakArea = weakAreas.get(keyBigram);
@@ -231,15 +283,17 @@ export async function getRecommendedLessons(
   _userId: string,
   sessionHistory: SessionHistoryEntry[],
   weakAreas: Map<string, WeakArea>,
-  count: number = 5
+  count: number = 5,
+  placementResults?: Array<{ testId: string; passed: boolean }>
 ): Promise<SelectedLesson[]> {
   const now = new Date();
   const lessonProgressMap = buildLessonProgressMap(sessionHistory);
+  const skippedLanguages = getSkippedLanguagesFromPlacement(placementResults);
 
   const scoredLessons: SelectedLesson[] = [];
 
   for (const lesson of LESSON_CATALOG) {
-    const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now);
+    const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now, skippedLanguages);
     if (score.priority > 0) {
       scoredLessons.push(score);
     }
