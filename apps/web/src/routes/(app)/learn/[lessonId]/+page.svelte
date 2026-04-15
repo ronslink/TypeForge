@@ -325,8 +325,51 @@
   }
 
   let testFailed = $state(false);
+  // Org membership flag — institutions can have a retry cooldown, individuals always get unlimited
+  let isOrgMember = $state(false);
+  // The org-defined cooldown in hours (0 = unlimited). Fetched from org settings.
+  let orgRetryPolicy = $state<{ cooldownHours: number } | null>(null);
+
+  // ── Reset all session state when lessonId changes (Next Lesson navigation) ──
+  // SvelteKit reuses the component when navigating between [lessonId] routes,
+  // so we must manually reset everything to get a clean slate.
+  let _prevLessonId = $state<string | null>(null);
+  $effect(() => {
+    if (lessonId && lessonId !== _prevLessonId) {
+      _prevLessonId = lessonId;
+      currentIndex = 0;
+      errors = new Set();
+      isComplete = false;
+      isStarted = false;
+      showCelebration = false;
+      sessionSubmitted = false;
+      testFailed = false;
+      startTime = null;
+      elapsedSeconds = 0;
+      currentWPM = 0;
+      currentAccuracy = 100;
+      currentStreak = 0;
+      previousStreak = 0;
+      maxStreak = 0;
+      keystrokes = [];
+      finalWPM = 0;
+      finalAccuracy = 0;
+      finalDuration = 0;
+      ariaLiveText = '';
+      pressedKey = undefined;
+      showIntroAnimation = true;
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          const seen = sessionStorage.getItem(`tf_intro_seen_${lessonId}`);
+          if (seen) showIntroAnimation = false;
+        }
+      } catch {}
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+  });
 
   function completeLesson() {
+
     if (isComplete) return;
     
     isComplete = true;
@@ -363,17 +406,31 @@
 
   async function submitSession() {
     if (sessionSubmitted || !lesson) return;
+    sessionSubmitted = true;
 
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
-      
       const token = await ctx?.session?.getToken();
       const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
+        const h = new Headers(init?.headers);
+        if (token) h.set('Authorization', `Bearer ${token}`);
+        return fetch(input, { ...init, headers: h });
       };
       const api = createApiClient('/', authFetch);
+
+      // If this is a placement test, record the result separately
+      if (lesson.isTest) {
+        await authFetch('/api/v1/progress/placement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            testId: lesson.id,
+            passed: !testFailed,
+            accuracy: finalAccuracy,
+            wpm: finalWPM,
+          }),
+        });
+      }
 
       await api.api.v1.sessions.$post({
         json: {
@@ -391,19 +448,16 @@
           consistency: finalAccuracy,
         },
       });
-      
-      sessionSubmitted = true;
     } catch (error) {
       console.error('Failed to submit session:', error);
-      // Still show completion even if API fails
     }
   }
 
   function getNextLessonId(): string | null {
     if (!lesson) return null;
-    const currentIndex = LESSON_CATALOG.findIndex((l) => l.id === lesson.id);
-    const nextLesson = LESSON_CATALOG[currentIndex + 1];
-    return nextLesson?.id || null;
+    const catalogIdx = LESSON_CATALOG.findIndex((l) => l.id === lesson.id);
+    if (catalogIdx === -1) return null;
+    return LESSON_CATALOG[catalogIdx + 1]?.id ?? null;
   }
 
   function goToNextLesson() {
@@ -457,9 +511,24 @@
     return labels[level] || 'Unknown';
   }
 
-  onMount(() => {
+  onMount(async () => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+
+    // Fetch placement retry policy (needed to show correct retry messaging)
+    try {
+      const token = await ctx?.session?.getToken();
+      const res = await fetch('/api/v1/progress/placement/policy', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const policy = await res.json();
+        isOrgMember = policy.isOrgMember ?? false;
+        orgRetryPolicy = { cooldownHours: policy.cooldownHours ?? 0 };
+      }
+    } catch {
+      // Non-critical; default to unlimited retries
+    }
   });
 
   onDestroy(() => {
@@ -583,8 +652,17 @@
         >
           {#if testFailed}
             <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
-            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Test Failed!</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10">You needed 90% accuracy. You achieved {finalAccuracy}%.</p>
+            <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">Test Failed</h2>
+            <p id="completion-description" class="text-on-surface-variant mb-2 relative z-10">
+              You needed 90% accuracy. You scored {finalAccuracy}%.
+            </p>
+            {#if !isOrgMember}
+              <p class="text-xs text-primary mb-6 relative z-10">↻ Retries are <strong>unlimited</strong> — try again whenever you're ready.</p>
+            {:else if orgRetryPolicy && orgRetryPolicy.cooldownHours > 0}
+              <p class="text-xs text-on-surface-variant mb-6 relative z-10">Your institution requires a <strong>{orgRetryPolicy.cooldownHours}h</strong> cooldown between attempts.</p>
+            {:else}
+              <p class="text-xs text-primary mb-6 relative z-10">↻ Retries are <strong>unlimited</strong> for your organisation.</p>
+            {/if}
           {:else if lesson.isTest && lesson.id.includes('-test-5')}
             <div class="absolute inset-0 bg-primary/5 z-0 pointer-events-none"></div>
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">Certification Earned!</h2>

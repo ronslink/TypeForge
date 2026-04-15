@@ -149,6 +149,9 @@ export const orgSettings = pgTable('org_settings', {
   brandingLogoUrl: text('branding_logo_url'),
   brandingPrimaryColor: text('branding_primary_color'),
   dataExportEnabled: boolean('data_export_enabled').notNull().default(true),
+  // Placement test policy: 0 = unlimited retries (individuals); set hours for institution cooldown
+  placementTestCooldownHours: integer('placement_test_cooldown_hours').notNull().default(0),
+  placementTestsEnabled: boolean('placement_tests_enabled').notNull().default(true),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -6,13 +6,8 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
-<<<<<<< HEAD
-import { typingSessions, userXp, streaks, userPlacementResults } from '@typeforge/db';
-import { eq, desc, and, gte, lte } from 'drizzle-orm';
-=======
-import { typingSessions, userXp, streaks, keyMastery } from '@typeforge/db';
+import { typingSessions, userXp, streaks, keyMastery, userPlacementResults, orgMembers, orgSettings } from '@typeforge/db';
 import { eq, desc, and, gte, lte, lt } from 'drizzle-orm';
->>>>>>> 0dfdd4f (feat(ui+lesson): animated HandGuide, LessonIntroModal explainer, live finger guide, error flash, segmented progress bar + feat(api): GET /progress/weakness endpoint)
 const app = new Hono();
 
 // All progress routes require authentication
@@ -287,6 +282,7 @@ app.get('/lessons', async (c) => {
 /**
  * POST /progress/placement - Record a placement test result
  * Body: { testId, passed, accuracy, wpm? }
+ * Enforces org-defined retry cooldown; individuals always get unlimited retries.
  */
 app.post('/placement', async (c) => {
   const auth = getAuth(c)!;
@@ -294,6 +290,46 @@ app.post('/placement', async (c) => {
   const userId = auth.userId;
 
   const body = await c.req.json<{ testId: string; passed: boolean; accuracy?: number; wpm?: number }>();
+
+  // Look up org membership and its placement policy
+  const orgMemberRow = await db
+    .select({
+      orgId: orgMembers.orgId,
+      cooldownHours: orgSettings.placementTestCooldownHours,
+    })
+    .from(orgMembers)
+    .leftJoin(orgSettings, eq(orgSettings.orgId, orgMembers.orgId))
+    .where(eq(orgMembers.userId, userId))
+    .limit(1);
+
+  const cooldownHours = orgMemberRow[0]?.cooldownHours ?? 0;
+
+  // Enforce cooldown only if org has set one > 0
+  if (cooldownHours > 0) {
+    const [lastAttempt] = await db
+      .select({ createdAt: userPlacementResults.createdAt })
+      .from(userPlacementResults)
+      .where(
+        and(eq(userPlacementResults.userId, userId), eq(userPlacementResults.testId, body.testId))
+      )
+      .orderBy(desc(userPlacementResults.createdAt))
+      .limit(1);
+
+    if (lastAttempt) {
+      const hoursSinceLast = (Date.now() - new Date(lastAttempt.createdAt).getTime()) / 3600000;
+      if (hoursSinceLast < cooldownHours) {
+        const hoursRemaining = Math.ceil(cooldownHours - hoursSinceLast);
+        return c.json(
+          {
+            error: `Retry cooldown active. Try again in ${hoursRemaining}h.`,
+            code: 'COOLDOWN_ACTIVE',
+            hoursRemaining,
+          },
+          429
+        );
+      }
+    }
+  }
 
   await db.insert(userPlacementResults).values({
     userId,
@@ -333,6 +369,35 @@ app.get('/placement', async (c) => {
 
   return c.json({ results });
 });
+
+/**
+ * GET /progress/placement/policy - Get the retry policy for the current user
+ * Returns { cooldownHours: number, isOrgMember: boolean }
+ * 0 = unlimited retries (individual user or org with no cooldown set)
+ */
+app.get('/placement/policy', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+
+  const orgMemberRow = await db
+    .select({
+      orgId: orgMembers.orgId,
+      cooldownHours: orgSettings.placementTestCooldownHours,
+      placementTestsEnabled: orgSettings.placementTestsEnabled,
+    })
+    .from(orgMembers)
+    .leftJoin(orgSettings, eq(orgSettings.orgId, orgMembers.orgId))
+    .where(eq(orgMembers.userId, userId))
+    .limit(1);
+
+  const isOrgMember = orgMemberRow.length > 0;
+  const cooldownHours = orgMemberRow[0]?.cooldownHours ?? 0;
+  const placementTestsEnabled = orgMemberRow[0]?.placementTestsEnabled ?? true;
+
+  return c.json({ isOrgMember, cooldownHours, placementTestsEnabled });
+});
+
 
 /**
  * GET /progress/weakness - Get user's weak keys
