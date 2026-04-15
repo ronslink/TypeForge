@@ -6,7 +6,7 @@ import { paraglide } from '@inlang/paraglide-sveltekit/vite';
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: adapter(),
+    adapter: adapter({ runtime: 'nodejs20.x' }),
     alias: {
       '@': './src',
       '@typeforge/db': '../../packages/db',

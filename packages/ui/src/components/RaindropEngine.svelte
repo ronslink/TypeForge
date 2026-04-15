@@ -82,16 +82,16 @@
       canvasRef.height = containerRef.clientHeight;
     }
   
-    function spawnDrop(timestamp: number) {
+    function spawnDrop() {
       if (!ctx || words.length === 0) return;
-      const word = words[Math.floor(Math.random() * words.length)];
+      const word = words[Math.floor(Math.random() * words.length)]!;
       
       ctx.font = 'bold 24px Inter, system-ui, sans-serif';
       const textWidth = ctx.measureText(word).width;
       
       const x = Math.max(20, Math.random() * (canvasRef.width - textWidth - 40));
       const speed = (0.5 + Math.random() * 0.5) * globalSpeedMultiplier;
-      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)]!;
   
       drops.push({
         id: dropIdCounter++,
@@ -126,7 +126,7 @@
   
       // Spawn Engine
       if (timestamp - lastSpawnTime > spawnRateMs) {
-        spawnDrop(timestamp);
+        spawnDrop();
         lastSpawnTime = timestamp;
       }
   
@@ -139,7 +139,7 @@
     function updatePhysics() {
       // Update Particles
       for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
+        const p = particles[i]!;
         p.x += p.vx;
         p.y += p.vy;
         p.life -= 0.02;
@@ -149,7 +149,7 @@
       // Update Drops
       let i = drops.length;
       while (i--) {
-        const drop = drops[i];
+        const drop = drops[i]!;
         drop.y += drop.speed;
         
         // Floor Collision

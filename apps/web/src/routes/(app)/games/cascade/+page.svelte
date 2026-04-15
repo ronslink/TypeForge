@@ -2,7 +2,7 @@
     import { RaindropEngine } from '@typeforge/ui';
     import { getSupportedLanguages, getRandomWords } from '@typeforge/curriculum';
     import { getLanguageByCode } from '$lib/i18n/languages';
-    import { confettiCelebration } from '@typeforge/ui';
+    import { ConfettiCelebration } from '@typeforge/ui';
   
     // Config State
     let isPlaying = $state(false);
@@ -13,6 +13,7 @@
     let showResults = $state(false);
     let finalScore = $state(0);
     let finalAccuracy = $state(0);
+    let showCelebration = $state(false);
   
     let availableLanguages = getSupportedLanguages()
       .map(code => getLanguageByCode(code))
@@ -39,7 +40,7 @@
       finalAccuracy = accuracy;
       showResults = true;
       if (score > 1000) {
-         confettiCelebration();
+         showCelebration = true;
       }
     }
   </script>

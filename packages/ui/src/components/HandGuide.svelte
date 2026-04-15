@@ -38,11 +38,6 @@
     'right-pinky': 'Pinky',
   };
 
-  const fingers = [
-    'left-pinky','left-ring','left-middle','left-index',
-    'right-index','right-middle','right-ring','right-pinky',
-  ];
-
   const activeLabel = $derived(
     activeFinger
       ? `${activeFinger.startsWith('left') ? 'Left' : 'Right'} ${fingerLabels[activeFinger.replace(/_/g, '-')] ?? ''} — ${homeKeys[activeFinger.replace(/_/g, '-')] ?? ''}`
