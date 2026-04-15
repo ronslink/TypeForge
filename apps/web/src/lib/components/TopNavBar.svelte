@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
-
   import { afterNavigate } from '$app/navigation';
   import { useClerkContext, UserButton } from 'svelte-clerk';
+  import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, type UiLocale } from '$lib/stores/locale';
 
   // Navigation items
   const navItems = [
@@ -19,6 +19,22 @@
 
   let currentPath    = $derived(page.url.pathname);
   let mobileMenuOpen = $state(false);
+
+  // UI locale state
+  let activeLocale = $state<UiLocale>('en');
+  let localeSwitcherOpen = $state(false);
+
+  $effect(() => {
+    activeLocale = getPersistedLocale();
+  });
+
+  async function handleLocaleSelect(code: UiLocale) {
+    localeSwitcherOpen = false;
+    activeLocale = code;
+    await setUiLocale(code);
+    const token = await ctx?.session?.getToken();
+    saveLocaleToApi(code, token ?? null);
+  }
 
   afterNavigate(() => { mobileMenuOpen = false; });
 </script>
@@ -72,6 +88,41 @@
           <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
         {/if}
       </a>
+
+      <!-- UI Language Switcher (desktop) -->
+      <div class="hidden md:block relative" style="z-index: 200;">
+        <button
+          class="ui-locale-btn"
+          onclick={() => localeSwitcherOpen = !localeSwitcherOpen}
+          aria-label="Change UI language"
+          aria-haspopup="listbox"
+          aria-expanded={localeSwitcherOpen}
+          title="UI Language"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>{UI_LOCALES.find(l => l.code === activeLocale)?.nativeName ?? 'EN'}</span>
+          <svg class="chevron" class:open={localeSwitcherOpen} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        {#if localeSwitcherOpen}
+          <div class="locale-dropdown" role="listbox" aria-label="Select UI language">
+            {#each UI_LOCALES as loc}
+              <button
+                class="locale-option"
+                class:locale-active={loc.code === activeLocale}
+                role="option"
+                aria-selected={loc.code === activeLocale}
+                onclick={() => handleLocaleSelect(loc.code)}
+              >
+                <span class="locale-native">{loc.nativeName}</span>
+                <span class="locale-en">{loc.englishName}</span>
+                {#if loc.code === activeLocale}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {/if}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
 
       {#if !loaded}
         <!-- Loading stub to reserve space -->
@@ -161,3 +212,72 @@
     </div>
   </div>
 {/if}
+
+<style>
+  /* ─── UI Locale Switcher ─── */
+  .ui-locale-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.6rem;
+    background: var(--surface-container, #1d2025);
+    border: 1px solid var(--outline-variant, #514533);
+    color: var(--on-surface, #e1e2ea);
+    font-family: var(--font-label, 'Space Grotesk', monospace);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .ui-locale-btn:hover {
+    background: var(--surface-container-high, #272a30);
+    border-color: var(--primary, #ffc56c);
+    color: var(--primary, #ffc56c);
+  }
+  .ui-locale-btn .chevron { transition: transform 0.2s ease; }
+  .ui-locale-btn .chevron.open { transform: rotate(180deg); }
+
+  .locale-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 180px;
+    background: var(--surface-container-low, #191c21);
+    border: 1px solid var(--outline-variant, #514533);
+    border-radius: 6px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,197,108,0.08);
+    animation: locale-in 0.18s cubic-bezier(0.22,1,0.36,1) both;
+    overflow: hidden;
+  }
+  @keyframes locale-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .locale-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.55rem 0.9rem;
+    background: transparent;
+    border: none;
+    color: var(--on-surface, #e1e2ea);
+    font-family: var(--font-body, 'Manrope', sans-serif);
+    font-size: 0.825rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .locale-option:hover { background: var(--surface-container-high, #272a30); }
+  .locale-option.locale-active { background: rgba(255,197,108,0.08); }
+  .locale-active .locale-native { color: var(--primary, #ffc56c); font-weight: 700; }
+
+  .locale-native { font-weight: 500; flex: 1; }
+  .locale-en {
+    color: var(--on-surface-variant, #d6c4ac);
+    font-size: 0.75rem;
+  }
+</style>

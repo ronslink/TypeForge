@@ -15,6 +15,7 @@
     "clean": "rm -rf .svelte-kit node_modules"
   },
   "dependencies": {
+    "@inlang/paraglide-sveltekit": "0.16.1",
     "@typeforge/api": "workspace:*",
     "@typeforge/curriculum": "workspace:*",
     "@typeforge/layouts": "workspace:*",

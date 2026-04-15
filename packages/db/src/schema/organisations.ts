@@ -152,6 +152,8 @@ export const orgSettings = pgTable('org_settings', {
   // Placement test policy: 0 = unlimited retries (individuals); set hours for institution cooldown
   placementTestCooldownHours: integer('placement_test_cooldown_hours').notNull().default(0),
   placementTestsEnabled: boolean('placement_tests_enabled').notNull().default(true),
+  // UI language default for all org members (can be overridden per user)
+  defaultUiLocale: text('default_ui_locale').notNull().default('en'),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
