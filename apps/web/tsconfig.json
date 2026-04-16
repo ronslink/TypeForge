@@ -1,26 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@typeforge/db": ["../../packages/db/src"],
-      "@typeforge/db/*": ["../../packages/db/src/*"],
-      "@typeforge/metrics": ["../../packages/metrics/src"],
-      "@typeforge/metrics/*": ["../../packages/metrics/src/*"],
-      "@typeforge/layouts": ["../../packages/layouts/src"],
-      "@typeforge/layouts/*": ["../../packages/layouts/src/*"],
-      "@typeforge/curriculum": ["../../packages/curriculum/src"],
-      "@typeforge/curriculum/*": ["../../packages/curriculum/src/*"],
-      "@typeforge/ui": ["../../packages/ui/src"],
-      "@typeforge/ui/*": ["../../packages/ui/src/*"],
-      "@typeforge/api": ["../../apps/api/src"],
-      "@typeforge/api/*": ["../../apps/api/src/*"],
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"]
-    },
-    "types": ["@cloudflare/workers-types", "vite/client"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.svelte", "vite.config.ts"],
-  "exclude": ["node_modules", ".svelte-kit"]
+    "types": ["vite/client"],
+    "skipLibCheck": true
+  }
 }

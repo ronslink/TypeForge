@@ -5,6 +5,7 @@
 
 import type { Context } from 'hono';
 import type { ClerkUser } from './clerk.js';
+import type { KVNamespace } from '@cloudflare/workers-types';
 
 /**
  * Parental consent request structure

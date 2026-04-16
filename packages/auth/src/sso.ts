@@ -4,6 +4,7 @@
  */
 
 import type { Context } from 'hono';
+import type { KVNamespace } from '@cloudflare/workers-types';
 
 /**
  * Google OAuth tokens response

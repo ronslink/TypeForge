@@ -2,6 +2,7 @@
  * TypeForge Cloudflare Worker Bindings
  * Interface matching all wrangler.toml bindings for type-safe env access
  */
+import type { Hyperdrive, D1Database, R2Bucket, Queue, KVNamespace } from '@cloudflare/workers-types';
 
 export interface Env {
   // Regional PostgreSQL via Hyperdrive

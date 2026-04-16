@@ -176,6 +176,8 @@
 
   // Check sessionStorage to skip intro for returning users
   let showIntroAnimation = $state(true);
+  // Tracks which key is currently highlighted in the intro animation
+  let introKeyIndex = $state(0);
 
   $effect(() => {
     if (lesson) {
@@ -361,6 +363,7 @@
       finalDuration = 0;
       ariaLiveText = '';
       pressedKey = undefined;
+      introKeyIndex = 0;
       showIntroAnimation = true;
       try {
         if (typeof sessionStorage !== 'undefined') {
@@ -499,6 +502,8 @@
     wpmCalculator = new WPMCalculator();
     accuracyTracker = new AccuracyTracker();
     lastAccuracyAnnouncement = 100;
+    introKeyIndex = 0;
+    showIntroAnimation = true;
     ariaLiveText = 'Lesson restarted';
   }
 

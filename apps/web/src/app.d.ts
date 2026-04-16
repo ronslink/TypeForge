@@ -1,5 +1,5 @@
 /// <reference types="@sveltejs/kit" />
-/// <reference types="@cloudflare/workers-types" />
+import type { Hyperdrive, D1Database, R2Bucket, Queue, KVNamespace, ExecutionContext } from '@cloudflare/workers-types';
 
 declare global {
   namespace App {
@@ -15,6 +15,8 @@ declare global {
         role: 'learner' | 'teacher' | 'org_admin' | 'platform_admin';
         homeRegion: 'EU' | 'US' | 'AF';
       };
+      /** Auth object injected by svelte-clerk's withClerkHandler */
+      auth: any;
     }
     interface PageData {}
     interface PageState {}

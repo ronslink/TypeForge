@@ -1,6 +1,5 @@
 import adapter from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { paraglide } from '@inlang/paraglide-sveltekit/vite';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -17,13 +16,6 @@ const config = {
       '@typeforge/api': '../../apps/api',
     },
   },
-  plugins: [
-    paraglide({
-      project: './project.inlang',
-      outdir: './src/lib/paraglide',
-    }),
-  ],
 };
 
 export default config;
-
