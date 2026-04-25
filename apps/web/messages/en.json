@@ -89,5 +89,36 @@
   "footer_tagline": "Forge your keystrokes. Master your craft.",
   "footer_curriculum": "Curriculum",
   "footer_company": "Company",
-  "footer_copyright": "© {year} TypeForge. All rights reserved."
+  "footer_copyright": "© {year} TypeForge. All rights reserved.",
+  
+  "nav_settings": "Settings",
+  "nav_sign_up": "Sign Up",
+  "nav_languages": "Languages",
+  "nav_typing_guide": "Typing Guide",
+
+  "footer_product": "Product",
+  "footer_account": "Account",
+  "footer_legal": "Legal",
+  "company_features": "Features",
+  "company_pricing": "Pricing",
+  "company_billing": "Billing",
+  "company_contact": "Contact",
+  "legal_privacy": "Privacy Policy",
+  "legal_terms": "Terms of Service",
+
+  "practice_sandbox_title": "Practice Sandbox",
+  "practice_sandbox_desc": "Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states. Select your drill sequence below.",
+  "practice_mode_words": "Words",
+  "practice_mode_words_desc": "Practice common words pulled natively from localized arrays.",
+  "practice_mode_sentences": "Sentences",
+  "practice_mode_sentences_desc": "Synthesized punctuated sentence blocks.",
+  "practice_mode_literature": "Literature",
+  "practice_mode_literature_desc": "Practice pacing using heavy formatting loaded from public domain excerpts.",
+  "practice_no_books": "No books available natively",
+  "practice_start_book": "Start Book Drill",
+  "practice_layout": "Keyboard Layout",
+  "practice_logged": "Your session has been logged to your daily streak.",
+  "practice_done": "Done",
+  "practice_errors": "Errors",
+  "lesson_speed": "Speed"
 }
