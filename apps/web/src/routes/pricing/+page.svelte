@@ -124,7 +124,7 @@
               </li>
             {/each}
           </ul>
-          <a href="/sign-up?plan=school" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
+          <a href="/contact" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
             Contact sales
           </a>
         </div>

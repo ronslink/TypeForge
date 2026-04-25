@@ -171,12 +171,26 @@
 
   onMount(fetchBillingData);
 
-  // Handle URL return params
+  // Handle URL return params and ?plan=pro auto-checkout
   onMount(() => {
     const url = new URL(window.location.href);
     if (url.searchParams.has('success')) {
       fetchBillingData();
       window.history.replaceState({}, '', '/billing');
+    }
+    if (url.searchParams.get('plan') === 'pro') {
+      window.history.replaceState({}, '', '/billing');
+      // Auto-trigger checkout for pro plan after data loads
+      const origFetch = fetchBillingData;
+      fetchBillingData = async () => {
+        await origFetch();
+        const current = currentPlanId();
+        if (current !== 'pro') {
+          billingInterval = 'monthly';
+          handleUpgrade('pro');
+        }
+        fetchBillingData = origFetch;
+      };
     }
   });
 </script>

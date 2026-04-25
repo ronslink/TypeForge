@@ -93,6 +93,7 @@
       period: '',
       features: ['All Basic Layouts', 'Weekly Progress Stats'],
       cta: 'Select Plan',
+      ctaHref: '/sign-up',
       popular: false
     },
     {
@@ -101,6 +102,7 @@
       period: '/mo',
       features: ['Full AI Weakness Modeling', 'Priority Multi-language Packs', 'Custom Practice Engines'],
       cta: 'Go Pro Now',
+      ctaHref: '/billing?plan=pro',
       popular: true
     },
     {
@@ -109,6 +111,7 @@
       period: '/seat/mo',
       features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
       cta: 'Contact Sales',
+      ctaHref: '/contact',
       popular: false
     }
   ];
@@ -494,13 +497,13 @@
             </ul>
           </div>
           {#if plan.popular}
-            <button class="notched-button w-full bg-primary text-on-primary py-4 font-label font-bold text-sm uppercase tracking-widest hover:amber-glow transition-all">
+            <a href={plan.ctaHref} class="notched-button w-full bg-primary text-on-primary py-4 font-label font-bold text-sm uppercase tracking-widest hover:amber-glow transition-all text-center block">
               {plan.cta}
-            </button>
+            </a>
           {:else}
-            <button class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors">
+            <a href={plan.ctaHref} class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors text-center block">
               {plan.cta}
-            </button>
+            </a>
           {/if}
         </div>
       {/each}
