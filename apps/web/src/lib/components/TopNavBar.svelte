@@ -13,7 +13,7 @@
   ]);
 
   const ctx = useClerkContext();
-  let loaded     = $derived(ctx?.loaded);
+  let loaded     = $derived(ctx?.isLoaded);
   let isSignedIn = $derived(!!ctx?.user);
   let user       = $derived(ctx?.user);
 
@@ -129,7 +129,7 @@
         <div class="hidden md:block w-24 h-8 bg-surface-container/50 rounded animate-pulse ml-4"></div>
       {:else if isSignedIn && user}
         <div class="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-outline-variant">
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       {:else}
         <a
@@ -201,7 +201,7 @@
          <div class="w-full py-6 bg-transparent"></div>
       {:else if isSignedIn && user}
         <div class="flex items-center gap-3">
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
           <span class="font-label text-sm text-on-surface-variant">{user.firstName || user.username}</span>
         </div>
       {:else}

@@ -99,8 +99,8 @@
     try {
       const api = createApiClient();
       const [subRes, invRes] = await Promise.all([
-        api.get('/billing/subscription'),
-        api.get('/billing/invoices'),
+        api.api.v1.billing.subscription.$get(),
+        api.api.v1.billing.invoices.$get(),
       ]);
       subscription = subRes.subscription ?? null;
       invoices     = invRes.invoices ?? [];
@@ -122,11 +122,14 @@
     error = null;
     try {
       const api = createApiClient();
-      const { checkoutUrl } = await api.post('/billing/checkout', {
-        interval: billingInterval,
-        successUrl: `${window.location.origin}/billing?success=1`,
-        cancelUrl:  `${window.location.origin}/billing?cancelled=1`,
+      const res = await api.api.v1.billing.checkout.$post({
+        json: {
+          interval: billingInterval,
+          successUrl: `${window.location.origin}/billing?success=1`,
+          cancelUrl:  `${window.location.origin}/billing?cancelled=1`,
+        }
       });
+      const { checkoutUrl } = await res.json();
       if (checkoutUrl) window.location.href = checkoutUrl;
     } catch (err: any) {
       error = err?.message ?? 'Failed to start checkout. Please try again.';
@@ -140,7 +143,8 @@
     error = null;
     try {
       const api = createApiClient();
-      const { portalUrl } = await api.post('/billing/portal', {});
+      const res = await api.api.v1.billing.portal.$post({ json: {} });
+      const { portalUrl } = await res.json();
       if (portalUrl) window.location.href = portalUrl;
     } catch (err: any) {
       error = err?.message ?? 'Failed to open billing portal.';
@@ -181,16 +185,14 @@
     if (url.searchParams.get('plan') === 'pro') {
       window.history.replaceState({}, '', '/billing');
       // Auto-trigger checkout for pro plan after data loads
-      const origFetch = fetchBillingData;
-      fetchBillingData = async () => {
-        await origFetch();
+      // Auto-trigger checkout for pro plan after data loads
+      fetchBillingData().then(() => {
         const current = currentPlanId();
         if (current !== 'pro') {
           billingInterval = 'monthly';
           handleUpgrade('pro');
         }
-        fetchBillingData = origFetch;
-      };
+      });
     }
   });
 </script>

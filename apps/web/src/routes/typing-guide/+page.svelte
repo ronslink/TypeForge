@@ -91,7 +91,7 @@
         </div>
         <p class="text-center font-body text-sm text-on-surface-variant">
           The raised bumps on <strong>F</strong> and <strong>J</strong> help you find home position without looking.
-          {#if !typeof navigator === 'undefined' && navigator.platform?.includes('Mac')}
+          {#if typeof navigator !== 'undefined' && navigator.platform?.includes('Mac')}
             <span class="block mt-1">On Mac keyboards, the dots are on <strong>F</strong> and <strong>J</strong>.</span>
           {/if}
         </p>

@@ -38,6 +38,13 @@
   const lessonId = $derived(page.params.lessonId);
   const lesson = $derived(getLessonById(lessonId));
 
+  // Derived values needed early
+  const lessonText = $derived(lesson?.content.map((c) => c.char).join('') || '');
+  let currentIndex = $state(0);
+  const lessonChars = $derived(lesson?.content || []);
+  const currentChar = $derived(lessonChars[currentIndex]);
+  const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
+
 
   // Get authentication context natively during component initialization
   const ctx = useClerkContext();
@@ -58,7 +65,7 @@
   const isRTL = $derived(lesson?.rtl || language?.rtl || false);
 
   // Session state
-  let currentIndex = $state(0);
+  // let currentIndex = $state(0); // MOVED UP
   let errors = $state<Set<number>>(new Set());
   let isComplete = $state(false);
   let isStarted = $state(false);
@@ -109,10 +116,7 @@
   let lastAccuracyAnnouncement = $state(100);
 
   // Derived values
-  const lessonText = $derived(lesson?.content.map((c) => c.char).join('') || '');
-  const lessonChars = $derived(lesson?.content || []);
-  const currentChar = $derived(lessonChars[currentIndex]);
-  const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
+
   const keyboardLayout = $derived(layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']);
 
   // RTL-aware keyboard layout - swaps left/right finger assignments
@@ -601,7 +605,7 @@
           <h1 class="font-headline text-3xl" id="lesson-title">
             {language?.nativeName || lesson.language}
           </h1>
-          <Badge variant="solid" size="sm">{getDifficultyLabel(lesson.difficulty)}</Badge>
+          <Badge variant="default">{getDifficultyLabel(lesson.difficulty)}</Badge>
           {#if isRTL}
             <span class="rtl-badge" role="note" aria-label="Right-to-left language">RTL</span>
           {/if}

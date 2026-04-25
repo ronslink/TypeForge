@@ -9,7 +9,7 @@
   let { children, data }: LayoutProps = $props();
 
   const ctx = useClerkContext();
-  let isLoading  = $derived(ctx?.loaded === false);
+  let isLoading  = $derived(ctx?.isLoaded === false);
   let isSignedIn = $derived(!!ctx?.user);
   let currentPath = $derived(page.url.pathname);
 
@@ -20,7 +20,7 @@
   const softAuthPages = ['/learn', '/progress', '/practice'];
 
   let showAuthBanner = $derived(
-    ctx?.loaded && !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
+    ctx?.isLoaded && !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
   );
 
   // Removed client-side auth gating — this is now strictly enforced server-side inside `hooks.server.ts`

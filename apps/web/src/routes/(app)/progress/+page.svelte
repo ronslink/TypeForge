@@ -3,15 +3,14 @@
   import { useClerkContext } from 'svelte-clerk';
   import { ProgressRing, StatCard, WeaknessHeatmap } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
-  import type { ProgressResponse, ProgressStatsResponse, Session } from '@typeforge/api/client';
 
   // Auth state
   const ctx = useClerkContext();
   let isSignedIn = $derived(!!ctx?.user);
 
   // Data states
-  let progress: ProgressResponse | null = $state(null);
-  let stats: ProgressStatsResponse | null = $state(null);
+  let progress: any = $state(null);
+  let stats: any = $state(null);
   let weakKeys: Array<{ key: string; accuracy: number; masteryLevel: number; totalAttempts: number; lastPracticedAt: string | null }> = $state([]);
   let loading = $state(true);
   let error: string | null = $state(null);
@@ -67,7 +66,7 @@
   }
 
   // Draw WPM history chart
-  function drawChart(sessions: Session[]) {
+  function drawChart(sessions: any[]) {
     if (!chartCanvas || sessions.length === 0) return;
     const c = chartCanvas.getContext('2d');
     if (!c) return;
@@ -222,7 +221,7 @@
         Track your WPM, accuracy, and streak. Your data is saved when you sign in.
       </p>
       <button
-        onclick={() => ctx?.clerk?.openSignIn({ redirectUrl: '/progress' })}
+        onclick={() => ctx?.clerk?.openSignIn({ fallbackRedirectUrl: '/progress' })}
         class="notched-button bg-primary text-on-primary px-6 py-3 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors"
       >
         Sign In

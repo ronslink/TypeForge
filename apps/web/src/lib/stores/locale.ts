@@ -26,7 +26,7 @@ export type UiLocale = (typeof SUPPORTED)[number];
 type Messages = typeof en;
 type MessageKey = keyof Messages;
 
-const MESSAGES: Record<UiLocale, Messages> = { en, es, fr, de, pt };
+const MESSAGES: Record<UiLocale, Partial<Messages>> = { en, es, fr, de, pt } as any;
 
 export const UI_LOCALES: { code: UiLocale; nativeName: string; englishName: string }[] = [
   { code: 'en', nativeName: 'English',   englishName: 'English'    },

@@ -28,7 +28,7 @@
 
   // Derived: the live Layout object for the keyboard preview
   const previewLayout = $derived(
-    (layouts as Record<string, Layout>)[selectedLayout] ?? layouts['qwerty-us']
+    (layouts as Record<string, Layout>)[selectedLayout] ?? (layouts['qwerty-us'] as Layout)
   );
 
   // Whenever the language changes, auto-select its canonical layout (user can override)
@@ -183,8 +183,6 @@
       <Keyboard
         layout={previewLayout}
         highlightKeys={new Set()}
-        activeKey={undefined}
-        rtl={!!previewLayout.rtl}
       />
     </div>
     <p class="text-xs text-on-surface-variant mt-3 font-body">

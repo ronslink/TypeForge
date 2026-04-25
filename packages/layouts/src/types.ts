@@ -30,7 +30,7 @@ export interface Key {
   /** Whether this key requires AltGr to access the character */
   requiresAltGr?: boolean;
   /** Finger responsible for this key */
-  finger?: Finger;
+  finger?: Finger | string;
   /** Hand that owns this key */
   hand?: Hand;
   /** Whether this key is marked for RTL rendering */

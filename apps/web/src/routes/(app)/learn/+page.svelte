@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { LessonCard, Button } from '@typeforge/ui';
-  import { LESSON_CATALOG, getLessonById, type Lesson } from '@typeforge/curriculum';
+  import { LESSON_CATALOG, getLessonById, type RegistryLesson as Lesson } from '@typeforge/curriculum';
   import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
   import { t } from '$lib/stores/locale';
   import type { PageData } from './$types';
@@ -179,7 +179,7 @@
     return {
       id: lesson.id,
       title: lesson.title,
-      description: `Focus Characters: ${lesson.tags.key_bigram || lesson.content.substring(0, 15)}`,
+      description: `Focus Characters: ${lesson.tags?.key_bigram || lesson.content.slice(0, 15).map((c: any) => c.char).join('')}`,
       difficulty: difficultyMap[lesson.difficulty] || 'beginner',
       language: '', // Intentionally left blank to avoid redundancy on every card
       duration: Math.max(1, Math.round(lesson.content.length / 100)), // Estimate based on content length

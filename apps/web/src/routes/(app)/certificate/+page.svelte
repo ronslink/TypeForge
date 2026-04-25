@@ -62,7 +62,7 @@
   
   <div class="mb-8 flex gap-4 print:hidden">
     <Button variant="primary" onclick={handlePrint}>Print Certificate</Button>
-    <Button variant="secondary" href="/learn">Back to Curriculum</Button>
+    <Button variant="secondary" onclick={() => window.location.href = '/learn'}>Back to Curriculum</Button>
   </div>
 
   {#if isLoading}
