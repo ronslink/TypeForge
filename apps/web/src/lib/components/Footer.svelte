@@ -35,9 +35,9 @@
         <a
           href="/"
           class="text-xl font-black tracking-tighter text-primary uppercase font-label block mb-4"
-          aria-label="TypeForge Home"
+          aria-label="TypingScholar Home"
         >
-          TYPEFORGE
+          TYPINGSCHOLAR
         </a>
         <p class="text-on-surface-variant text-sm font-body leading-relaxed max-w-[220px]">
           {$t('footer_tagline') || 'Forge your keystrokes. Master your craft.'}
@@ -69,7 +69,7 @@
     <!-- Bottom row: copyright + scripts badge -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-8 border-t border-outline-variant/10">
       <p class="text-xs text-on-surface-variant font-body">
-        {$t('footer_copyright', { year }) || '© ' + year + ' TypeForge. All rights reserved.'}
+        {$t('footer_copyright', { year }) || '© ' + year + ' TypingScholar. All rights reserved.'}
       </p>
       <div class="flex gap-2 flex-wrap">
         {#each ['Latin', 'Arabic', 'Cyrillic', 'Hebrew', 'CJK', 'Devanagari', 'Thai', 'Korean'] as script}

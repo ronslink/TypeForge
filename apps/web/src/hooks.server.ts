@@ -10,10 +10,20 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const currentPath = event.url.pathname;
 
   // Paths that do not enforce login wall
-  const publicRoutes = ['/onboarding', '/games/cascade', '/api'];
+  const publicRoutes = [
+    '/',
+    '/onboarding',
+    '/games/cascade',
+    '/api',
+    '/pricing',
+    '/languages',
+    '/typing-guide',
+    '/privacy-policy',
+    '/terms-of-service'
+  ];
   const softAuthPages = ['/learn', '/progress', '/practice', '/sign-in', '/sign-up'];
   
-  const isPublic = publicRoutes.some((r) => currentPath.startsWith(r));
+  const isPublic = publicRoutes.some((r) => currentPath === r || currentPath.startsWith(r + '/'));
   const isSoft = softAuthPages.some((r) => currentPath.startsWith(r));
 
   // Direct unauthenticated users away from protected areas (e.g. /settings, /billing, /org)

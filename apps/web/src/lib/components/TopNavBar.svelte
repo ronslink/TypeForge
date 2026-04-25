@@ -50,9 +50,9 @@
       <a
         href="/"
         class="text-xl font-black tracking-tighter text-primary uppercase font-label focus-visible:outline-2 focus-visible:outline-primary"
-        aria-label="TypeForge Home"
+        aria-label="TypingScholar Home"
       >
-        TYPEFORGE
+        TYPINGSCHOLAR
       </a>
 
       <!-- Desktop nav links -->
