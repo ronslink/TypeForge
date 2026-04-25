@@ -19,6 +19,30 @@
   let currentWpm = 124;
   let currentAccuracy = 98.2;
   let streak = 412;
+  let selectedScript = 'Latin';
+
+  // Demo texts per script
+  const demoTexts: Record<string, string> = {
+    Latin: "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique.",
+    Cyrillic: "Учитель печатает на клавиатуре быстро и без ошибок с первого раза.",
+    Arabic: "تعلم الكتابة على لوحة المفاتيح العربية يحتاج إلى التدريب المستمر",
+    CJK: "中文打字需要掌握拼音输入法才能做到速度与准确性兼备",
+    Greek: "Η εκμάθηση της μηχανογράφησης είναι δεξιότητα που απαιτεί εξάσκηση",
+    Hebrew: "לימוד הקלדה בעברית דורש תרגול מתמשך והקפדה על דיוק",
+    Korean: "한글 타자 연습은 정확도와 속도를 동시에 향상시키는 과정입니다",
+    Japanese: "日本語のタイピングはローマ字入力とかな入力を選ぶことができます"
+  };
+
+  function selectScript(script: { name: string; sample: string; layout: string; active: boolean }) {
+    // Toggle active state
+    scripts.forEach(s => s.active = s.name === script.name);
+    selectedScript = script.name;
+    // Reset demo to show new text (starting from a partial)
+    const newText = demoTexts[script.name] || demoText;
+    const sliceLen = Math.floor(newText.length * 0.35);
+    typedText = newText.slice(0, sliceLen);
+    demoText = newText;
+  }
 
   // Features data
   const features = [
@@ -114,11 +138,22 @@
     }
   ];
 
-  // Footer links
   const footerLinks = {
-    product: ['Features', 'Pricing', 'Enterprise'],
-    resources: ['School Resources', 'Typing Guide', 'Teacher Dash'],
-    legal: ['Privacy Policy', 'Legal', 'Compliance']
+    product: [
+      { label: 'Features', href: '/#features' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Languages', href: '/languages' }
+    ],
+    resources: [
+      { label: 'School Resources', href: '/languages' },
+      { label: 'Typing Guide', href: '/typing-guide' },
+      { label: 'Teacher Dashboard', href: '/learn' }
+    ],
+    legal: [
+      { label: 'Privacy Policy', href: '/privacy-policy' },
+      { label: 'Terms of Service', href: '/terms-of-service' },
+      { label: 'Compliance', href: '/privacy-policy' }
+    ]
   };
 
   let mounted = false;
@@ -165,6 +200,7 @@
             class="px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors border border-outline-variant/20 flex items-center gap-2"
             class:border-primary={script.active}
             class:text-primary={script.active}
+            onclick={() => selectScript(script)}
           >
             <span class="font-label text-lg">{script.sample}</span>
             <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant">{script.layout}</span>
@@ -219,8 +255,8 @@
         </div>
         
         <div class="mt-12 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/50">
-          <span>French AZERTY Layout</span>
-          <span>Shift + Alt to toggle language</span>
+          <span>{selectedScript} Layout — click script above to switch</span>
+          <span>Sign up to start real lessons</span>
         </div>
       </div>
     </div>
@@ -511,24 +547,24 @@
     <div class="flex flex-col gap-3">
       <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Product</span>
       {#each footerLinks.product as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
+        <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
     <div class="flex flex-col gap-3">
       <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Resources</span>
       {#each footerLinks.resources as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
+        <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
     <div class="flex flex-col gap-3">
       <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Legal</span>
       {#each footerLinks.legal as link}
-        <a href="#" class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link}</a>
+        <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
   </div>
   <div class="max-w-screen-2xl mx-auto px-6 md:px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2024 TYPINGSCHOLAR KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
+    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2026 TYPINGSCHOLAR KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
     <div class="flex gap-6">
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">language</span>
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">terminal</span>
