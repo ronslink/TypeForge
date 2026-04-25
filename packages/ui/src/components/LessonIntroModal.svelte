@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import HandGuide from './HandGuide.svelte';
 
   interface IntroKey {
@@ -14,7 +13,7 @@
     onStart: () => void;
   }
 
-  let { lessonId, introKeys, highlightKeys, onStart }: Props = $props();
+  let { lessonId, introKeys, onStart }: Props = $props();
 
   // Steps: 'explainer' | 'keys'
   let step = $state<'explainer' | 'keys'>('explainer');
@@ -22,7 +21,6 @@
   // Key walkthrough state
   let keyIndex = $state(0);
   let autoInterval: ReturnType<typeof setInterval> | null = null;
-  let started = $state(false);
 
   const explainerCards = [
     { icon: '🔤', title: 'Type the highlighted character', desc: 'The next character glows — that\'s your target.' },
@@ -36,9 +34,6 @@
     step === 'keys' && keyIndex < introKeys.length ? introKeys[keyIndex] : null
   );
 
-  const progress = $derived(
-    introKeys.length > 0 ? Math.round(((keyIndex) / introKeys.length) * 100) : 0
-  );
 
   function startKeyWalkthrough() {
     step = 'keys';

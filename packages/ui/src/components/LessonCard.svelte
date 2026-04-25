@@ -51,7 +51,7 @@
       {/if}
     </div>
     {#if lesson.language}
-      <Badge variant="primary" class="shadow-sm">
+      <Badge variant="primary">
         {lesson.language}
       </Badge>
     {/if}

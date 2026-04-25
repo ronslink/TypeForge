@@ -56,3 +56,30 @@ export interface Layout {
   /** Rows of keys (0 = number row, 1 = top alpha, 2 = home row, 3 = bottom alpha, 4 = space) */
   rows: Key[][];
 }
+
+/** 
+ * Represents a single key with absolute positioning for rendering.
+ * Used primarily by the assets/visualization packages.
+ */
+export interface KeyDefinition {
+  /** Default character */
+  char: string;
+  /** Key code (e.g., 'KeyA', 'Digit1') */
+  code: string;
+  /** Shift character */
+  shift?: string;
+  /** Absolute row index */
+  row: number;
+  /** Absolute column position for staggered rendering */
+  column: number;
+  /** Finger responsible for this key */
+  finger: Finger | string;
+}
+
+/**
+ * A flat representation of a keyboard layout for absolute rendering.
+ */
+export interface KeyboardLayout {
+  /** Array of all keys with their absolute positions */
+  keys: KeyDefinition[];
+}

@@ -241,7 +241,7 @@
           return;
         }
   
-        const expectedChar = targetDrop.word[targetDrop.typedCount].toLowerCase();
+        const expectedChar = targetDrop.word.charAt(targetDrop.typedCount).toLowerCase();
         
         if (typedChar === expectedChar) {
           targetDrop.typedCount++;
@@ -268,16 +268,18 @@
         let highestY = -999;
   
         for (let i = 0; i < drops.length; i++) {
-          if (drops[i].word[0].toLowerCase() === typedChar && drops[i].y > highestY) {
-            highestY = drops[i].y;
+          const drop = drops[i]!;
+          if (drop.word.charAt(0).toLowerCase() === typedChar && drop.y > highestY) {
+            highestY = drop.y;
             highestIndex = i;
           }
         }
   
         if (highestIndex !== -1) {
           activeLockIndex = highestIndex;
-          drops[highestIndex].isLocked = true;
-          drops[highestIndex].typedCount = 1;
+          const drop = drops[highestIndex]!;
+          drop.isLocked = true;
+          drop.typedCount = 1;
           correctKeystrokes++;
         }
       }

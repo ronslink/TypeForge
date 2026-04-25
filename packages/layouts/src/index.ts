@@ -16,7 +16,7 @@ import dubeolsik from './layouts/dubeolsik.json' with { type: 'json' };
 import devanagariPhonetic from './layouts/devanagari-phonetic.json' with { type: 'json' };
 import romaji from './layouts/romaji.json' with { type: 'json' };
 
-export type { Layout, Key, Finger, Hand, LayoutName } from './types.js';
+export type { Layout, Key, Finger, Hand, LayoutName, KeyboardLayout, KeyDefinition } from './types.js';
 
 /** All built-in layouts keyed by their ID */
 export const layouts = {
