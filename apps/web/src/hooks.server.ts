@@ -16,6 +16,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
     '/games/cascade',
     '/api',
     '/pricing',
+    '/contact',
     '/languages',
     '/typing-guide',
     '/privacy-policy',

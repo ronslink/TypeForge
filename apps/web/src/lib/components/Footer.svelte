@@ -8,16 +8,23 @@
       { href: '/practice',      label: $t('nav_practice') || 'Practice'   },
       { href: '/games/cascade', label: $t('nav_play') || 'Games'    },
       { href: '/progress',      label: $t('nav_progress') || 'Progress'   },
+      { href: '/languages',     label: $t('nav_languages') || 'Languages'  },
+      { href: '/typing-guide',  label: $t('nav_typing_guide') || 'Typing Guide' },
     ],
     [$t('footer_company') || 'Company']: [
       { href: '/#features',     label: $t('company_features') || 'Features'   },
-      { href: '/#pricing',      label: $t('company_pricing') || 'Pricing'    },
+      { href: '/pricing',       label: $t('company_pricing') || 'Pricing'    },
       { href: '/billing',       label: $t('company_billing') || 'Billing'    },
+      { href: '/contact',       label: $t('company_contact') || 'Contact'    },
     ],
     [$t('footer_account') || 'Account']: [
       { href: '/settings',      label: $t('nav_settings') || 'Settings'   },
       { href: '/sign-in',       label: $t('nav_sign_in') || 'Sign In'    },
       { href: '/sign-up',       label: $t('nav_sign_up') || 'Sign Up'    },
+    ],
+    [$t('footer_legal') || 'Legal']: [
+      { href: '/privacy-policy',   label: $t('legal_privacy') || 'Privacy Policy'   },
+      { href: '/terms-of-service', label: $t('legal_terms') || 'Terms of Service' },
     ],
   });
 
@@ -28,7 +35,7 @@
   <div class="max-w-screen-2xl mx-auto px-8 py-16">
 
     <!-- Top row: brand + columns -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
 
       <!-- Brand -->
       <div class="col-span-2 md:col-span-1">
