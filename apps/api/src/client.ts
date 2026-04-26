@@ -14,6 +14,7 @@
  *   json: { wpm: 60, accuracy: 95, ... }
  * });
  * ```
+ */
 import { hc } from 'hono/client';
 import type { Hono } from 'hono';
 
