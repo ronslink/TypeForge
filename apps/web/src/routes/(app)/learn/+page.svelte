@@ -24,41 +24,48 @@
   let weakKeys = $state<string[]>([]);
   let bannerDismissed = $state(false);
 
-  onMount(async () => {
+  let dataFetched = false;
+
+  $effect(() => {
+    if (!ctx?.isLoaded || dataFetched) return;
     if (!isSignedIn) return;
-    try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
-      };
-      const api = createApiClient('/', authFetch);
 
-      // Fetch completed lessons + weak keys in parallel
-      const [progressRes, weakRes] = await Promise.all([
-        api.api.v1.progress.lessons.$get(),
-        authFetch('/api/v1/progress/weakness'),
-      ]);
+    dataFetched = true;
+    (async () => {
+      try {
+        const token = await ctx?.session?.getToken();
+        const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+          const defaultHeaders = new Headers(init?.headers);
+          if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
+          return fetch(input, { ...init, headers: defaultHeaders });
+        };
+        const api = createApiClient('/', authFetch);
 
-      if (progressRes.ok) {
-        const payload = await progressRes.json();
-        if (payload.completedLessons) {
-          completedLessonIds = new Set(payload.completedLessons);
+        // Fetch completed lessons + weak keys in parallel
+        const [progressRes, weakRes] = await Promise.all([
+          api.api.v1.progress.lessons.$get(),
+          authFetch('/api/v1/progress/weakness'),
+        ]);
+
+        if (progressRes.ok) {
+          const payload = await progressRes.json();
+          if (payload.completedLessons) {
+            completedLessonIds = new Set(payload.completedLessons);
+          }
         }
-      }
 
-      if (weakRes.ok) {
-        const w = await weakRes.json();
-        weakKeys = (w.weakKeys ?? []).slice(0, 5).map((k: { key: string }) => k.key.toUpperCase());
-        // Restore dismissed state per session
-        try {
-          if (sessionStorage.getItem('tf_adaptive_banner_dismissed')) bannerDismissed = true;
-        } catch {}
+        if (weakRes.ok) {
+          const w = await weakRes.json();
+          weakKeys = (w.weakKeys ?? []).slice(0, 5).map((k: { key: string }) => k.key.toUpperCase());
+          // Restore dismissed state per session
+          try {
+            if (sessionStorage.getItem('tf_adaptive_banner_dismissed')) bannerDismissed = true;
+          } catch {}
+        }
+      } catch (e) {
+        console.error('Failed to wire user progression:', e);
       }
-    } catch (e) {
-      console.error('Failed to wire user progression:', e);
-    }
+    })();
   });
 
   function dismissBanner() {

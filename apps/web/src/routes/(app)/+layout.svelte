@@ -4,14 +4,16 @@
   import { goto, afterNavigate } from '$app/navigation';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import { useClerkContext } from 'svelte-clerk';
 
   let { children, data }: LayoutProps = $props();
 
   // Soft auth banner shown when signed out on soft-auth pages
   const softAuthPages = ['/learn', '/progress', '/practice'];
 
+  const ctx = useClerkContext();
   let showAuthBanner = $derived(
-    data.isSignedIn === false && softAuthPages.some((p) => page.url.pathname.startsWith(p))
+    ctx?.isLoaded && !ctx?.user && softAuthPages.some((p) => page.url.pathname.startsWith(p))
   );
 
   // Move focus to main content after each navigation

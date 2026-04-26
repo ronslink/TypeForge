@@ -148,36 +148,47 @@
     });
   }
 
-  // Fetch all data in parallel
-  onMount(async () => {
-    if (!isSignedIn) { loading = false; return; }
-    try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const h = new Headers(init?.headers);
-        if (token) h.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: h });
-      };
-      const api = createApiClient('/', authFetch);
+  let dataFetched = false;
 
-      const [progressRes, statsRes, weakRes] = await Promise.all([
-        api.api.v1.progress.$get(),
-        api.api.v1.progress.stats.$get(),
-        authFetch('/api/v1/progress/weakness'),
-      ]);
+  // Fetch all data reactively when auth state is resolved
+  $effect(() => {
+    if (!ctx?.isLoaded || dataFetched) return;
 
-      if (progressRes.ok) progress = await progressRes.json();
-      if (statsRes.ok)    stats    = await statsRes.json();
-      if (weakRes.ok) {
-        const j = await weakRes.json();
-        weakKeys = j.weakKeys ?? [];
-      }
-    } catch (e) {
-      error = 'Failed to load progress data';
-      console.error(e);
-    } finally {
+    if (!isSignedIn) {
       loading = false;
+      return;
     }
+
+    dataFetched = true;
+    (async () => {
+      try {
+        const token = await ctx?.session?.getToken();
+        const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+          const h = new Headers(init?.headers);
+          if (token) h.set('Authorization', `Bearer ${token}`);
+          return fetch(input, { ...init, headers: h });
+        };
+        const api = createApiClient('/', authFetch);
+
+        const [progressRes, statsRes, weakRes] = await Promise.all([
+          api.api.v1.progress.$get(),
+          api.api.v1.progress.stats.$get(),
+          authFetch('/api/v1/progress/weakness'),
+        ]);
+
+        if (progressRes.ok) progress = await progressRes.json();
+        if (statsRes.ok)    stats    = await statsRes.json();
+        if (weakRes.ok) {
+          const j = await weakRes.json();
+          weakKeys = j.weakKeys ?? [];
+        }
+      } catch (e) {
+        error = 'Failed to load progress data';
+        console.error(e);
+      } finally {
+        loading = false;
+      }
+    })();
   });
 
   $effect(() => {
