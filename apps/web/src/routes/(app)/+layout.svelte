@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { LayoutProps } from './$types';
-  import { useClerkContext } from 'svelte-clerk';
   import { page } from '$app/state';
   import { goto, afterNavigate } from '$app/navigation';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
@@ -8,22 +7,12 @@
 
   let { children, data }: LayoutProps = $props();
 
-  const ctx = useClerkContext();
-  let isLoading  = $derived(ctx?.isLoaded === false);
-  let isSignedIn = $derived(!!ctx?.user);
-  let currentPath = $derived(page.url.pathname);
-
-
-  // Routes accessible without authentication (no redirect)
-  const publicRoutes  = ['/onboarding', '/games/cascade'];
-  // Pages that show an auth nudge banner but don't redirect
+  // Soft auth banner shown when signed out on soft-auth pages
   const softAuthPages = ['/learn', '/progress', '/practice'];
 
   let showAuthBanner = $derived(
-    ctx?.isLoaded && !isSignedIn && softAuthPages.some((p) => currentPath.startsWith(p))
+    data.isSignedIn === false && softAuthPages.some((p) => page.url.pathname.startsWith(p))
   );
-
-  // Removed client-side auth gating — this is now strictly enforced server-side inside `hooks.server.ts`
 
   // Move focus to main content after each navigation
   let mainContentRef = $state<HTMLElement | null>(null);
@@ -37,11 +26,6 @@
     }
   }
 </script>
-
-<!--
-  Accessibility: skip link → TopNavBar (with aria-current, focus-visible)
-  → main (tabindex=-1, focus on navigate) → Footer
--->
 
 <div class="min-h-screen bg-background grid-texture text-on-background flex flex-col">
 
@@ -80,7 +64,6 @@
   >
     {@render children()}
   </main>
-
 
   <Footer />
 </div>
