@@ -6,7 +6,7 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
-import { typingSessions, userXp, streaks, keyMastery, userPlacementResults, orgMembers, orgSettings } from '@typeforge/db';
+import { typingSessions, userXp, streaks, keyMastery, userPlacementResults, orgMembers, orgSettings, lessons } from '@typeforge/db';
 import { eq, desc, and, gte, lte, lt } from 'drizzle-orm';
 const app = new Hono();
 
@@ -262,9 +262,10 @@ app.get('/lessons', async (c) => {
 
   const completedSessions = await db
     .select({
-      lessonId: typingSessions.lessonId,
+      lessonSlug: lessons.slug,
     })
     .from(typingSessions)
+    .leftJoin(lessons, eq(lessons.id, typingSessions.lessonId))
     .where(
       and(
         eq(typingSessions.userId, userId),
@@ -273,7 +274,7 @@ app.get('/lessons', async (c) => {
     );
 
   const completedLessonIds = Array.from(
-    new Set(completedSessions.map(s => s.lessonId).filter(Boolean))
+    new Set(completedSessions.map(s => s.lessonSlug).filter(Boolean))
   );
 
   return c.json({ completedLessons: completedLessonIds as string[] });

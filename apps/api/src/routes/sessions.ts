@@ -15,6 +15,7 @@ import {
   keyMastery,
   dailyStats,
   userProgress,
+  lessons,
 } from '@typeforge/db';
 import { eq, desc, and, sql } from 'drizzle-orm';
 const app = new Hono();
@@ -259,12 +260,33 @@ app.post('/', async (c) => {
 
   const now = new Date();
 
+  // Convert payload.lessonId (slug) to internal DB UUID if necessary
+  let internalLessonId: string | null = null;
+  if (payload.lessonId) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.lessonId);
+    if (isUuid) {
+      internalLessonId = payload.lessonId;
+    } else {
+      const [dbLesson] = await db
+        .select({ id: lessons.id })
+        .from(lessons)
+        .where(eq(lessons.slug, payload.lessonId))
+        .limit(1);
+      
+      if (dbLesson) {
+        internalLessonId = dbLesson.id;
+      } else {
+        console.warn(`Lesson slug '${payload.lessonId}' not found in DB lessons table`);
+      }
+    }
+  }
+
   // Create the session
   const [session] = await db
     .insert(typingSessions)
     .values({
       userId,
-      lessonId: payload.lessonId || null,
+      lessonId: internalLessonId,
       exerciseId: null,
       languageCode: payload.language,
       layoutId: payload.layout,
@@ -315,7 +337,7 @@ app.post('/', async (c) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const totalChars = payload.totalCharacters || payload.keystrokes.length;
   const sessionMinutes = Math.floor(payload.duration / 60);
-  const lessonCompleted = payload.lessonId ? 1 : 0;
+  const lessonCompleted = internalLessonId ? 1 : 0;
 
   await Promise.all([
     // Operation A — keyMastery upsert
@@ -377,13 +399,13 @@ app.post('/', async (c) => {
         },
       }),
 
-    // Operation C — userProgress upsert (only if lessonId present)
-    payload.lessonId
+    // Operation C — userProgress upsert (only if internalLessonId present)
+    internalLessonId
       ? db
           .insert(userProgress)
           .values({
             userId,
-            lessonId: payload.lessonId,
+            lessonId: internalLessonId,
             status: 'completed',
             bestWpm: payload.wpm,
             bestAccuracy: payload.accuracy,
