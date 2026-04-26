@@ -4,6 +4,41 @@ import type { Handle } from '@sveltejs/kit';
 import { env as publicEnv } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
 
+// Lightweight auth checker that never throws or redirects
+// Used for soft-auth pages where we want auth context but not enforced redirects
+const clerkAuthOnly: Handle = async ({ event, resolve }) => {
+  try {
+    // Use the server-side ClerkClient directly without the full middleware
+    const { createClerkClient } = await import('@clerk/backend');
+    const publishableKey = publicEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || privateEnv.VITE_CLERK_PUBLISHABLE_KEY || privateEnv.CLERK_PUBLISHABLE_KEY;
+    const secretKey = privateEnv.CLERK_SECRET_KEY;
+
+    if (!publishableKey || !secretKey) {
+      event.locals.auth = { userId: null };
+      return resolve(event);
+    }
+
+    const clerk = createClerkClient({ secretKey, publishableKey });
+    const requestState = await clerk.authenticateRequest(event.request);
+
+    // If there's a redirect header, we're in a handshake — skip it for soft-auth pages
+    // The client-side ClerkProvider will handle this naturally
+    const locationHeader = requestState.headers.get('location');
+    if (locationHeader) {
+      // Just set auth to null and let the page render without auth context
+      event.locals.auth = { userId: null };
+      return resolve(event);
+    }
+
+    event.locals.auth = { userId: requestState.toAuth().userId };
+    return resolve(event);
+  } catch (err) {
+    console.warn('[Clerk auth check failed]', err);
+    event.locals.auth = { userId: null };
+    return resolve(event);
+  }
+};
+
 const authGuard: Handle = async ({ event, resolve }) => {
   const { userId } = event.locals.auth ?? {};
   const currentPath = event.url.pathname;
@@ -40,23 +75,4 @@ const authGuard: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-const clerkSafe: Handle = async ({ event, resolve }) => {
-  try {
-    return await withClerkHandler({
-      publishableKey: publicEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || privateEnv.VITE_CLERK_PUBLISHABLE_KEY || privateEnv.CLERK_PUBLISHABLE_KEY,
-      secretKey: privateEnv.CLERK_SECRET_KEY,
-    })({ event, resolve });
-  } catch (err) {
-    // Clerk middleware threw — log and continue without auth context
-    console.warn('[Clerk middleware error]', err);
-    event.locals.auth = { userId: null };
-    try {
-      return await resolve(event);
-    } catch (resolveErr) {
-      console.error('[Resolve error after Clerk failure]', resolveErr);
-      return new Response('Something went wrong', { status: 500 });
-    }
-  }
-};
-
-export const handle = sequence(clerkSafe, authGuard);
+export const handle = sequence(clerkAuthOnly, authGuard);
