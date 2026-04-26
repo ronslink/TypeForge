@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
-  import { ProgressRing, StatCard, WeaknessHeatmap } from '@typeforge/ui';
+  import { ProgressRing, StatCard, WeaknessHeatmap, MilestoneCertifications } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
 
   // Auth state
@@ -188,6 +188,12 @@
   let levelProgress = $derived(progress ? calculateLevelProgress(progress.xp) : 0);
   let recentSessions = $derived(progress?.history?.slice(0, 10) || []);
 
+  let bestValidSession = $derived(
+    (progress?.history || [])
+      .filter((s: any) => (s.accuracy || 0) >= 95)
+      .sort((a: any, b: any) => (b.wpm || 0) - (a.wpm || 0))[0] || { wpm: 0, accuracy: 0 }
+  );
+
   // Map API weakness shape → WeaknessHeatmap shape
   let heatmapData = $derived(
     weakKeys.map((k) => ({
@@ -271,6 +277,15 @@
         <StatCard label="Avg Accuracy"   value={`${Math.round(progress?.avgAccuracy ?? 0)}%`} variant="secondary" />
         <StatCard label="Streak"         value={progress?.streak ?? 0} unit="days" variant="primary" />
       </div>
+    </div>
+
+    <!-- ───────────────────────────── Certifications ───────────────────────────────── -->
+    <div class="mb-8">
+      <MilestoneCertifications 
+        wpm={bestValidSession.wpm} 
+        accuracy={bestValidSession.accuracy} 
+        onViewCertificate={() => window.location.href = '/certificate'}
+      />
     </div>
 
     <!-- ──────────────────────────────── This week vs last ───────────────────────────── -->

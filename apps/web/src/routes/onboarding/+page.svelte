@@ -200,6 +200,11 @@
       const r = wpmCalculator.getWPM();
       currentWPM = Math.round(r.netWPM);
       currentAccuracy = Math.round(accuracyCalculator.getAccuracy());
+
+      // Auto-stop at 120 active seconds
+      if (activeElapsedSeconds >= 120) {
+        endTest();
+      }
     }, 500);
   }
 
@@ -572,7 +577,7 @@
 
           <!-- Pause indicator + Stop button -->
           {#if testStarted && !testEnded}
-            <div class="flex items-center justify-between px-1" aria-live="polite">
+            <div class="flex items-center justify-between px-1 relative pb-3" aria-live="polite">
               <div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest
                 {isPausedUI ? 'text-amber-400' : 'text-on-surface-variant/50'}">
                 {#if isPausedUI}
@@ -580,8 +585,16 @@
                   <span>Clock paused — tap any key to resume</span>
                 {:else}
                   <span class="ob-active-dot" aria-hidden="true"></span>
-                  <span>Clock running</span>
+                  <span>Clock running — {120 - Math.min(120, activeElapsedSeconds)}s left</span>
                 {/if}
+              </div>
+              
+              <!-- 120s Progress Bar -->
+              <div class="absolute left-0 bottom-0 h-1 bg-surface-container-highest w-full overflow-hidden">
+                <div 
+                  class="h-full bg-primary transition-all duration-500 ease-linear" 
+                  style="width: {(Math.min(120, activeElapsedSeconds) / 120) * 100}%"
+                ></div>
               </div>
               {#if canStopTest}
                 <button

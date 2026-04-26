@@ -1,48 +1,48 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
-  import { ConfettiCelebration, Button } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
   
   const ctx = useClerkContext();
-  const user = $derived(ctx?.user);
+  let isSignedIn = $derived(!!ctx?.user);
   
-  let isLoading = $state(true);
-  let showConfetti = $state(false);
-  let bestWPM = $state(0);
-  let bestAccuracy = $state(0);
-  let issueDate = $state(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+  let bestSession = $state({ wpm: 0, accuracy: 0, date: new Date().toISOString() });
+  let loading = $state(true);
   
   onMount(async () => {
+    if (!isSignedIn) {
+      loading = false;
+      return;
+    }
+    
     try {
       const token = await ctx?.session?.getToken();
-      if (!token) return;
-      
       const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
+        const h = new Headers(init?.headers);
+        if (token) h.set('Authorization', `Bearer ${token}`);
+        return fetch(input, { ...init, headers: h });
       };
-      
       const api = createApiClient('/', authFetch);
-      // Fetch user profile metrics to populate certificate
-      const response = await api.api.v1.progress.$get();
-      if (response.ok) {
-        const data = await response.json();
-        // Assuming data returns global max metrics, fallbacks provided
-        bestWPM = data.highestWpm || 120;
-        bestAccuracy = data.averageAccuracy || 98;
+      
+      const res = await api.api.v1.progress.$get();
+      if (res.ok) {
+        const progress = await res.json();
+        const validSessions = (progress?.history || []).filter((s: any) => (s.accuracy || 0) >= 95);
+        if (validSessions.length > 0) {
+          bestSession = validSessions.sort((a: any, b: any) => (b.wpm || 0) - (a.wpm || 0))[0];
+        }
       }
     } catch (e) {
       console.error(e);
-      // Failsafe for unauthenticated dummy view
-      bestWPM = 120;
-      bestAccuracy = 98;
     } finally {
-      isLoading = false;
-      setTimeout(() => showConfetti = true, 500);
+      loading = false;
     }
   });
+
+  function formatDate(iso: string) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
 
   function handlePrint() {
     window.print();
@@ -50,107 +50,162 @@
 </script>
 
 <svelte:head>
-  <title>Your Certification — TypeForge</title>
+  <title>TypingScholar Certificate</title>
 </svelte:head>
 
-<!-- Generate Confetti celebration on load -->
-{#if !isLoading}
-  <ConfettiCelebration trigger={showConfetti} duration={8000} />
-{/if}
-
-<div class="max-w-5xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[85vh] print:p-0 print:m-0 print:min-h-0">
-  
-  <div class="mb-8 flex gap-4 print:hidden">
-    <Button variant="primary" onclick={handlePrint}>Print Certificate</Button>
-    <Button variant="secondary" onclick={() => window.location.href = '/learn'}>Back to Curriculum</Button>
+{#if loading}
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="animate-pulse flex flex-col items-center">
+      <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p class="font-label tracking-widest uppercase text-on-surface-variant text-sm">Validating records...</p>
+    </div>
+  </div>
+{:else if bestSession.wpm < 60 || !isSignedIn}
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md bg-surface-container p-8 rounded border border-outline-variant/30 text-center">
+      <span class="material-symbols-outlined text-error text-5xl mb-4">lock</span>
+      <h1 class="font-headline text-2xl mb-2">Certificate Locked</h1>
+      <p class="text-on-surface-variant text-sm mb-6">
+        You must achieve <strong>Proficient</strong> status (60+ WPM with 95% Accuracy) to unlock the official TypingScholar Certificate.
+      </p>
+      <a href="/progress" class="notched-button bg-primary text-background px-6 py-3 font-label text-sm font-bold uppercase tracking-wider">
+        Return to Progress
+      </a>
+    </div>
+  </div>
+{:else}
+  <!-- Print Controls (Hidden when printing) -->
+  <div class="fixed top-6 right-6 flex gap-4 print:hidden z-50">
+    <a href="/progress" class="notched-button bg-surface-container text-on-surface px-4 py-2 font-label text-xs uppercase tracking-widest border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+      Back
+    </a>
+    <button onclick={handlePrint} class="notched-button bg-primary text-background px-4 py-2 font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined text-[18px]">print</span>
+      Print / Save PDF
+    </button>
   </div>
 
-  {#if isLoading}
-    <div class="animate-pulse text-primary font-headline text-2xl">Forging your achievement...</div>
-  {:else}
-    <!-- Certificate Canvas -->
-    <div class="relative w-full max-w-[1056px] min-h-[816px] bg-[#FAF9F6] border-[16px] border-[#2A2A2A] shadow-2xl p-12 flex flex-col items-center justify-center overflow-hidden print:shadow-none print:border-none print:bg-white print:break-inside-avoid text-black">
+  <!-- Certificate Container -->
+  <div class="certificate-wrapper min-h-screen bg-background flex items-center justify-center p-8 print:p-0">
+    <div class="certificate aspect-[1.414/1] w-full max-w-[1056px] relative bg-white text-black overflow-hidden shadow-2xl print:shadow-none">
       
-      <!-- Ornamental Corners -->
-      <div class="absolute top-0 left-0 w-32 h-32 border-t-[8px] border-l-[8px] border-[#D4AF37] m-4"></div>
-      <div class="absolute top-0 right-0 w-32 h-32 border-t-[8px] border-r-[8px] border-[#D4AF37] m-4"></div>
-      <div class="absolute bottom-0 left-0 w-32 h-32 border-b-[8px] border-l-[8px] border-[#D4AF37] m-4"></div>
-      <div class="absolute bottom-0 right-0 w-32 h-32 border-b-[8px] border-r-[8px] border-[#D4AF37] m-4"></div>
+      <!-- Ornamental Border -->
+      <div class="absolute inset-4 border-[1px] border-black/10"></div>
+      <div class="absolute inset-[18px] border-4 border-black/80"></div>
+      <div class="absolute inset-[24px] border-[1px] border-black/10"></div>
       
-      <!-- Watermark Background -->
-      <div class="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+      <!-- Corner Ornaments -->
+      <div class="absolute top-5 left-5 w-8 h-8 border-t-4 border-l-4 border-black/80"></div>
+      <div class="absolute top-5 right-5 w-8 h-8 border-t-4 border-r-4 border-black/80"></div>
+      <div class="absolute bottom-5 left-5 w-8 h-8 border-b-4 border-l-4 border-black/80"></div>
+      <div class="absolute bottom-5 right-5 w-8 h-8 border-b-4 border-r-4 border-black/80"></div>
+
+      <!-- Background Watermark -->
+      <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+        <span class="font-headline text-[250px] leading-none tracking-tighter">TS</span>
       </div>
 
-      <div class="relative z-10 w-full flex flex-col items-center text-center px-12">
-        <h3 class="font-label text-xl tracking-[0.5em] text-[#808080] uppercase mb-4">Official Certification</h3>
+      <!-- Certificate Content -->
+      <div class="relative h-full flex flex-col items-center justify-center text-center p-16 pb-12 z-10">
         
-        <h1 class="font-headline text-6xl md:text-8xl text-[#1A1A1A] mb-8 font-serif leading-none tracking-tight">
-          TypeForge
+        <h3 class="font-label text-sm uppercase tracking-[0.4em] text-black/60 mb-6">Official Certification</h3>
+        
+        <h1 class="font-headline text-6xl md:text-7xl mb-10 tracking-tight text-black">
+          TypingScholar
         </h1>
 
-        <div class="w-24 h-1 bg-[#D4AF37] mb-12"></div>
-
-        <p class="font-body text-xl text-[#4A4A4A] italic mb-6">This document certifies that</p>
-        
-        <h2 class="font-headline text-5xl md:text-6xl text-[#1A1A1A] mb-12 capitalize border-b border-black/20 pb-4 min-w-[50%]">
-          {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : user?.username || 'Guest Scholar'}
-        </h2>
-
-        <p class="font-body text-2xl text-[#4A4A4A] max-w-3xl leading-relaxed mb-16">
-          Has successfully completed the comprehensive Curriculum path, mastering all mechanical typing stages and proving exceptional physical dexterity, accuracy, and endurance.
+        <p class="font-body text-xl md:text-2xl text-black/80 mb-6 italic">
+          This certifies that
         </p>
 
-        <!-- Dynamic Metrics Render -->
-        <div class="flex justify-center gap-16 mb-16 w-full">
-          <div class="text-center">
-            <span class="block font-label text-sm uppercase tracking-widest text-[#808080] mb-2">Verified Peak Speed</span>
-            <span class="font-headline text-5xl text-[#2A2A2A]">{bestWPM}<span class="text-xl ml-1 text-[#808080] font-body">WPM</span></span>
-          </div>
-          <div class="w-px bg-[#D4AF37]/50"></div>
-          <div class="text-center">
-            <span class="block font-label text-sm uppercase tracking-widest text-[#808080] mb-2">Verified Average Accuracy</span>
-            <span class="font-headline text-5xl text-[#2A2A2A]">{bestAccuracy}<span class="text-xl ml-1 text-[#808080]">%</span></span>
-          </div>
-        </div>
+        <h2 class="font-headline text-4xl md:text-5xl text-black border-b border-black/20 pb-4 px-12 mb-10 min-w-[50%]">
+          {ctx?.user?.firstName ? `${ctx.user.firstName} ${ctx.user.lastName || ''}` : 'Verified Scholar'}
+        </h2>
 
-        <!-- Footer Signatures -->
-        <div class="flex justify-between items-end w-full px-12 mt-12">
-          <div class="flex flex-col items-center min-w-[200px]">
-            <span class="font-serif text-3xl italic text-[#1A1A1A] mb-2 border-b border-black/20 pb-2 w-full text-center">T. Scholar</span>
-            <span class="font-label text-xs uppercase tracking-widest text-[#808080]">Board of Directors</span>
+        <p class="font-body text-lg md:text-xl text-black/80 max-w-2xl mx-auto leading-relaxed mb-12">
+          Has successfully completed the kinetic analysis and adaptive curriculum required to achieve 
+          <strong>Professional Grade</strong> proficiency, demonstrating an elite typing speed of 
+          <strong class="text-black">{Math.round(bestSession.wpm)} Words Per Minute</strong> 
+          with a sustained accuracy of 
+          <strong class="text-black">{Math.round(bestSession.accuracy)}%</strong>.
+        </p>
+
+        <!-- Footer / Signatures -->
+        <div class="w-full flex justify-between items-end mt-auto px-16">
+          <div class="text-center w-48">
+            <div class="font-headline text-2xl border-b border-black/30 pb-2 mb-2 text-black/80">
+              {formatDate(bestSession.date)}
+            </div>
+            <div class="font-label text-xs uppercase tracking-widest text-black/50">Date of Award</div>
           </div>
 
-          <!-- Gold Seal Badge -->
-          <div class="relative w-32 h-32 flex items-center justify-center">
-            <div class="absolute inset-0 bg-[#D4AF37] rounded-full flex items-center justify-center shadow-lg transform rotate-12">
-              <div class="w-28 h-28 border border-background/30 rounded-full flex items-center justify-center border-dashed">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-background"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <!-- Seal -->
+          <div class="relative flex items-center justify-center">
+            <div class="absolute w-24 h-24 bg-[#ffc56c] rounded-full mix-blend-multiply opacity-20 blur-md"></div>
+            <div class="w-32 h-32 rounded-full border-[6px] border-[#ffc56c] flex items-center justify-center relative bg-white shadow-lg z-10">
+              <div class="absolute inset-2 border border-[#ffc56c]/50 rounded-full border-dashed"></div>
+              <div class="text-center">
+                <span class="block font-headline text-2xl text-[#c48d35] leading-none mb-1">TS</span>
+                <span class="block font-label text-[8px] uppercase tracking-widest text-[#c48d35] font-bold">Certified</span>
               </div>
             </div>
           </div>
 
-          <div class="flex flex-col items-center min-w-[200px]">
-            <span class="font-serif text-2xl text-[#1A1A1A] mb-2 border-b border-black/20 pb-2 w-full text-center">{issueDate}</span>
-            <span class="font-label text-xs uppercase tracking-widest text-[#808080]">Date of Issue</span>
+          <div class="text-center w-48">
+            <div class="border-b border-black/30 pb-2 mb-2">
+              <span class="font-label italic text-2xl tracking-tighter text-black/80 block -mb-1 signature-font">TypeForge Engine</span>
+            </div>
+            <div class="font-label text-xs uppercase tracking-widest text-black/50">Neural Verifier</div>
           </div>
         </div>
+
       </div>
     </div>
-  {/if}
-</div>
+  </div>
+{/if}
 
 <style>
-  /* Enhance printing capabilities */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+  .signature-font {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .notched-button {
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  /* Print optimizations */
   @media print {
-    :global(body) {
-      background: white !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
     @page {
-      size: landscape;
-      margin: 0cm;
+      size: A4 landscape;
+      margin: 0;
+    }
+    
+    :global(body) {
+      margin: 0;
+      padding: 0;
+      background: white;
+    }
+    
+    :global(nav), :global(footer), :global(sidebar) {
+      display: none !important;
+    }
+
+    .certificate-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .certificate {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border: none;
+      box-shadow: none;
+      transform: scale(1);
     }
   }
 </style>

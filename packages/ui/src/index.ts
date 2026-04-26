@@ -15,6 +15,7 @@ export { default as RaindropEngine } from './components/RaindropEngine.svelte';
 
 // Metrics & Progress Components
 export { default as MetricsBar } from './components/MetricsBar.svelte';
+export { default as MilestoneCertifications } from "./components/MilestoneCertifications.svelte";
 export { default as ProgressRing } from './components/ProgressRing.svelte';
 
 // Lesson Components
