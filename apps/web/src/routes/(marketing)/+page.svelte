@@ -260,7 +260,7 @@
       { label: 'Languages', href: '/languages' }
     ],
     resources: [
-      { label: 'School Resources', href: '/languages' },
+      { label: 'School Resources', href: '/contact' },
       { label: 'Typing Guide', href: '/typing-guide' },
       { label: 'Teacher Dashboard', href: '/learn' }
     ],

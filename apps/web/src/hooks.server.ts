@@ -5,9 +5,13 @@ import { env as publicEnv } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  // Extract auth context injected by svelte-clerk
   const { userId } = event.locals.auth ?? {};
   const currentPath = event.url.pathname;
+
+  // Let SvelteKit handle 404s and other non-resolvable routes
+  if (event.route.id === null) {
+    return resolve(event);
+  }
 
   // Paths that do not enforce login wall
   const publicRoutes = [

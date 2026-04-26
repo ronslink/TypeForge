@@ -106,12 +106,11 @@
           </a>
         </div>
 
-        <!-- School -->
+        <!-- Schools -->
         <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 flex flex-col">
           <div class="mb-6">
-            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">School</h2>
-            <div class="flex items-baseline gap-2">
-              <span class="font-headline text-2xl text-on-surface-variant">From</span>
+            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">Schools</h2>
+            <div class="flex items-baseline gap-1">
               <span class="font-headline text-5xl">$6</span>
               <span class="text-on-surface-variant font-body">/seat/mo</span>
             </div>
