@@ -8,6 +8,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const { userId } = event.locals.auth ?? {};
   const currentPath = event.url.pathname;
 
+  // Let SvelteKit handle 404s and other non-resolvable routes
+  if (event.route.id === null) {
+    return resolve(event);
+  }
+
   const publicRoutes = [
     '/',
     '/onboarding',
@@ -24,11 +29,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
   const isPublic = publicRoutes.some((r) => currentPath === r || currentPath.startsWith(r + '/'));
   const isSoft = softAuthPages.some((r) => currentPath.startsWith(r));
-
-  // Render a proper 404 for unknown routes
-  if (event.route.id === null) {
-    return new Response('Not Found', { status: 404 });
-  }
 
   if (!userId && !isPublic && !isSoft && currentPath !== '/') {
     return new Response(null, {
@@ -47,13 +47,12 @@ const clerkSafe: Handle = async ({ event, resolve }) => {
       secretKey: privateEnv.CLERK_SECRET_KEY,
     })({ event, resolve });
   } catch (err) {
-    // Clerk middleware threw — log and continue without auth
+    // Clerk middleware threw — log and continue without auth context
     console.warn('[Clerk middleware error]', err);
     event.locals.auth = { userId: null };
     try {
       return await resolve(event);
     } catch (resolveErr) {
-      // Even resolve failed — return a safe error page instead of crashing
       console.error('[Resolve error after Clerk failure]', resolveErr);
       return new Response('Something went wrong', { status: 500 });
     }

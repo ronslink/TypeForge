@@ -222,8 +222,8 @@
       price: '$6',
       period: '/seat/mo',
       features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
-      cta: 'Contact Sales',
-      ctaHref: '/contact',
+      cta: 'Sign up now',
+      ctaHref: '/sign-up?plan=school',
       popular: false
     }
   ];
@@ -260,7 +260,7 @@
       { label: 'Languages', href: '/languages' }
     ],
     resources: [
-      { label: 'School Resources', href: '/languages' },
+      { label: 'School Resources', href: '/contact' },
       { label: 'Typing Guide', href: '/typing-guide' },
       { label: 'Teacher Dashboard', href: '/learn' }
     ],

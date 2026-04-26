@@ -81,7 +81,7 @@
         </div>
 
       {:else}
-        <form onsubmit={handleSubmit} class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 md:p-10">
+        <form onsubmit={handleSubmit} novalidate class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 md:p-10">
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Name -->
             <div>
