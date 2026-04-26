@@ -55,79 +55,104 @@
     scripts = scripts; // trigger reactivity
   });
 
+  let demoGeneration = $state(0);
+  let activeTimers = new Set<ReturnType<typeof setTimeout>>();
+
+  function safeTimeout(cb: () => void, delay: number) {
+    const id = setTimeout(() => {
+      activeTimers.delete(id);
+      cb();
+    }, delay);
+    activeTimers.add(id);
+    return id;
+  }
+
+  function clearAllTimers() {
+    activeTimers.forEach(id => clearTimeout(id));
+    activeTimers.clear();
+  }
+
   function jumpToScene(name: string) {
     const idx = DEMO_SCENES.findIndex(s => s.script === name);
     if (idx === -1 || idx === demoSceneIdx) return;
+    
+    demoGeneration++;
+    const currentGen = demoGeneration;
+    clearAllTimers();
+
     triggerFade(() => {
+      if (demoGeneration !== currentGen) return;
       demoSceneIdx = idx;
       demoTypedLen = 0;
       currentWpm = 0;
       currentAccuracy = 100;
       streak = 0;
+      
+      safeTimeout(() => scheduleNextChar(currentGen), 600);
     });
   }
 
   function triggerFade(callback: () => void) {
     demoFading = true;
-    setTimeout(() => {
+    safeTimeout(() => {
       callback();
       demoFading = false;
     }, 380);
   }
 
-  // Main demo loop
+  function scheduleNextChar(gen: number) {
+    if (demoGeneration !== gen) return;
+    const scene = DEMO_SCENES[demoSceneIdx]!;
+    const msPerChar = Math.round(60000 / (scene.wpm * 5));
+    const jitter = msPerChar * 0.25;
+    const delay = msPerChar + (Math.random() * jitter * 2 - jitter);
+
+    safeTimeout(() => {
+      if (demoGeneration !== gen) return;
+      
+      if (demoTypedLen < scene.text.length) {
+        demoTypedLen++;
+        const progress = demoTypedLen / scene.text.length;
+        currentWpm = Math.round(scene.wpm * Math.min(1, progress * 1.4));
+        currentAccuracy = parseFloat(
+          (100 - (100 - scene.accuracy) * Math.min(1, progress * 1.2)).toFixed(1)
+        );
+        streak = demoTypedLen;
+        scheduleNextChar(gen);
+      } else {
+        safeTimeout(() => {
+          if (demoGeneration !== gen) return;
+          advanceScene(gen);
+        }, 2200);
+      }
+    }, delay);
+  }
+
+  function advanceScene(gen: number) {
+    if (demoGeneration !== gen) return;
+    demoGeneration++;
+    const nextGen = demoGeneration;
+    
+    triggerFade(() => {
+      if (demoGeneration !== nextGen) return;
+      demoSceneIdx = (demoSceneIdx + 1) % DEMO_SCENES.length;
+      demoTypedLen = 0;
+      currentWpm = 0;
+      currentAccuracy = 100;
+      streak = 0;
+      safeTimeout(() => scheduleNextChar(nextGen), 600);
+    });
+  }
+
   let mounted = false;
   onMount(() => {
     mounted = true;
-    let charTimer: ReturnType<typeof setTimeout>;
-    let sceneTimer: ReturnType<typeof setTimeout>;
-
-    function scheduleNextChar() {
-      const scene = DEMO_SCENES[demoSceneIdx]!;
-      // ms per char = 60000 / (wpm * 5)
-      const msPerChar = Math.round(60000 / (scene.wpm * 5));
-      // Add slight human jitter ±25%
-      const jitter = msPerChar * 0.25;
-      const delay = msPerChar + (Math.random() * jitter * 2 - jitter);
-
-      charTimer = setTimeout(() => {
-        if (demoTypedLen < scene.text.length) {
-          demoTypedLen++;
-          // Tick up WPM toward target
-          const progress = demoTypedLen / scene.text.length;
-          currentWpm = Math.round(scene.wpm * Math.min(1, progress * 1.4));
-          // Accuracy drifts to target
-          currentAccuracy = parseFloat(
-            (100 - (100 - scene.accuracy) * Math.min(1, progress * 1.2)).toFixed(1)
-          );
-          // Streak increments every char
-          streak = demoTypedLen;
-          scheduleNextChar();
-        } else {
-          // Scene finished — wait then advance to next
-          sceneTimer = setTimeout(() => advanceScene(), 2200);
-        }
-      }, delay);
-    }
-
-    function advanceScene() {
-      triggerFade(() => {
-        demoSceneIdx = (demoSceneIdx + 1) % DEMO_SCENES.length;
-        demoTypedLen = 0;
-        currentWpm = 0;
-        currentAccuracy = 100;
-        streak = 0;
-      });
-      // Give fade time then start typing
-      setTimeout(scheduleNextChar, 600);
-    }
-
-    // Kick off
-    setTimeout(scheduleNextChar, 800);
+    demoGeneration++;
+    safeTimeout(() => scheduleNextChar(demoGeneration), 800);
 
     return () => {
-      clearTimeout(charTimer);
-      clearTimeout(sceneTimer);
+      demoGeneration++; // kill any pending loops
+      clearAllTimers();
     };
   });
 
