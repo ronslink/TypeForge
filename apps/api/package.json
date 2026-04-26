@@ -15,12 +15,15 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.53",
     "@hono/zod-validator": "^0.4.0",
     "@typeforge/auth": "workspace:*",
     "@typeforge/db": "workspace:*",
+    "ai": "^6.0.168",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.6.0",
-    "stripe": "^14.0.0"
+    "stripe": "^14.0.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^20.19.37",

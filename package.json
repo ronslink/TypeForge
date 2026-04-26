@@ -8,8 +8,7 @@
     "touch-typing",
     "multilingual",
     "education",
-    "sveltekit",
-    "cloudflare-workers"
+    "sveltekit"
   ],
   "author": "TypeForge Team",
   "license": "UNLICENSED",
@@ -51,8 +50,6 @@
     "typescript-eslint": "^8.18.0"
   },
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20250110.0",
-    "@sveltejs/adapter-cloudflare": "^4.8.0",
     "hono": "^4.6.0"
   }
 }

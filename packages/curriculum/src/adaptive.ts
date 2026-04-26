@@ -9,6 +9,7 @@ import { getRandomWords } from './wordlists/index.js';
 export interface AdaptiveLessonRequest {
   weakKeys: string[];
   language: string;
+  aiGeneratedText?: string;
 }
 
 export interface AdaptiveLesson {
@@ -28,7 +29,7 @@ export interface AdaptiveLesson {
  * Generate an adaptive lesson focused on weak keys
  */
 export function generateAdaptiveLesson(request: AdaptiveLessonRequest): AdaptiveLesson {
-  const { weakKeys, language } = request;
+  const { weakKeys, language, aiGeneratedText } = request;
   const normalizedLang = language.toLowerCase().trim();
 
   // Build exercises
@@ -37,13 +38,23 @@ export function generateAdaptiveLesson(request: AdaptiveLessonRequest): Adaptive
   // 1. Key repetition drill
   exercises.push(generateKeyDrill(weakKeys));
 
-  // 2. Word-based exercise using language wordlist filtered by weak keys
-  exercises.push(generateWordExercise(weakKeys, normalizedLang));
+  if (aiGeneratedText) {
+    // If AI generated text is provided, use it as the primary practice content
+    exercises.push({
+      id: `adaptive-ai-${Date.now()}`,
+      type: 'paragraphs',
+      content: [aiGeneratedText],
+      focusKeys: weakKeys,
+    });
+  } else {
+    // 2. Word-based exercise using language wordlist filtered by weak keys
+    exercises.push(generateWordExercise(weakKeys, normalizedLang));
 
-  // 3. Sentence patterns
-  exercises.push(generateSentenceExercise(weakKeys, normalizedLang));
+    // 3. Sentence patterns
+    exercises.push(generateSentenceExercise(weakKeys, normalizedLang));
+  }
 
-  const totalChars = exercises.reduce((sum, ex) => sum + ex.content.join(' ').length, 0);
+  const totalChars = exercises.reduce((sum, ex) => sum + (Array.isArray(ex.content) ? ex.content.join(' ').length : 0), 0);
   const estimatedMinutes = Math.max(3, Math.ceil(totalChars / 150));
 
   return {

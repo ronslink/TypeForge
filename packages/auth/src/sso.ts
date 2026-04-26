@@ -4,7 +4,6 @@
  */
 
 import type { Context } from 'hono';
-import type { KVNamespace } from '@cloudflare/workers-types';
 
 /**
  * Google OAuth tokens response
@@ -381,7 +380,7 @@ export function generateOAuthState(): string {
 export async function storeOAuthState(
   state: string,
   data: Record<string, unknown>,
-  kv: KVNamespace,
+  kv: any,
   ttlSeconds: number = 600 // 10 minutes
 ): Promise<void> {
   await kv.put(`oauth:state:${state}`, JSON.stringify(data), {
@@ -394,7 +393,7 @@ export async function storeOAuthState(
  */
 export async function verifyOAuthState(
   state: string,
-  kv: KVNamespace
+  kv: any
 ): Promise<Record<string, unknown> | null> {
   const key = `oauth:state:${state}`;
   const stored = await kv.get(key);

@@ -2,7 +2,11 @@
  * TypeForge Cloudflare Worker Bindings
  * Interface matching all wrangler.toml bindings for type-safe env access
  */
-import type { Hyperdrive, D1Database, R2Bucket, Queue, KVNamespace } from '@cloudflare/workers-types';
+type Hyperdrive = any;
+type D1Database = any;
+type R2Bucket = any;
+type Queue = any;
+type KVNamespace = any;
 
 export interface Env {
   // Regional PostgreSQL via Hyperdrive
@@ -22,9 +26,6 @@ export interface Env {
   // KV cache for sessions and rate limiting
   CACHE: KVNamespace;
 
-  // Upstash Redis for real-time features (streaks, leaderboards)
-  UPSTASH_REDIS_REST_URL: string;
-  UPSTASH_REDIS_REST_TOKEN: string;
 
   // Clerk authentication
   CLERK_SECRET_KEY: string;

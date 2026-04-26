@@ -12,7 +12,6 @@
       "@typeforge/curriculum": ["../../packages/curriculum/src"],
       "@typeforge/curriculum/*": ["../../packages/curriculum/src/*"]
     },
-    "types": ["@cloudflare/workers-types"],
     "module": "ESNext",
     "target": "ES2022",
     "lib": ["ES2022"]

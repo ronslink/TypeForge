@@ -13,7 +13,10 @@ import {
   languages,
   typingSessions,
   keyMastery,
+  subscriptions,
 } from '@typeforge/db';
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 import { eq, and, desc } from 'drizzle-orm';
 import {
   selectNextLesson,
@@ -188,14 +191,63 @@ app.get('/next', requireAuth, async (c) => {
 });
 
 /**
- * POST /lessons/adaptive - Generate an ephemeral adaptive lesson for weak keys
+ * POST /lessons/adaptive - Generate an ephemeral adaptive lesson for weak keys using AI
  */
 app.post('/adaptive', requireAuth, async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const userId = auth.userId;
+
+  // 1. Verify premium subscription
+  const [sub] = await db
+    .select()
+    .from(subscriptions)
+    .where(and(eq(subscriptions.entityId, userId), eq(subscriptions.status, 'active')))
+    .limit(1);
+
+  if (!sub) {
+    return c.json({ error: 'Premium subscription required for AI Adaptive Drills', code: 'FORBIDDEN' }, 403);
+  }
+
   const body = await c.req.json();
   const weakKeys = Array.isArray(body.weakKeys) ? (body.weakKeys as string[]) : [];
   const language = typeof body.language === 'string' ? body.language : 'en';
 
-  const lesson = generateAdaptiveLesson({ weakKeys, language });
+  if (weakKeys.length === 0) {
+    return c.json({ error: 'Weak keys are required', code: 'BAD_REQUEST' }, 400);
+  }
+
+  const apiKey = process.env.MINIMAX_API_KEY;
+  let aiGeneratedText: string | undefined;
+
+  if (apiKey) {
+    try {
+      const minimax = createOpenAI({
+        baseURL: 'https://api.minimax.io/v1',
+        apiKey: apiKey,
+      });
+
+      const prompt = `You are an expert typing tutor. 
+Generate a 3-sentence paragraph in language '${language}'. 
+The paragraph MUST heavily feature and over-index the following weak keys/characters: [ ${weakKeys.join(', ')} ].
+Make the text coherent, natural-sounding, and moderately challenging.
+Return ONLY the raw text. Do not include quotes, explanations, or introductory text.`;
+
+      const { text } = await generateText({
+        model: minimax('MiniMax-M2.7'),
+        prompt,
+      });
+
+      aiGeneratedText = text;
+    } catch (e) {
+      console.error('AI Generation Failed:', e);
+      // Fallback to deterministic generation if AI fails
+    }
+  } else {
+    console.warn('MINIMAX_API_KEY not set. Falling back to deterministic generation.');
+  }
+
+  const lesson = generateAdaptiveLesson({ weakKeys, language, aiGeneratedText });
 
   return c.json({ lesson });
 });

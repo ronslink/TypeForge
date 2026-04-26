@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { 
     TypingInput, 
     Keyboard, 
@@ -39,7 +40,16 @@
   let availableLanguages = getSupportedLanguages();
 
   // Practice Modes State
-  let mode = $state<'select' | 'words' | 'sentences' | 'book'>('select');
+  let mode = $state<'select' | 'words' | 'sentences' | 'book' | 'adaptive'>('select');
+  let isGeneratingAI = $state(false);
+  
+  onMount(() => {
+    const urlMode = $page.url.searchParams.get('mode');
+    const weakKeys = $page.url.searchParams.get('weakKeys')?.split(',') || [];
+    if (urlMode === 'adaptive' && weakKeys.length > 0) {
+      mountAdaptivePractice(weakKeys);
+    }
+  });
   
   let currentBooks = $derived(FAMOUS_BOOKS[userLanguage] || FAMOUS_BOOKS['en'] || []);
   let selectedBookId = $state('');
@@ -194,6 +204,69 @@
     keystrokes = [];
     wpmCalculator = new WPMCalculator();
     accuracyTracker = new AccuracyTracker();
+  }
+
+  async function mountAdaptivePractice(weakKeys: string[]) {
+    mode = 'adaptive';
+    isGeneratingAI = true;
+    try {
+      const token = await ctx?.session?.getToken();
+      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+        const defaultHeaders = new Headers(init?.headers);
+        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
+        return fetch(input, { ...init, headers: defaultHeaders });
+      };
+      
+      const api = createApiClient('/', authFetch);
+      const res = await api.api.v1.lessons.adaptive.$post({
+        json: { weakKeys, language: userLanguage }
+      });
+
+      if (!res.ok) {
+        if (res.status === 403) {
+          alert('Premium subscription required for AI Adaptive Drills');
+          goto('/pricing');
+          return;
+        }
+        throw new Error('Failed to generate lesson');
+      }
+
+      const data = await res.json();
+      const lesson = data.lesson;
+      const chars: LessonChar[] = [];
+      for (const ex of lesson.exercises) {
+        if (ex.type === 'words' || ex.type === 'sentences' || ex.type === 'paragraphs') {
+          const text = Array.isArray(ex.content) ? ex.content.join(' ') : String(ex.content);
+          chars.push(...generateLessonSequence(text));
+          chars.push(generateLessonSequence(' ')[0]!); // Space between exercises
+        }
+      }
+      // Remove trailing space
+      if (chars.length > 0) chars.pop();
+      
+      lessonChars = chars;
+      
+      // Reset state
+      currentIndex = 0;
+      errors = new Set();
+      isComplete = false;
+      isStarted = false;
+      showCelebration = false;
+      sessionSubmitted = false;
+      startTime = null;
+      elapsedSeconds = 0;
+      currentWPM = 0;
+      currentAccuracy = 100;
+      currentStreak = 0;
+      keystrokes = [];
+      wpmCalculator = new WPMCalculator();
+      accuracyTracker = new AccuracyTracker();
+    } catch (e) {
+      console.error(e);
+      mode = 'select';
+    } finally {
+      isGeneratingAI = false;
+    }
   }
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -381,6 +454,12 @@
         </select>
         <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">{$t('practice_start_book') || 'Start Book Drill'}</button>
       </div>
+    </div>
+  {:else if isGeneratingAI}
+    <div class="flex flex-col items-center justify-center py-24 space-y-6">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+      <h2 class="font-headline text-2xl text-primary animate-pulse">Generating AI Adaptive Drill...</h2>
+      <p class="text-on-surface-variant max-w-md text-center">Analyzing your weak keys and composing a custom multilingual sequence using Kimi AI.</p>
     </div>
   {:else}
     <div class="mb-6 flex items-center justify-between">

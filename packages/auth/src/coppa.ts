@@ -5,7 +5,6 @@
 
 import type { Context } from 'hono';
 import type { ClerkUser } from './clerk.js';
-import type { KVNamespace } from '@cloudflare/workers-types';
 
 /**
  * Parental consent request structure
@@ -106,7 +105,7 @@ export async function createParentalConsentRequest(
   };
   
   // Store consent request in KV cache (would be implemented with actual KV binding)
-  const kv = ctx.env?.CACHE as KVNamespace | undefined;
+  const kv = ctx.env?.CACHE as any;
   if (kv) {
     await kv.put(
       `consent:${consentToken}`,
@@ -130,7 +129,7 @@ export async function createParentalConsentRequest(
  */
 export async function verifyParentalConsent(
   token: string,
-  kv?: KVNamespace
+  kv?: any
 ): Promise<boolean> {
   if (!kv) {
     console.error('[COPPA] KV namespace not available for consent verification');

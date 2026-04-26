@@ -1,5 +1,10 @@
 /// <reference types="@sveltejs/kit" />
-import type { Hyperdrive, D1Database, R2Bucket, Queue, KVNamespace, ExecutionContext } from '@cloudflare/workers-types';
+type Hyperdrive = any;
+type D1Database = any;
+type R2Bucket = any;
+type Queue = any;
+type KVNamespace = any;
+type ExecutionContext = any;
 
 declare global {
   namespace App {
@@ -29,8 +34,6 @@ declare global {
         ASSETS: R2Bucket;
         JOBS: Queue;
         CACHE: KVNamespace;
-        UPSTASH_REDIS_REST_URL: string;
-        UPSTASH_REDIS_REST_TOKEN: string;
       };
       context: ExecutionContext;
     }

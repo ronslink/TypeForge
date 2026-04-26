@@ -364,7 +364,10 @@
         </div>
       </div>
       <div class="adaptive-banner-actions">
-        <a href="/practice" class="drill-btn">{$t('adaptive_banner_cta')}</a>
+        <a href="/practice?mode=adaptive&weakKeys={weakKeys.join(',')}" class="drill-btn">
+          {$t('adaptive_banner_cta')}
+          <span class="ml-2 px-1.5 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-amber-500/20 text-amber-500 rounded-sm">PRO</span>
+        </a>
         <button
           onclick={dismissBanner}
           class="dismiss-btn"
