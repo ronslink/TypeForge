@@ -48,7 +48,7 @@ export async function authMiddleware(c: Context, next: Next) {
     if (!internalUser) {
       if (!authState.user) throw new Error("Clerk User context required for auto-provisioning");
       
-      const email = authState.user.email || 'unknown@example.com';
+      const email = authState.user.email || `${rawClerkId}@placeholder.local`;
       [internalUser] = await db.insert(users).values({
         clerkId: rawClerkId,
         email,
