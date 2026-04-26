@@ -1,5 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import { buildClerkProps } from 'svelte-clerk/server';
+import { env as publicEnv } from '$env/dynamic/public';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
   // Preload critical fonts for better performance
@@ -24,6 +25,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
   return {
     fontPreloads,
-    ...buildClerkProps(locals.auth)
+    ...buildClerkProps(locals.auth),
+    publishableKey: publicEnv.PUBLIC_CLERK_PUBLISHABLE_KEY,
   };
 };
