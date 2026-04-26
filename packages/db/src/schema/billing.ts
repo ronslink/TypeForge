@@ -42,6 +42,7 @@ export const orgBilling = pgTable('org_billing', {
   currentSeatCount: integer('current_seat_count').notNull().default(0),
   purchasedSeats: integer('purchased_seats').notNull().default(0),
   pendingSeatCount: integer('pending_seat_count'),
+  seatCooldownDays: integer('seat_cooldown_days').notNull().default(180),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 export const subStatusEnum = pgEnum('sub_status', [
@@ -125,6 +126,7 @@ export const subscriptionSeats = pgTable(
     orgId: uuid('org_id').references(() => organisations.id, { onDelete: 'cascade' }),
     allocatedAt: timestamp('allocated_at', { withTimezone: true }).notNull().defaultNow(),
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    reassignableAt: timestamp('reassignable_at', { withTimezone: true }),
   },
   (table) => ({
     subUserUnique: { unique: true, columns: [table.subscriptionId, table.userId] },

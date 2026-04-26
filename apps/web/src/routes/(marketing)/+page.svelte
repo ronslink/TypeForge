@@ -4,7 +4,7 @@
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 
   // Script diversity grid data
-  const scripts = [
+  let scripts = $state([
     { name: 'Latin', sample: 'Aa', layout: 'QWERTY', active: true },
     { name: 'Cyrillic', sample: 'Аа', layout: 'ЙЦУКЕН', active: false },
     { name: 'Arabic', sample: 'أب', layout: 'Arabic', active: false },
@@ -13,38 +13,123 @@
     { name: 'Hebrew', sample: 'אב', layout: 'Hebrew', active: false },
     { name: 'Korean', sample: '한글', layout: 'Dubeolsik', active: false },
     { name: 'Japanese', sample: 'ひら', layout: 'Romaji', active: false },
+  ]);
+
+  // ── Animated cycling demo ────────────────────────────────────────────────
+  interface DemoScene {
+    script: string;
+    lang: string;
+    layout: string;
+    rtl: boolean;
+    text: string;
+    wpm: number;       // target WPM for this scene
+    accuracy: number;  // final accuracy shown
+    accentClass: string;
+  }
+
+  const DEMO_SCENES: DemoScene[] = [
+    { script: 'Latin',    lang: 'Français',   layout: 'AZERTY',    rtl: false, text: "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique absolue.",        wpm: 94,  accuracy: 98.4, accentClass: 'text-primary' },
+    { script: 'Cyrillic', lang: 'Русский',    layout: 'ЙЦУКЕН',   rtl: false, text: 'Учитель быстро печатает на клавиатуре без единой ошибки и удивляет всех своей скоростью.',                     wpm: 78,  accuracy: 96.1, accentClass: 'text-secondary' },
+    { script: 'Arabic',   lang: 'العربية',    layout: 'Arabic',   rtl: true,  text: 'تعلم الكتابة على لوحة المفاتيح العربية يحتاج إلى التدريب المستمر والدقة في تحديد الأحرف.',                       wpm: 61,  accuracy: 97.2, accentClass: 'text-tertiary' },
+    { script: 'CJK',      lang: '日本語',     layout: 'Romaji',   rtl: false, text: '日本語のタイピングはローマ字入力とかな入力を選ぶことができます。練習を重ねると速度が上がります。',              wpm: 55,  accuracy: 99.1, accentClass: 'text-primary' },
+    { script: 'Korean',   lang: '한국어',     layout: 'Dubeolsik',rtl: false, text: '한글 타자 연습은 정확도와 속도를 동시에 향상시키는 과정입니다. 꾸준한 연습이 핵심입니다.',                         wpm: 70,  accuracy: 95.8, accentClass: 'text-secondary' },
   ];
 
-  // Typing demo state
-  let demoText = "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique.";
-  let typedText = "L'apprentissage de la dactylo";
-  let currentWpm = 124;
-  let currentAccuracy = 98.2;
-  let streak = 412;
-  let selectedScript = 'Latin';
+  // Reactive demo state
+  let demoSceneIdx = $state(0);
+  let demoTypedLen = $state(0);
+  let demoFading   = $state(false);
+  let currentWpm   = $state(0);
+  let currentAccuracy = $state(100);
+  let streak       = $state(0);
 
-  // Demo texts per script
-  const demoTexts: Record<string, string> = {
-    Latin: "L'apprentissage de la dactylographie sur un clavier AZERTY nécessite une précision mécanique.",
-    Cyrillic: "Учитель печатает на клавиатуре быстро и без ошибок с первого раза.",
-    Arabic: "تعلم الكتابة على لوحة المفاتيح العربية يحتاج إلى التدريب المستمر",
-    CJK: "中文打字需要掌握拼音输入法才能做到速度与准确性兼备",
-    Greek: "Η εκμάθηση της μηχανογράφησης είναι δεξιότητα που απαιτεί εξάσκηση",
-    Hebrew: "לימוד הקלדה בעברית דורש תרגול מתמשך והקפדה על דיוק",
-    Korean: "한글 타자 연습은 정확도와 속도를 동시에 향상시키는 과정입니다",
-    Japanese: "日本語のタイピングはローマ字入力とかな入力を選ぶことができます"
-  };
+  const demoScene    = $derived(DEMO_SCENES[demoSceneIdx]!);
+  const demoTyped    = $derived(demoScene.text.slice(0, demoTypedLen));
+  const demoCurrent  = $derived(demoScene.text[demoTypedLen] ?? '');
+  const demoRemaining = $derived(demoScene.text.slice(demoTypedLen + 1));
+  const selectedScript = $derived(demoScene.script);
 
-  function selectScript(script: { name: string; sample: string; layout: string; active: boolean }) {
-    // Toggle active state
-    scripts.forEach(s => s.active = s.name === script.name);
-    selectedScript = script.name;
-    // Reset demo to show new text (starting from a partial)
-    const newText = demoTexts[script.name] || demoText;
-    const sliceLen = Math.floor(newText.length * 0.35);
-    typedText = newText.slice(0, sliceLen);
-    demoText = newText;
+  // Keep script pills in sync
+  $effect(() => {
+    scripts.forEach(s => { s.active = s.name === demoScene.script; });
+    scripts = scripts; // trigger reactivity
+  });
+
+  function jumpToScene(name: string) {
+    const idx = DEMO_SCENES.findIndex(s => s.script === name);
+    if (idx === -1 || idx === demoSceneIdx) return;
+    triggerFade(() => {
+      demoSceneIdx = idx;
+      demoTypedLen = 0;
+      currentWpm = 0;
+      currentAccuracy = 100;
+      streak = 0;
+    });
   }
+
+  function triggerFade(callback: () => void) {
+    demoFading = true;
+    setTimeout(() => {
+      callback();
+      demoFading = false;
+    }, 380);
+  }
+
+  // Main demo loop
+  let mounted = false;
+  onMount(() => {
+    mounted = true;
+    let charTimer: ReturnType<typeof setTimeout>;
+    let sceneTimer: ReturnType<typeof setTimeout>;
+
+    function scheduleNextChar() {
+      const scene = DEMO_SCENES[demoSceneIdx]!;
+      // ms per char = 60000 / (wpm * 5)
+      const msPerChar = Math.round(60000 / (scene.wpm * 5));
+      // Add slight human jitter ±25%
+      const jitter = msPerChar * 0.25;
+      const delay = msPerChar + (Math.random() * jitter * 2 - jitter);
+
+      charTimer = setTimeout(() => {
+        if (demoTypedLen < scene.text.length) {
+          demoTypedLen++;
+          // Tick up WPM toward target
+          const progress = demoTypedLen / scene.text.length;
+          currentWpm = Math.round(scene.wpm * Math.min(1, progress * 1.4));
+          // Accuracy drifts to target
+          currentAccuracy = parseFloat(
+            (100 - (100 - scene.accuracy) * Math.min(1, progress * 1.2)).toFixed(1)
+          );
+          // Streak increments every char
+          streak = demoTypedLen;
+          scheduleNextChar();
+        } else {
+          // Scene finished — wait then advance to next
+          sceneTimer = setTimeout(() => advanceScene(), 2200);
+        }
+      }, delay);
+    }
+
+    function advanceScene() {
+      triggerFade(() => {
+        demoSceneIdx = (demoSceneIdx + 1) % DEMO_SCENES.length;
+        demoTypedLen = 0;
+        currentWpm = 0;
+        currentAccuracy = 100;
+        streak = 0;
+      });
+      // Give fade time then start typing
+      setTimeout(scheduleNextChar, 600);
+    }
+
+    // Kick off
+    setTimeout(scheduleNextChar, 800);
+
+    return () => {
+      clearTimeout(charTimer);
+      clearTimeout(sceneTimer);
+    };
+  });
 
   // Features data
   const features = [
@@ -161,10 +246,7 @@
     ]
   };
 
-  let mounted = false;
-  onMount(() => {
-    mounted = true;
-  });
+
 </script>
 
 <svelte:head>
@@ -208,7 +290,7 @@
             class="px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors border border-outline-variant/20 flex items-center gap-2"
             class:border-primary={script.active}
             class:text-primary={script.active}
-            onclick={() => selectScript(script)}
+            onclick={() => jumpToScene(script.name)}
           >
             <span class="font-label text-lg">{script.sample}</span>
             <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant">{script.layout}</span>
@@ -238,33 +320,73 @@
   <section class="max-w-5xl mx-auto px-6 py-20" id="demo">
     <div class="bg-surface-container-high p-1 border-t border-s border-white/5 amber-glow">
       <div class="bg-surface-container-lowest p-8 md:p-12 relative overflow-hidden">
+
+        <!-- Language badge -->
+        <div class="flex items-center gap-3 mb-8">
+          <span class="demo-lang-badge font-label text-xs uppercase tracking-widest px-2.5 py-1 border rounded
+            {demoScene.accentClass} border-current opacity-80" style="transition: opacity 0.3s">
+            {demoScene.script}
+          </span>
+          <span class="font-label text-sm text-on-surface-variant" dir={demoScene.rtl ? 'rtl' : 'ltr'}>
+            {demoScene.lang}
+          </span>
+          <span class="text-on-surface-variant/30 text-xs font-label uppercase ml-1">{demoScene.layout}</span>
+          <!-- Cursor pulse dot -->
+          <span class="ml-auto flex items-center gap-1.5 text-xs font-label uppercase tracking-widest text-on-surface-variant/50">
+            <span class="demo-live-dot"></span>live demo
+          </span>
+        </div>
+
         <!-- Stats Header -->
-        <div class="grid grid-cols-3 gap-4 mb-12 border-b border-outline-variant/20 pb-8">
+        <div class="grid grid-cols-3 gap-4 mb-10 border-b border-outline-variant/20 pb-8">
           <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_wpm') || 'WPM Rate'}</span>
-            <div class="font-label text-4xl text-secondary font-bold">{currentWpm}</div>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_wpm') || 'WPM'}</span>
+            <div class="font-label text-4xl font-bold {demoScene.accentClass} tabular-nums demo-metric" aria-live="polite">{currentWpm}</div>
           </div>
           <div>
             <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_accuracy') || 'Accuracy'}</span>
-            <div class="font-label text-4xl text-secondary font-bold">{currentAccuracy}%</div>
+            <div class="font-label text-4xl font-bold {demoScene.accentClass} tabular-nums demo-metric" aria-live="polite">{currentAccuracy}%</div>
           </div>
           <div>
             <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_streak') || 'Streak'}</span>
-            <div class="font-label text-4xl text-primary font-bold">{streak}</div>
+            <div class="font-label text-4xl font-bold text-primary tabular-nums demo-metric" aria-live="polite">{streak}</div>
           </div>
         </div>
-        
+
         <!-- Typing Area -->
-        <div class="font-label text-2xl md:text-3xl lg:text-4xl leading-relaxed tracking-tight text-on-surface/40 relative">
-          <span class="text-on-surface">{typedText}</span>
-          <span class="text-error relative">g</span>
-          <span class="w-0.5 h-8 md:h-10 bg-primary absolute inline-block animate-pulse" style="bottom: 0.25rem;"></span>
-          <span>{demoText.slice(typedText.length + 1)}</span>
+        <div
+          class="demo-text font-label text-xl md:text-2xl lg:text-3xl leading-relaxed tracking-tight"
+          class:demo-fading={demoFading}
+          dir={demoScene.rtl ? 'rtl' : 'ltr'}
+          lang={demoScene.lang}
+          aria-label="Animated typing demonstration"
+          aria-live="off"
+        >
+          <!-- Typed chars -->
+          <span class="text-on-surface">{demoTyped}</span>
+          <!-- Cursor character -->
+          {#if demoCurrent}
+            <span class="demo-cursor-char {demoScene.accentClass}" aria-hidden="true">{demoCurrent}</span>
+            <span class="demo-cursor" aria-hidden="true"></span>
+          {:else}
+            <!-- Finished —  blinking cursor at end -->
+            <span class="demo-cursor demo-cursor-end" aria-hidden="true"></span>
+          {/if}
+          <!-- Remaining chars -->
+          <span class="text-on-surface/30">{demoRemaining}</span>
         </div>
-        
-        <div class="mt-12 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/50">
-          <span>{selectedScript} Layout — click script above to switch</span>
-          <span>Sign up to start real lessons</span>
+
+        <!-- Progress bar -->
+        <div class="mt-8 h-0.5 bg-surface-container-highest rounded-full overflow-hidden">
+          <div
+            class="h-full {demoScene.accentClass.replace('text-', 'bg-')} rounded-full transition-all duration-300"
+            style="width: {demoScene.text.length > 0 ? Math.round((demoTypedLen / demoScene.text.length) * 100) : 0}%"
+          ></div>
+        </div>
+
+        <div class="mt-6 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/40">
+          <span>Auto-cycling — click a script above to jump</span>
+          <a href="/sign-up" class="hover:text-primary transition-colors">Start your own →</a>
         </div>
       </div>
     </div>
@@ -650,5 +772,54 @@
       'wght' 400,
       'GRAD' 0,
       'opsz' 24;
+  }
+
+  /* ── Live Demo CSS ── */
+  .demo-text {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .demo-fading {
+    opacity: 0;
+  }
+
+  .demo-cursor-char {
+    position: relative;
+  }
+  .demo-cursor {
+    position: relative;
+    display: inline-block;
+  }
+  .demo-cursor::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 2px;
+    height: 1.2em;
+    background-color: currentColor;
+    border-radius: 1px;
+    animation: cursorBlink 0.8s step-end infinite;
+  }
+  .demo-cursor-end::after {
+    left: 4px;
+    background-color: var(--primary);
+  }
+
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .demo-live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #ef4444; /* red indicator */
+    animation: pulseRed 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulseRed {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px #ef4444; }
+    50% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 2px #ef4444; }
   }
 </style>

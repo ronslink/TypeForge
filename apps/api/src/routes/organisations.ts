@@ -6,7 +6,7 @@
 import { Hono } from 'hono';
 import { requireAuth, requireRole, getAuth, getDb } from '../middleware/index.js';
 import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks } from '@typeforge/db';
-import { eq, and, sql, inArray } from 'drizzle-orm';
+import { eq, and, or, sql, inArray } from 'drizzle-orm';
 import Stripe from 'stripe';
 
 const app = new Hono();
@@ -185,7 +185,7 @@ app.get('/:id/dashboard', async (c) => {
     return c.json({ error: 'Access denied', code: 'FORBIDDEN' }, 403);
   }
 
-  // Get active members count
+  // Get all members
   const allMembers = await db
     .select({ status: orgMembers.status, userId: orgMembers.userId })
     .from(orgMembers)
@@ -196,28 +196,58 @@ app.get('/:id/dashboard', async (c) => {
   const userIds = allMembers.map(m => m.userId).filter(Boolean) as string[];
 
   let averageAccuracy = 0;
+  let averageWpm = 0;
   let totalLessonsCompleted = 0;
+  let atRiskCount = 0;
 
   if (userIds.length > 0) {
     const stats = await db.select({
+        userId: dailyStats.userId,
         avgAccuracy: sql<number>`AVG(${dailyStats.avgAccuracy})`,
+        avgWpm: sql<number>`AVG(${dailyStats.avgWpm})`,
         lessonsCompleted: sql<number>`SUM(${dailyStats.lessonsCompleted})`
       })
       .from(dailyStats)
-      .where(inArray(dailyStats.userId, userIds));
+      .where(inArray(dailyStats.userId, userIds))
+      .groupBy(dailyStats.userId);
 
-    if (stats.length > 0 && stats[0]) {
-      averageAccuracy = Math.round(Number(stats[0].avgAccuracy) || 0);
-      totalLessonsCompleted = Number(stats[0].lessonsCompleted) || 0;
+    if (stats.length > 0) {
+      const totalAccuracy = stats.reduce((sum, s) => sum + (Number(s.avgAccuracy) || 0), 0);
+      const totalWpm = stats.reduce((sum, s) => sum + (Number(s.avgWpm) || 0), 0);
+      const totalLessons = stats.reduce((sum, s) => sum + (Number(s.lessonsCompleted) || 0), 0);
+      averageAccuracy = Math.round(totalAccuracy / stats.length);
+      averageWpm = Math.round(totalWpm / stats.length);
+      totalLessonsCompleted = totalLessons;
+      atRiskCount = stats.filter(s => (Number(s.avgAccuracy) || 0) < 70).length;
     }
   }
+
+  // Get seat info
+  const [billing] = await db
+    .select({
+      purchasedSeats: orgBilling.purchasedSeats,
+      currentSeatCount: orgBilling.currentSeatCount,
+      seatCooldownDays: orgBilling.seatCooldownDays,
+      seatPriceCents: orgBilling.seatPriceCents,
+    })
+    .from(orgBilling)
+    .where(eq(orgBilling.orgId, orgId))
+    .limit(1);
 
   return c.json({ 
     stats: {
       totalMembers,
       activeMembers,
       averageAccuracy,
-      totalLessonsCompleted
+      averageWpm,
+      totalLessonsCompleted,
+      atRiskCount,
+      seats: billing ? {
+        used: billing.currentSeatCount,
+        purchased: billing.purchasedSeats,
+        cooldownDays: billing.seatCooldownDays,
+        pricePerSeatCents: billing.seatPriceCents,
+      } : null,
     }
   });
 });
@@ -344,10 +374,14 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
   const stripe = getStripe();
   
   const body = await c.req.json();
-  const { seatCount, successUrl, cancelUrl } = body;
+  const { seatCount, cooldownDays = 180, successUrl, cancelUrl } = body;
   
   if (!seatCount || seatCount < 1) {
     return c.json({ error: 'Seat count must be at least 1', code: 'INVALID_SEAT_COUNT' }, 400);
+  }
+  
+  if (cooldownDays !== 90 && cooldownDays !== 180) {
+    return c.json({ error: 'Cooldown days must be 90 or 180', code: 'INVALID_COOLDOWN' }, 400);
   }
   
   // Get org details
@@ -382,7 +416,11 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
   }
   
   // Create checkout session for seats
-  const priceId = process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID;
+  const priceId = cooldownDays === 90 
+    ? (process.env.STRIPE_SEAT_PRICE_ID_90 || 'price_seat_90_placeholder') 
+    : (process.env.STRIPE_SEAT_PRICE_ID_180 || 'price_seat_180_placeholder');
+    
+  const priceCents = cooldownDays === 90 ? 600 : 800;
   
   const session = await stripe.checkout.sessions.create({
     customer: customerId as string,
@@ -405,15 +443,18 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
         orgId,
         type: 'org_seats',
         seatCount: seatCount.toString(),
+        cooldownDays: cooldownDays.toString(),
       },
     },
   });
   
-  // Update billing record with pending seat count
+  // Update billing record with pending seat count and cooldown settings
   await db
     .update(orgBilling)
     .set({
       pendingSeatCount: seatCount,
+      seatCooldownDays: cooldownDays,
+      seatPriceCents: priceCents,
       updatedAt: new Date(),
     })
     .where(eq(orgBilling.orgId, orgId));
@@ -422,7 +463,8 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
     checkoutUrl: session.url,
     sessionId: session.id,
     seatCount,
-    monthlyCost: (seatCount * SEAT_PRICE_CENTS) / 100,
+    cooldownDays,
+    monthlyCost: (seatCount * priceCents) / 100,
   });
 });
 
@@ -462,7 +504,10 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => 
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID_90 || 'price_seat_90_placeholder') ||
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID_180 || 'price_seat_180_placeholder') ||
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {
@@ -543,7 +588,10 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   
   // Find the seat item
   const seatItem = subscription.items.data.find(
-    (item) => item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
+    (item) => 
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID_90 || 'price_seat_90_placeholder') ||
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID_180 || 'price_seat_180_placeholder') ||
+      item.price.id === (process.env.STRIPE_SEAT_PRICE_ID || SEAT_PRICE_ID)
   );
   
   if (!seatItem) {
@@ -605,6 +653,7 @@ app.get('/:id/seats', async (c) => {
       seatPriceCents: orgBilling.seatPriceCents,
       billingInterval: orgBilling.billingInterval,
       stripeSubscriptionId: orgBilling.stripeSubscriptionId,
+      seatCooldownDays: orgBilling.seatCooldownDays,
     })
     .from(orgBilling)
     .where(eq(orgBilling.orgId, orgId))
@@ -635,16 +684,34 @@ app.get('/:id/seats', async (c) => {
     .leftJoin(users, eq(subscriptionSeats.userId, users.id))
     .where(eq(subscriptionSeats.orgId, orgId));
   
+  const [seatCountRecord] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(subscriptionSeats)
+    .where(and(
+      eq(subscriptionSeats.orgId, orgId),
+      or(
+        sql`${subscriptionSeats.revokedAt} IS NULL`,
+        sql`${subscriptionSeats.reassignableAt} > NOW()`
+      )
+    ));
+  const dynamicSeatCount = Number(seatCountRecord?.count || 0);
+  
+  // Sync the cached count
+  await db.update(orgBilling)
+    .set({ currentSeatCount: dynamicSeatCount })
+    .where(eq(orgBilling.orgId, orgId));
+
   return c.json({
     seats: {
       activeMembers,
       purchased: billing.purchasedSeats,
       pending: billing.pendingSeatCount || 0,
-      available: Math.max(0, billing.purchasedSeats - activeMembers),
+      available: Math.max(0, billing.purchasedSeats - dynamicSeatCount),
       pricePerSeat: billing.seatPriceCents / 100,
       interval: billing.billingInterval,
       monthlyTotal: (billing.purchasedSeats * billing.seatPriceCents) / 100,
       hasActiveSubscription: !!billing.stripeSubscriptionId,
+      seatCooldownDays: billing.seatCooldownDays,
     },
     seatAssignments: seatDetails,
   });
@@ -675,7 +742,20 @@ app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => 
     return c.json({ error: 'Billing info not found', code: 'NOT_FOUND' }, 404);
   }
   
-  if (billing.currentSeatCount >= billing.purchasedSeats) {
+  // Calculate dynamic seat usage
+  const [seatCountRecord] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(subscriptionSeats)
+    .where(and(
+      eq(subscriptionSeats.orgId, orgId),
+      or(
+        sql`${subscriptionSeats.revokedAt} IS NULL`,
+        sql`${subscriptionSeats.reassignableAt} > NOW()`
+      )
+    ));
+  const dynamicSeatCount = Number(seatCountRecord?.count || 0);
+  
+  if (dynamicSeatCount >= billing.purchasedSeats) {
     return c.json({ 
       error: 'No available seats',
       code: 'NO_SEATS_AVAILABLE',
@@ -705,17 +785,36 @@ app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => 
     joinedAt: new Date(),
   });
   
-  await db.insert(subscriptionSeats).values({
-    orgId,
-    userId,
-    allocatedAt: new Date(),
-  });
+  // Try to claim a cooled-down seat first
+  const [expiredSeat] = await db.select()
+    .from(subscriptionSeats)
+    .where(and(
+      eq(subscriptionSeats.orgId, orgId),
+      sql`${subscriptionSeats.revokedAt} IS NOT NULL`,
+      sql`${subscriptionSeats.reassignableAt} <= NOW()`
+    ))
+    .limit(1);
+
+  if (expiredSeat) {
+    await db.update(subscriptionSeats).set({
+      userId,
+      allocatedAt: new Date(),
+      revokedAt: null,
+      reassignableAt: null,
+    }).where(eq(subscriptionSeats.id, expiredSeat.id));
+  } else {
+    await db.insert(subscriptionSeats).values({
+      orgId,
+      userId,
+      allocatedAt: new Date(),
+    });
+  }
   
-  // Update seat count
+  // Update seat count cache
   await db
     .update(orgBilling)
     .set({
-      currentSeatCount: billing.currentSeatCount + 1,
+      currentSeatCount: dynamicSeatCount + 1,
       updatedAt: new Date(),
     })
     .where(eq(orgBilling.orgId, orgId));
@@ -739,7 +838,10 @@ app.delete('/:id/seats/:userId', requireRole('org_admin', 'teacher'), async (c) 
   
   // Get current billing info
   const [billing] = await db
-    .select({ currentSeatCount: orgBilling.currentSeatCount })
+    .select({ 
+      currentSeatCount: orgBilling.currentSeatCount,
+      seatCooldownDays: orgBilling.seatCooldownDays 
+    })
     .from(orgBilling)
     .where(eq(orgBilling.orgId, orgId))
     .limit(1);
@@ -756,19 +858,26 @@ app.delete('/:id/seats/:userId', requireRole('org_admin', 'teacher'), async (c) 
       eq(orgMembers.userId, targetUserId)
     ));
   
-  // Remove seat assignment
+  // Mark seat as revoked and set cooldown
+  const cooldownDays = billing.seatCooldownDays || 180;
+  const reassignableAt = new Date(Date.now() + cooldownDays * 24 * 60 * 60 * 1000);
+
   await db
-    .delete(subscriptionSeats)
+    .update(subscriptionSeats)
+    .set({
+      revokedAt: new Date(),
+      reassignableAt,
+    })
     .where(and(
       eq(subscriptionSeats.orgId, orgId),
       eq(subscriptionSeats.userId, targetUserId)
     ));
   
-  // Update seat count
+  // We do NOT decrement the cached seat count immediately because the seat is in cooldown.
+  // The seat is still considered "active" towards the quota.
   await db
     .update(orgBilling)
     .set({
-      currentSeatCount: Math.max(0, billing.currentSeatCount - 1),
       updatedAt: new Date(),
     })
     .where(eq(orgBilling.orgId, orgId));

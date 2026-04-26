@@ -140,14 +140,24 @@
   let userInput = $state('');
   let testStarted = $state(false);
   let testEnded = $state(false);
-  let timeRemaining = $state(60);
+  let elapsedSeconds = $state(0);          // wall-clock (for display only)
+  let activeElapsedSeconds = $state(0);    // wall-clock minus pauses
+  let isPausedUI = $state(false);
+  let testStartTime = $state<number | null>(null);
   let wpmCalculator = $state(new WPMCalculator());
   let accuracyCalculator = $state(new AccuracyCalculator());
   let currentWPM = $state(0);
   let currentAccuracy = $state(100);
   let testInterval: ReturnType<typeof setInterval> | null = null;
+  let idleInterval: ReturnType<typeof setInterval> | null = null;
   let pressedKey = $state<string | undefined>(undefined);
   let highlightKeys = $state<Set<string>>(new Set());
+
+  // Minimum correct chars before "Stop & See Results" appears
+  const canStopTest = $derived(
+    testStarted && !testEnded &&
+    userInput.length >= 10
+  );
 
   function initPlacementTest() {
     const lang = getSelectedLanguage();
@@ -155,30 +165,42 @@
     userInput = '';
     testStarted = false;
     testEnded = false;
-    timeRemaining = 60;
+    elapsedSeconds = 0;
+    activeElapsedSeconds = 0;
+    isPausedUI = false;
+    testStartTime = null;
     wpmCalculator = new WPMCalculator();
     accuracyCalculator = new AccuracyCalculator();
     currentWPM = 0;
     currentAccuracy = 100;
     pressedKey = undefined;
     highlightKeys = new Set();
+    if (testInterval) { clearInterval(testInterval); testInterval = null; }
+    if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
   }
 
   function startTest() {
     testStarted = true;
-    testInterval = setInterval(() => {
-      timeRemaining--;
-      updateMetrics();
-      if (timeRemaining <= 0) {
-        endTest();
-      }
-    }, 1000);
-  }
+    testStartTime = Date.now();
 
-  function updateMetrics() {
-    const wpmResult = wpmCalculator.getWPM();
-    currentWPM = Math.round(wpmResult.netWPM);
-    currentAccuracy = Math.round(accuracyCalculator.getAccuracy());
+    // Wall-clock tick
+    testInterval = setInterval(() => { elapsedSeconds++; }, 1000);
+
+    // Idle / pause detection + metrics refresh every 500ms
+    idleInterval = setInterval(() => {
+      const now = Date.now();
+      wpmCalculator.tick(now);
+      isPausedUI = wpmCalculator.isPaused;
+      if (testStartTime !== null) {
+        const wallMs = now - testStartTime;
+        activeElapsedSeconds = Math.round(
+          Math.max(0, wallMs - wpmCalculator.totalPausedMs) / 1000
+        );
+      }
+      const r = wpmCalculator.getWPM();
+      currentWPM = Math.round(r.netWPM);
+      currentAccuracy = Math.round(accuracyCalculator.getAccuracy());
+    }, 500);
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -210,7 +232,7 @@
         }
       }
 
-      updateMetrics();
+      // (metrics refreshed by idleInterval)
 
       // Check if test is complete
       if (userInput.length >= testText.length) {
@@ -226,13 +248,16 @@
   }
 
   function endTest() {
-    if (testInterval) {
-      clearInterval(testInterval);
-      testInterval = null;
-    }
+    if (testInterval) { clearInterval(testInterval); testInterval = null; }
+    if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     testEnded = true;
     testStarted = false;
+    isPausedUI = false;
 
+    // Capture final active-time metrics
+    const r = wpmCalculator.getWPM();
+    currentWPM = Math.round(r.netWPM);
+    currentAccuracy = Math.round(accuracyCalculator.getAccuracy());
     const finalWPM = currentWPM;
     const finalAccuracy = currentAccuracy;
 
@@ -250,6 +275,9 @@
         level,
       },
     }));
+
+    // Auto-advance to results step after a brief pause so the student sees the score
+    setTimeout(() => nextStep(), 1600);
   }
 
   // ============================================================================
@@ -272,7 +300,7 @@
             wpm: state.testResults?.wpm || 0,
             accuracy: state.testResults?.accuracy || 0,
             keystrokes: [],
-            duration: 60 - timeRemaining,
+            duration: activeElapsedSeconds,
             language: state.selectedLanguage,
             layout: state.selectedLayout,
           },
@@ -380,7 +408,7 @@
   let metrics = $derived([
     { label: 'WPM', value: currentWPM, unit: '', variant: 'primary' as const },
     { label: 'Accuracy', value: currentAccuracy, unit: '%', variant: 'secondary' as const },
-    { label: 'Time', value: timeRemaining, unit: 's', variant: 'default' as const },
+    { label: 'Active Time', value: activeElapsedSeconds, unit: 's', variant: 'default' as const },
   ]);
 </script>
 
@@ -538,9 +566,37 @@
 
       <!-- Step 4: Placement Test -->
       {#if $onboardingStore.currentStep === 4}
-        <div class="space-y-6">
+        <div class="space-y-4">
           <!-- Metrics Bar -->
           <MetricsBar {metrics} />
+
+          <!-- Pause indicator + Stop button -->
+          {#if testStarted && !testEnded}
+            <div class="flex items-center justify-between px-1" aria-live="polite">
+              <div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest
+                {isPausedUI ? 'text-amber-400' : 'text-on-surface-variant/50'}">
+                {#if isPausedUI}
+                  <span class="ob-pause-dot" aria-hidden="true"></span>
+                  <span>Clock paused — tap any key to resume</span>
+                {:else}
+                  <span class="ob-active-dot" aria-hidden="true"></span>
+                  <span>Clock running</span>
+                {/if}
+              </div>
+              {#if canStopTest}
+                <button
+                  id="onboarding-stop-btn"
+                  onclick={endTest}
+                  class="ob-stop-btn font-label text-xs font-bold uppercase tracking-widest px-4 py-2
+                    border border-outline-variant/40 text-on-surface-variant
+                    hover:border-primary hover:text-primary transition-all duration-200"
+                  aria-label="Stop the placement test and see your results"
+                >
+                  Stop &amp; See Results
+                </button>
+              {/if}
+            </div>
+          {/if}
 
           <!-- Typing Area -->
           <div class="typing-area bg-surface-container-low p-8 relative">
@@ -570,7 +626,7 @@
             {#if !testStarted && !testEnded}
               <div class="text-center py-4">
                 <p class="font-label text-sm text-on-surface-variant animate-pulse">
-                  Start typing to begin the test
+                  Start typing to begin — type as much as you like, then hit "Stop & See Results"
                 </p>
               </div>
             {/if}
@@ -593,6 +649,7 @@
           </div>
         </div>
       {/if}
+
 
       <!-- Step 5: Results -->
       {#if $onboardingStore.currentStep === 5}
@@ -689,7 +746,7 @@
           class:cursor-not-allowed={!canProceed}
         >
           {#if $onboardingStore.currentStep === 4}
-            See Results
+            Continue to Results
           {:else}
             Continue
           {/if}
@@ -700,6 +757,30 @@
 </div>
 
 <style>
+  /* ─── Onboarding pause indicators ─── */
+  .ob-pause-dot, .ob-active-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ob-pause-dot { background: #f59e0b; animation: ob-pulse-amber 1.4s ease-in-out infinite; }
+  .ob-active-dot { background: #4ade80; animation: ob-pulse-green 2s ease-in-out infinite; }
+  @keyframes ob-pulse-amber {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(0.8); }
+  }
+  @keyframes ob-pulse-green {
+    0%,100% { opacity:0.6; transform:scale(1); }
+    50% { opacity:1; transform:scale(1.2); }
+  }
+  .ob-stop-btn {
+    clip-path: polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+    background: transparent;
+    cursor: pointer;
+  }
+
   /* Language & Layout Cards */
   .language-card,
   .layout-card {

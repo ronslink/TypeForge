@@ -25,10 +25,10 @@
     'Everything in Power User',
     'Teacher dashboard with class analytics',
     'Student roster management',
-    'Group assignments & progress tracking',
+    'Flexible seats ($6/mo, 90-day lock)',
+    'Semester seats ($8/mo, 180-day lock)',
     'SCIM/Google Workspace SSO',
-    'COPPA-compliant (under 13 support)',
-    'Dedicated onboarding support'
+    'COPPA-compliant (under 13)'
   ];
 
   const faqs = [
@@ -111,8 +111,9 @@
           <div class="mb-6">
             <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">School</h2>
             <div class="flex items-baseline gap-2">
+              <span class="font-headline text-2xl text-on-surface-variant">From</span>
               <span class="font-headline text-5xl">$6</span>
-              <span class="text-on-surface-variant font-body">/seat/month</span>
+              <span class="text-on-surface-variant font-body">/seat/mo</span>
             </div>
             <p class="text-sm text-on-surface-variant mt-2 font-body">For classrooms & districts</p>
           </div>
@@ -124,8 +125,8 @@
               </li>
             {/each}
           </ul>
-          <a href="/contact" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
-            Contact sales
+          <a href="/sign-up?plan=school" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
+            Sign up now
           </a>
         </div>
       </div>

@@ -74,7 +74,9 @@
   let startTime = $state<number | null>(null);
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
-  const LESSON_TIME_LIMIT = $derived(lessonChars.length > 0 ? Math.max(60, Math.ceil((lessonChars.length / 5) * 4)) : 60);
+  let activeElapsedSeconds = $state(0);
+  let isPausedUI = $state(false);
+  let idleInterval: ReturnType<typeof setInterval> | null = null;
 
   // Metrics
   let wpmCalculator = $state(new WPMCalculator());
@@ -98,6 +100,9 @@
   const currentChar = $derived(lessonChars[currentIndex]);
   const activeKeyboardLayout = $derived(layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']);
 
+  // Can the student stop early?
+  const canStop = $derived(isStarted && !isComplete && keystrokes.filter(k => k.correct).length >= 10);
+
   // Auto-select the canonical layout when the practice language changes.
   $effect(() => {
     userLayout = getDefaultLayoutForLanguage(userLanguage);
@@ -112,28 +117,32 @@
     }
   });
 
+  // Wall-clock timer (display only)
   $effect(() => {
     if (isStarted && !isComplete) {
-      const interval = setInterval(() => {
+      timerInterval = setInterval(() => { elapsedSeconds++; }, 1000);
+      return () => { if (timerInterval) clearInterval(timerInterval); };
+    }
+  });
+
+  // Idle / pause detection — ticks every 500ms
+  $effect(() => {
+    if (isStarted && !isComplete) {
+      idleInterval = setInterval(() => {
+        const now = Date.now();
+        wpmCalculator.tick(now);
+        isPausedUI = wpmCalculator.isPaused;
+        if (startTime !== null) {
+          const wallMs = now - startTime;
+          activeElapsedSeconds = Math.round(
+            Math.max(0, wallMs - wpmCalculator.totalPausedMs) / 1000
+          );
+        }
         const wpmResult = wpmCalculator.getWPM();
         currentWPM = Math.round(wpmResult.netWPM);
         currentAccuracy = Math.round(accuracyTracker.getAccuracy());
       }, 500);
-      return () => clearInterval(interval);
-    }
-  });
-
-  $effect(() => {
-    if (isStarted && !isComplete) {
-      timerInterval = setInterval(() => {
-        elapsedSeconds++;
-        if (elapsedSeconds >= LESSON_TIME_LIMIT) {
-          completePractice();
-        }
-      }, 1000);
-      return () => {
-        if (timerInterval) clearInterval(timerInterval);
-      };
+      return () => { if (idleInterval) clearInterval(idleInterval); };
     }
   });
 
@@ -198,12 +207,16 @@
     sessionSubmitted = false;
     startTime = null;
     elapsedSeconds = 0;
+    activeElapsedSeconds = 0;
+    isPausedUI = false;
     currentWPM = 0;
     currentAccuracy = 100;
     currentStreak = 0;
     keystrokes = [];
     wpmCalculator = new WPMCalculator();
     accuracyTracker = new AccuracyTracker();
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
   }
 
   async function mountAdaptivePractice(weakKeys: string[]) {
@@ -255,12 +268,16 @@
       sessionSubmitted = false;
       startTime = null;
       elapsedSeconds = 0;
+      activeElapsedSeconds = 0;
+      isPausedUI = false;
       currentWPM = 0;
       currentAccuracy = 100;
       currentStreak = 0;
       keystrokes = [];
       wpmCalculator = new WPMCalculator();
       accuracyTracker = new AccuracyTracker();
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     } catch (e) {
       console.error(e);
       mode = 'select';
@@ -335,14 +352,12 @@
     if (isComplete) return;
     isComplete = true;
     showCelebration = true;
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     const wpmResult = wpmCalculator.getWPM();
     finalWPM = Math.round(wpmResult.netWPM);
     finalAccuracy = Math.round(accuracyTracker.getAccuracy());
-    finalDuration = elapsedSeconds;
+    finalDuration = activeElapsedSeconds;
     submitSession();
   }
 
@@ -440,20 +455,51 @@
         <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_sentences_desc') || 'Synthesized punctuated sentence blocks'}</p>
       </button>
       
-      <div class="bg-surface-container-low p-6 rounded-2xl border border-transparent filter-none flex flex-col gap-3">
-        <h3 class="font-headline text-xl">{$t('practice_mode_literature') || 'Literature'}</h3>
-        <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_literature_desc') || 'Practice pacing using heavy formatting loaded from public domain excerpts.'}</p>
-        <select bind:value={selectedBookId} class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-2 font-body font-bold shadow-inner" disabled={currentBooks.length === 0}>
-           {#if currentBooks.length === 0}
-             <option value="">{$t('practice_no_books') || 'No books available natively'}</option>
-           {:else}
-             {#each currentBooks as book}
-               <option value={book.id}>{book.title} ({book.author})</option>
-             {/each}
-           {/if}
-        </select>
-        <button onclick={() => mountPracticeMode('book')} class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm">{$t('practice_start_book') || 'Start Book Drill'}</button>
+      <div class="bg-surface-container-low p-6 rounded-2xl border border-transparent flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="font-headline text-xl">{$t('practice_mode_literature') || 'Literature'}</h3>
+          {#if currentBooks.length > 0}
+            <span class="text-xs font-label uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
+              {currentBooks.length} {currentBooks.length === 1 ? 'work' : 'works'}
+            </span>
+          {/if}
+        </div>
+        <p class="text-on-surface-variant text-sm flex-1">{$t('practice_mode_literature_desc') || 'Type passages from public-domain classics in your chosen language.'}</p>
+
+        {#if currentBooks.length === 0}
+          <p class="text-xs text-on-surface-variant italic border border-outline-variant/30 rounded p-3">
+            No native-language classics available yet — showing English works instead.
+          </p>
+        {:else}
+          <select
+            bind:value={selectedBookId}
+            class="w-full bg-surface-container text-on-surface p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded mb-1 font-body font-bold shadow-inner"
+          >
+            {#each currentBooks as book}
+              <option value={book.id}>{book.title} — {book.author} ({book.year < 0 ? Math.abs(book.year) + ' BCE' : book.year})</option>
+            {/each}
+          </select>
+
+          <!-- Excerpt preview -->
+          {#if selectedBookId}
+            {@const selected = currentBooks.find(b => b.id === selectedBookId)}
+            {#if selected}
+              <p class="text-xs text-on-surface-variant/70 italic line-clamp-2 leading-relaxed border-l-2 border-primary/30 pl-3">
+                "{selected.excerpt.slice(0, 120)}…"
+              </p>
+            {/if}
+          {/if}
+        {/if}
+
+        <button
+          onclick={() => mountPracticeMode('book')}
+          disabled={currentBooks.length === 0}
+          class="bg-primary text-background font-bold uppercase tracking-wider text-xs py-3 px-4 rounded hover:bg-opacity-80 transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {$t('practice_start_book') || 'Start Book Drill'}
+        </button>
       </div>
+
     </div>
   {:else if isGeneratingAI}
     <div class="flex flex-col items-center justify-center py-24 space-y-6">
@@ -509,12 +555,40 @@
             { label: $t('lesson_wpm') || 'WPM', value: currentWPM, variant: 'primary' },
             { label: $t('lesson_accuracy') || 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
             { label: $t('progress_streak') || 'Streak', value: currentStreak, variant: 'default' },
-            { label: $t('lesson_time') || 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
+            { label: 'Active Time', value: formatTime(activeElapsedSeconds), variant: 'default' },
             { label: $t('practice_errors') || 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' }
           ]}
           {currentStreak}
           previousStreak={previousStreak}
         />
+
+        <!-- Pause indicator + Stop & Finish -->
+        {#if isStarted && !isComplete}
+          <div class="flex items-center justify-between -mt-4 px-1" aria-live="polite">
+            <div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest
+              {isPausedUI ? 'text-amber-400' : 'text-on-surface-variant/40'}">
+              {#if isPausedUI}
+                <span class="pr-pause-dot" aria-hidden="true"></span>
+                <span>Clock paused — tap any key to resume</span>
+              {:else}
+                <span class="pr-active-dot" aria-hidden="true"></span>
+                <span>Clock running</span>
+              {/if}
+            </div>
+            {#if canStop}
+              <button
+                id="practice-stop-btn"
+                onclick={completePractice}
+                class="pr-stop-btn font-label text-xs font-bold uppercase tracking-widest px-4 py-2
+                  border border-outline-variant/40 text-on-surface-variant
+                  hover:border-primary hover:text-primary transition-all duration-200"
+                aria-label="Stop practice and see results"
+              >
+                Stop &amp; Finish
+              </button>
+            {/if}
+          </div>
+        {/if}
         
         <div class="p-8 bg-surface-container-low rounded-2xl shadow-lg border border-surface-container relative">
           <TypingInput
@@ -534,3 +608,28 @@
   {/if}
   </div>
 </div>
+
+<style>
+  .pr-pause-dot, .pr-active-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pr-pause-dot { background: #f59e0b; animation: pr-pulse-amber 1.4s ease-in-out infinite; }
+  .pr-active-dot { background: #4ade80; animation: pr-pulse-green 2s ease-in-out infinite; }
+  @keyframes pr-pulse-amber {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(0.8); }
+  }
+  @keyframes pr-pulse-green {
+    0%,100% { opacity:0.6; transform:scale(1); }
+    50% { opacity:1; transform:scale(1.2); }
+  }
+  .pr-stop-btn {
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    background: transparent;
+    cursor: pointer;
+  }
+</style>

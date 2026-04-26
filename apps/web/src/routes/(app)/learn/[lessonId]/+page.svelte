@@ -73,11 +73,16 @@
   let errorFlash = $state(false);
   let sessionSubmitted = $state(false);
 
-  // Timer state
+  // Timer state — wall-clock elapsed (display only); active time lives in wpmCalculator
   let startTime = $state<number | null>(null);
   let elapsedSeconds = $state(0);
   let timerInterval: ReturnType<typeof setInterval> | null = null;
-  const LESSON_TIME_LIMIT = $derived(lessonChars.length > 0 ? Math.max(60, Math.ceil((lessonChars.length / 5) * 4)) : 60);
+  // Pause detection UI state — mirrors wpmCalculator.isPaused reactively
+  let isPausedUI = $state(false);
+  // Idle watcher interval
+  let idleInterval: ReturnType<typeof setInterval> | null = null;
+  // Active elapsed seconds (wall-clock minus pauses) for display
+  let activeElapsedSeconds = $state(0);
 
   // Metrics
   let wpmCalculator = $state(new WPMCalculator());
@@ -222,17 +227,7 @@
     }
   });
 
-  // Update metrics periodically
-  $effect(() => {
-    if (isStarted && !isComplete && !showIntroAnimation) {
-      const interval = setInterval(() => {
-        const wpmResult = wpmCalculator.getWPM();
-        currentWPM = Math.round(wpmResult.netWPM);
-        currentAccuracy = Math.round(accuracyTracker.getAccuracy());
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  });
+  // Metrics update is now handled inside the idle-detection effect below
 
   // Announce accuracy changes on word completion
   $effect(() => {
@@ -246,14 +241,36 @@
     }
   });
 
-  // Timer effect
+  // Wall-clock timer (display only — no hard stop)
   $effect(() => {
     if (isStarted && !isComplete && !showIntroAnimation) {
       timerInterval = setInterval(() => {
         elapsedSeconds++;
-        if (elapsedSeconds >= LESSON_TIME_LIMIT) completeLesson();
       }, 1000);
       return () => { if (timerInterval) clearInterval(timerInterval); };
+    }
+  });
+
+  // Idle / pause detection — ticks every 500ms, updates isPausedUI and wpmCalculator
+  $effect(() => {
+    if (isStarted && !isComplete && !showIntroAnimation) {
+      idleInterval = setInterval(() => {
+        const now = Date.now();
+        wpmCalculator.tick(now);
+        isPausedUI = wpmCalculator.isPaused;
+        // Active elapsed = wall-clock minus total paused time
+        if (startTime !== null) {
+          const wallMs = now - startTime;
+          activeElapsedSeconds = Math.round(
+            Math.max(0, wallMs - wpmCalculator.totalPausedMs) / 1000
+          );
+        }
+        // Refresh live WPM too (replaces the separate 500ms interval)
+        const wpmResult = wpmCalculator.getWPM();
+        currentWPM = Math.round(wpmResult.netWPM);
+        currentAccuracy = Math.round(accuracyTracker.getAccuracy());
+      }, 500);
+      return () => { if (idleInterval) clearInterval(idleInterval); };
     }
   });
 
@@ -356,6 +373,8 @@
       testFailed = false;
       startTime = null;
       elapsedSeconds = 0;
+      activeElapsedSeconds = 0;
+      isPausedUI = false;
       currentWPM = 0;
       currentAccuracy = 100;
       currentStreak = 0;
@@ -376,8 +395,12 @@
         }
       } catch {}
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     }
   });
+
+  // Can the student manually stop the lesson?
+  const canStop = $derived(isStarted && !isComplete && keystrokes.filter(k => k.correct).length >= 10);
 
   function completeLesson() {
 
@@ -386,16 +409,14 @@
     isComplete = true;
     showCelebration = true;
     
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
 
-    // Calculate final metrics
+    // Calculate final metrics using active time (pauses excluded)
     const wpmResult = wpmCalculator.getWPM();
     finalWPM = Math.round(wpmResult.netWPM);
     finalAccuracy = Math.round(accuracyTracker.getAccuracy());
-    finalDuration = elapsedSeconds;
+    finalDuration = activeElapsedSeconds;
 
     if (lesson?.isTest && finalAccuracy < 90) {
       testFailed = true;
@@ -498,6 +519,8 @@
     sessionSubmitted = false;
     startTime = null;
     elapsedSeconds = 0;
+    activeElapsedSeconds = 0;
+    isPausedUI = false;
     currentWPM = 0;
     currentAccuracy = 100;
     currentStreak = 0;
@@ -559,6 +582,7 @@
       window.removeEventListener('keyup', handleKeyUp);
     }
     if (timerInterval) clearInterval(timerInterval);
+    if (idleInterval) clearInterval(idleInterval);
   });
 </script>
 
@@ -777,6 +801,7 @@
           lessonId={lesson.id}
           {introKeys}
           {highlightKeys}
+          language={language}
           onStart={stopIntro}
         />
       {/if}
@@ -804,13 +829,13 @@
     </div>
 
     <!-- Live Metrics Bar -->
-    <div class="mb-8" role="region" aria-label="Live statistics">
+    <div class="mb-4" role="region" aria-label="Live statistics">
       <MetricsBar
         metrics={[
           { label: 'WPM', value: currentWPM, variant: 'primary' },
           { label: 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
           { label: 'Streak', value: currentStreak, variant: 'default' },
-          { label: 'Time', value: formatTime(Math.max(0, LESSON_TIME_LIMIT - elapsedSeconds)), variant: 'default' },
+          { label: 'Active Time', value: formatTime(activeElapsedSeconds), variant: 'default' },
           { label: 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' },
           { label: 'Correct', value: keystrokes.filter((k) => k.correct).length, variant: 'default' }
         ]}
@@ -818,6 +843,36 @@
         {previousStreak}
       />
     </div>
+
+    <!-- Pause indicator + Stop & Finish row -->
+    {#if isStarted && !isComplete}
+      <div class="flex items-center justify-between mb-6 px-1" aria-live="polite">
+        <!-- Pause status -->
+        <div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest
+          {isPausedUI ? 'text-tertiary' : 'text-on-surface-variant/50'}">
+          {#if isPausedUI}
+            <span class="pause-dot" aria-hidden="true"></span>
+            <span>Clock paused — tap any key to resume</span>
+          {:else if isStarted}
+            <span class="active-dot" aria-hidden="true"></span>
+            <span>Clock running</span>
+          {/if}
+        </div>
+        <!-- Student-controlled stop -->
+        {#if canStop}
+          <button
+            id="stop-finish-btn"
+            onclick={completeLesson}
+            class="stop-btn font-label text-xs font-bold uppercase tracking-widest px-4 py-2
+              border border-outline-variant/40 text-on-surface-variant
+              hover:border-primary hover:text-primary transition-all duration-200"
+            aria-label="Stop lesson and see your results"
+          >
+            Stop &amp; Finish
+          </button>
+        {/if}
+      </div>
+    {/if}
 
     <!-- Keyboard Visualization with RTL support -->
     <div 
@@ -885,8 +940,41 @@
 </div>
 
 <style>
+  /* ─── Pause indicator dots ─── */
+  .pause-dot, .active-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pause-dot {
+    background: #f59e0b;
+    animation: pulse-amber 1.4s ease-in-out infinite;
+  }
+  .active-dot {
+    background: #4ade80;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  @keyframes pulse-amber {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  @keyframes pulse-green {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* ─── Stop & Finish button ─── */
+  .stop-btn {
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    cursor: pointer;
+    background: transparent;
+  }
+
   /* ─── Cooldown overlay ─── */
   .border-warning { border-color: #f59e0b; }
+
 
   .cooldown-icon {
     font-size: 3rem;
