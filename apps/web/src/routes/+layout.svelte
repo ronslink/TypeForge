@@ -7,7 +7,7 @@
   let { children, data }: LayoutProps = $props();
 </script>
 
-<ClerkProvider {...data} publishableKey={data.publishableKey}>
+<ClerkProvider {...data}>
   <div class="min-h-screen bg-background text-on-background">
     <LocaleInit />
     {@render children()}
