@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/stores/locale';
+  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 
   // Script diversity grid data
   const scripts = [
@@ -177,13 +179,16 @@
     <div class="flex items-center gap-8">
       <span class="text-xl font-black tracking-tighter text-primary-container uppercase font-label">TYPINGSCHOLAR</span>
       <div class="hidden md:flex gap-6 items-center">
-        <a href="#features" class="text-primary border-b-2 border-primary pb-1 font-body text-sm">Features</a>
-        <a href="#languages" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Languages</a>
-        <a href="#pricing" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">Pricing</a>
+        <a href="#features" class="text-primary border-b-2 border-primary pb-1 font-body text-sm">{$t('mkt_features') || 'Features'}</a>
+        <a href="#languages" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">{$t('mkt_languages') || 'Languages'}</a>
+        <a href="#pricing" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">{$t('mkt_pricing') || 'Pricing'}</a>
+        <div class="ml-4 pl-4 border-l border-outline-variant/30 hidden lg:block">
+          <LanguageSwitcher />
+        </div>
       </div>
     </div>
       <a href="/sign-up" class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95 block">
-        Start Typing
+        {$t('mkt_start_typing') || 'Start Typing'}
       </a>
   </div>
 </nav>
@@ -212,17 +217,17 @@
       </div>
 
       <h1 class="font-headline text-5xl md:text-7xl lg:text-8xl tracking-tight leading-tight mb-6">
-        Master typing in <span class="italic text-primary">any</span> language
+        {$t('mkt_hero_title_1') || 'Master typing in'} <span class="italic text-primary">{$t('mkt_hero_title_2') || 'any'}</span> {$t('mkt_hero_title_3') || 'language'}
       </h1>
       <p class="font-body text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-        Adaptive AI. Every script. Every layout.
+        {$t('mkt_hero_subtitle') || 'Adaptive AI. Every script. Every layout.'}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
         <a href="/sign-up" class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all block">
-          Start free today
+          {$t('mkt_hero_cta') || 'Start free today'}
         </a>
         <a href="#pricing" class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
-          Institutional Access
+          {$t('mkt_hero_secondary_cta') || 'Institutional Access'}
           <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </a>
       </div>
@@ -236,15 +241,15 @@
         <!-- Stats Header -->
         <div class="grid grid-cols-3 gap-4 mb-12 border-b border-outline-variant/20 pb-8">
           <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">WPM Rate</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_wpm') || 'WPM Rate'}</span>
             <div class="font-label text-4xl text-secondary font-bold">{currentWpm}</div>
           </div>
           <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Accuracy</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_accuracy') || 'Accuracy'}</span>
             <div class="font-label text-4xl text-secondary font-bold">{currentAccuracy}%</div>
           </div>
           <div>
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Streak</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('mkt_demo_streak') || 'Streak'}</span>
             <div class="font-label text-4xl text-primary font-bold">{streak}</div>
           </div>
         </div>

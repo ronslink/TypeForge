@@ -5,7 +5,6 @@
   "nav_progress": "Fortschritt",
   "nav_sign_in": "Anmelden",
   "nav_sign_out": "Abmelden",
-
   "learn_heading": "Lernen ⚡",
   "learn_subheading": "Meistere deine Tippsequenz mit geführten Lehrplanmodulen, die auf deinen bevorzugten Dialekt und deine Hardware zugeschnitten sind.",
   "learn_course_progression": "Kursverlauf",
@@ -16,11 +15,9 @@
   "learn_no_results": "Keine Lektionen entsprechen deinen Filtern.",
   "learn_all_difficulties": "Alle Schwierigkeiten",
   "learn_stage_label": "Stufe {level}",
-
   "adaptive_banner_title": "Adaptives Training verfügbar",
   "adaptive_banner_body": "Du hast {count} {count, plural, one {Taste} other {Tasten}} unter dem Meisterungsniveau:",
   "adaptive_banner_cta": "Training starten →",
-
   "progress_heading": "Dein Fortschritt",
   "progress_subheading": "Verfolge deine Geschwindigkeit, Genauigkeit, Serien und Tastenbeherrschung.",
   "progress_sign_in_heading": "Anmelden um deinen Fortschritt zu sehen",
@@ -50,7 +47,6 @@
   "progress_date": "Datum",
   "progress_language": "Sprache",
   "progress_duration": "Dauer",
-
   "lesson_complete": "Lektion abgeschlossen!",
   "lesson_complete_body": "Gut gemacht beim Abschließen dieser Lektion!",
   "lesson_test_passed": "Test bestanden!",
@@ -74,20 +70,34 @@
   "lesson_no_lesson": "Lektion nicht gefunden.",
   "lesson_focus_hint": "Hier klicken oder tippen um zu beginnen",
   "lesson_start_cta": "Tippen starten",
-
   "placement_cooldown_drill_cta": "Schwache Tasten üben →",
   "placement_back": "Zurück zum Lehrplan",
-
   "error_load_failed": "Daten konnten nicht geladen werden",
   "error_retry": "Wiederholen",
-
   "lang_selector_placeholder": "Sprachen suchen...",
   "lang_selector_no_results": "Keine Sprachen gefunden",
   "lang_selector_rtl_badge": "RTL",
   "lang_ui_label": "Oberflächensprache",
-
   "footer_tagline": "Forme deine Tastenanschläge. Meistere dein Handwerk.",
   "footer_curriculum": "Lehrplan",
   "footer_company": "Unternehmen",
-  "footer_copyright": "© {year} TypeForge. Alle Rechte vorbehalten."
+  "footer_copyright": "© {year} TypeForge. Alle Rechte vorbehalten.",
+  "mkt_features": "Funktionen",
+  "mkt_languages": "Sprachen",
+  "mkt_pricing": "Preise",
+  "mkt_start_typing": "Tippen Starten",
+  "mkt_hero_title_1": "Meistern Sie das Tippen in",
+  "mkt_hero_title_2": "jeder",
+  "mkt_hero_title_3": "Sprache",
+  "mkt_hero_subtitle": "Adaptive KI. Jedes Alphabet. Jedes Layout.",
+  "mkt_hero_cta": "Heute kostenlos starten",
+  "mkt_hero_secondary_cta": "Institutioneller Zugang",
+  "mkt_demo_wpm": "WPM Rate",
+  "mkt_demo_accuracy": "Genauigkeit",
+  "mkt_demo_streak": "Serie",
+  "mkt_stats_lessons": "Abgeschlossene Lektionen",
+  "mkt_stats_hours": "Geübte Stunden",
+  "mkt_stats_keystrokes": "Getippte Tasten",
+  "mkt_footer_tagline": "Schmiede deine Tastenanschläge. Meistere dein Handwerk.",
+  "mkt_footer_copyright": "© 2026 TypeForge. Alle Rechte vorbehalten."
 }

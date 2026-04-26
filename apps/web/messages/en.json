@@ -5,7 +5,6 @@
   "nav_progress": "Progress",
   "nav_sign_in": "Sign In",
   "nav_sign_out": "Sign Out",
-
   "learn_heading": "Learn ⚡",
   "learn_subheading": "Master your typing sequence with guided curriculum modules specifically tailored to your preferred dialect and hardware structure.",
   "learn_course_progression": "Course Progression",
@@ -16,11 +15,9 @@
   "learn_no_results": "No lessons match your filters.",
   "learn_all_difficulties": "All Difficulties",
   "learn_stage_label": "Stage {level}",
-
   "adaptive_banner_title": "Adaptive Drill Available",
   "adaptive_banner_body": "You have {count} {count, plural, one {key} other {keys}} below mastery:",
   "adaptive_banner_cta": "Start Drill →",
-
   "progress_heading": "Your Progress",
   "progress_subheading": "Track your speed, accuracy, streaks, and key-level mastery.",
   "progress_sign_in_heading": "Sign in to see your progress",
@@ -50,7 +47,6 @@
   "progress_date": "Date",
   "progress_language": "Language",
   "progress_duration": "Duration",
-
   "lesson_complete": "Lesson Complete!",
   "lesson_complete_body": "Great job finishing this lesson!",
   "lesson_test_passed": "Test Passed!",
@@ -74,28 +70,22 @@
   "lesson_no_lesson": "Lesson not found.",
   "lesson_focus_hint": "Click here or start typing to begin",
   "lesson_start_cta": "Start Typing",
-
   "placement_cooldown_drill_cta": "Drill Weak Keys →",
   "placement_back": "Back to Curriculum",
-
   "error_load_failed": "Failed to load data",
   "error_retry": "Retry",
-
   "lang_selector_placeholder": "Search languages...",
   "lang_selector_no_results": "No languages found",
   "lang_selector_rtl_badge": "RTL",
   "lang_ui_label": "UI Language",
-
   "footer_tagline": "Forge your keystrokes. Master your craft.",
   "footer_curriculum": "Curriculum",
   "footer_company": "Company",
   "footer_copyright": "© {year} TypeForge. All rights reserved.",
-  
   "nav_settings": "Settings",
   "nav_sign_up": "Sign Up",
   "nav_languages": "Languages",
   "nav_typing_guide": "Typing Guide",
-
   "footer_product": "Product",
   "footer_account": "Account",
   "footer_legal": "Legal",
@@ -105,7 +95,6 @@
   "company_contact": "Contact",
   "legal_privacy": "Privacy Policy",
   "legal_terms": "Terms of Service",
-
   "practice_sandbox_title": "Practice Sandbox",
   "practice_sandbox_desc": "Freeform typing simulation. Submitting tracks grants active backend XP profiles without unlocking Curriculum states. Select your drill sequence below.",
   "practice_mode_words": "Words",
@@ -120,5 +109,23 @@
   "practice_logged": "Your session has been logged to your daily streak.",
   "practice_done": "Done",
   "practice_errors": "Errors",
-  "lesson_speed": "Speed"
+  "lesson_speed": "Speed",
+  "mkt_features": "Features",
+  "mkt_languages": "Languages",
+  "mkt_pricing": "Pricing",
+  "mkt_start_typing": "Start Typing",
+  "mkt_hero_title_1": "Master typing in",
+  "mkt_hero_title_2": "any",
+  "mkt_hero_title_3": "language",
+  "mkt_hero_subtitle": "Adaptive AI. Every script. Every layout.",
+  "mkt_hero_cta": "Start free today",
+  "mkt_hero_secondary_cta": "Institutional Access",
+  "mkt_demo_wpm": "WPM Rate",
+  "mkt_demo_accuracy": "Accuracy",
+  "mkt_demo_streak": "Streak",
+  "mkt_stats_lessons": "Lessons Completed",
+  "mkt_stats_hours": "Hours Practiced",
+  "mkt_stats_keystrokes": "Keystrokes Logged",
+  "mkt_footer_tagline": "Forge your keystrokes. Master your craft.",
+  "mkt_footer_copyright": "© 2026 TypeForge. All rights reserved."
 }

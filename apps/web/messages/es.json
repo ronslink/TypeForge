@@ -5,7 +5,6 @@
   "nav_progress": "Progreso",
   "nav_sign_in": "Iniciar sesión",
   "nav_sign_out": "Cerrar sesión",
-
   "learn_heading": "Aprender ⚡",
   "learn_subheading": "Domina tu secuencia de escritura con módulos curriculares guiados adaptados a tu dialecto y hardware preferidos.",
   "learn_course_progression": "Progresión del curso",
@@ -16,11 +15,9 @@
   "learn_no_results": "Ninguna lección coincide con tus filtros.",
   "learn_all_difficulties": "Todas las dificultades",
   "learn_stage_label": "Etapa {level}",
-
   "adaptive_banner_title": "Ejercicio adaptativo disponible",
   "adaptive_banner_body": "Tienes {count} {count, plural, one {tecla} other {teclas}} por debajo del dominio:",
   "adaptive_banner_cta": "Iniciar ejercicio →",
-
   "progress_heading": "Tu progreso",
   "progress_subheading": "Sigue tu velocidad, precisión, rachas y dominio de teclas.",
   "progress_sign_in_heading": "Inicia sesión para ver tu progreso",
@@ -50,7 +47,6 @@
   "progress_date": "Fecha",
   "progress_language": "Idioma",
   "progress_duration": "Duración",
-
   "lesson_complete": "¡Lección completa!",
   "lesson_complete_body": "¡Buen trabajo completando esta lección!",
   "lesson_test_passed": "¡Prueba superada!",
@@ -74,20 +70,34 @@
   "lesson_no_lesson": "Lección no encontrada.",
   "lesson_focus_hint": "Haz clic aquí o empieza a escribir para comenzar",
   "lesson_start_cta": "Empezar a escribir",
-
   "placement_cooldown_drill_cta": "Practicar teclas débiles →",
   "placement_back": "Volver al currículo",
-
   "error_load_failed": "Error al cargar datos",
   "error_retry": "Reintentar",
-
   "lang_selector_placeholder": "Buscar idiomas...",
   "lang_selector_no_results": "No se encontraron idiomas",
   "lang_selector_rtl_badge": "RTL",
   "lang_ui_label": "Idioma de interfaz",
-
   "footer_tagline": "Forja tus pulsaciones. Domina tu oficio.",
   "footer_curriculum": "Currículo",
   "footer_company": "Empresa",
-  "footer_copyright": "© {year} TypeForge. Todos los derechos reservados."
+  "footer_copyright": "© {year} TypeForge. Todos los derechos reservados.",
+  "mkt_features": "Características",
+  "mkt_languages": "Idiomas",
+  "mkt_pricing": "Precios",
+  "mkt_start_typing": "Empezar a Escribir",
+  "mkt_hero_title_1": "Domina la escritura en",
+  "mkt_hero_title_2": "cualquier",
+  "mkt_hero_title_3": "idioma",
+  "mkt_hero_subtitle": "IA Adaptativa. Cada alfabeto. Cada teclado.",
+  "mkt_hero_cta": "Empieza gratis hoy",
+  "mkt_hero_secondary_cta": "Acceso Institucional",
+  "mkt_demo_wpm": "Tasa PPM",
+  "mkt_demo_accuracy": "Precisión",
+  "mkt_demo_streak": "Racha",
+  "mkt_stats_lessons": "Lecciones Completadas",
+  "mkt_stats_hours": "Horas Practicadas",
+  "mkt_stats_keystrokes": "Pulsaciones Registradas",
+  "mkt_footer_tagline": "Forja tus pulsaciones. Domina tu arte.",
+  "mkt_footer_copyright": "© 2026 TypeForge. Todos los derechos reservados."
 }

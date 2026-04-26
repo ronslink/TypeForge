@@ -5,7 +5,6 @@
   "nav_progress": "Progrès",
   "nav_sign_in": "Se connecter",
   "nav_sign_out": "Se déconnecter",
-
   "learn_heading": "Apprendre ⚡",
   "learn_subheading": "Maîtrisez votre séquence de frappe avec des modules de curriculum guidés adaptés à votre dialecte et matériel préférés.",
   "learn_course_progression": "Progression du cours",
@@ -16,11 +15,9 @@
   "learn_no_results": "Aucune leçon ne correspond à vos filtres.",
   "learn_all_difficulties": "Toutes les difficultés",
   "learn_stage_label": "Étape {level}",
-
   "adaptive_banner_title": "Exercice adaptatif disponible",
   "adaptive_banner_body": "Vous avez {count} {count, plural, one {touche} other {touches}} en dessous de la maîtrise :",
   "adaptive_banner_cta": "Commencer l'exercice →",
-
   "progress_heading": "Votre progrès",
   "progress_subheading": "Suivez votre vitesse, précision, séries et maîtrise des touches.",
   "progress_sign_in_heading": "Connectez-vous pour voir votre progrès",
@@ -50,7 +47,6 @@
   "progress_date": "Date",
   "progress_language": "Langue",
   "progress_duration": "Durée",
-
   "lesson_complete": "Leçon terminée !",
   "lesson_complete_body": "Bravo pour avoir terminé cette leçon !",
   "lesson_test_passed": "Test réussi !",
@@ -74,20 +70,34 @@
   "lesson_no_lesson": "Leçon introuvable.",
   "lesson_focus_hint": "Cliquez ici ou commencez à taper pour démarrer",
   "lesson_start_cta": "Commencer à taper",
-
   "placement_cooldown_drill_cta": "Entraîner les touches faibles →",
   "placement_back": "Retour au curriculum",
-
   "error_load_failed": "Échec du chargement des données",
   "error_retry": "Réessayer",
-
   "lang_selector_placeholder": "Rechercher des langues...",
   "lang_selector_no_results": "Aucune langue trouvée",
   "lang_selector_rtl_badge": "RTL",
   "lang_ui_label": "Langue de l'interface",
-
   "footer_tagline": "Forgez vos frappes. Maîtrisez votre art.",
   "footer_curriculum": "Curriculum",
   "footer_company": "Entreprise",
-  "footer_copyright": "© {year} TypeForge. Tous droits réservés."
+  "footer_copyright": "© {year} TypeForge. Tous droits réservés.",
+  "mkt_features": "Fonctionnalités",
+  "mkt_languages": "Langues",
+  "mkt_pricing": "Tarifs",
+  "mkt_start_typing": "Commencer",
+  "mkt_hero_title_1": "Maîtrisez la frappe dans",
+  "mkt_hero_title_2": "n'importe quelle",
+  "mkt_hero_title_3": "langue",
+  "mkt_hero_subtitle": "IA Adaptative. Chaque alphabet. Chaque clavier.",
+  "mkt_hero_cta": "Commencez gratuitement",
+  "mkt_hero_secondary_cta": "Accès Institutionnel",
+  "mkt_demo_wpm": "Mots par minute",
+  "mkt_demo_accuracy": "Précision",
+  "mkt_demo_streak": "Série",
+  "mkt_stats_lessons": "Leçons Terminées",
+  "mkt_stats_hours": "Heures Pratiquées",
+  "mkt_stats_keystrokes": "Frappes Enregistrées",
+  "mkt_footer_tagline": "Forgez vos frappes. Maîtrisez votre art.",
+  "mkt_footer_copyright": "© 2026 TypeForge. Tous droits réservés."
 }
