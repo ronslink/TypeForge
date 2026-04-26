@@ -52,6 +52,7 @@
   "lesson_test_passed": "Test Passed!",
   "lesson_test_passed_body": "Stage cleared. You've proven your mechanics.",
   "lesson_cert_earned": "Certification Earned!",
+  "lesson_cert_body": "You've proven mastery and earned your official certificate.",
   "lesson_test_failed": "Test Failed",
   "lesson_test_failed_body": "You needed 90% accuracy. You scored {accuracy}%.",
   "lesson_retry_unlimited": "↻ Retries are unlimited — try again whenever you're ready.",

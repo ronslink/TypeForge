@@ -754,7 +754,7 @@
             <div class="cooldown-icon" aria-hidden="true">⏳</div>
             <h2 id="completion-title" class="font-headline text-2xl mb-2 text-warning relative z-10">{$t('lesson_cooldown_active')}</h2>
             <p id="completion-description" class="text-on-surface-variant text-sm mb-6 relative z-10">
-              {@html $t('lesson_cooldown_desc', { hours: orgRetryPolicy?.cooldownHours ?? cooldownHoursRemaining })}
+              {@html $t('lesson_cooldown_body', { hours: orgRetryPolicy?.cooldownHours ?? cooldownHoursRemaining })}
             </p>
 
             <div class="cooldown-pill" role="status" aria-label="Time remaining">
@@ -790,25 +790,25 @@
             <div class="absolute inset-0 bg-error/5 z-0 pointer-events-none"></div>
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-error relative z-10">{$t('lesson_test_failed')}</h2>
             <p id="completion-description" class="text-on-surface-variant mb-2 relative z-10">
-              {$t('lesson_test_failed_desc', { accuracy: finalAccuracy })}
+              {$t('lesson_test_failed_body', { accuracy: finalAccuracy })}
             </p>
             {#if !isOrgMember}
-              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retries_unlimited')}</p>
+              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retry_unlimited')}</p>
             {:else if orgRetryPolicy && orgRetryPolicy.cooldownHours > 0}
-              <p class="text-xs text-on-surface-variant mb-6 relative z-10">{@html $t('lesson_cooldown_org_desc', { hours: orgRetryPolicy.cooldownHours })}</p>
+              <p class="text-xs text-on-surface-variant mb-6 relative z-10">{@html $t('lesson_retry_cooldown', { hours: orgRetryPolicy.cooldownHours })}</p>
             {:else}
-              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retries_org_unlimited')}</p>
+              <p class="text-xs text-primary mb-6 relative z-10">{@html $t('lesson_retry_org_unlimited')}</p>
             {/if}
           {:else if lesson.isTest && lesson.id.includes('-test-5')}
             <div class="absolute inset-0 bg-primary/5 z-0 pointer-events-none"></div>
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary relative z-10">{$t('lesson_cert_earned')}</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">{$t('lesson_cert_desc')}</p>
+            <p id="completion-description" class="text-on-surface-variant mb-8 relative z-10 font-bold text-sm">{$t('lesson_cert_body')}</p>
           {:else if lesson.isTest}
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">{$t('lesson_test_passed')}</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_test_passed_desc')}</p>
+            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_test_passed_body')}</p>
           {:else}
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">{$t('lesson_complete')}</h2>
-            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_complete_desc')}</p>
+            <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_complete_body')}</p>
           {/if}
           
           <!-- Results Grid -->
