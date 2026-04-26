@@ -86,8 +86,7 @@
         'Automated grading & progress reports',
         'Priority support with SLA',
       ],
-      cta: 'Contact Sales',
-      externalHref: 'mailto:sales@typeforge.com',
+      cta: 'Upgrade to Team',
     },
   ];
 
@@ -114,10 +113,7 @@
 
   async function handleUpgrade(planId: PlanTier) {
     if (planId === 'free') return;
-    if (planId === 'team') {
-      window.location.href = 'mailto:sales@typeforge.com';
-      return;
-    }
+    
     isCheckingOut = true;
     error = null;
     try {

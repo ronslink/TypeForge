@@ -219,11 +219,13 @@
     },
     {
       name: 'Schools',
-      price: '$6',
+      price: 'From $6',
       period: '/seat/mo',
       features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
-      cta: 'Sign up now',
-      ctaHref: '/sign-up?plan=school',
+      ctas: [
+        { label: 'Sign up (90-day)', href: '/sign-up?plan=school-90' },
+        { label: 'Sign up (180-day)', href: '/sign-up?plan=school-180' }
+      ],
       popular: false
     }
   ];
@@ -648,7 +650,15 @@
               {/each}
             </ul>
           </div>
-          {#if plan.popular}
+          {#if 'ctas' in plan && plan.ctas}
+            <div class="flex flex-col gap-3">
+              {#each plan.ctas as cta}
+                <a href={cta.href} class="w-full border border-outline-variant/30 py-3 font-label text-sm uppercase tracking-widest hover:bg-surface-container-high transition-colors text-center block">
+                  {cta.label}
+                </a>
+              {/each}
+            </div>
+          {:else if plan.popular}
             <a href={plan.ctaHref} class="notched-button w-full bg-primary text-on-primary py-4 font-label font-bold text-sm uppercase tracking-widest hover:amber-glow transition-all text-center block">
               {plan.cta}
             </a>

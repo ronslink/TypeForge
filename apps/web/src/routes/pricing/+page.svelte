@@ -34,7 +34,7 @@
   const faqs = [
     { q: 'Can I switch plans later?', a: 'Yes, you can upgrade or downgrade at any time. Changes take effect at the start of the next billing cycle.' },
     { q: 'What happens when I hit the free limits?', a: 'Nothing — you just continue with the free tier. We never lock your data or stop you from using what you have.' },
-    { q: 'Is there a discount for annual billing?', a: 'Power User annual billing is available at $79/year (save ~27%). Contact us for school annual pricing.' },
+    { q: 'Is there a discount for annual billing?', a: 'Power User annual billing is available at $79/year (save ~27%). School plans are available in flexible 90-day ($6/mo) and semester 180-day ($8/mo) billing cycles.' },
     { q: 'How does school licensing work?', a: 'School seats are licensed per active student per month. You can add/remove seats at any time and billing adjusts automatically.' }
   ];
 </script>
@@ -124,9 +124,14 @@
               </li>
             {/each}
           </ul>
-          <a href="/sign-up?plan=school" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
-            Sign up now
-          </a>
+          <div class="flex flex-col gap-3">
+            <a href="/sign-up?plan=school-90" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
+              Sign up (90-day)
+            </a>
+            <a href="/sign-up?plan=school-180" class="border border-outline-variant/30 text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container-high transition-colors">
+              Sign up (180-day)
+            </a>
+          </div>
         </div>
       </div>
 

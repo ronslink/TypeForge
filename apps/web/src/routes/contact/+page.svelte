@@ -19,26 +19,32 @@
     formState = 'submitting';
     errorMessage = null;
 
-    // Basic validation
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    try {
+      // Basic validation
+      if (!name?.trim() || !email?.trim() || !message?.trim()) {
+        formState = 'error';
+        errorMessage = 'Please fill in all required fields.';
+        return;
+      }
+
+      // Email format check
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        formState = 'error';
+        errorMessage = 'Please enter a valid email address.';
+        return;
+      }
+
+      // Simulate submission (in production this would call an API endpoint)
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      // Success
+      formState = 'success';
+    } catch (err) {
       formState = 'error';
-      errorMessage = 'Please fill in all required fields.';
-      return;
+      errorMessage = 'An unexpected error occurred. Please try again.';
+      console.error(err);
     }
-
-    // Email format check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      formState = 'error';
-      errorMessage = 'Please enter a valid email address.';
-      return;
-    }
-
-    // Simulate submission (in production this would call an API endpoint)
-    await new Promise(resolve => setTimeout(resolve, 1200));
-
-    // Success
-    formState = 'success';
   }
 </script>
 
