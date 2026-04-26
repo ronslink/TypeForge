@@ -220,6 +220,19 @@
   // Global Course Matrix Tracker
   const completedForTrack = $derived(filteredLessons.filter(l => completedLessonIds.has(l.id)).length);
   const trackProgressPercent = $derived(filteredLessons.length > 0 ? Math.round((completedForTrack / filteredLessons.length) * 100) : 0);
+
+  // Highest Unlocked Stage Calculation
+  // A user can play lessons in a stage if they have passed the test for the PREVIOUS stage.
+  const highestUnlockedStage = $derived.by(() => {
+    let maxTestLevelPassed = 0;
+    for (const lessonId of completedLessonIds) {
+      const lesson = getLessonById(lessonId);
+      if (lesson?.isTest && lesson.difficulty > maxTestLevelPassed) {
+        maxTestLevelPassed = lesson.difficulty;
+      }
+    }
+    return maxTestLevelPassed + 1; // Unlocks the next stage
+  });
 </script>
 
 <svelte:head>
@@ -442,13 +455,18 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ml-6">
                   {#each stage.lessons as lesson}
+                    {@const isLocked = stage.level > highestUnlockedStage}
                     {#if lesson.isTest}
-                      <div class="md:col-span-2 lg:col-span-3 w-full group relative transition-transform hover:-translate-y-1">
-                        <div class="absolute inset-0 bg-primary/5 rounded-2xl border-2 border-primary/50 group-hover:border-primary shadow-[0_0_25px_rgba(240,165,0,0.15)] transition-all"></div>
+                      <div class="md:col-span-2 lg:col-span-3 w-full group relative transition-transform {isLocked ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:-translate-y-1'}">
+                        <div class="absolute inset-0 bg-primary/5 rounded-2xl border-2 {isLocked ? 'border-surface-variant' : 'border-primary/50 group-hover:border-primary shadow-[0_0_25px_rgba(240,165,0,0.15)]'} transition-all"></div>
                         <div class="relative p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                           <div class="flex-1 flex items-start gap-4">
-                            <div class="bg-primary text-background p-3 rounded-full shadow-lg">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3.5-3.5"/><path d="M15.5 11.5L12 8"/><path d="M6 18h12"/><path d="M7 21h10"/><path d="M3.5 12.5v-7A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5v7C20.5 17 12 21 12 21s-8.5-4-8.5-8.5z"/></svg>
+                            <div class="{isLocked ? 'bg-surface-variant text-surface-container' : 'bg-primary text-background'} p-3 rounded-full shadow-lg">
+                              {#if isLocked}
+                                <span class="text-xl">🔒</span>
+                              {:else}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3.5-3.5"/><path d="M15.5 11.5L12 8"/><path d="M6 18h12"/><path d="M7 21h10"/><path d="M3.5 12.5v-7A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5v7C20.5 17 12 21 12 21s-8.5-4-8.5-8.5z"/></svg>
+                              {/if}
                             </div>
                             <div>
                               <h4 class="font-headline text-xl text-primary font-bold uppercase tracking-widest">{lesson.title}</h4>
@@ -469,6 +487,8 @@
                                 {#if lesson.id.includes('-test-5')}
                                   <a href="/certificate" class="text-xs hover:text-primary transition-colors underline opacity-70 mt-1 cursor-pointer">View Certification</a>
                                 {/if}
+                             {:else if isLocked}
+                                <button disabled class="bg-surface-variant text-on-surface-variant font-bold px-8 py-3 rounded uppercase tracking-wider text-sm cursor-not-allowed">Locked</button>
                              {:else}
                                 <a href={`/learn/${lesson.id}`} class="bg-primary hover:bg-opacity-90 text-background font-bold px-8 py-3 rounded uppercase tracking-wider text-sm transition-all focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background outline-none hover:shadow-[0_0_15px_rgba(240,165,0,0.5)]">Start Test</a>
                              {/if}
@@ -479,6 +499,7 @@
                       <LessonCard
                         lesson={toLessonCardProps(lesson)}
                         href={`/learn/${lesson.id}`}
+                        locked={isLocked}
                       >
                         <div class="flex flex-wrap gap-2 mt-2">
                           {#each getLessonTags(lesson).slice(0, 3) as tag}

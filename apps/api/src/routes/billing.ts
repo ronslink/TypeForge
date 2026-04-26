@@ -117,35 +117,51 @@ app.post('/checkout', requireAuth, async (c) => {
     ? (process.env.STRIPE_PRICE_MONTHLY || INDIVIDUAL_PRICES.monthly.priceId)
     : (process.env.STRIPE_PRICE_ANNUAL || INDIVIDUAL_PRICES.annual.priceId);
   
-  // Create checkout session
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
-    mode: 'subscription',
-    success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/cancel`,
-    metadata: {
-      userId: auth.userId,
-      type: 'individual',
-      interval,
-    },
-    subscription_data: {
+  // Mock checkout fallback if price IDs are not configured
+  if (priceId.includes('placeholder')) {
+    console.warn(`Mock checkout triggered for individual plan. No real Stripe price ID configured for ${interval}.`);
+    const mockSessionId = `mock_session_${Date.now()}`;
+    const url = (successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`).replace('{CHECKOUT_SESSION_ID}', mockSessionId);
+    return c.json({ 
+      checkoutUrl: url,
+      sessionId: mockSessionId,
+    });
+  }
+
+  try {
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/billing/cancel`,
       metadata: {
         userId: auth.userId,
         type: 'individual',
+        interval,
       },
-    },
-  });
-  
-  return c.json({ 
-    checkoutUrl: session.url,
-    sessionId: session.id,
-  });
+      subscription_data: {
+        metadata: {
+          userId: auth.userId,
+          type: 'individual',
+        },
+      },
+    });
+    
+    return c.json({ 
+      checkoutUrl: session.url,
+      sessionId: session.id,
+    });
+  } catch (error: any) {
+    console.error('Stripe checkout error:', error);
+    return c.json({ error: error.message || 'Failed to initialize Stripe checkout' }, 500);
+  }
 });
 
 /**

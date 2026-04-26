@@ -421,51 +421,67 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
     : (process.env.STRIPE_SEAT_PRICE_ID_180 || 'price_seat_180_placeholder');
     
   const priceCents = cooldownDays === 90 ? 600 : 800;
-  
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId as string,
-    line_items: [
-      {
-        price: priceId,
-        quantity: seatCount,
-      },
-    ],
-    mode: 'subscription',
-    success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/cancel`,
-    metadata: {
-      orgId,
-      type: 'org_seats',
-      seatCount: seatCount.toString(),
-    },
-    subscription_data: {
+
+  // Mock checkout fallback if price IDs are not configured
+  if (priceId.includes('placeholder')) {
+    console.warn(`Mock checkout triggered for org plan. No real Stripe price ID configured.`);
+    const mockSessionId = `mock_session_${Date.now()}`;
+    const url = (successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`).replace('{CHECKOUT_SESSION_ID}', mockSessionId);
+    return c.json({ 
+      checkoutUrl: url,
+      sessionId: mockSessionId,
+    });
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId as string,
+      line_items: [
+        {
+          price: priceId,
+          quantity: seatCount,
+        },
+      ],
+      mode: 'subscription',
+      success_url: successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/cancel`,
       metadata: {
         orgId,
         type: 'org_seats',
         seatCount: seatCount.toString(),
-        cooldownDays: cooldownDays.toString(),
       },
-    },
-  });
-  
-  // Update billing record with pending seat count and cooldown settings
-  await db
-    .update(orgBilling)
-    .set({
-      pendingSeatCount: seatCount,
-      seatCooldownDays: cooldownDays,
-      seatPriceCents: priceCents,
-      updatedAt: new Date(),
-    })
-    .where(eq(orgBilling.orgId, orgId));
-  
-  return c.json({
-    checkoutUrl: session.url,
-    sessionId: session.id,
-    seatCount,
-    cooldownDays,
-    monthlyCost: (seatCount * priceCents) / 100,
-  });
+      subscription_data: {
+        metadata: {
+          orgId,
+          type: 'org_seats',
+          seatCount: seatCount.toString(),
+          cooldownDays: cooldownDays.toString(),
+        },
+      },
+    });
+    
+    // Update billing record with pending seat count and cooldown settings
+    await db
+      .update(orgBilling)
+      .set({
+        pendingSeatCount: seatCount,
+        seatCooldownDays: cooldownDays,
+        seatPriceCents: priceCents,
+        updatedAt: new Date(),
+      })
+      .where(eq(orgBilling.orgId, orgId));
+    
+    return c.json({
+      checkoutUrl: session.url,
+      sessionId: session.id,
+      seatCount,
+      cooldownDays,
+      monthlyCost: (seatCount * priceCents) / 100,
+    });
+  } catch (error: any) {
+    console.error('Stripe checkout error:', error);
+    return c.json({ error: error.message || 'Failed to initialize Stripe checkout' }, 500);
+  }
 });
 
 /**

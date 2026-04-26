@@ -16,12 +16,13 @@
   interface Props {
     lesson: Lesson;
     selected?: boolean;
+    locked?: boolean;
     children?: Snippet;
     onclick?: () => void;
     href?: string;
   }
 
-  let { lesson, selected = false, children, onclick, href }: Props = $props();
+  let { lesson, selected = false, locked = false, children, onclick, href }: Props = $props();
 
   const difficultyColors = {
     beginner: 'bg-success-container text-on-success-container',
@@ -31,18 +32,21 @@
 </script>
 
 <svelte:element
-  this={href ? 'a' : 'button'}
-  {href}
-  type={href ? undefined : 'button'}
+  this={href && !locked ? 'a' : 'button'}
+  href={locked ? undefined : href}
+  type={href && !locked ? undefined : 'button'}
   class="lesson-card block w-full bg-surface-container-low p-6 rounded-2xl text-left transition-all focus-indicator {selected
     ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface'
-    : ''}"
-  onclick={onclick}
+    : ''} {locked ? 'opacity-50 grayscale cursor-not-allowed locked-card' : ''}"
+  onclick={locked ? undefined : onclick}
 >
   <div class="flex items-start justify-between mb-4 relative z-10">
     <div class="flex-1">
-      <h3 class="font-headline text-xl font-bold text-on-surface mb-1 drop-shadow-sm">
+      <h3 class="font-headline text-xl font-bold text-on-surface mb-1 drop-shadow-sm flex items-center gap-2">
         {lesson.title}
+        {#if locked}
+          <span class="text-on-surface-variant text-base">🔒</span>
+        {/if}
       </h3>
       {#if lesson.description}
         <p class="text-sm font-body text-on-surface-variant line-clamp-2">
@@ -50,7 +54,7 @@
         </p>
       {/if}
     </div>
-    {#if lesson.language}
+    {#if lesson.language && !locked}
       <Badge variant="primary">
         {lesson.language}
       </Badge>
@@ -92,14 +96,14 @@
     transform: translateZ(0); /* Force hardware accel for smooth scale */
   }
 
-  .lesson-card:hover {
+  .lesson-card:hover:not(.locked-card) {
     transform: translateY(-4px) scale(1.01);
     box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.6);
     border-color: var(--surface-variant, #f0a500);
     background-color: var(--surface-container, #22262c);
   }
 
-  .lesson-card:active {
+  .lesson-card:active:not(.locked-card) {
     transform: translateY(-1px) scale(0.99);
     transition: all 0.05s ease;
   }
@@ -123,7 +127,7 @@
     pointer-events: none;
   }
 
-  .lesson-card:hover::before {
+  .lesson-card:hover:not(.locked-card)::before {
     opacity: 1;
   }
 
@@ -140,7 +144,7 @@
     z-index: 1;
   }
 
-  .lesson-card:hover::after {
+  .lesson-card:hover:not(.locked-card)::after {
     width: 100%;
   }
 </style>

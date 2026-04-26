@@ -72,6 +72,7 @@
   let showCelebration = $state(false);
   let errorFlash = $state(false);
   let sessionSubmitted = $state(false);
+  let isLocked = $state(false);
 
   // Timer state — wall-clock elapsed (display only); active time lives in wpmCalculator
   let startTime = $state<number | null>(null);
@@ -574,6 +575,33 @@
     } catch {
       // Non-critical; default to unlimited retries
     }
+
+    // Enforce locked curriculum logic
+    try {
+      const token = await ctx?.session?.getToken();
+      const progressRes = await fetch('/api/v1/progress/lessons', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (progressRes.ok) {
+        const payload = await progressRes.json();
+        const completedLessonIds = new Set<string>(payload.completedLessons || []);
+        
+        let maxTestLevelPassed = 0;
+        for (const id of completedLessonIds) {
+          const l = getLessonById(id);
+          if (l?.isTest && l.difficulty > maxTestLevelPassed) {
+            maxTestLevelPassed = l.difficulty;
+          }
+        }
+        const highestUnlockedStage = maxTestLevelPassed + 1;
+        
+        if (lesson && lesson.difficulty > highestUnlockedStage) {
+          isLocked = true;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to check locked status', e);
+    }
   });
 
   onDestroy(() => {
@@ -609,7 +637,30 @@
 </div>
 
 <div class="max-w-5xl mx-auto px-6 py-12">
-  {#if lesson}
+  {#if isLocked}
+    <div class="mb-6">
+      <a 
+        href="/learn" 
+        class="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2 focus-indicator"
+        aria-label={$t('lesson_back')}
+      >
+        <span aria-hidden="true">←</span>
+        <span>{$t('lesson_back')}</span>
+      </a>
+    </div>
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <div class="bg-surface-container w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-inner">
+        <span class="text-5xl drop-shadow-md">🔒</span>
+      </div>
+      <h1 class="font-headline text-4xl mb-4 text-on-surface">Lesson Locked</h1>
+      <p class="text-on-surface-variant max-w-md mx-auto mb-8 font-body">
+        You haven't unlocked this curriculum stage yet. Please complete the preceding evaluation tests to advance.
+      </p>
+      <a href="/learn" class="notched-button bg-primary text-on-primary px-8 py-3 font-label uppercase tracking-widest font-bold hover:shadow-[0_0_15px_rgba(240,165,0,0.5)] transition-shadow">
+        Return to Curriculum
+      </a>
+    </div>
+  {:else if lesson}
     <!-- Back Link -->
     <div class="mb-6">
       <a 
