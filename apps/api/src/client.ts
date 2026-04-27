@@ -15,7 +15,7 @@
  * });
  * ```
  */
-import { hc } from 'hono/client';
+import { hc, ExtractSchema, MergeSchemaPath } from 'hono/client';
 import type { Hono } from 'hono';
 
 // ============================================================================
@@ -1121,6 +1121,7 @@ export type ProgressApiType = Hono<
 
 /**
  * Combined API type for all routes
+ * Uses MergeSchemaPath to properly nest sub-route schemas under their path prefixes
  */
 export type AppType = Hono<
   any,
@@ -1141,14 +1142,13 @@ export type AppType = Hono<
         status: 200;
       };
     };
-    '/api/v1/sessions': SessionsApiType;
-    '/api/v1/lessons': LessonsApiType;
-    '/api/v1/progress': ProgressApiType;
-    '/api/v1/users': UsersApiType;
-    '/api/v1/organisations': OrganisationsApiType;
-    '/api/v1/billing': BillingApiType;
-    '/api/v1/admin': AdminApiType;
-  }
+  } & MergeSchemaPath<ExtractSchema<SessionsApiType>, '/api/v1/sessions'>
+  & MergeSchemaPath<ExtractSchema<LessonsApiType>, '/api/v1/lessons'>
+  & MergeSchemaPath<ExtractSchema<ProgressApiType>, '/api/v1/progress'>
+  & MergeSchemaPath<ExtractSchema<UsersApiType>, '/api/v1/users'>
+  & MergeSchemaPath<ExtractSchema<OrganisationsApiType>, '/api/v1/organisations'>
+  & MergeSchemaPath<ExtractSchema<BillingApiType>, '/api/v1/billing'>
+  & MergeSchemaPath<ExtractSchema<AdminApiType>, '/api/v1/admin'>
 >;
 
 // ============================================================================
