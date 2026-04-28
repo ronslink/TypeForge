@@ -58,6 +58,7 @@
       ],
       cta: 'Current plan',
       ctaDisabled: true,
+      externalHref: undefined,
     },
     {
       id: 'pro' as PlanTier,

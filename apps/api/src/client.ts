@@ -15,7 +15,7 @@
  * });
  * ```
  */
-import { hc } from 'hono/client';
+import { hc, ExtractSchema, MergeSchemaPath } from 'hono/client';
 import type { Hono } from 'hono';
 
 // ============================================================================
@@ -653,12 +653,16 @@ export type SessionsApiType = Hono<
           };
         };
         output: SessionsListResponse;
+        outputFormat: 'json';
+        status: 200;
       };
       $post: {
         input: {
           json: SessionPayload;
         };
         output: SessionCreateResponse;
+        outputFormat: 'json';
+        status: 201;
       };
     };
     '/:id': {
@@ -669,6 +673,8 @@ export type SessionsApiType = Hono<
           };
         };
         output: SessionResponse;
+        outputFormat: 'json';
+        status: 200;
       };
       $put: {
         input: {
@@ -689,6 +695,8 @@ export type SessionsApiType = Hono<
           };
         };
         output: SessionResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/keystrokes': {
@@ -702,6 +710,8 @@ export type SessionsApiType = Hono<
           };
         };
         output: KeystrokesRecordResponse;
+        outputFormat: 'json';
+        status: 201;
       };
     };
   }
@@ -723,11 +733,16 @@ export type LessonsApiType = Hono<
           };
         };
         output: LessonsListResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/next': {
       $get: {
+        input: {};
         output: NextLessonResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id': {
@@ -738,6 +753,8 @@ export type LessonsApiType = Hono<
           };
         };
         output: LessonResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/categories': {
@@ -748,11 +765,16 @@ export type LessonsApiType = Hono<
           };
         };
         output: LessonCategoriesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/languages': {
       $get: {
+        input: {};
         output: LanguagesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -766,13 +788,18 @@ export type UsersApiType = Hono<
   {
     '/me': {
       $get: {
+        input: {};
         output: UserResponse;
+        outputFormat: 'json';
+        status: 200;
       };
       $put: {
         input: {
           json: UserUpdatePayload;
         };
         output: UserResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/me/preferences': {
@@ -781,16 +808,24 @@ export type UsersApiType = Hono<
           json: UserPreferencesUpdatePayload;
         };
         output: UserPreferencesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/me/progress': {
       $get: {
+        input: {};
         output: UserProgressResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/me/stats': {
       $get: {
+        input: {};
         output: UserStatsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/me/weaknesses': {
@@ -801,6 +836,8 @@ export type UsersApiType = Hono<
           };
         };
         output: UserWeaknessesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -814,13 +851,18 @@ export type OrganisationsApiType = Hono<
   {
     '/': {
       $get: {
+        input: {};
         output: OrganisationsListResponse;
+        outputFormat: 'json';
+        status: 200;
       };
       $post: {
         input: {
           json: OrganisationCreatePayload;
         };
         output: OrganisationResponse;
+        outputFormat: 'json';
+        status: 201;
       };
     };
     '/:id': {
@@ -829,6 +871,8 @@ export type OrganisationsApiType = Hono<
           param: { id: string };
         };
         output: OrganisationResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/classes': {
@@ -837,6 +881,8 @@ export type OrganisationsApiType = Hono<
           param: { id: string };
         };
         output: OrgClassesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/members': {
@@ -845,6 +891,8 @@ export type OrganisationsApiType = Hono<
           param: { id: string };
         };
         output: OrgMembersResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/invite': {
@@ -854,6 +902,8 @@ export type OrganisationsApiType = Hono<
           json: InvitePayload;
         };
         output: InvitationResponse;
+        outputFormat: 'json';
+        status: 201;
       };
     };
     '/:id/billing/seats': {
@@ -863,6 +913,8 @@ export type OrganisationsApiType = Hono<
           json: SeatCheckoutPayload;
         };
         output: SeatCheckoutResponse;
+        outputFormat: 'json';
+        status: 201;
       };
     };
     '/:id/billing/seats/upgrade': {
@@ -872,6 +924,8 @@ export type OrganisationsApiType = Hono<
           json: SeatUpgradePayload;
         };
         output: SeatUpgradeResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/billing/seats/downgrade': {
@@ -881,6 +935,8 @@ export type OrganisationsApiType = Hono<
           json: SeatDowngradePayload;
         };
         output: SeatDowngradeResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/seats': {
@@ -889,6 +945,8 @@ export type OrganisationsApiType = Hono<
           param: { id: string };
         };
         output: SeatsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/seats/assign': {
@@ -898,6 +956,8 @@ export type OrganisationsApiType = Hono<
           json: SeatAssignPayload;
         };
         output: SeatAssignResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/:id/seats/:userId': {
@@ -906,6 +966,8 @@ export type OrganisationsApiType = Hono<
           param: { id: string; userId: string };
         };
         output: SeatRemoveResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -919,12 +981,18 @@ export type BillingApiType = Hono<
   {
     '/plans': {
       $get: {
+        input: {};
         output: PlansResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/subscription': {
       $get: {
+        input: {};
         output: SubscriptionResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/checkout': {
@@ -933,21 +1001,32 @@ export type BillingApiType = Hono<
           json: CheckoutPayload;
         };
         output: CheckoutResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/portal': {
       $post: {
+        input: {};
         output: PortalResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/invoices': {
       $get: {
+        input: {};
         output: InvoicesResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/webhook': {
       $post: {
+        input: {};
         output: WebhookResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -961,7 +1040,10 @@ export type AdminApiType = Hono<
   {
     '/stats': {
       $get: {
+        input: {};
         output: AdminStatsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/users': {
@@ -973,11 +1055,16 @@ export type AdminApiType = Hono<
           };
         };
         output: AdminUsersResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/organisations': {
       $get: {
+        input: {};
         output: AdminOrganisationsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/audit-logs': {
@@ -989,6 +1076,8 @@ export type AdminApiType = Hono<
           };
         };
         output: AuditLogsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/users/:id/status': {
@@ -998,6 +1087,8 @@ export type AdminApiType = Hono<
           json: AdminUserStatusPayload;
         };
         output: AdminUserResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -1011,12 +1102,18 @@ export type ProgressApiType = Hono<
   {
     '/': {
       $get: {
+        input: {};
         output: ProgressResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/stats': {
       $get: {
+        input: {};
         output: ProgressStatsResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
   }
@@ -1024,28 +1121,34 @@ export type ProgressApiType = Hono<
 
 /**
  * Combined API type for all routes
+ * Uses MergeSchemaPath to properly nest sub-route schemas under their path prefixes
  */
 export type AppType = Hono<
   any,
   {
     '/health': {
       $get: {
+        input: {};
         output: HealthResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
     '/api/v1': {
       $get: {
+        input: {};
         output: ApiInfoResponse;
+        outputFormat: 'json';
+        status: 200;
       };
     };
-    '/api/v1/sessions': SessionsApiType;
-    '/api/v1/lessons': LessonsApiType;
-    '/api/v1/progress': ProgressApiType;
-    '/api/v1/users': UsersApiType;
-    '/api/v1/organisations': OrganisationsApiType;
-    '/api/v1/billing': BillingApiType;
-    '/api/v1/admin': AdminApiType;
-  }
+  } & MergeSchemaPath<ExtractSchema<SessionsApiType>, '/api/v1/sessions'>
+  & MergeSchemaPath<ExtractSchema<LessonsApiType>, '/api/v1/lessons'>
+  & MergeSchemaPath<ExtractSchema<ProgressApiType>, '/api/v1/progress'>
+  & MergeSchemaPath<ExtractSchema<UsersApiType>, '/api/v1/users'>
+  & MergeSchemaPath<ExtractSchema<OrganisationsApiType>, '/api/v1/organisations'>
+  & MergeSchemaPath<ExtractSchema<BillingApiType>, '/api/v1/billing'>
+  & MergeSchemaPath<ExtractSchema<AdminApiType>, '/api/v1/admin'>
 >;
 
 // ============================================================================
