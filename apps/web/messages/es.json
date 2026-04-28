@@ -134,5 +134,17 @@
   "settings_preview_desc": "This is how your selected layout will appear during lessons.",
   "settings_preview_rtl": "↩ RTL Layout",
   "settings_preview_layout": "Layout:",
-  "settings_preview_script": "Script:"
+  "settings_preview_script": "Script:",
+  "legal_privacy": "Política de Privacidad",
+  "legal_terms": "Términos de Servicio",
+  "legal_compliance": "Cumplimiento",
+  "mkt_school_resources": "Recursos Escolares",
+  "mkt_typing_guide": "Guía de Escritura",
+  "mkt_teacher_dashboard": "Panel del Profesor",
+  "mkt_region_americas": "Américas",
+  "mkt_region_europe": "Europa",
+  "mkt_region_mea": "Oriente Medio y África",
+  "mkt_region_east_asia": "Asia Oriental",
+  "mkt_region_cee": "Europa Central y del Este",
+  "mkt_page_title": "TypingScholar — Domina la escritura en cualquier idioma"
 }
