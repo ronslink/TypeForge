@@ -1,47 +1,48 @@
 <script lang="ts">
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import { t } from '$lib/stores/locale';
 
   const freeFeatures = [
-    '15 languages (Latin, CJK starter, Cyrillic)',
-    'Adaptive lessons with weakness detection',
-    'Practice mode with WPM/accuracy tracking',
-    'Cascade typing game',
-    'Progress dashboard',
-    'Basic statistics'
+    'pricing_feature_free_1',
+    'pricing_feature_free_2',
+    'pricing_feature_free_3',
+    'pricing_feature_free_4',
+    'pricing_feature_free_5',
+    'pricing_feature_free_6'
   ];
 
   const powerFeatures = [
-    'All 17+ languages (full CJK, Arabic, Hebrew, Devanagari, Thai...)',
-    'Priority processing & no rate limits',
-    'Advanced analytics & session history',
-    'Unlimited practice sessions',
-    'All typing games & achievements',
-    'Export progress reports (CSV)',
-    'Priority support'
+    'pricing_feature_power_1',
+    'pricing_feature_power_2',
+    'pricing_feature_power_3',
+    'pricing_feature_power_4',
+    'pricing_feature_power_5',
+    'pricing_feature_power_6',
+    'pricing_feature_power_7'
   ];
 
   const schoolFeatures = [
-    'Everything in Power User',
-    'Teacher dashboard with class analytics',
-    'Student roster management',
-    'Flexible seats ($6/mo, 90-day lock)',
-    'Semester seats ($8/mo, 180-day lock)',
-    'SCIM/Google Workspace SSO',
-    'COPPA-compliant (under 13)'
+    'pricing_feature_school_1',
+    'pricing_feature_school_2',
+    'pricing_feature_school_3',
+    'pricing_feature_school_4',
+    'pricing_feature_school_5',
+    'pricing_feature_school_6',
+    'pricing_feature_school_7'
   ];
 
   const faqs = [
-    { q: 'Can I switch plans later?', a: 'Yes, you can upgrade or downgrade at any time. Changes take effect at the start of the next billing cycle.' },
-    { q: 'What happens when I hit the free limits?', a: 'Nothing — you just continue with the free tier. We never lock your data or stop you from using what you have.' },
-    { q: 'Is there a discount for annual billing?', a: 'Power User annual billing is available at $79/year (save ~27%). School plans are available in flexible 90-day ($6/mo) and semester 180-day ($8/mo) billing cycles.' },
-    { q: 'How does school licensing work?', a: 'School seats are licensed per active student per month. You can add/remove seats at any time and billing adjusts automatically.' }
+    { q: 'pricing_faq_switch_q', a: 'pricing_faq_switch_a' },
+    { q: 'pricing_faq_free_limits_q', a: 'pricing_faq_free_limits_a' },
+    { q: 'pricing_faq_annual_q', a: 'pricing_faq_annual_a' },
+    { q: 'pricing_faq_school_licensing_q', a: 'pricing_faq_school_licensing_a' }
   ];
 </script>
 
 <svelte:head>
-  <title>Pricing — TypingScholar</title>
-  <meta name="description" content="Simple, transparent pricing for TypingScholar. Free forever, or unlock advanced features with Power User or School plans." />
+  <title>{$t('pricing_page_title')}</title>
+  <meta name="description" content={$t('pricing_meta_description')} />
 </svelte:head>
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col">
@@ -49,9 +50,9 @@
   <main class="pt-20 flex-1">
     <section class="py-24 px-6 md:px-8 max-w-screen-xl mx-auto">
       <div class="text-center mb-16">
-        <h1 class="font-headline text-5xl md:text-6xl tracking-tight mb-4">Simple, transparent pricing</h1>
+        <h1 class="font-headline text-5xl md:text-6xl tracking-tight mb-4">{$t('pricing_hero_title')}</h1>
         <p class="font-body text-xl text-on-surface-variant max-w-2xl mx-auto">
-          Start free. Upgrade when you're ready. No hidden fees, no contracts.
+          {$t('pricing_hero_subtitle')}
         </p>
       </div>
 
@@ -60,76 +61,76 @@
         <!-- Free -->
         <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 flex flex-col">
           <div class="mb-6">
-            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">Individual</h2>
+            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">{$t('pricing_plan_individual')}</h2>
             <div class="flex items-baseline gap-2">
               <span class="font-headline text-5xl">$0</span>
-              <span class="text-on-surface-variant font-body">/forever</span>
+              <span class="text-on-surface-variant font-body">{$t('pricing_perforever')}</span>
             </div>
-            <p class="text-sm text-on-surface-variant mt-2 font-body">No credit card required</p>
+            <p class="text-sm text-on-surface-variant mt-2 font-body">{$t('pricing_no_credit_card')}</p>
           </div>
           <ul class="space-y-3 flex-1 mb-8">
-            {#each freeFeatures as feature}
+            {#each freeFeatures as key}
               <li class="flex items-start gap-3 font-body text-sm">
                 <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                {feature}
+                {$t(key)}
               </li>
             {/each}
           </ul>
           <a href="/sign-up" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
-            Get started free
+            {$t('pricing_cta_free')}
           </a>
         </div>
 
         <!-- Power User -->
         <div class="bg-surface-container-high border-2 border-primary rounded-2xl p-8 flex flex-col relative">
           <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-            <span class="bg-primary text-on-primary font-label text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>
+            <span class="bg-primary text-on-primary font-label text-xs font-bold px-3 py-1 rounded-full">{$t('pricing_badge_popular')}</span>
           </div>
           <div class="mb-6">
-            <h2 class="font-label text-lg uppercase tracking-wider text-primary mb-2">Power User</h2>
+            <h2 class="font-label text-lg uppercase tracking-wider text-primary mb-2">{$t('pricing_plan_power_user')}</h2>
             <div class="flex items-baseline gap-2">
               <span class="font-headline text-5xl">$9</span>
-              <span class="text-on-surface-variant font-body">/month</span>
+              <span class="text-on-surface-variant font-body">{$t('pricing_permonth')}</span>
             </div>
-            <p class="text-sm text-on-surface-variant mt-2 font-body">Unlock the full experience</p>
+            <p class="text-sm text-on-surface-variant mt-2 font-body">{$t('pricing_power_unlock')}</p>
           </div>
           <ul class="space-y-3 flex-1 mb-8">
-            {#each powerFeatures as feature}
+            {#each powerFeatures as key}
               <li class="flex items-start gap-3 font-body text-sm">
                 <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                {feature}
+                {$t(key)}
               </li>
             {/each}
           </ul>
           <a href="/sign-up?plan=power" class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold text-center block hover:bg-primary-fixed-dim transition-colors">
-            Upgrade to Power User
+            {$t('pricing_cta_power')}
           </a>
         </div>
 
         <!-- Schools -->
         <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 flex flex-col">
           <div class="mb-6">
-            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">Schools</h2>
+            <h2 class="font-label text-lg uppercase tracking-wider text-on-surface-variant mb-2">{$t('pricing_plan_schools')}</h2>
             <div class="flex items-baseline gap-1">
               <span class="font-headline text-5xl">$6</span>
-              <span class="text-on-surface-variant font-body">/seat/mo</span>
+              <span class="text-on-surface-variant font-body">{$t('pricing_perseatmo')}</span>
             </div>
-            <p class="text-sm text-on-surface-variant mt-2 font-body">For classrooms & districts</p>
+            <p class="text-sm text-on-surface-variant mt-2 font-body">{$t('pricing_schools_subtitle')}</p>
           </div>
           <ul class="space-y-3 flex-1 mb-8">
-            {#each schoolFeatures as feature}
+            {#each schoolFeatures as key}
               <li class="flex items-start gap-3 font-body text-sm">
                 <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                {feature}
+                {$t(key)}
               </li>
             {/each}
           </ul>
           <div class="flex flex-col gap-3">
             <a href="/sign-up?plan=school-90" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
-              Sign up (90-day)
+              {$t('pricing_cta_school_90')}
             </a>
             <a href="/sign-up?plan=school-180" class="border border-outline-variant/30 text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container-high transition-colors">
-              Sign up (180-day)
+              {$t('pricing_cta_school_180')}
             </a>
           </div>
         </div>
@@ -137,12 +138,12 @@
 
       <!-- FAQ -->
       <div class="mt-24 max-w-3xl mx-auto">
-        <h2 class="font-headline text-3xl text-center mb-12">Frequently asked questions</h2>
+        <h2 class="font-headline text-3xl text-center mb-12">{$t('pricing_faq_heading')}</h2>
         <div class="space-y-6">
           {#each faqs as item}
             <div class="border-b border-outline-variant/20 pb-6">
-              <h3 class="font-label text-lg mb-2">{item.q}</h3>
-              <p class="font-body text-on-surface-variant">{item.a}</p>
+              <h3 class="font-label text-lg mb-2">{$t(item.q)}</h3>
+              <p class="font-body text-on-surface-variant">{$t(item.a)}</p>
             </div>
           {/each}
         </div>
