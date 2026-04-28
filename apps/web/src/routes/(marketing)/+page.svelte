@@ -160,31 +160,31 @@
   const features = [
     {
       icon: 'psychology',
-      title: 'AI Weakness Detection',
-      description: 'Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.',
+      title: $t('mkt_feature_ai_title') || 'AI Weakness Detection',
+      description: $t('mkt_feature_ai_desc') || 'Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.',
       span: 'large',
       hasChart: true
     },
     {
       icon: 'bolt',
-      title: 'Zero Latency',
-      description: 'Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.',
+      title: $t('mkt_feature_latency_title') || 'Zero Latency',
+      description: $t('mkt_feature_latency_desc') || 'Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.',
       span: 'small'
     },
     {
       icon: 'translate',
-      title: 'Global Foundry',
-      description: 'Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.',
+      title: $t('mkt_feature_global_title') || 'Global Foundry',
+      description: $t('mkt_feature_global_desc') || 'Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.',
       span: 'small'
     },
     {
       icon: 'school',
-      title: 'School Grade Rigor',
-      description: 'COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.',
+      title: $t('mkt_feature_school_title') || 'School Grade Rigor',
+      description: $t('mkt_feature_school_desc') || 'COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.',
       span: 'large-institution',
       stats: [
-        { value: '100%', label: 'Compliance' },
-        { value: '500+', label: 'Schools' }
+        { value: '100%', label: $t('mkt_stat_compliance') || 'Compliance' },
+        { value: '500+', label: $t('mkt_stat_schools') || 'Schools' }
       ]
     }
   ];
@@ -200,11 +200,11 @@
   // Pricing plans
   const pricingPlans = [
     {
-      name: 'Individual',
+      name: $t('pricing_plan_individual') || 'Individual',
       price: 'Free',
       period: '',
       features: ['All Basic Layouts', 'Weekly Progress Stats'],
-      cta: 'Select Plan',
+      cta: $t('pricing_cta_select') || 'Select Plan',
       ctaHref: '/sign-up',
       popular: false
     },
@@ -218,13 +218,13 @@
       popular: true
     },
     {
-      name: 'Schools',
+      name: $t('pricing_plan_schools') || 'Schools',
       price: 'From $6',
       period: '/seat/mo',
       features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
       ctas: [
-        { label: 'Sign up (90-day)', href: '/sign-up?plan=school-90' },
-        { label: 'Sign up (180-day)', href: '/sign-up?plan=school-180' }
+        { label: $t('pricing_cta_school_90') || 'Sign up (90-day)', href: '/sign-up?plan=school-90' },
+        { label: $t('pricing_cta_school_180') || 'Sign up (180-day)', href: '/sign-up?plan=school-180' }
       ],
       popular: false
     }
