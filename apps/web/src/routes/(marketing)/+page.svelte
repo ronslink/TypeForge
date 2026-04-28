@@ -255,29 +255,29 @@
     }
   ];
 
-  const footerLinks = {
+  const footerLinks = $derived({
     product: [
-      { label: 'Features', href: '/#features' },
-      { label: 'Pricing', href: '/pricing' },
-      { label: 'Languages', href: '/languages' }
+      { label: $t('mkt_features'), href: '/#features' },
+      { label: $t('mkt_pricing'), href: '/pricing' },
+      { label: $t('mkt_languages'), href: '/languages' }
     ],
     resources: [
-      { label: 'School Resources', href: '/contact' },
-      { label: 'Typing Guide', href: '/typing-guide' },
-      { label: 'Teacher Dashboard', href: '/learn' }
+      { label: $t('mkt_school_resources'), href: '/contact' },
+      { label: $t('mkt_typing_guide'), href: '/typing-guide' },
+      { label: $t('mkt_teacher_dashboard'), href: '/learn' }
     ],
     legal: [
-      { label: 'Privacy Policy', href: '/privacy-policy' },
-      { label: 'Terms of Service', href: '/terms-of-service' },
-      { label: 'Compliance', href: '/privacy-policy' }
+      { label: $t('legal_privacy'), href: '/privacy-policy' },
+      { label: $t('legal_terms'), href: '/terms-of-service' },
+      { label: $t('legal_compliance'), href: '/privacy-policy' }
     ]
-  };
+  });
 
 
 </script>
 
 <svelte:head>
-  <title>TypingScholar — Master typing in any language</title>
+  <title>{$t('mkt_page_title') || 'TypingScholar — Master typing in any language'}</title>
   <meta name="description" content="Adaptive AI. Every script. Every layout. The definitive typing platform for modern explorers." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </svelte:head>
@@ -487,7 +487,7 @@
     <!-- Americas -->
     <div class="mb-10">
       <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌎</span> Americas
+        <span>🌎</span> {$t('mkt_region_americas')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {#each [{code:'en',native:'English',text:'The quick brown fox jumps over the lazy dog.',rtl:false,flag:'us'},{code:'es',native:'Español',text:'El veloz murciélago hindú comía feliz cardillo y kiwi.',rtl:false,flag:'es'},{code:'pt',native:'Português',text:'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',rtl:false,flag:'br'}] as lang}
@@ -506,7 +506,7 @@
     <!-- Europe -->
     <div class="mb-10">
       <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌍</span> Europe
+        <span>🌍</span> {$t('mkt_region_europe')}
       </h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {#each [{n:'Deutsch',c:'de',s:'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.',f:'de'},{n:'Français',c:'fr',s:'Portez ce vieux whisky au juge blond qui fume.',f:'fr'},{n:'Italiano',c:'it',s:'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.',f:'it'},{n:'Nederlands',c:'nl',s:"Pa's wijsje: fox lyophiliseert glad jodiumacetylide.",f:'nl'},{n:'Polski',c:'pl',s:'Pchnąć w tę łódź jeża lub ośm skrzyń fig.',f:'pl'},{n:'Ελληνικά',c:'el',s:'Το λαγός και η χελώνα έτρεξαν γρήγορα.',g:true,f:'gr'},{n:'Čeština',c:'cs',s:'Příliš žluťoučký kůň úpěl ďábelské kódy.',f:'cz'},{n:'Magyar',c:'hu',s:'Árvízi tölgyért bolygott sírkövet döngetett.',f:'hu'},{n:'Svenska',c:'sv',s:'Gädda prygelnäbba fyrskrift växer franskt.',f:'se'},{n:'Norsk',c:'no',s:'Kjevveisk mot tre, eg snur og vinker til hunden.',f:'no'},{n:'Dansk',c:'da',s:'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.',f:'dk'},{n:'Suomi',c:'fi',s:'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.',f:'fi'}] as lang}
@@ -524,7 +524,7 @@
     <!-- Middle East & Africa -->
     <div class="mb-10">
       <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌏</span> Middle East & Africa
+        <span>🌏</span> {$t('mkt_region_mea')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {#each [{n:'العربية',c:'ar',s:'نص حكيم له سرعان تسري به',rtl:true,f:'sa'},{n:'עברית',c:'he',s:'איך בלשון הקודש, ספר צלחת פסיק',rtl:true,f:'il'}] as lang}
@@ -542,7 +542,7 @@
     <!-- East Asia -->
     <div class="mb-10">
       <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-        <span>🌏</span> East Asia
+        <span>🌏</span> {$t('mkt_region_east_asia')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {#each [{n:'日本語',c:'ja',s:'いろはにほへとちりぬるを わかよたれそつねならむ',f:'jp'},{n:'简体中文',c:'zh',s:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。',f:'cn'},{n:'한국어',c:'ko',s:'다람쥐 헌 쳇바퀴에 타고파.',f:'kr'}] as lang}
@@ -577,7 +577,7 @@
       </div>
       <div>
         <h3 class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
-          <span>🌏</span> Central & Eastern Europe
+          <span>🌏</span> {$t('mkt_region_cee')}
         </h3>
         <div class="grid grid-cols-2 gap-3">
           {#each [{n:'Русский',c:'ru',s:'Эй, жлоб! Где туз? Прячь юных съёмных.',f:'ru'},{n:'Українська',c:'uk',s:'Ей, барсу! Блискавично ховай юних.',f:'ua'},{n:'Türkçe',c:'tr',s:'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.',f:'tr'}] as lang}

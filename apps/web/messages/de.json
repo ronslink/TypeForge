@@ -134,5 +134,17 @@
   "settings_preview_desc": "This is how your selected layout will appear during lessons.",
   "settings_preview_rtl": "↩ RTL Layout",
   "settings_preview_layout": "Layout:",
-  "settings_preview_script": "Script:"
+  "settings_preview_script": "Script:",
+  "legal_privacy": "Datenschutzrichtlinie",
+  "legal_terms": "Nutzungsbedingungen",
+  "legal_compliance": "Compliance",
+  "mkt_school_resources": "Schulische Ressourcen",
+  "mkt_typing_guide": "Schreibleitfaden",
+  "mkt_teacher_dashboard": "Lehrer-Dashboard",
+  "mkt_region_americas": "Amerika",
+  "mkt_region_europe": "Europa",
+  "mkt_region_mea": "Naher Osten und Afrika",
+  "mkt_region_east_asia": "Ostasien",
+  "mkt_region_cee": "Mittel- und Osteuropa",
+  "mkt_page_title": "TypingScholar — Meistern Sie das Tippen in jeder Sprache"
 }
