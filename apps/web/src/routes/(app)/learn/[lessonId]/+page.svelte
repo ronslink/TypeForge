@@ -1218,7 +1218,6 @@
   }
 
   /* Smooth transitions for direction changes */
-  .typing-container,
   :global(.typing-input) {
     transition: direction 0.3s ease;
   }
@@ -1249,7 +1248,6 @@
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    .typing-container,
     :global(.typing-input) {
       transition: none;
     }
@@ -1260,7 +1258,6 @@
   }
 
   /* Class-based reduced motion override */
-  :global(.reduced-motion) .typing-container,
   :global(.reduced-motion) :global(.typing-input) {
     transition: none;
   }

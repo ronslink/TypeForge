@@ -611,7 +611,7 @@
     line-height: 1.4;
   }
 
-  .adaptive-body strong {
+  :global(.adaptive-body strong) {
     color: var(--on-surface, #e3e2e6);
   }
 
