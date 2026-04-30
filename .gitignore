@@ -66,9 +66,15 @@ secrets/
 drizzle/meta/
 !drizzle/meta/.gitkeep
 
-# Temporary files
+# Temporary / debug files
 tmp/
 temp/
 *.tmp
-lint_all_results.txt
-lint_final2.txt
+*.bak
+*_errors.txt
+*_results.txt
+*_typecheck.txt
+lint_*.txt
+typecheck*.log
+appmap.log
+errors.json
