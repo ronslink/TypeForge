@@ -52,7 +52,7 @@ app.get('/', async (c) => {
 /**
  * POST /organisations - Create a new organisation
  */
-app.post('/', requireRole('org_admin', 'platform_admin'), async (c) => {
+app.post('/', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
   

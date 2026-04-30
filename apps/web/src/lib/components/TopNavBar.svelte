@@ -5,11 +5,14 @@
   import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, t, type UiLocale } from '$lib/stores/locale';
 
   // Navigation items using reactive translation keys
+  let hasOrg = $state(false);
+
   const navItems = $derived([
     { href: '/learn',          label: $t('nav_learn')    },
     { href: '/practice',       label: $t('nav_practice') },
     { href: '/games/cascade',  label: $t('nav_play')     },
     { href: '/progress',       label: $t('nav_progress') },
+    ...(hasOrg ? [{ href: '/org', label: 'Dashboard' }] : []),
   ]);
 
   const ctx = useClerkContext();
@@ -26,6 +29,23 @@
 
   $effect(() => {
     activeLocale = getPersistedLocale();
+  });
+
+  // Check if user belongs to an org (fire-and-forget)
+  $effect(() => {
+    if (!isSignedIn) { hasOrg = false; return; }
+    (async () => {
+      try {
+        const token = await ctx?.session?.getToken();
+        const res = await fetch('/api/v1/organisations', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.ok) {
+          const data = await res.json();
+          hasOrg = data.organisations?.length > 0;
+        }
+      } catch { /* ignore */ }
+    })();
   });
 
   async function handleLocaleSelect(code: UiLocale) {

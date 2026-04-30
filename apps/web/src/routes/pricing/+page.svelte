@@ -126,10 +126,10 @@
             {/each}
           </ul>
           <div class="flex flex-col gap-3">
-            <a href="/sign-up?plan=school-90" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
+            <a href="/onboarding/school?plan=90" class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container transition-colors">
               {$t('pricing_cta_school_90')}
             </a>
-            <a href="/sign-up?plan=school-180" class="border border-outline-variant/30 text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container-high transition-colors">
+            <a href="/onboarding/school?plan=180" class="border border-outline-variant/30 text-on-surface px-6 py-3 font-label font-bold text-center block hover:bg-surface-container-high transition-colors">
               {$t('pricing_cta_school_180')}
             </a>
           </div>
