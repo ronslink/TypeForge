@@ -52,27 +52,27 @@
       </div>
     </div>
 
-    <h1 class="font-headline text-4xl mb-3">Welcome to TypeForge for Schools!</h1>
-    <p class="text-on-surface-variant font-body text-lg mb-2">Your school account has been set up successfully.</p>
+    <h1 class="font-headline text-4xl mb-3">{$t('org_success_title')}</h1>
+    <p class="text-on-surface-variant font-body text-lg mb-2">{$t('org_success_desc')}</p>
 
     {#if orgData}
       <div class="bg-surface-container-low border border-outline-variant/20 p-6 mt-8 mb-8 text-left space-y-3">
         <div class="flex justify-between">
-          <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Organization</span>
+          <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_org_label')}</span>
           <span class="font-body text-sm text-on-surface font-bold">{orgData.name}</span>
         </div>
         {#if orgData.billing}
           <div class="flex justify-between">
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Seats Purchased</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_seats_label')}</span>
             <span class="font-body text-sm text-on-surface">{orgData.billing.purchasedSeats ?? orgData.billing.pendingSeatCount ?? '—'}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Billing Cycle</span>
-            <span class="font-body text-sm text-on-surface">{orgData.billing.seatCooldownDays === 90 ? '90-day (Flexible)' : '180-day (Semester)'}</span>
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_cycle_label')}</span>
+            <span class="font-body text-sm text-on-surface">{orgData.billing.seatCooldownDays === 90 ? $t('org_success_90day') : $t('org_success_180day')}</span>
           </div>
         {/if}
         <div class="flex justify-between">
-          <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Your Role</span>
+          <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_role_label')}</span>
           <span class="font-body text-sm text-primary font-bold uppercase">Admin</span>
         </div>
       </div>

@@ -36,11 +36,11 @@
 
   async function handleCreateAndPay() {
     if (!schoolName.trim()) {
-      errorMsg = 'Please enter your school name.';
+      errorMsg = $t('school_name_required');
       return;
     }
     if (seatCount < 5) {
-      errorMsg = 'Minimum 5 seats required.';
+      errorMsg = $t('school_min_seats');
       return;
     }
 
@@ -137,8 +137,8 @@
       <!-- Step 1: Sign In -->
       {#if currentStep === 1}
         <div class="text-center mb-8">
-          <h1 class="font-headline text-3xl mb-2">Create Your School Account</h1>
-          <p class="text-on-surface-variant font-body">Sign in or create an account to get started</p>
+          <h1 class="font-headline text-3xl mb-2">{$t('school_create_account')}</h1>
+          <p class="text-on-surface-variant font-body">{$t('school_create_account_desc')}</p>
         </div>
         <div class="bg-surface-container-low border border-outline-variant/20 p-8 flex justify-center">
           <SignIn
@@ -155,12 +155,12 @@
       <!-- Step 2: School Details -->
       {:else if currentStep === 2}
         <div class="text-center mb-8">
-          <h1 class="font-headline text-3xl mb-2">Set Up Your School</h1>
-          <p class="text-on-surface-variant font-body">Tell us about your institution</p>
+          <h1 class="font-headline text-3xl mb-2">{$t('school_setup_title')}</h1>
+          <p class="text-on-surface-variant font-body">{$t('school_setup_desc')}</p>
         </div>
         <div class="bg-surface-container-low border border-outline-variant/20 p-8 space-y-6">
           <div>
-            <label for="school-name" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">School Name *</label>
+            <label for="school-name" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_name_label')} *</label>
             <input
               id="school-name"
               type="text"
@@ -170,7 +170,7 @@
             />
           </div>
           <div>
-            <label for="country" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">Country</label>
+            <label for="country" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_country_label')}</label>
             <input
               id="country"
               type="text"
@@ -180,7 +180,7 @@
             />
           </div>
           <div>
-            <label for="website" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">Website (optional)</label>
+            <label for="website" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_website_label')}</label>
             <input
               id="website"
               type="url"
@@ -195,7 +195,7 @@
               onclick={() => { if (schoolName.trim()) currentStep = 3; else errorMsg = 'Please enter your school name.'; }}
               class="notched-button bg-primary text-on-primary px-8 py-3 font-label font-bold text-sm hover:bg-primary-fixed-dim transition-colors"
             >
-              Continue →
+              {$t('school_continue')}
             </button>
           </div>
 
@@ -207,13 +207,13 @@
       <!-- Step 3: Plan & Payment -->
       {:else if currentStep === 3}
         <div class="text-center mb-8">
-          <h1 class="font-headline text-3xl mb-2">Choose Your Seats</h1>
+          <h1 class="font-headline text-3xl mb-2">{$t('school_choose_seats')}</h1>
           <p class="text-on-surface-variant font-body">{planDays}-day plan · ${pricePerSeat}/seat/month</p>
         </div>
         <div class="bg-surface-container-low border border-outline-variant/20 p-8 space-y-6">
           <!-- Seat selector -->
           <div>
-            <label for="seat-count" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-3">Number of Student Seats</label>
+            <label for="seat-count" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-3">{$t('school_seat_count_label')}</label>
             <div class="flex items-center gap-4">
               <button
                 onclick={() => { if (seatCount > 5) seatCount--; }}
@@ -250,10 +250,10 @@
             </div>
             <div class="flex justify-between font-body text-sm text-on-surface-variant">
               <span>{planDays}-day billing cycle</span>
-              <span class="text-on-surface">{planDays === 90 ? 'Flexible' : 'Semester'}</span>
+              <span class="text-on-surface">{planDays === 90 ? $t('school_plan_flexible') : $t('school_plan_semester')}</span>
             </div>
             <div class="border-t border-outline-variant/20 pt-3 flex justify-between">
-              <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">Total</span>
+              <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('school_total_label')}</span>
               <span class="font-headline text-2xl text-primary">${monthlyCost}<span class="text-sm text-on-surface-variant font-body">/mo</span></span>
             </div>
           </div>
@@ -261,10 +261,10 @@
           <!-- Plan summary -->
           <div class="bg-primary/5 border border-primary/20 p-4 text-sm font-body text-on-surface-variant space-y-1">
             <p>✓ <strong>{schoolName}</strong> — {seatCount} student seats</p>
-            <p>✓ Teacher dashboard with class analytics</p>
-            <p>✓ Student roster management & invitations</p>
-            <p>✓ COPPA & GDPR compliant</p>
-            <p>✓ SSO integration available</p>
+            <p>{$t('school_summary_dashboard')}</p>
+            <p>{$t('school_summary_roster')}</p>
+            <p>{$t('school_summary_compliance')}</p>
+            <p>{$t('school_summary_sso')}</p>
           </div>
 
           {#if errorMsg}
@@ -275,7 +275,7 @@
             <button
               onclick={() => { currentStep = 2; errorMsg = null; }}
               class="text-on-surface-variant hover:text-on-surface font-label text-sm transition-colors"
-            >← Back</button>
+            >{$t('school_back')}</button>
             <button
               onclick={handleCreateAndPay}
               disabled={isSubmitting}
@@ -283,9 +283,9 @@
             >
               {#if isSubmitting}
                 <span class="inline-block w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></span>
-                Processing...
+                {$t('school_processing')}
               {:else}
-                Proceed to Payment →
+                {$t('school_proceed_payment')}
               {/if}
             </button>
           </div>

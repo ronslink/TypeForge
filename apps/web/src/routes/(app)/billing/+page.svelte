@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import type { PageProps } from './$types';
@@ -238,7 +239,7 @@
               {:else if subscription?.status === 'trialing'}
                 <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-primary/20 text-primary">Trial</span>
               {:else if subscription?.status === 'past_due'}
-                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-error/20 text-error">Past Due</span>
+                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-error/20 text-error">{$t('billing_past_due')}</span>
               {:else}
                 <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-surface-container-highest text-on-surface-variant">Free</span>
               {/if}
@@ -304,7 +305,7 @@
             </span>
           </div>
           {#if billingInterval === 'annual' && plan.id !== 'free'}
-            <p class="text-xs text-secondary font-label mb-4">Billed annually</p>
+            <p class="text-xs text-secondary font-label mb-4">{$t('billing_billed_annually')}</p>
           {:else}
             <div class="mb-4"></div>
           {/if}

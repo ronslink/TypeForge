@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { InviteStudentModal } from '@typeforge/ui';
@@ -125,14 +126,14 @@
 
 {#if loading}
   <div class="h-64 flex items-center justify-center">
-    <div class="text-on-surface-variant font-label animate-pulse text-sm uppercase tracking-widest">Loading Dashboard...</div>
+    <div class="text-on-surface-variant font-label animate-pulse text-sm uppercase tracking-widest">{$t('org_loading')}</div>
   </div>
 {:else if error}
   <div class="text-error bg-error-container/20 p-4 border border-error-container rounded">{error}</div>
 {:else if !organizationData}
   <div class="bg-surface-container-low border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-12 min-h-[300px] mt-8 rounded-lg">
     <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-4">group_off</span>
-    <h2 class="font-headline text-xl mb-2">No Active Organization</h2>
+    <h2 class="font-headline text-xl mb-2">{$t('org_no_org')}</h2>
     <p class="font-body text-sm text-on-surface-variant max-w-sm text-center">
       You are not currently a member of any organization.
     </p>
@@ -144,7 +145,7 @@
     <div class="flex items-start justify-between gap-4 flex-wrap">
       <div>
         <h1 class="font-headline text-3xl text-on-surface">{organizationData.name}</h1>
-        <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mt-1">Teacher Dashboard</p>
+        <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mt-1">{$t('org_teacher_dashboard')}</p>
       </div>
       <button
         id="invite-student-btn"
@@ -164,7 +165,7 @@
       <div class="seat-bar bg-surface-container-low border border-outline-variant/20 p-5">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
-            <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">Seat Quota</span>
+            <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('org_seat_quota')}</span>
             <span class="font-mono text-sm font-bold {seatData.used >= seatData.purchased ? 'text-error' : 'text-primary'}">
               {seatData.used} / {seatData.purchased} seats used
             </span>
@@ -195,7 +196,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </span>
         <span class="font-headline text-3xl text-on-surface">{dashboardStats?.totalMembers ?? 0}</span>
-        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Students</span>
+        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_students')}</span>
       </div>
 
       <div class="stat-card">
@@ -203,7 +204,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </span>
         <span class="font-headline text-3xl text-on-surface">{dashboardStats?.averageWpm ?? 0}</span>
-        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Avg WPM</span>
+        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_avg_wpm')}</span>
       </div>
 
       <div class="stat-card">
@@ -211,7 +212,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </span>
         <span class="font-headline text-3xl text-on-surface">{dashboardStats?.averageAccuracy ?? 0}%</span>
-        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Avg Accuracy</span>
+        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_avg_accuracy')}</span>
       </div>
 
       <div class="stat-card">
@@ -219,7 +220,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </span>
         <span class="font-headline text-3xl text-on-surface">{dashboardStats?.totalLessonsCompleted ?? 0}</span>
-        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Lessons Done</span>
+        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_lessons_done')}</span>
       </div>
 
       <div class="stat-card {(dashboardStats?.atRiskCount ?? 0) > 0 ? 'border-error/40 bg-error/5' : ''}">
@@ -227,7 +228,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
         </span>
         <span class="font-headline text-3xl {(dashboardStats?.atRiskCount ?? 0) > 0 ? 'text-error' : 'text-on-surface'}">{dashboardStats?.atRiskCount ?? 0}</span>
-        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">At Risk</span>
+        <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_at_risk')}</span>
       </div>
     </div>
 
@@ -262,7 +263,7 @@
             {/each}
           </div>
         {:else}
-          <p class="text-on-surface-variant text-sm font-body py-4 text-center">No session data yet</p>
+          <p class="text-on-surface-variant text-sm font-body py-4 text-center">{$t('org_no_sessions')}</p>
         {/if}
       </div>
 
@@ -297,7 +298,7 @@
         {:else}
           <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary/50"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <p class="font-label text-sm text-on-surface-variant">All students on track!</p>
+            <p class="font-label text-sm text-on-surface-variant">{$t('org_all_on_track')}</p>
           </div>
         {/if}
       </div>
@@ -305,19 +306,19 @@
 
     <!-- ── Class Activity Breakdown ──────────────────────────── -->
     <div class="bg-surface-container-low border border-outline-variant/20 p-6">
-      <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-5">Class Breakdown</h2>
+      <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-5">{$t('org_class_breakdown')}</h2>
       <div class="grid grid-cols-3 gap-4">
         <div class="text-center p-4 bg-primary/5 border border-primary/20 rounded">
           <div class="font-headline text-4xl text-primary mb-1">{studentsByStatus.active}</div>
-          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">On Track</div>
+          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_on_track')}</div>
         </div>
         <div class="text-center p-4 bg-error/5 border border-error/20 rounded">
           <div class="font-headline text-4xl text-error mb-1">{studentsByStatus.struggling}</div>
-          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Struggling</div>
+          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_struggling')}</div>
         </div>
         <div class="text-center p-4 bg-surface-container-high border border-outline-variant/20 rounded">
           <div class="font-headline text-4xl text-on-surface-variant mb-1">{studentsByStatus.inactive}</div>
-          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">No Activity</div>
+          <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_no_activity')}</div>
         </div>
       </div>
     </div>
@@ -335,11 +336,11 @@
       {:else}
         <div class="roster-table w-full">
           <div class="roster-header grid grid-cols-[1fr_100px_100px_80px_120px] gap-2 pb-2 border-b border-outline-variant/20 font-label text-xs uppercase tracking-widest text-on-surface-variant">
-            <span>Student</span>
+            <span>{$t('org_student_col')}</span>
             <span class="text-right">WPM</span>
             <span class="text-right">Accuracy</span>
             <span class="text-right">Streak</span>
-            <span class="text-right">Action</span>
+            <span class="text-right">{$t('org_action_col')}</span>
           </div>
           {#each membersList.slice(0, 10) as student}
             <div class="roster-row grid grid-cols-[1fr_100px_100px_80px_120px] gap-2 py-3 border-b border-outline-variant/10 last:border-0 items-center hover:bg-surface-container/40 transition-colors">
