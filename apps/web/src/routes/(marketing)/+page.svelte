@@ -360,7 +360,7 @@
           <span class="text-on-surface-variant/30 text-xs font-label uppercase ml-1">{demoScene.layout}</span>
           <!-- Cursor pulse dot -->
           <span class="ml-auto flex items-center gap-1.5 text-xs font-label uppercase tracking-widest text-on-surface-variant/50">
-            <span class="demo-live-dot"></span>live demo
+            <span class="demo-live-dot"></span>{$t('mkt_demo_live')}
           </span>
         </div>
 
@@ -412,8 +412,8 @@
         </div>
 
         <div class="mt-6 flex justify-between items-center text-xs font-label uppercase text-on-surface-variant/40">
-          <span>Auto-cycling — click a script above to jump</span>
-          <a href="/sign-up" class="hover:text-primary transition-colors">Start your own →</a>
+          <span>{$t('mkt_demo_auto_cycle')}</span>
+          <a href="/sign-up" class="hover:text-primary transition-colors">{$t('mkt_demo_start_own')}</a>
         </div>
       </div>
     </div>
@@ -421,36 +421,36 @@
 
   <!-- Features Section -->
   <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="features">
-    <h2 class="font-headline text-4xl md:text-5xl mb-16 text-center md:text-start">Built different.</h2>
+    <h2 class="font-headline text-4xl md:text-5xl mb-16 text-center md:text-start">{$t('mkt_built_different')}</h2>
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
       <!-- AI Weakness Detection - Large -->
       <div class="md:col-span-8 bg-surface-container-low p-8 md:p-10 flex flex-col justify-between group hover:bg-surface-container transition-colors">
         <div>
           <span class="material-symbols-outlined text-primary text-4xl mb-6">psychology</span>
-          <h3 class="font-headline text-2xl md:text-3xl mb-4">AI Weakness Detection</h3>
-          <p class="font-body text-on-surface-variant max-w-md">Our neural engine identifies micro-stutters and recurring error patterns in your stroke sequence, generating custom drills to eliminate them.</p>
+          <h3 class="font-headline text-2xl md:text-3xl mb-4">{$t('mkt_feature_ai_title')}</h3>
+          <p class="font-body text-on-surface-variant max-w-md">{$t('mkt_feature_ai_desc')}</p>
         </div>
         <div class="mt-12 flex items-end gap-4">
           <div class="h-24 w-1 bg-surface-container-highest"></div>
           <div class="h-16 w-1 bg-surface-container-highest"></div>
           <div class="h-32 w-1 bg-primary"></div>
           <div class="h-20 w-1 bg-surface-container-highest"></div>
-          <span class="font-label text-xs text-primary ml-2">LATENCY PEAK DETECTED</span>
+          <span class="font-label text-xs text-primary ml-2">{$t('mkt_latency_peak')}</span>
         </div>
       </div>
 
       <!-- Zero Latency - Small -->
       <div class="md:col-span-4 bg-surface-container-low p-8 md:p-10 group hover:bg-surface-container transition-colors">
         <span class="material-symbols-outlined text-secondary text-4xl mb-6">bolt</span>
-        <h3 class="font-headline text-2xl md:text-3xl mb-4">Zero Latency</h3>
-        <p class="font-body text-on-surface-variant">Input processing optimized at the kernel level. Every stroke is rendered before your key returns to its neutral state.</p>
+        <h3 class="font-headline text-2xl md:text-3xl mb-4">{$t('mkt_feature_latency_title')}</h3>
+        <p class="font-body text-on-surface-variant">{$t('mkt_feature_latency_desc')}</p>
       </div>
 
       <!-- Global Foundry - Small -->
       <div class="md:col-span-4 bg-surface-container-low p-8 md:p-10">
         <span class="material-symbols-outlined text-on-surface-variant text-4xl mb-6">translate</span>
-        <h3 class="font-headline text-2xl mb-4">Global Foundry</h3>
-        <p class="font-body text-on-surface-variant text-sm">Full support for Latin, Arabic, Cyrillic, and CJK scripts with native layout emulation.</p>
+        <h3 class="font-headline text-2xl mb-4">{$t('mkt_feature_global_title')}</h3>
+        <p class="font-body text-on-surface-variant text-sm">{$t('mkt_feature_global_desc')}</p>
       </div>
 
       <!-- Institution - Large -->
@@ -458,19 +458,19 @@
         <div class="flex-1">
           <div class="flex items-center gap-2 text-primary mb-4">
             <span class="material-symbols-outlined">school</span>
-            <span class="font-label text-xs uppercase tracking-widest">For Institutions</span>
+            <span class="font-label text-xs uppercase tracking-widest">{$t('mkt_for_institutions')}</span>
           </div>
-          <h3 class="font-headline text-2xl md:text-3xl mb-4">School Grade Rigor</h3>
-          <p class="font-body text-on-surface-variant">COPPA/GDPR compliant infrastructure with centralized teacher dashboards and automated grading curves.</p>
+          <h3 class="font-headline text-2xl md:text-3xl mb-4">{$t('mkt_feature_school_title')}</h3>
+          <p class="font-body text-on-surface-variant">{$t('mkt_feature_school_desc')}</p>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-background p-4 flex flex-col">
             <span class="font-label text-secondary font-bold">100%</span>
-            <span class="text-[10px] uppercase font-label text-on-surface-variant">Compliance</span>
+            <span class="text-[10px] uppercase font-label text-on-surface-variant">{$t('mkt_stat_compliance')}</span>
           </div>
           <div class="bg-background p-4 flex flex-col">
             <span class="font-label text-secondary font-bold">500+</span>
-            <span class="text-[10px] uppercase font-label text-on-surface-variant">Schools</span>
+            <span class="text-[10px] uppercase font-label text-on-surface-variant">{$t('mkt_stat_schools')}</span>
           </div>
         </div>
       </div>
@@ -480,8 +480,8 @@
   <!-- Languages Showcase Section -->
   <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="languages">
     <div class="text-center mb-16">
-      <h2 class="font-headline text-4xl md:text-5xl mb-4">Every language. Every script.</h2>
-      <p class="font-body text-on-surface-variant max-w-xl mx-auto">29 languages across 6 regions, from Latin to Arabic to CJK. Type in your native script with adaptive AI guidance.</p>
+      <h2 class="font-headline text-4xl md:text-5xl mb-4">{$t('mkt_every_language')}</h2>
+      <p class="font-body text-on-surface-variant max-w-xl mx-auto">{$t('mkt_every_language_desc')}</p>
     </div>
 
     <!-- Americas -->
@@ -594,7 +594,7 @@
     </div>
 
     <div class="mt-12 text-center">
-      <p class="font-label text-sm text-on-surface-variant/60">And more — 29 languages, 8 script families, 1 adaptive platform</p>
+      <p class="font-label text-sm text-on-surface-variant/60">{$t('mkt_and_more')}</p>
     </div>
   </section>
 
@@ -602,8 +602,8 @@
   <section class="py-24 bg-surface-container-lowest">
     <div class="max-w-screen-2xl mx-auto px-6 md:px-8">
       <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-        <h2 class="font-headline text-4xl md:text-5xl lg:text-6xl max-w-xl">From Placement to Mastery.</h2>
-        <p class="font-body text-on-surface-variant max-w-xs pb-2">A structured evolution through the kinetic arts of typing.</p>
+        <h2 class="font-headline text-4xl md:text-5xl lg:text-6xl max-w-xl">{$t('mkt_placement_to_mastery')}</h2>
+        <p class="font-body text-on-surface-variant max-w-xs pb-2">{$t('mkt_placement_subtitle')}</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-outline-variant/20">
         {#each steps as step, i}
@@ -620,8 +620,8 @@
   <!-- Pricing Section -->
   <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto" id="pricing">
     <div class="text-center mb-16">
-      <h2 class="font-headline text-4xl md:text-5xl mb-4">Forged for Everyone.</h2>
-      <p class="font-body text-on-surface-variant">Scale your precision from solo typing to district-wide mastery.</p>
+      <h2 class="font-headline text-4xl md:text-5xl mb-4">{$t('mkt_forged_for_everyone')}</h2>
+      <p class="font-body text-on-surface-variant">{$t('mkt_forged_subtitle')}</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {#each pricingPlans as plan}
@@ -637,7 +637,7 @@
             <div class="flex justify-between items-start mb-4">
               <h4 class="font-label text-xs uppercase tracking-widest" class:text-primary={plan.popular} class:text-on-surface-variant={!plan.popular}>{plan.name}</h4>
               {#if plan.popular}
-                <span class="bg-primary text-on-primary px-2 py-1 text-[10px] font-bold uppercase tracking-tighter">Most Popular</span>
+                <span class="bg-primary text-on-primary px-2 py-1 text-[10px] font-bold uppercase tracking-tighter">{$t('mkt_most_popular')}</span>
               {/if}
             </div>
             <div class="font-headline text-4xl mb-6">{plan.price}<span class="text-lg text-on-surface-variant">{plan.period}</span></div>
@@ -676,8 +676,8 @@
   <section class="py-24 px-6 md:px-8 max-w-screen-2xl mx-auto border-t border-outline-variant/10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
       <div>
-        <span class="font-label text-xs uppercase tracking-widest text-primary mb-6 block">Testimonials</span>
-        <h2 class="font-headline text-3xl md:text-4xl mb-8">What People Say</h2>
+        <span class="font-label text-xs uppercase tracking-widest text-primary mb-6 block">{$t('mkt_testimonials')}</span>
+        <h2 class="font-headline text-3xl md:text-4xl mb-8">{$t('mkt_what_people_say')}</h2>
         <div class="bg-surface-container p-8 relative">
           <span class="material-symbols-outlined text-primary/20 text-6xl absolute inset-block-start-4 inset-inline-end-4">format_quote</span>
           <p class="font-body text-lg italic mb-6 leading-relaxed">"{testimonials[0].quote}"</p>
@@ -707,29 +707,29 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 md:px-8 py-12 max-w-screen-2xl mx-auto">
     <div>
       <span class="text-lg font-bold text-primary-container font-label">TYPINGSCHOLAR</span>
-      <p class="mt-4 text-xs text-on-surface/50 leading-relaxed font-body">Engineered for accuracy. Built for the foundry. The definitive typing platform for modern explorers.</p>
+      <p class="mt-4 text-xs text-on-surface/50 leading-relaxed font-body">{$t('mkt_footer_desc')}</p>
     </div>
     <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Product</span>
+      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">{$t('footer_product')}</span>
       {#each footerLinks.product as link}
         <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
     <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Resources</span>
+      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">{$t('footer_resources')}</span>
       {#each footerLinks.resources as link}
         <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
     <div class="flex flex-col gap-3">
-      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">Legal</span>
+      <span class="font-label text-xs uppercase tracking-widest text-on-surface mb-2">{$t('footer_legal')}</span>
       {#each footerLinks.legal as link}
         <a href={link.href} class="text-on-surface/50 hover:text-primary-container transition-colors text-sm font-body">{link.label}</a>
       {/each}
     </div>
   </div>
   <div class="max-w-screen-2xl mx-auto px-6 md:px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">© 2026 TYPINGSCHOLAR KINETIC FOUNDRY. ALL RIGHTS RESERVED.</span>
+    <span class="text-[10px] text-on-surface/30 font-label tracking-widest">{$t('mkt_copyright_full')}</span>
     <div class="flex gap-6">
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">language</span>
       <span class="material-symbols-outlined text-on-surface/30 hover:text-primary transition-colors cursor-pointer">terminal</span>

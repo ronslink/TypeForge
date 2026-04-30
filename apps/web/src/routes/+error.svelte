@@ -2,6 +2,7 @@
   import { page } from '$app/state';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import { t } from '$lib/stores/locale';
   
   // Use page.status and page.error in SvelteKit 2
 </script>
@@ -23,23 +24,23 @@
       </div>
       
       <h1 class="font-headline text-5xl md:text-6xl tracking-tight mb-4">
-        {page.status === 404 ? 'Page not found' : 'Something went wrong'}
+        {page.status === 404 ? $t('error_page_not_found') : $t('error_something_wrong')}
       </h1>
       
       <p class="font-body text-xl text-on-surface-variant max-w-lg mx-auto mb-10">
         {#if page.status === 404}
-          We couldn't find the page you're looking for. It might have been moved or doesn't exist.
+          {$t('error_404_description')}
         {:else}
-          We encountered an unexpected error ({page.status}). Our team has been notified.
+          {$t('error_generic_description', { status: page.status })}
         {/if}
       </p>
       
       <div class="flex gap-4 justify-center">
         <button onclick={() => window.history.back()} class="notched-button bg-surface-container-high text-on-surface px-6 py-3 font-label font-bold hover:bg-surface-container transition-colors">
-          Go back
+          {$t('error_go_back')}
         </button>
         <a href="/" class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold hover:bg-primary-fixed-dim transition-colors">
-          Return home
+          {$t('error_return_home')}
         </a>
       </div>
     </div>

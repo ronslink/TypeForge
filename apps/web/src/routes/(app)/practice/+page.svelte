@@ -460,7 +460,7 @@
           <h3 class="font-headline text-xl">{$t('practice_mode_literature') || 'Literature'}</h3>
           {#if currentBooks.length > 0}
             <span class="text-xs font-label uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full shrink-0">
-              {currentBooks.length} {currentBooks.length === 1 ? 'work' : 'works'}
+              {$t('practice_works_count', { count: currentBooks.length })}
             </span>
           {/if}
         </div>
@@ -468,7 +468,7 @@
 
         {#if currentBooks.length === 0}
           <p class="text-xs text-on-surface-variant italic border border-outline-variant/30 rounded p-3">
-            No native-language classics available yet — showing English works instead.
+            {$t('practice_no_classics')}
           </p>
         {:else}
           <select
@@ -504,8 +504,8 @@
   {:else if isGeneratingAI}
     <div class="flex flex-col items-center justify-center py-24 space-y-6">
       <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
-      <h2 class="font-headline text-2xl text-primary animate-pulse">Generating AI Adaptive Drill...</h2>
-      <p class="text-on-surface-variant max-w-md text-center">Analyzing your weak keys and composing a custom multilingual sequence using Kimi AI.</p>
+      <h2 class="font-headline text-2xl text-primary animate-pulse">{$t('practice_generating_ai')}</h2>
+      <p class="text-on-surface-variant max-w-md text-center">{$t('practice_analyzing_keys')}</p>
     </div>
   {:else}
     <div class="mb-6 flex items-center justify-between">
@@ -513,7 +513,7 @@
         onclick={() => { mode = 'select'; lessonChars = []; }}
         class="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2"
       >
-        <span>← Back to select</span>
+        <span>{$t('practice_back_to_select')}</span>
       </button>
       <h2 class="font-headline text-xl uppercase tracking-widest text-primary font-bold">
         {mode} {$t('nav_practice') || 'Practice'}
@@ -555,7 +555,7 @@
             { label: $t('lesson_wpm') || 'WPM', value: currentWPM, variant: 'primary' },
             { label: $t('lesson_accuracy') || 'Accuracy', value: `${currentAccuracy}%`, variant: 'secondary' },
             { label: $t('progress_streak') || 'Streak', value: currentStreak, variant: 'default' },
-            { label: 'Active Time', value: formatTime(activeElapsedSeconds), variant: 'default' },
+            { label: $t('practice_active_time'), value: formatTime(activeElapsedSeconds), variant: 'default' },
             { label: $t('practice_errors') || 'Errors', value: keystrokes.filter((k) => !k.correct).length, variant: 'default' }
           ]}
           {currentStreak}
@@ -569,10 +569,10 @@
               {isPausedUI ? 'text-amber-400' : 'text-on-surface-variant/40'}">
               {#if isPausedUI}
                 <span class="pr-pause-dot" aria-hidden="true"></span>
-                <span>Clock paused — tap any key to resume</span>
+                <span>{$t('practice_clock_paused')}</span>
               {:else}
                 <span class="pr-active-dot" aria-hidden="true"></span>
-                <span>Clock running</span>
+                <span>{$t('practice_clock_running')}</span>
               {/if}
             </div>
             {#if canStop}
@@ -584,7 +584,7 @@
                   hover:border-primary hover:text-primary transition-all duration-200"
                 aria-label="Stop practice and see results"
               >
-                Stop &amp; Finish
+                {$t('practice_stop_finish')}
               </button>
             {/if}
           </div>

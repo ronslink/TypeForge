@@ -83,7 +83,7 @@
           : 'text-on-surface/70 hover:text-white'}"
         aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}
       >
-        Settings
+        {$t('nav_settings')}
         {#if currentPath.startsWith('/settings')}
           <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" aria-hidden="true"></span>
         {/if}
@@ -183,7 +183,7 @@
       </svg>
     </button>
     <nav class="flex flex-col gap-2 flex-1" aria-label="Mobile nav">
-      {#each [...navItems, { href: '/settings', label: 'Settings' }] as item}
+      {#each [...navItems, { href: '/settings', label: $t('nav_settings') }] as item}
         <a
           href={item.href}
           class="font-label text-lg py-3 px-4 transition-colors border-l-2 {currentPath.startsWith(item.href)

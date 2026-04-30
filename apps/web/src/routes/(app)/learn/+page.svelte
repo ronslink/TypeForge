@@ -90,25 +90,25 @@
       .filter(Boolean) as Language[]
   );
 
-  const difficultyLevels = [
-    { value: '1', label: 'Beginner ★' },
-    { value: '2', label: 'Beginner ★★' },
-    { value: '3', label: 'Intermediate ★★★' },
-    { value: '4', label: 'Advanced ★★★★' },
-    { value: '5', label: 'Expert ★★★★★' },
-  ];
+  const difficultyLevels = $derived([
+    { value: '1', label: $t('learn_diff_beginner_1') },
+    { value: '2', label: $t('learn_diff_beginner_2') },
+    { value: '3', label: $t('learn_diff_intermediate') },
+    { value: '4', label: $t('learn_diff_advanced') },
+    { value: '5', label: $t('learn_diff_expert') },
+  ]);
 
-  const tags = [
-    'home row',
-    'top row',
-    'bottom row',
-    'punctuation',
-    'speed',
-    'accuracy',
-    'endurance',
-    'left hand',
-    'right hand',
-  ];
+  const tags = $derived([
+    $t('learn_tag_home_row'),
+    $t('learn_tag_top_row'),
+    $t('learn_tag_bottom_row'),
+    $t('learn_tag_punctuation'),
+    $t('learn_tag_speed'),
+    $t('learn_tag_accuracy'),
+    $t('learn_tag_endurance'),
+    $t('learn_tag_left_hand'),
+    $t('learn_tag_right_hand'),
+  ]);
 
   // Filter lessons based on selected filters
   const filteredLessons = $derived(
@@ -208,13 +208,13 @@
   }
 
   // Define Curriculum Sequence
-  const curriculumStages = [
-    { level: 1, title: 'Stage 1: Home Row Fundamentals', description: 'Master the resting position for ultimate typing efficiency.' },
-    { level: 2, title: 'Stage 2: Core Combinations', description: 'Combine primary fingers to drill cross-key bigrams.' },
-    { level: 3, title: 'Stage 3: Top Row Extensions', description: 'Expand your reach to the top alpha row.' },
-    { level: 4, title: 'Stage 4: Bottom Row Variables', description: 'Learn the lower reaches for complete alpha mastery.' },
-    { level: 5, title: 'Stage 5: Speed & Coordination', description: 'Real words, endurance blocks, and ultimate flow.' }
-  ];
+  const curriculumStages = $derived([
+    { level: 1, title: $t('learn_stage_1_title'), description: $t('learn_stage_1_desc') },
+    { level: 2, title: $t('learn_stage_2_title'), description: $t('learn_stage_2_desc') },
+    { level: 3, title: $t('learn_stage_3_title'), description: $t('learn_stage_3_desc') },
+    { level: 4, title: $t('learn_stage_4_title'), description: $t('learn_stage_4_desc') },
+    { level: 5, title: $t('learn_stage_5_title'), description: $t('learn_stage_5_desc') }
+  ]);
 
   // Helper to group lessons by difficulty for progressive layout
   const groupedLessons = $derived(
@@ -247,7 +247,7 @@
 </svelte:head>
 
 <div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">
-  <SideNavBar title="Course Settings">
+  <SideNavBar title={$t('learn_course_settings')}>
     <!-- Search -->
     <div class="relative w-full">
       <input
@@ -267,13 +267,13 @@
     </div>
 
     <div class="flex flex-col gap-1.5 w-full mt-4">
-      <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Target Language</label>
+      <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('learn_target_language')}</label>
       <select
         id="lang-select"
         bind:value={selectedLanguage}
         class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
       >
-        <option value="all">All Languages</option>
+        <option value="all">{$t('learn_all_languages')}</option>
         {#each languages as lang}
           <option value={lang.code}>{lang.nativeName}</option>
         {/each}
@@ -282,7 +282,7 @@
 
     <!-- Global Layout Selector -->
     <div class="flex flex-col gap-1.5 w-full">
-      <label for="global-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Hardware Layout</label>
+      <label for="global-layout" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('learn_hardware_layout')}</label>
       <select 
         id="global-layout"
         class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
@@ -299,13 +299,13 @@
     </div>
 
     <div class="flex flex-col gap-1.5 w-full mt-4">
-       <label for="diff-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Mastery Level</label>
+       <label for="diff-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('learn_mastery_level')}</label>
        <select
           id="diff-select"
           bind:value={selectedDifficulty}
           class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
         >
-          <option value="all">All Levels</option>
+          <option value="all">{$t('learn_all_levels')}</option>
           {#each difficultyLevels as level}
             <option value={level.value}>{level.label}</option>
           {/each}
@@ -314,13 +314,13 @@
 
     <!-- Tag Filter -->
     <div class="flex flex-col gap-1.5 w-full">
-       <label for="tag-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Focus Area</label>
+       <label for="tag-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('learn_focus_area')}</label>
        <select
           id="tag-select"
           bind:value={selectedTag}
           class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
         >
-          <option value="all">All Focus Tags</option>
+          <option value="all">{$t('learn_all_focus_tags')}</option>
           {#each tags as tag}
             <option value={tag}>{tag}</option>
           {/each}
@@ -386,7 +386,7 @@
       <div class="adaptive-banner-actions">
         <a href="/practice?mode=adaptive&weakKeys={weakKeys.join(',')}" class="drill-btn">
           {$t('adaptive_banner_cta')}
-          <span class="ml-2 px-1.5 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-amber-500/20 text-amber-500 rounded-sm">PRO</span>
+          <span class="ml-2 px-1.5 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-amber-500/20 text-amber-500 rounded-sm">{$t('learn_pro_badge')}</span>
         </a>
         <button
           onclick={dismissBanner}
@@ -435,7 +435,7 @@
     <h2 class="font-headline text-2xl mb-6">
       {selectedLanguage === userLanguage && selectedDifficulty === 'all' && selectedTag === 'all' && !searchQuery
         ? $t('learn_all_difficulties')
-        : 'Filtered Lessons'}
+        : $t('learn_filtered_lessons')}
     </h2>
     
     {#if filteredLessons.length > 0}
@@ -452,7 +452,7 @@
                 
                 <div class="mb-6 ml-6 p-6 bg-surface-container-low/50 backdrop-blur-sm rounded-xl border border-surface-container shadow-sm flex items-center justify-between">
                   <div>
-                    <h3 class="font-headline text-2xl text-on-surface">{$t('learn_stage_label', { level: stage.level })}: {stage.title.split(': ')[1] || stage.title}</h3>
+                    <h3 class="font-headline text-2xl text-on-surface">{$t('learn_stage_label', { level: stage.level })}: {stage.title}</h3>
                     <p class="text-on-surface-variant text-sm mt-1.5">{stage.description}</p>
                   </div>
                   <div class="hidden sm:block text-primary/20">
@@ -477,10 +477,10 @@
                             </div>
                             <div>
                               <h4 class="font-headline text-xl text-primary font-bold uppercase tracking-widest">{lesson.title}</h4>
-                              <p class="text-on-surface-variant text-sm mt-1">Unlock this strict evaluation node verifying your mastery over all preceding mechanics to advance.</p>
+                              <p class="text-on-surface-variant text-sm mt-1">{$t('learn_unlock_test_desc')}</p>
                               <div class="flex gap-4 mt-3">
-                                <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">Min Accuracy 90%</span>
-                                <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-1 rounded">{lesson.content.length} words</span>
+                                <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">{$t('learn_min_accuracy')}</span>
+                                <span class="bg-surface-container text-on-surface-variant text-xs px-2 py-1 rounded">{$t('learn_words_count', { count: lesson.content.length })}</span>
                               </div>
                             </div>
                           </div>
@@ -488,16 +488,16 @@
                           <div class="flex flex-col items-center gap-2">
                              {#if completedLessonIds.has(lesson.id)}
                                 <div class="text-primary text-sm font-bold uppercase tracking-widest bg-primary/20 px-4 py-2 rounded-lg border border-primary/30 flex items-center gap-2">
-                                  <span>Passed</span>
+                                  <span>{$t('learn_passed')}</span>
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                                 {#if lesson.id.includes('-test-5')}
-                                  <a href="/certificate" class="text-xs hover:text-primary transition-colors underline opacity-70 mt-1 cursor-pointer">View Certification</a>
+                                  <a href="/certificate" class="text-xs hover:text-primary transition-colors underline opacity-70 mt-1 cursor-pointer">{$t('learn_view_certification')}</a>
                                 {/if}
                              {:else if isLocked}
-                                <button disabled class="bg-surface-variant text-on-surface-variant font-bold px-8 py-3 rounded uppercase tracking-wider text-sm cursor-not-allowed">Locked</button>
+                                <button disabled class="bg-surface-variant text-on-surface-variant font-bold px-8 py-3 rounded uppercase tracking-wider text-sm cursor-not-allowed">{$t('learn_locked')}</button>
                              {:else}
-                                <a href={`/learn/${lesson.id}`} class="bg-primary hover:bg-opacity-90 text-background font-bold px-8 py-3 rounded uppercase tracking-wider text-sm transition-all focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background outline-none hover:shadow-[0_0_15px_rgba(240,165,0,0.5)]">Start Test</a>
+                                <a href={`/learn/${lesson.id}`} class="bg-primary hover:bg-opacity-90 text-background font-bold px-8 py-3 rounded uppercase tracking-wider text-sm transition-all focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background outline-none hover:shadow-[0_0_15px_rgba(240,165,0,0.5)]">{$t('learn_start_test')}</a>
                              {/if}
                           </div>
                         </div>

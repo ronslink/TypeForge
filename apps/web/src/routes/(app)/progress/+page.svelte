@@ -3,6 +3,7 @@
   import { useClerkContext } from 'svelte-clerk';
   import { ProgressRing, StatCard, WeaknessHeatmap, MilestoneCertifications } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
+  import { t } from '$lib/stores/locale';
 
   // Auth state
   const ctx = useClerkContext();
@@ -227,21 +228,21 @@
 </svelte:head>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
-  <h1 class="font-headline text-4xl mb-2">Your Progress</h1>
-  <p class="text-on-surface-variant text-sm mb-10">Track your speed, accuracy, streaks, and key-level mastery.</p>
+  <h1 class="font-headline text-4xl mb-2">{$t('progress_heading')}</h1>
+  <p class="text-on-surface-variant text-sm mb-10">{$t('progress_subheading')}</p>
 
   {#if !isSignedIn}
     <div class="bg-surface-container p-12 text-center border border-outline-variant/30">
       <div class="mb-6"><ProgressRing progress={0} size={120} /></div>
-      <h2 class="font-headline text-2xl mb-4">Sign in to see your progress</h2>
+      <h2 class="font-headline text-2xl mb-4">{$t('progress_sign_in_heading')}</h2>
       <p class="text-on-surface-variant mb-6 max-w-md mx-auto text-sm">
-        Track your WPM, accuracy, and streak. Your data is saved when you sign in.
+        {$t('progress_sign_in_body')}
       </p>
       <button
         onclick={() => ctx?.clerk?.openSignIn({ fallbackRedirectUrl: '/progress' })}
         class="notched-button bg-primary text-on-primary px-6 py-3 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors"
       >
-        Sign In
+        {$t('progress_sign_in_cta')}
       </button>
     </div>
 
@@ -260,7 +261,7 @@
       <button
         onclick={() => window.location.reload()}
         class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold"
-      >Retry</button>
+      >{$t('error_retry')}</button>
     </div>
 
   {:else}
@@ -273,20 +274,20 @@
           <ProgressRing progress={levelProgress} size={140} strokeWidth={10} variant="primary" showLabel={false} />
           <div class="absolute inset-0 flex flex-col items-center justify-center">
             <span class="font-label text-5xl font-bold text-primary leading-none">{currentLevel}</span>
-            <span class="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">Level</span>
+            <span class="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">{$t('progress_level')}</span>
           </div>
         </div>
         <p class="text-xs text-on-surface-variant mt-3 text-center">
-          {progress?.xp ?? 0} XP · {1000 - ((progress?.xp ?? 0) % 1000)} to next
+          {$t('progress_xp_to_next', { xp: progress?.xp ?? 0, remaining: 1000 - ((progress?.xp ?? 0) % 1000) })}
         </p>
       </div>
 
       <!-- Stats grid -->
       <div class="stats-grid">
-        <StatCard label="Total Sessions" value={progress?.totalSessions ?? 0} variant="default" />
-        <StatCard label="Avg WPM"        value={Math.round(progress?.avgWpm ?? 0)} variant="primary" />
-        <StatCard label="Avg Accuracy"   value={`${Math.round(progress?.avgAccuracy ?? 0)}%`} variant="secondary" />
-        <StatCard label="Streak"         value={progress?.streak ?? 0} unit="days" variant="primary" />
+        <StatCard label={$t('progress_total_sessions')} value={progress?.totalSessions ?? 0} variant="default" />
+        <StatCard label={$t('progress_avg_wpm')}        value={Math.round(progress?.avgWpm ?? 0)} variant="primary" />
+        <StatCard label={$t('progress_avg_accuracy')}   value={`${Math.round(progress?.avgAccuracy ?? 0)}%`} variant="secondary" />
+        <StatCard label={$t('progress_streak')}         value={progress?.streak ?? 0} unit={$t('progress_streak_unit')} variant="primary" />
       </div>
     </div>
 
@@ -303,7 +304,7 @@
     {#if stats}
       <div class="bg-surface-container border border-outline-variant/20 p-6 mb-8">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="font-headline text-xl">Weekly Comparison</h2>
+          <h2 class="font-headline text-xl">{$t('progress_weekly_heading')}</h2>
           <span class="text-xs {improvementColor(stats.improvement)} font-bold uppercase tracking-wider">
             {improvementLabel(stats.improvement)}
           </span>
@@ -312,38 +313,38 @@
         <div class="grid grid-cols-2 gap-6">
           <!-- This week -->
           <div class="week-card this-week">
-            <div class="week-label">This week</div>
+            <div class="week-label">{$t('progress_this_week')}</div>
             <div class="week-metrics">
               <div class="metric">
                 <span class="metric-val">{stats.thisWeek.sessions}</span>
-                <span class="metric-key">sessions</span>
+                <span class="metric-key">{$t('progress_sessions')}</span>
               </div>
               <div class="metric">
                 <span class="metric-val text-primary">{Math.round(stats.thisWeek.wpm)}</span>
-                <span class="metric-key">avg WPM</span>
+                <span class="metric-key">{$t('progress_wpm')}</span>
               </div>
               <div class="metric">
                 <span class="metric-val text-secondary">{Math.round(stats.thisWeek.accuracy)}%</span>
-                <span class="metric-key">accuracy</span>
+                <span class="metric-key">{$t('progress_accuracy')}</span>
               </div>
             </div>
           </div>
 
           <!-- Last week -->
           <div class="week-card last-week">
-            <div class="week-label text-on-surface-variant">Last week</div>
+            <div class="week-label text-on-surface-variant">{$t('progress_last_week')}</div>
             <div class="week-metrics">
               <div class="metric">
                 <span class="metric-val text-on-surface-variant">{stats.lastWeek.sessions}</span>
-                <span class="metric-key">sessions</span>
+                <span class="metric-key">{$t('progress_sessions')}</span>
               </div>
               <div class="metric">
                 <span class="metric-val text-on-surface-variant">{Math.round(stats.lastWeek.wpm)}</span>
-                <span class="metric-key">avg WPM</span>
+                <span class="metric-key">{$t('progress_wpm')}</span>
               </div>
               <div class="metric">
                 <span class="metric-val text-on-surface-variant">{Math.round(stats.lastWeek.accuracy)}%</span>
-                <span class="metric-key">accuracy</span>
+                <span class="metric-key">{$t('progress_accuracy')}</span>
               </div>
             </div>
           </div>
@@ -353,14 +354,14 @@
 
     <!-- ──────────────────────────────────── WPM Chart ──────────────────────────────── -->
     <div class="bg-surface-container border border-outline-variant/20 p-6 mb-8">
-      <h2 class="font-headline text-xl mb-4">WPM Over Time</h2>
+      <h2 class="font-headline text-xl mb-4">{$t('progress_wpm_chart')}</h2>
       <div class="h-64 w-full">
         {#if progress?.history && progress.history.length > 0}
           <canvas bind:this={chartCanvas} width={800} height={256} class="w-full h-full"></canvas>
         {:else}
           <div class="h-full flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/20 min-h-[200px]">
-            <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50">No sessions yet</p>
-            <p class="font-body text-xs text-on-surface-variant/40 mt-2">Complete a lesson to start tracking your WPM.</p>
+            <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50">{$t('progress_no_sessions')}</p>
+            <p class="font-body text-xs text-on-surface-variant/40 mt-2">{$t('progress_no_sessions_hint')}</p>
           </div>
         {/if}
       </div>
@@ -374,15 +375,15 @@
           <div class="drill-cta">
             <div>
               <p class="text-sm font-bold text-on-surface mb-1">
-                Your weakest keys: {#each topWeakKeys as k, i}<span class="key-chip">{k}</span>{#if i < topWeakKeys.length - 1} {/if}{/each}
+                {$t('progress_weakest_keys')} {#each topWeakKeys as k, i}<span class="key-chip">{k}</span>{#if i < topWeakKeys.length - 1} {/if}{/each}
               </p>
-              <p class="text-xs text-on-surface-variant">Practice these with a targeted adaptive drill.</p>
+              <p class="text-xs text-on-surface-variant">{$t('progress_weakness_drill_desc')}</p>
             </div>
             <a
               href="/practice"
               class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-xs font-bold uppercase tracking-wider hover:bg-primary-fixed-dim transition-colors whitespace-nowrap"
             >
-              Drill Weak Keys →
+              {$t('progress_weakness_drill_cta')}
             </a>
           </div>
         </WeaknessHeatmap>
@@ -390,9 +391,9 @@
       {:else}
         <!-- No weakness data yet -->
         <div class="p-8 text-center border-2 border-dashed border-outline-variant/20 m-6">
-          <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50 mb-2">Key Weakness Map</p>
+          <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50 mb-2">{$t('progress_weakness_heading')}</p>
           <p class="font-body text-xs text-on-surface-variant/40 max-w-xs mx-auto">
-            Complete more lessons so we can identify which keys need attention.
+            {$t('progress_weakness_empty')}
           </p>
         </div>
       {/if}
@@ -400,17 +401,17 @@
 
     <!-- ──────────────────────────────────── Session Table ──────────────────────────── -->
     <div class="bg-surface-container border border-outline-variant/20 p-6">
-      <h2 class="font-headline text-xl mb-4">Recent Sessions</h2>
+      <h2 class="font-headline text-xl mb-4">{$t('progress_sessions_heading')}</h2>
       {#if recentSessions.length > 0}
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
               <tr class="border-b border-outline-variant">
-                <th class="text-left py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">Date</th>
-                <th class="text-left py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">Language</th>
-                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">WPM</th>
-                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">Accuracy</th>
-                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant hidden sm:table-cell">Duration</th>
+                <th class="text-left py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('progress_date')}</th>
+                <th class="text-left py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('progress_language')}</th>
+                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('lesson_wpm')}</th>
+                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('lesson_accuracy')}</th>
+                <th class="text-right py-3 px-4 font-label text-xs uppercase tracking-widest text-on-surface-variant hidden sm:table-cell">{$t('progress_duration')}</th>
               </tr>
             </thead>
             <tbody>
@@ -432,8 +433,8 @@
         </div>
       {:else}
         <div class="py-12 text-center border-2 border-dashed border-outline-variant/20">
-          <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50">No sessions yet</p>
-          <a href="/learn" class="inline-block mt-4 text-primary text-sm hover:underline">Start your first lesson →</a>
+          <p class="font-label text-sm uppercase tracking-widest text-on-surface-variant/50">{$t('progress_no_sessions')}</p>
+          <a href="/learn" class="inline-block mt-4 text-primary text-sm hover:underline">{$t('progress_start_first')}</a>
         </div>
       {/if}
     </div>

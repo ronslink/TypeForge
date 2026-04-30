@@ -1,5 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
+  import { t } from '$lib/stores/locale';
   import { ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
   import { WPMCalculator, AccuracyCalculator } from '@typeforge/metrics';
   import { MetricsBar, Keyboard } from '@typeforge/ui';
@@ -372,15 +373,15 @@
   let stepTitle = $derived.by(() => {
     switch ($onboardingStore.currentStep) {
       case 1:
-        return 'Choose Your Language';
+        return $t('onboarding_step1_title');
       case 2:
-        return 'Select Keyboard Layout';
+        return $t('onboarding_step2_title');
       case 3:
-        return 'Lifetime Access';
+        return $t('onboarding_step3_title');
       case 4:
-        return 'Placement Test';
+        return $t('onboarding_step4_title');
       case 5:
-        return 'Your Results';
+        return $t('onboarding_step5_title');
       default:
         return '';
     }
@@ -389,15 +390,15 @@
   let stepDescription = $derived.by(() => {
     switch ($onboardingStore.currentStep) {
       case 1:
-        return 'Select the language you want to practice typing in';
+        return $t('onboarding_step1_desc');
       case 2:
-        return 'Choose the keyboard layout you use';
+        return $t('onboarding_step2_desc');
       case 3:
-        return 'Unlock unlimited courses, tracking, and certification with a one-time lifetime license.';
+        return $t('onboarding_step3_desc');
       case 4:
-        return 'Type the text below to assess your current skill level';
+        return $t('onboarding_step4_desc');
       case 5:
-        return 'Based on your performance, we recommend the following starting level';
+        return $t('onboarding_step5_desc');
       default:
         return '';
     }
@@ -412,8 +413,8 @@
   // Metrics for display
   let metrics = $derived([
     { label: 'WPM', value: currentWPM, unit: '', variant: 'primary' as const },
-    { label: 'Accuracy', value: currentAccuracy, unit: '%', variant: 'secondary' as const },
-    { label: 'Active Time', value: activeElapsedSeconds, unit: 's', variant: 'default' as const },
+    { label: $t('lesson_accuracy'), value: currentAccuracy, unit: '%', variant: 'secondary' as const },
+    { label: $t('practice_active_time'), value: activeElapsedSeconds, unit: 's', variant: 'default' as const },
   ]);
 </script>
 
@@ -443,7 +444,7 @@
   <header class="pt-16 pb-8 px-6">
     <div class="max-w-4xl mx-auto text-center">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <span class="font-label text-sm text-primary uppercase tracking-widest">Step {$onboardingStore.currentStep} of 5</span>
+        <span class="font-label text-sm text-primary uppercase tracking-widest">{$t('onboarding_step_of', { step: $onboardingStore.currentStep, total: 5 })}</span>
       </div>
       <h1 class="font-headline text-4xl md:text-5xl text-on-background mb-3">
         {stepTitle}
@@ -525,15 +526,15 @@
            
            <!-- Pricing tier presentation -->
            <div class="text-center mb-8">
-             <div class="inline-flex bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4">No Subscriptions</div>
+             <div class="inline-flex bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4">{$t('onboarding_no_subscriptions')}</div>
              <div class="font-headline text-6xl text-on-surface mb-2">$29.99</div>
-             <div class="text-on-surface-variant text-sm">One-time payment for lifetime access</div>
+             <div class="text-on-surface-variant text-sm">{$t('onboarding_one_time_payment')}</div>
            </div>
 
            <!-- Fake Mock Payment Inputs -->
            <div class="space-y-4 mb-8">
              <div>
-               <label for="card" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Card Details</label>
+               <label for="card" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">{$t('onboarding_card_details')}</label>
                <div class="flex flex-col gap-2">
                  <input id="card" type="text" placeholder="1234 5678 9101 1121" class="w-full bg-surface-container px-4 py-3 rounded-t border border-b-0 border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary font-mono placeholder:opacity-40" />
                  <div class="flex">
@@ -544,7 +545,7 @@
              </div>
              
              <div>
-               <label for="name" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Name on card</label>
+               <label for="name" class="block text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">{$t('onboarding_name_on_card')}</label>
                <input id="name" type="text" placeholder="Jane Doe" class="w-full bg-surface-container px-4 py-3 rounded border border-outline-variant/30 text-sm focus:outline-none focus:ring-1 focus:ring-primary" />
              </div>
            </div>
@@ -557,15 +558,15 @@
              >
              {#if isPaymentProcessing}
                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Processing...
+                {$t('onboarding_processing')}
              {:else if $onboardingStore.hasPaid}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="20 6 9 17 4 12"/></svg>
-                Payment Successful
+                {$t('onboarding_payment_success')}
              {:else}
-                Simulate Payment — $29.99
+                {$t('onboarding_simulate_payment')}
              {/if}
            </button>
-           <p class="text-xs text-center text-on-surface-variant mt-4 opacity-70 italic">Powered by Test. Do not enter real numbers.</p>
+           <p class="text-xs text-center text-on-surface-variant mt-4 opacity-70 italic">{$t('onboarding_payment_disclaimer')}</p>
          </div>
       {/if}
 
@@ -582,10 +583,10 @@
                 {isPausedUI ? 'text-amber-400' : 'text-on-surface-variant/50'}">
                 {#if isPausedUI}
                   <span class="ob-pause-dot" aria-hidden="true"></span>
-                  <span>Clock paused — tap any key to resume</span>
+                  <span>{$t('onboarding_clock_paused')}</span>
                 {:else}
                   <span class="ob-active-dot" aria-hidden="true"></span>
-                  <span>Clock running — {120 - Math.min(120, activeElapsedSeconds)}s left</span>
+                  <span>{$t('onboarding_clock_running', { remaining: 120 - Math.min(120, activeElapsedSeconds) })}</span>
                 {/if}
               </div>
               
@@ -646,7 +647,7 @@
 
             {#if testEnded}
               <div class="text-center py-4">
-                <p class="font-label text-lg text-primary">Test Complete!</p>
+                <p class="font-label text-lg text-primary">{$t('onboarding_test_complete')}</p>
               </div>
             {/if}
           </div>
@@ -677,7 +678,7 @@
               <div class="font-label text-6xl font-bold text-primary mt-4">
                 {results?.wpm || 0}
               </div>
-              <span class="font-body text-sm text-on-surface-variant">words per minute</span>
+              <span class="font-body text-sm text-on-surface-variant">{$t('onboarding_words_per_minute')}</span>
             </div>
 
             <div class="result-card bg-surface-container-low p-8 text-center">
@@ -687,7 +688,7 @@
               <div class="font-label text-6xl font-bold text-secondary mt-4">
                 {results?.accuracy || 0}%
               </div>
-              <span class="font-body text-sm text-on-surface-variant">correct keystrokes</span>
+              <span class="font-body text-sm text-on-surface-variant">{$t('onboarding_correct_keystrokes')}</span>
             </div>
 
             <div class="result-card bg-surface-container-low p-8 text-center">
@@ -697,13 +698,13 @@
               <div class="font-label text-4xl font-bold text-on-surface mt-4 capitalize">
                 {results?.level || 'beginner'}
               </div>
-              <span class="font-body text-sm text-on-surface-variant">starting point</span>
+              <span class="font-body text-sm text-on-surface-variant">{$t('onboarding_starting_point')}</span>
             </div>
           </div>
 
           <!-- Level Description -->
           <div class="level-description bg-surface-container p-6">
-            <h3 class="font-headline text-xl text-on-surface mb-3">What this means</h3>
+            <h3 class="font-headline text-xl text-on-surface mb-3">{$t('onboarding_what_this_means')}</h3>
             <p class="font-body text-on-surface-variant">
               {#if results?.level === 'beginner'}
                 You're just starting out! We'll guide you through the fundamentals of touch typing,
@@ -759,7 +760,7 @@
           class:cursor-not-allowed={!canProceed}
         >
           {#if $onboardingStore.currentStep === 4}
-            Continue to Results
+            {$t('onboarding_continue_results')}
           {:else}
             Continue
           {/if}
