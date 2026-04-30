@@ -180,8 +180,12 @@
       window.history.replaceState({}, '', '/billing');
     }
     if (url.searchParams.get('plan') === 'pro') {
+      if (!isSignedIn) {
+        // Redirect to sign-in, then come back to auto-checkout
+        window.location.href = `/sign-in#/?redirect_url=${encodeURIComponent('/billing?plan=pro')}`;
+        return;
+      }
       window.history.replaceState({}, '', '/billing');
-      // Auto-trigger checkout for pro plan after data loads
       // Auto-trigger checkout for pro plan after data loads
       fetchBillingData().then(() => {
         const current = currentPlanId();

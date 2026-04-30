@@ -102,7 +102,7 @@
               </li>
             {/each}
           </ul>
-          <a href="/sign-up?plan=power" class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold text-center block hover:bg-primary-fixed-dim transition-colors">
+          <a href="/billing?plan=pro" class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold text-center block hover:bg-primary-fixed-dim transition-colors">
             {$t('pricing_cta_power')}
           </a>
         </div>
