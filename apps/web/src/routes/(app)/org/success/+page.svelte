@@ -41,7 +41,7 @@
 
 <div class="max-w-2xl mx-auto px-6 py-16 text-center">
   {#if loading}
-    <div class="animate-pulse text-on-surface-variant font-label text-sm uppercase tracking-widest">Loading...</div>
+    <div class="animate-pulse text-on-surface-variant font-label text-sm uppercase tracking-widest">{$t('org_loading')}</div>
   {:else}
     <!-- Success Icon -->
     <div class="flex justify-center mb-8">
@@ -83,18 +83,18 @@
         href="/org"
         class="notched-button bg-primary text-on-primary px-8 py-3 font-label font-bold text-sm hover:bg-primary-fixed-dim transition-colors"
       >
-        Go to Dashboard →
+        {$t('org_success_go_dashboard')}
       </a>
       <a
         href="/org"
         class="notched-button bg-surface-container-high text-on-surface px-8 py-3 font-label font-bold text-sm hover:bg-surface-container transition-colors"
       >
-        Invite Students
+        {$t('org_success_invite')}
       </a>
     </div>
 
     <p class="text-on-surface-variant/60 text-xs font-body mt-8">
-      You can manage seats, invite students, and view analytics from your dashboard at any time.
+      {$t('org_success_hint')}
     </p>
   {/if}
 </div>

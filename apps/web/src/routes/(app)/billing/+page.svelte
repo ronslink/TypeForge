@@ -40,57 +40,57 @@
   // -------------------------------------------------------------------------
   // Plans definition (mirrors backend INDIVIDUAL_PRICES)
   // -------------------------------------------------------------------------
-  const plans = [
+  const plans = $derived([
     {
       id: 'free' as PlanTier,
-      name: 'Free',
+      name: $t('billing_plan_free'),
       price: { monthly: '$0', annual: '$0' },
       period: '',
       features: [
-        'All core keyboard layouts (7 total)',
-        'Full lesson curriculum — beginner to advanced',
-        'Cascade typing game',
-        'Basic weekly progress stats',
+        $t('billing_free_feat_1'),
+        $t('billing_free_feat_2'),
+        $t('billing_free_feat_3'),
+        $t('billing_free_feat_4'),
       ],
       missingFeatures: [
-        'Advanced performance analytics',
-        'Certificate generation',
-        'Priority language packs',
+        $t('billing_free_missing_1'),
+        $t('billing_free_missing_2'),
+        $t('billing_free_missing_3'),
       ],
-      cta: 'Current plan',
+      cta: $t('billing_current_plan'),
       ctaDisabled: true,
       externalHref: undefined,
     },
     {
       id: 'pro' as PlanTier,
-      name: 'Pro',
+      name: $t('billing_plan_pro'),
       price: { monthly: '$9', annual: '$79' },
       period: '/mo',
       popular: true,
       features: [
-        'Everything in Free',
-        'Full analytics — keystroke heat maps, WPM trends',
-        'Printable certificates',
-        'Priority access to all language packs',
-        'Custom practice engines',
+        $t('billing_pro_feat_1'),
+        $t('billing_pro_feat_2'),
+        $t('billing_pro_feat_3'),
+        $t('billing_pro_feat_4'),
+        $t('billing_pro_feat_5'),
       ],
-      cta: 'Upgrade to Pro',
+      cta: $t('billing_upgrade_pro'),
     },
     {
       id: 'team' as PlanTier,
-      name: 'Team',
+      name: $t('billing_plan_team'),
       price: { monthly: '$29', annual: '$249' },
       period: '/mo',
       features: [
-        'Everything in Pro',
-        'Up to 50 seats',
-        'Teacher / org dashboard',
-        'Automated grading & progress reports',
-        'Priority support with SLA',
+        $t('billing_team_feat_1'),
+        $t('billing_team_feat_2'),
+        $t('billing_team_feat_3'),
+        $t('billing_team_feat_4'),
+        $t('billing_team_feat_5'),
       ],
-      cta: 'Upgrade to Team',
+      cta: $t('billing_upgrade_team'),
     },
-  ];
+  ]);
 
   // -------------------------------------------------------------------------
   // API calls
@@ -207,8 +207,8 @@
 
   <!-- Header -->
   <header class="mb-10">
-    <h1 class="font-headline text-4xl mb-2">Billing</h1>
-    <p class="text-on-surface-variant font-body">Manage your subscription and payment history.</p>
+    <h1 class="font-headline text-4xl mb-2">{$t('billing_title')}</h1>
+    <p class="text-on-surface-variant font-body">{$t('billing_subtitle')}</p>
   </header>
 
   <!-- Error banner -->
@@ -222,7 +222,7 @@
   {#if isSignedIn}
     <section class="mb-12" aria-labelledby="sub-status-heading">
       <h2 id="sub-status-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-4">
-        Your Plan
+        {$t('billing_your_plan')}
       </h2>
 
       {#if isLoading}
@@ -232,21 +232,21 @@
           <div>
             <div class="flex items-center gap-3 mb-1">
               <span class="font-headline text-2xl">
-                {subscription?.plan?.name ?? 'Free'}
+                {subscription?.plan?.name ?? $t('billing_plan_free')}
               </span>
               {#if subscription?.status === 'active'}
-                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/20 text-secondary">Active</span>
+                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/20 text-secondary">{$t('billing_active')}</span>
               {:else if subscription?.status === 'trialing'}
-                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-primary/20 text-primary">Trial</span>
+                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-primary/20 text-primary">{$t('billing_trial')}</span>
               {:else if subscription?.status === 'past_due'}
                 <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-error/20 text-error">{$t('billing_past_due')}</span>
               {:else}
-                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-surface-container-highest text-on-surface-variant">Free</span>
+                <span class="font-label text-xs uppercase tracking-widest px-2 py-0.5 bg-surface-container-highest text-on-surface-variant">{$t('billing_free')}</span>
               {/if}
             </div>
             {#if subscription?.currentPeriodEnd}
               <p class="text-on-surface-variant text-sm font-body">
-                {subscription.cancelAtPeriodEnd ? 'Cancels' : 'Renews'} on {formatDate(subscription.currentPeriodEnd)}
+                {subscription.cancelAtPeriodEnd ? $t('billing_cancels_on', { date: formatDate(subscription.currentPeriodEnd) }) : $t('billing_renews_on', { date: formatDate(subscription.currentPeriodEnd) })}
               </p>
             {/if}
           </div>
@@ -257,7 +257,7 @@
               disabled={isOpeningPortal}
               class="notched-button bg-surface-container text-on-surface px-6 py-3 font-label text-sm font-bold hover:bg-surface-container-high transition-colors disabled:opacity-50"
             >
-              {isOpeningPortal ? 'Opening…' : 'Manage Billing →'}
+              {isOpeningPortal ? $t('billing_opening') : $t('billing_manage')}
             </button>
           {/if}
         </div>
@@ -272,19 +272,19 @@
       class="font-label text-sm px-4 py-2 transition-colors {billingInterval === 'monthly'
         ? 'bg-primary text-on-primary'
         : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}"
-    >Monthly</button>
+    >{$t('billing_monthly')}</button>
     <button
       onclick={() => (billingInterval = 'annual')}
       class="font-label text-sm px-4 py-2 transition-colors {billingInterval === 'annual'
         ? 'bg-primary text-on-primary'
         : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}"
-    >Annual <span class="text-secondary font-bold ml-1">−27%</span></button>
+    >{$t('billing_annual')} <span class="text-secondary font-bold ml-1">{$t('billing_annual_discount')}</span></button>
   </div>
 
   <!-- Plans Grid -->
   <section class="mb-16" aria-labelledby="plans-heading">
     <h2 id="plans-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-6">
-      Available Plans
+      {$t('billing_available_plans')}
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -294,7 +294,7 @@
 
           {#if plan.popular}
             <div class="font-label text-[10px] uppercase tracking-widest text-on-primary bg-primary px-3 py-1 mb-4 self-start">
-              Most Popular
+              {$t('billing_most_popular')}
             </div>
           {/if}
 
@@ -332,7 +332,7 @@
             </a>
           {:else if isCurrentPlan}
             <div class="font-label text-sm text-on-surface-variant text-center py-3 border border-outline-variant">
-              Current Plan
+              {$t('billing_current_plan')}
             </div>
           {:else if plan.ctaDisabled}
             <a
@@ -347,7 +347,7 @@
               disabled={isCheckingOut}
               class="notched-button bg-primary text-on-primary w-full py-3 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors disabled:opacity-50"
             >
-              {isCheckingOut ? 'Redirecting…' : plan.cta}
+              {isCheckingOut ? $t('billing_redirecting') : plan.cta}
             </button>
           {/if}
         </div>
@@ -359,16 +359,16 @@
   {#if isSignedIn && invoices.length > 0}
     <section aria-labelledby="invoices-heading">
       <h2 id="invoices-heading" class="font-headline text-xl uppercase tracking-widest text-primary mb-6">
-        Invoice History
+        {$t('billing_invoice_history')}
       </h2>
       <div class="bg-surface-container-low">
         <table class="w-full text-sm font-body">
           <thead>
             <tr class="border-b border-outline-variant text-on-surface-variant">
-              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">Date</th>
-              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">Amount</th>
-              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">Status</th>
-              <th class="text-right px-6 py-3 font-label uppercase tracking-widest text-xs">Receipt</th>
+              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">{$t('billing_col_date')}</th>
+              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">{$t('billing_col_amount')}</th>
+              <th class="text-left px-6 py-3 font-label uppercase tracking-widest text-xs">{$t('billing_col_status')}</th>
+              <th class="text-right px-6 py-3 font-label uppercase tracking-widest text-xs">{$t('billing_col_receipt')}</th>
             </tr>
           </thead>
           <tbody>

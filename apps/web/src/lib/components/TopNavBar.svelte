@@ -12,7 +12,7 @@
     { href: '/practice',       label: $t('nav_practice') },
     { href: '/games/cascade',  label: $t('nav_play')     },
     { href: '/progress',       label: $t('nav_progress') },
-    ...(hasOrg ? [{ href: '/org', label: 'Dashboard' }] : []),
+    ...(hasOrg ? [{ href: '/org', label: $t('nav_dashboard') }] : []),
   ]);
 
   const ctx = useClerkContext();
