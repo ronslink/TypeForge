@@ -214,5 +214,12 @@ export const hindiWordlist: WordlistEntry[] = [
   { word: "हिंदी", difficulty: 3, tags: ['noun'] },
   { word: "भारत", difficulty: 3, tags: ['geography'] },
   { word: "देवनागरी", difficulty: 3, tags: ['noun'] },
+  // === Classic Literature ===
+  { word: 'रहिमन पानी राखिये', difficulty: 3, tags: ['literature', 'kabir'] },
+  { word: 'बिन पानी सब सून', difficulty: 3, tags: ['literature', 'kabir'] },
+  { word: 'पानी गये न ऊबरै', difficulty: 3, tags: ['literature', 'kabir'] },
+  { word: 'मोती मानुष चून', difficulty: 3, tags: ['literature', 'kabir'] },
+  { word: 'बुरा जो देखन मैं चला', difficulty: 3, tags: ['literature', 'kabir'] },
 ];
+
 export default hindiWordlist;

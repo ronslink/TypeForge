@@ -381,6 +381,12 @@ export const arabicWordlist: WordlistEntry[] = [
   { word: '٨', difficulty: 3, tags: ['numeral', 'advanced', 'arabic-indic'] },
   { word: '٩', difficulty: 3, tags: ['numeral', 'advanced', 'arabic-indic'] },
   { word: '٠', difficulty: 3, tags: ['numeral', 'advanced', 'arabic-indic'] },
+  // === Classic Literature ===
+  { word: 'أنا الذي نظر الأعمى إلى أدبي', difficulty: 3, tags: ['literature', 'mutanabbi'] },
+  { word: 'وأسمعت كلماتي من به صمم', difficulty: 3, tags: ['literature', 'mutanabbi'] },
+  { word: 'الخيل والليل والبيداء تعرفني', difficulty: 3, tags: ['literature', 'mutanabbi'] },
+  { word: 'والسيف والرمح والقرطاس والقلم', difficulty: 3, tags: ['literature', 'mutanabbi'] },
+  { word: 'وما نيل المطالب بالتمني', difficulty: 3, tags: ['literature', 'shawqi'] },
 ];
 
 export default arabicWordlist;

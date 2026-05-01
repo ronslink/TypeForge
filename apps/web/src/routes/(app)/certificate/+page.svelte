@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { t } from '$lib/stores/locale';
   
   const ctx = useClerkContext();
   let isSignedIn = $derived(!!ctx?.user);
@@ -50,26 +51,26 @@
 </script>
 
 <svelte:head>
-  <title>TypingScholar Certificate</title>
+  <title>{$t('cert_official')} — TypeForge</title>
 </svelte:head>
 
 {#if loading}
   <div class="min-h-screen flex items-center justify-center">
     <div class="animate-pulse flex flex-col items-center">
       <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p class="font-label tracking-widest uppercase text-on-surface-variant text-sm">Validating records...</p>
+      <p class="font-label tracking-widest uppercase text-on-surface-variant text-sm">{$t('cert_validating')}</p>
     </div>
   </div>
 {:else if bestSession.wpm < 60 || !isSignedIn}
   <div class="min-h-screen flex items-center justify-center p-6">
     <div class="max-w-md bg-surface-container p-8 rounded border border-outline-variant/30 text-center">
       <span class="material-symbols-outlined text-error text-5xl mb-4">lock</span>
-      <h1 class="font-headline text-2xl mb-2">Certificate Locked</h1>
+      <h1 class="font-headline text-2xl mb-2">{$t('cert_locked_title')}</h1>
       <p class="text-on-surface-variant text-sm mb-6">
-        You must achieve <strong>Proficient</strong> status (60+ WPM with 95% Accuracy) to unlock the official TypingScholar Certificate.
+        {@html $t('cert_locked_desc')}
       </p>
       <a href="/progress" class="notched-button bg-primary text-background px-6 py-3 font-label text-sm font-bold uppercase tracking-wider">
-        Return to Progress
+        {$t('cert_return_progress')}
       </a>
     </div>
   </div>
@@ -77,11 +78,11 @@
   <!-- Print Controls (Hidden when printing) -->
   <div class="fixed top-6 right-6 flex gap-4 print:hidden z-50">
     <a href="/progress" class="notched-button bg-surface-container text-on-surface px-4 py-2 font-label text-xs uppercase tracking-widest border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
-      Back
+      {$t('cert_back')}
     </a>
     <button onclick={handlePrint} class="notched-button bg-primary text-background px-4 py-2 font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
       <span class="material-symbols-outlined text-[18px]">print</span>
-      Print / Save PDF
+      {$t('cert_print')}
     </button>
   </div>
 
@@ -108,26 +109,22 @@
       <!-- Certificate Content -->
       <div class="relative h-full flex flex-col items-center justify-center text-center p-16 pb-12 z-10">
         
-        <h3 class="font-label text-sm uppercase tracking-[0.4em] text-black/60 mb-6">Official Certification</h3>
+        <h3 class="font-label text-sm uppercase tracking-[0.4em] text-black/60 mb-6">{$t('cert_official')}</h3>
         
         <h1 class="font-headline text-6xl md:text-7xl mb-10 tracking-tight text-black">
           TypingScholar
         </h1>
 
         <p class="font-body text-xl md:text-2xl text-black/80 mb-6 italic">
-          This certifies that
+          {$t('cert_certifies')}
         </p>
 
         <h2 class="font-headline text-4xl md:text-5xl text-black border-b border-black/20 pb-4 px-12 mb-10 min-w-[50%]">
-          {ctx?.user?.firstName ? `${ctx.user.firstName} ${ctx.user.lastName || ''}` : 'Verified Scholar'}
+          {ctx?.user?.firstName ? `${ctx.user.firstName} ${ctx.user.lastName || ''}` : $t('cert_default_name')}
         </h2>
 
         <p class="font-body text-lg md:text-xl text-black/80 max-w-2xl mx-auto leading-relaxed mb-12">
-          Has successfully completed the kinetic analysis and adaptive curriculum required to achieve 
-          <strong>Professional Grade</strong> proficiency, demonstrating an elite typing speed of 
-          <strong class="text-black">{Math.round(bestSession.wpm)} Words Per Minute</strong> 
-          with a sustained accuracy of 
-          <strong class="text-black">{Math.round(bestSession.accuracy)}%</strong>.
+          {@html $t('cert_body', { wpm: Math.round(bestSession.wpm).toString(), accuracy: Math.round(bestSession.accuracy).toString() })}
         </p>
 
         <!-- Footer / Signatures -->
@@ -136,7 +133,7 @@
             <div class="font-headline text-2xl border-b border-black/30 pb-2 mb-2 text-black/80">
               {formatDate(bestSession.date)}
             </div>
-            <div class="font-label text-xs uppercase tracking-widest text-black/50">Date of Award</div>
+            <div class="font-label text-xs uppercase tracking-widest text-black/50">{$t('cert_date_label')}</div>
           </div>
 
           <!-- Seal -->
@@ -146,7 +143,7 @@
               <div class="absolute inset-2 border border-[#ffc56c]/50 rounded-full border-dashed"></div>
               <div class="text-center">
                 <span class="block font-headline text-2xl text-[#c48d35] leading-none mb-1">TS</span>
-                <span class="block font-label text-[8px] uppercase tracking-widest text-[#c48d35] font-bold">Certified</span>
+                <span class="block font-label text-[8px] uppercase tracking-widest text-[#c48d35] font-bold">{$t('cert_certified')}</span>
               </div>
             </div>
           </div>
@@ -155,7 +152,7 @@
             <div class="border-b border-black/30 pb-2 mb-2">
               <span class="font-label italic text-2xl tracking-tighter text-black/80 block -mb-1 signature-font">TypeForge Engine</span>
             </div>
-            <div class="font-label text-xs uppercase tracking-widest text-black/50">Neural Verifier</div>
+            <div class="font-label text-xs uppercase tracking-widest text-black/50">{$t('cert_verifier')}</div>
           </div>
         </div>
 

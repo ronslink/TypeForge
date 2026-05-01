@@ -18,15 +18,23 @@ import es from '../../../messages/es.json';
 import fr from '../../../messages/fr.json';
 import de from '../../../messages/de.json';
 import pt from '../../../messages/pt.json';
+import ja from '../../../messages/ja.json';
+import ko from '../../../messages/ko.json';
+import zh from '../../../messages/zh.json';
+import ar from '../../../messages/ar.json';
+import hi from '../../../messages/hi.json';
+import tr from '../../../messages/tr.json';
+import it from '../../../messages/it.json';
+import ru from '../../../messages/ru.json';
 
 // ── Types ────────────────────────────────────────────────────────────────────
-const SUPPORTED = ['en', 'es', 'fr', 'de', 'pt'] as const;
+const SUPPORTED = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh', 'ar', 'hi', 'tr', 'it', 'ru'] as const;
 export type UiLocale = (typeof SUPPORTED)[number];
 
 type Messages = typeof en;
 type MessageKey = keyof Messages;
 
-const MESSAGES: Record<UiLocale, Partial<Messages>> = { en, es, fr, de, pt } as any;
+const MESSAGES: Record<UiLocale, Partial<Messages>> = { en, es, fr, de, pt, ja, ko, zh, ar, hi, tr, it, ru } as any;
 
 export const UI_LOCALES: { code: UiLocale; nativeName: string; englishName: string }[] = [
   { code: 'en', nativeName: 'English',   englishName: 'English'    },
@@ -34,6 +42,14 @@ export const UI_LOCALES: { code: UiLocale; nativeName: string; englishName: stri
   { code: 'fr', nativeName: 'Français',  englishName: 'French'     },
   { code: 'de', nativeName: 'Deutsch',   englishName: 'German'     },
   { code: 'pt', nativeName: 'Português', englishName: 'Portuguese' },
+  { code: 'ja', nativeName: '日本語',    englishName: 'Japanese'   },
+  { code: 'ko', nativeName: '한국어',    englishName: 'Korean'     },
+  { code: 'zh', nativeName: '中文',      englishName: 'Chinese'    },
+  { code: 'ar', nativeName: 'العربية',   englishName: 'Arabic'     },
+  { code: 'hi', nativeName: 'हिन्दी',    englishName: 'Hindi'      },
+  { code: 'tr', nativeName: 'Türkçe',    englishName: 'Turkish'    },
+  { code: 'it', nativeName: 'Italiano',  englishName: 'Italian'    },
+  { code: 'ru', nativeName: 'Русский',   englishName: 'Russian'    },
 ];
 
 // ── Core writable store ───────────────────────────────────────────────────────

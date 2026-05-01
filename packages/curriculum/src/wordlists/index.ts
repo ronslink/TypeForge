@@ -27,6 +27,8 @@ import { swahiliWordlist } from './sw.js';
 import { italianWordlist } from './it.js';
 import { japaneseWordlist } from './ja.js';
 import { koreanWordlist } from './ko.js';
+import { chineseWordlist } from './zh.js';
+import { turkishWordlist } from './tr.js';
 
 // Re-export types
 export type { WordlistEntry };
@@ -57,6 +59,8 @@ export {
   italianWordlist,
   japaneseWordlist,
   koreanWordlist,
+  chineseWordlist,
+  turkishWordlist,
 };
 
 // Language code mapping
@@ -109,6 +113,10 @@ const WORDLIST_MAP: Record<string, WordlistEntry[]> = {
   japanese: japaneseWordlist,
   ko: koreanWordlist,
   korean: koreanWordlist,
+  zh: chineseWordlist,
+  chinese: chineseWordlist,
+  tr: turkishWordlist,
+  turkish: turkishWordlist,
 };
 
 /**

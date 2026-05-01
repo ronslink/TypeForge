@@ -4,6 +4,19 @@ import type { Handle } from '@sveltejs/kit';
 import { env as publicEnv } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
 
+const SUPPORTED_LOCALES = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh', 'ar', 'hi', 'tr', 'it', 'ru'] as const;
+type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+
+/** Parse Accept-Language header and return the best matching supported locale */
+function detectLocale(acceptLanguage: string | null): SupportedLocale {
+  if (!acceptLanguage) return 'en';
+  for (const part of acceptLanguage.split(',')) {
+    const code = part.trim().split(';')[0]!.split('-')[0]!.toLowerCase();
+    if (SUPPORTED_LOCALES.includes(code as SupportedLocale)) return code as SupportedLocale;
+  }
+  return 'en';
+}
+
 const clerkHandler: Handle = async ({ event, resolve }) => {
   return clerkForApp({ event, resolve });
 };
@@ -49,7 +62,13 @@ const authGuard: Handle = async ({ event, resolve }) => {
     });
   }
 
-  return resolve(event);
+  // Detect locale from Accept-Language for SSR
+  const detectedLocale = detectLocale(event.request.headers.get('Accept-Language'));
+  event.locals.detectedLocale = detectedLocale;
+
+  return resolve(event, {
+    transformPageChunk: ({ html }) => html.replace('%sveltekit.htmlAttributes%', `lang="${detectedLocale}"`),
+  });
 };
 
 export const handle = sequence(clerkHandler, authGuard);

@@ -593,6 +593,21 @@ function generateDynamicContent(text: string): LessonChar[] {
   });
 }
 
+const SCRIPT_MAP: Record<string, string> = {
+  ar: 'arabic',
+  he: 'hebrew',
+  ru: 'cyrillic',
+  ko: 'hangul',
+  ja: 'hiragana',
+  zh: 'han',
+  hi: 'devanagari',
+  el: 'greek',
+};
+const RTL_LANGS = ['ar', 'he'];
+
+const getScript = (lang: string) => SCRIPT_MAP[lang] || 'latin';
+const isRtl = (lang: string) => RTL_LANGS.includes(lang);
+
 masterLanguages.forEach(lang => {
   // 1. Synthesize Basic Practice Modules if not hardcoded
   const existingLessons = LESSON_CATALOG.filter(l => l.language === lang && !l.isTest);
@@ -605,9 +620,9 @@ masterLanguages.forEach(lang => {
          id: `${lang}-basic-1`,
          title: `Basic Words Drill`,
          language: lang,
-         script: lang === 'ar' ? 'arabic' : 'latin',
+         script: getScript(lang),
          difficulty: 1,
-         rtl: lang === 'ar',
+         rtl: isRtl(lang),
          tags: { hand: 'both', finger: 'all', key_bigram: 'basic', speed: 'accuracy' },
          content: generateDynamicContent(basicWords.join(' '))
        });
@@ -615,9 +630,9 @@ masterLanguages.forEach(lang => {
          id: `${lang}-speed-1`,
          title: `Speed & Endurance Run`,
          language: lang,
-         script: lang === 'ar' ? 'arabic' : 'latin',
+         script: getScript(lang),
          difficulty: 3,
-         rtl: lang === 'ar',
+         rtl: isRtl(lang),
          tags: { hand: 'both', finger: 'all', key_bigram: 'speed', speed: 'speed' },
          content: generateDynamicContent(speedWords.join(' '))
        });
@@ -635,9 +650,9 @@ masterLanguages.forEach(lang => {
         id: `${lang}-test-${level}`,
         title: isFinal ? 'Final Proficiency Test' : `Stage ${level} Certification Test`,
         language: lang,
-        script: lang === 'ar' ? 'arabic' : 'latin',
+        script: getScript(lang),
         difficulty: level,
-        rtl: lang === 'ar',
+        rtl: isRtl(lang),
         isTest: true,
         tags: {
           hand: 'both',

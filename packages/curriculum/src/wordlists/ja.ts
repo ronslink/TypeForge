@@ -182,6 +182,12 @@ export const japaneseWordlist: WordlistEntry[] = [
   { word: 'エンジニア', difficulty: 3, tags: ['katakana', 'occupation', 'advanced'] },
   { word: 'マネージャー', difficulty: 3, tags: ['katakana', 'occupation', 'advanced'] },
   { word: 'コンサルタント', difficulty: 3, tags: ['katakana', 'occupation', 'advanced'] },
+  // === Classic Literature ===
+  { word: '吾輩は猫である', difficulty: 3, tags: ['literature', 'soseki'] },
+  { word: '名前はまだ無い', difficulty: 3, tags: ['literature', 'soseki'] },
+  { word: '国境の長いトンネルを抜けると雪国であった', difficulty: 3, tags: ['literature', 'kawabata'] },
+  { word: '春はあけぼの', difficulty: 3, tags: ['literature', 'sei_shonagon'] },
+  { word: '祇園精舎の鐘の声', difficulty: 3, tags: ['literature', 'heike'] },
 ];
 
 export default japaneseWordlist;

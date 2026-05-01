@@ -24,6 +24,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
   return {
     fontPreloads,
+    detectedLocale: locals.detectedLocale ?? 'en',
     ...buildClerkProps(locals.auth)
   };
 };

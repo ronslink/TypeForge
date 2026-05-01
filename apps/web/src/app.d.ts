@@ -22,6 +22,8 @@ declare global {
       };
       /** Auth object injected by svelte-clerk's withClerkHandler */
       auth: any;
+      /** Browser language detected from Accept-Language header */
+      detectedLocale?: string;
     }
     interface PageData {}
     interface PageState {}

@@ -335,6 +335,12 @@ export const koreanWordlist: WordlistEntry[] = [
   { word: '회복', difficulty: 3, tags: ['sino-korean', 'noun', 'advanced'] },
   { word: '후회', difficulty: 3, tags: ['sino-korean', 'noun', 'advanced'] },
   { word: '흐름', difficulty: 3, tags: ['sino-korean', 'noun', 'advanced'] },
+  // === Classic Literature ===
+  { word: '나 보기가 역겨워', difficulty: 3, tags: ['literature', 'kim_sowol'] },
+  { word: '가실 때에는', difficulty: 3, tags: ['literature', 'kim_sowol'] },
+  { word: '말없이 고이 보내 드리오리다', difficulty: 3, tags: ['literature', 'kim_sowol'] },
+  { word: '별 헤는 밤', difficulty: 3, tags: ['literature', 'yun_dongju'] },
+  { word: '하늘과 바람과 별과 시', difficulty: 3, tags: ['literature', 'yun_dongju'] },
 ];
 
 export default koreanWordlist;

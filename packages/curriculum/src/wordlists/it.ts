@@ -284,6 +284,12 @@ export const italianWordlist: WordlistEntry[] = [
   { word: 'biologico', difficulty: 3, tags: ['adjective'] },
   { word: 'geografico', difficulty: 3, tags: ['adjective'] },
   { word: 'demografico', difficulty: 3, tags: ['adjective'] },
+  // === Classic Literature ===
+  { word: 'Nel mezzo del cammin di nostra vita', difficulty: 3, tags: ['literature', 'dante'] },
+  { word: 'mi ritrovai per una selva oscura', difficulty: 3, tags: ['literature', 'dante'] },
+  { word: 'ché la diritta via era smarrita', difficulty: 3, tags: ['literature', 'dante'] },
+  { word: 'Amor, ch\'a nullo amato amar perdona', difficulty: 3, tags: ['literature', 'dante'] },
+  { word: 'L\'amor che move il sole e l\'altre stelle', difficulty: 3, tags: ['literature', 'dante'] },
 ];
 
 export default italianWordlist;

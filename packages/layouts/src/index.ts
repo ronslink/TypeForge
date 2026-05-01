@@ -101,6 +101,7 @@ export const LANGUAGE_TO_LAYOUT: Record<string, LayoutId> = {
   'ru': 'cyrillic-ru',
   'uk': 'cyrillic-ru',
   'el': 'greek',
+  'tr': 'qwerty-us',
 };
 
 /**
