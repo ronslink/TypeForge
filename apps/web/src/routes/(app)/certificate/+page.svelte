@@ -54,9 +54,9 @@
   <title>{$t('cert_official')} — TypingScholar</title>
   {#if bestSession.wpm > 0}
     <meta property="og:title" content="My TypingScholar Certificate" />
-    <meta property="og:image" content={\`https://typingscholar.com/api/og/certificate?wpm=\${bestSession.wpm}&acc=\${bestSession.accuracy}\`} />
+    <meta property="og:image" content={`https://typingscholar.com/api/og/certificate?wpm=${bestSession.wpm}&acc=${bestSession.accuracy}`} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={\`https://typingscholar.com/api/og/certificate?wpm=\${bestSession.wpm}&acc=\${bestSession.accuracy}\`} />
+    <meta name="twitter:image" content={`https://typingscholar.com/api/og/certificate?wpm=${bestSession.wpm}&acc=${bestSession.accuracy}`} />
   {/if}
 </svelte:head>
 
@@ -91,7 +91,7 @@
       {$t('cert_print')}
     </button>
     <a 
-      href={\`https://twitter.com/intent/tweet?text=I%20just%20hit%20\${bestSession.wpm}%20WPM%20with%20\${bestSession.accuracy}%25%20accuracy%20on%20TypingScholar!%0A%0Ahttps://typingscholar.com/certificate\`}
+      href={`https://twitter.com/intent/tweet?text=I%20just%20hit%20${bestSession.wpm}%20WPM%20with%20${bestSession.accuracy}%25%20accuracy%20on%20TypingScholar!%0A%0Ahttps://typingscholar.com/certificate`}
       target="_blank"
       rel="noopener noreferrer"
       class="notched-button bg-[#1DA1F2] text-white px-4 py-2 font-label text-xs font-bold uppercase tracking-widest hover:bg-[#1A91DA] transition-colors flex items-center gap-2"
