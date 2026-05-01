@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
@@ -22,6 +21,14 @@
   let additionalSeats = $state(5);
   let isBuyingSeats = $state(false);
   let seatPurchaseError = $state<string | null>(null);
+  let needsInstitutionSetup = $state(false);
+  let setupSchoolName = $state('');
+  let setupCountryCode = $state('');
+  let setupWebsite = $state('');
+  let setupSeatCount = $state(5);
+  let setupPlanDays = $state(90);
+  let setupError = $state<string | null>(null);
+  let isSettingUpInstitution = $state(false);
 
   onMount(async () => {
     if (!isSignedIn) { loading = false; return; }
@@ -47,10 +54,11 @@
     if (!orgsRes.ok) throw new Error($t('org_load_failed'));
     const { organisations } = await orgsRes.json();
     if (!organisations || organisations.length === 0) {
-      goto('/onboarding/school');
+      needsInstitutionSetup = true;
       return;
     }
 
+    needsInstitutionSetup = false;
     orgId = organisations[0].org.id;
     organizationData = organisations[0].org;
 
@@ -122,6 +130,8 @@
 
   let availableSeats = $derived(seatData ? Math.max(0, seatData.available ?? seatData.purchased - seatData.activeMembers) : 0);
   let monthlySeatCost = $derived(seatData ? additionalSeats * seatData.pricePerSeat : 0);
+  let setupPricePerSeat = $derived(setupPlanDays === 90 ? 6 : 8);
+  let setupMonthlyCost = $derived(setupSeatCount * setupPricePerSeat);
 
   let topPerformers = $derived(
     [...studentMembers].sort((a, b) => b.wpm - a.wpm).slice(0, 3)
@@ -169,6 +179,68 @@
       isBuyingSeats = false;
     }
   }
+
+  async function handleInstitutionSetup() {
+    if (!api) return;
+    if (!setupSchoolName.trim()) {
+      setupError = $t('school_name_required');
+      return;
+    }
+    if (setupSeatCount < 5) {
+      setupError = $t('school_min_seats');
+      return;
+    }
+
+    isSettingUpInstitution = true;
+    setupError = null;
+
+    try {
+      const orgRes = await api.api.v1.organisations.$post({
+        json: {
+          name: setupSchoolName.trim(),
+          slug: setupSchoolName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+          orgType: 'school',
+          countryCode: setupCountryCode.trim().slice(0, 2).toUpperCase() || undefined,
+          website: setupWebsite || undefined,
+        }
+      });
+
+      if (!orgRes.ok) {
+        const body = await orgRes.json() as any;
+        throw new Error(body?.error || $t('org_create_failed'));
+      }
+
+      const { organisation } = await orgRes.json() as any;
+      const newOrgId = organisation.id;
+
+      const billingRes = await api.api.v1.organisations[':id'].billing.seats.$post({
+        param: { id: newOrgId },
+        json: {
+          seatCount: setupSeatCount,
+          cooldownDays: setupPlanDays,
+          successUrl: `${window.location.origin}/org/success?orgId=${newOrgId}&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/org`,
+        }
+      });
+
+      if (!billingRes.ok) {
+        const body = await billingRes.json() as any;
+        throw new Error(body?.error || $t('org_update_seats_failed'));
+      }
+
+      const { checkoutUrl } = await billingRes.json() as any;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      await loadData();
+    } catch (e: any) {
+      setupError = e?.message || $t('org_create_failed');
+    } finally {
+      isSettingUpInstitution = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -181,6 +253,131 @@
   </div>
 {:else if error}
   <div class="text-error bg-error-container/20 p-4 border border-error-container rounded">{error}</div>
+{:else if needsInstitutionSetup}
+  <div class="dashboard-root px-6 py-8 max-w-screen-lg mx-auto space-y-6">
+    <div class="bg-surface-container-low border border-outline-variant/20 p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+        <div class="max-w-xl">
+          <p class="font-label text-xs uppercase tracking-widest text-primary mb-2">{$t('org_setup_detected')}</p>
+          <h1 class="font-headline text-3xl text-on-surface mb-3">{$t('org_setup_title')}</h1>
+          <p class="font-body text-sm text-on-surface-variant">{$t('org_setup_desc')}</p>
+        </div>
+        <div class="bg-primary/10 border border-primary/25 px-4 py-3 text-sm font-label text-primary">
+          {$t('org_setup_dashboard_badge')}
+        </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1fr_320px] mt-8">
+        <div class="space-y-5">
+          <div>
+            <label for="setup-school-name" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_name_label')} *</label>
+            <input
+              id="setup-school-name"
+              type="text"
+              bind:value={setupSchoolName}
+              placeholder="e.g. Lincoln High School"
+              class="w-full bg-surface-container px-4 py-3 text-sm font-body text-on-surface border border-outline-variant/30 focus:border-primary focus:outline-none transition-colors"
+            />
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="setup-country" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_country_label')}</label>
+              <input
+                id="setup-country"
+                type="text"
+                bind:value={setupCountryCode}
+                placeholder="e.g. US, GB, DE"
+                class="w-full bg-surface-container px-4 py-3 text-sm font-body text-on-surface border border-outline-variant/30 focus:border-primary focus:outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <label for="setup-website" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2">{$t('school_website_label')}</label>
+              <input
+                id="setup-website"
+                type="url"
+                bind:value={setupWebsite}
+                placeholder="https://school.edu"
+                class="w-full bg-surface-container px-4 py-3 text-sm font-body text-on-surface border border-outline-variant/30 focus:border-primary focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="setup-seat-count" class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-3">{$t('school_seat_count_label')}</label>
+            <div class="flex items-center gap-4">
+              <button
+                onclick={() => { if (setupSeatCount > 5) setupSeatCount--; }}
+                disabled={setupSeatCount <= 5}
+                class="w-10 h-10 bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center hover:bg-surface-container transition-colors disabled:opacity-30"
+                aria-label={$t('org_decrease_seats')}
+              >-</button>
+              <input
+                id="setup-seat-count"
+                type="number"
+                min="5"
+                max="500"
+                bind:value={setupSeatCount}
+                class="w-24 text-center bg-surface-container px-4 py-3 text-2xl font-headline text-primary border border-outline-variant/30 focus:border-primary focus:outline-none"
+              />
+              <button
+                onclick={() => setupSeatCount++}
+                class="w-10 h-10 bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center hover:bg-surface-container transition-colors"
+                aria-label={$t('org_increase_seats')}
+              >+</button>
+            </div>
+          </div>
+
+          <div>
+            <span class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-3">{$t('org_setup_plan')}</span>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                class="plan-option {setupPlanDays === 90 ? 'active' : ''}"
+                onclick={() => setupPlanDays = 90}
+              >
+                <span class="font-label text-sm text-on-surface">{$t('school_plan_flexible')}</span>
+                <span class="font-body text-xs text-on-surface-variant">$6/seat/mo · 90 days</span>
+              </button>
+              <button
+                type="button"
+                class="plan-option {setupPlanDays === 180 ? 'active' : ''}"
+                onclick={() => setupPlanDays = 180}
+              >
+                <span class="font-label text-sm text-on-surface">{$t('school_plan_semester')}</span>
+                <span class="font-body text-xs text-on-surface-variant">$8/seat/mo · 180 days</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="bg-surface-container border border-outline-variant/20 p-5 h-fit space-y-4">
+          <div class="flex items-center justify-between font-body text-sm text-on-surface-variant">
+            <span>{$t('school_summary_seats', { count: setupSeatCount })}</span>
+            <span class="font-bold text-on-surface">${setupMonthlyCost}/mo</span>
+          </div>
+          <div class="flex items-center justify-between font-body text-sm text-on-surface-variant">
+            <span>{$t('org_setup_cycle')}</span>
+            <span>{setupPlanDays === 90 ? $t('school_plan_flexible') : $t('school_plan_semester')}</span>
+          </div>
+          <div class="border-t border-outline-variant/20 pt-4 space-y-2 text-sm font-body text-on-surface-variant">
+            <p>{$t('school_summary_dashboard')}</p>
+            <p>{$t('school_summary_roster')}</p>
+            <p>{$t('school_summary_compliance')}</p>
+          </div>
+          {#if setupError}
+            <p class="text-error text-sm font-body">{setupError}</p>
+          {/if}
+          <button
+            onclick={handleInstitutionSetup}
+            disabled={isSettingUpInstitution}
+            class="notched-button w-full bg-primary text-on-primary font-label font-bold text-sm px-6 py-3 hover:bg-primary-fixed-dim transition-colors disabled:opacity-50 disabled:cursor-wait"
+          >
+            {isSettingUpInstitution ? $t('school_processing') : $t('org_setup_continue_payment')}
+          </button>
+        </aside>
+      </div>
+    </div>
+  </div>
 {:else}
   <div class="dashboard-root px-6 py-8 max-w-screen-xl mx-auto space-y-8">
 
@@ -498,5 +695,24 @@
 
   .seat-bar {
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .plan-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-height: 76px;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .plan-option:hover,
+  .plan-option.active {
+    border-color: rgba(240, 165, 0, 0.55);
+    background: rgba(240, 165, 0, 0.1);
   }
 </style>
