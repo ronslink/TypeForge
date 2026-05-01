@@ -48,7 +48,9 @@ const authGuard: Handle = async ({ event, resolve }) => {
     '/languages',
     '/typing-guide',
     '/privacy-policy',
-    '/terms-of-service'
+    '/terms-of-service',
+    '/sitemap.xml',
+    '/robots.txt'
   ];
   const softAuthPages = ['/learn', '/progress', '/practice', '/sign-in', '/sign-up'];
 
