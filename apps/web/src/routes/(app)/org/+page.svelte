@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
@@ -42,7 +43,10 @@
     const orgsRes = await api.api.v1.organisations.$get();
     if (!orgsRes.ok) throw new Error('Failed to load organizations');
     const { organisations } = await orgsRes.json();
-    if (!organisations || organisations.length === 0) return;
+    if (!organisations || organisations.length === 0) {
+      goto('/onboarding/school');
+      return;
+    }
 
     orgId = organisations[0].org.id;
     organizationData = organisations[0].org;
@@ -130,14 +134,6 @@
   </div>
 {:else if error}
   <div class="text-error bg-error-container/20 p-4 border border-error-container rounded">{error}</div>
-{:else if !organizationData}
-  <div class="bg-surface-container-low border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-12 min-h-[300px] mt-8 rounded-lg">
-    <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-4">group_off</span>
-    <h2 class="font-headline text-xl mb-2">{$t('org_no_org')}</h2>
-    <p class="font-body text-sm text-on-surface-variant max-w-sm text-center">
-      You are not currently a member of any organization.
-    </p>
-  </div>
 {:else}
   <div class="dashboard-root px-6 py-8 max-w-screen-xl mx-auto space-y-8">
 

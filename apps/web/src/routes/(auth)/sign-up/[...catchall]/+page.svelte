@@ -1,5 +1,13 @@
 <script lang="ts">
   import { SignUp } from 'svelte-clerk';
+  import { page } from '$app/state';
+
+  let plan = $derived(page.url.searchParams.get('plan'));
+  let redirectUrl = $derived(
+    plan && plan.startsWith('school') 
+      ? `/onboarding/school?plan=${plan.split('-')[1] || 90}`
+      : '/learn'
+  );
 </script>
 
 <svelte:head>
@@ -7,7 +15,7 @@
 </svelte:head>
 
 <div class="clerk-container w-full">
-  <SignUp fallbackRedirectUrl="/learn" routing="path" path="/sign-up" />
+  <SignUp fallbackRedirectUrl={redirectUrl} routing="path" path="/sign-up" />
 </div>
 
 <style>

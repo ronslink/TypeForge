@@ -138,6 +138,11 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    fs: {
+      allow: ['messages', '../../packages', '../..'],
+    },
+  },
   optimizeDeps: {
     include: [
       'drizzle-orm',

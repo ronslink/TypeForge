@@ -152,12 +152,20 @@
           <UserButton />
         </div>
       {:else}
-        <a
-          href="/sign-up"
-          class="hidden md:inline-block notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors ml-4 text-center"
-        >
-          {$t('lesson_start_cta')}
-        </a>
+        <div class="hidden md:flex items-center gap-4 ml-4">
+          <a
+            href="/onboarding/school"
+            class="text-sm font-body text-on-surface/70 hover:text-white transition-colors"
+          >
+            For Teachers
+          </a>
+          <a
+            href="/sign-up"
+            class="notched-button bg-primary text-on-primary px-4 py-2 font-label text-sm font-bold hover:bg-primary-fixed-dim transition-colors text-center"
+          >
+            {$t('lesson_start_cta')}
+          </a>
+        </div>
       {/if}
 
       <!-- Mobile hamburger -->

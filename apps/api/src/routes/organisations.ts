@@ -53,46 +53,50 @@ app.get('/', async (c) => {
  * POST /organisations - Create a new organisation
  */
 app.post('/', async (c) => {
-  const auth = getAuth(c)!;
-  const db = getDb(c);
-  
-  const body = await c.req.json();
-  const { name, slug, orgType, countryCode, website } = body;
-  
-  const [org] = await db.insert(organisations).values({
-    name,
-    slug,
-    orgType: orgType ?? 'school',
-    status: 'trial',
-    homeRegion: auth.region,
-    countryCode,
-    website,
-  }).returning();
-  
-  // Add creator as admin
-  await db.insert(orgMembers).values({
-    orgId: org!.id,
-    userId: auth.userId,
-    role: 'admin',
-    status: 'active',
-    joinedAt: new Date(),
-  });
-  
-  // Create default org settings
-  await db.insert(orgSettings).values({
-    orgId: org!.id,
-  });
-  
-  // Initialize org billing record
-  await db.insert(orgBilling).values({
-    orgId: org!.id,
-    seatPriceCents: SEAT_PRICE_CENTS,
-    billingInterval: 'monthly',
-    currentSeatCount: 1, // Creator counts as 1 seat
-    purchasedSeats: 1,
-  });
-  
-  return c.json({ organisation: org }, 201);
+  try {
+    const auth = getAuth(c)!;
+    const db = getDb(c);
+    
+    const body = await c.req.json();
+    const { name, slug, orgType, countryCode, website } = body;
+    
+    const [org] = await db.insert(organisations).values({
+      name,
+      slug,
+      orgType: orgType ?? 'school',
+      status: 'trial',
+      homeRegion: auth.region,
+      countryCode,
+      website,
+    }).returning();
+    
+    // Add creator as admin
+    await db.insert(orgMembers).values({
+      orgId: org!.id,
+      userId: auth.userId,
+      role: 'admin',
+      status: 'active',
+      joinedAt: new Date(),
+    });
+    
+    // Create default org settings
+    await db.insert(orgSettings).values({
+      orgId: org!.id,
+    });
+    
+    // Initialize org billing record
+    await db.insert(orgBilling).values({
+      orgId: org!.id,
+      seatPriceCents: SEAT_PRICE_CENTS,
+      billingInterval: 'monthly',
+      currentSeatCount: 1, // Creator counts as 1 seat
+      purchasedSeats: 1,
+    });
+    
+    return c.json({ organisation: org }, 201);
+  } catch (err: any) {
+    return c.json({ error: err.message, stack: err.stack }, 500);
+  }
 });
 
 /**
