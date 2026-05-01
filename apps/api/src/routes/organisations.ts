@@ -5,8 +5,8 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
-import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks } from '@typeforge/db';
-import { eq, and, or, sql, inArray } from 'drizzle-orm';
+import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks, typingSessions, keyMastery } from '@typeforge/db';
+import { eq, and, or, sql, inArray, desc } from 'drizzle-orm';
 import Stripe from 'stripe';
 
 const app = new Hono();
@@ -362,6 +362,135 @@ app.get('/:id/members', async (c) => {
   });
   
   return c.json({ members });
+});
+
+/**
+ * GET /organisations/:id/members/:userId/performance - Student drill-down
+ */
+app.get('/:id/members/:userId/performance', async (c) => {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const orgId = c.req.param('id') as string;
+  const targetUserId = c.req.param('userId') as string;
+
+  const [requesterMembership] = await db
+    .select({ role: orgMembers.role, status: orgMembers.status })
+    .from(orgMembers)
+    .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, auth.userId)))
+    .limit(1);
+
+  if (!requesterMembership || requesterMembership.status !== 'active') {
+    return c.json({ error: 'Access denied', code: 'FORBIDDEN' }, 403);
+  }
+
+  if (!ORG_MANAGER_ROLES.includes(requesterMembership.role as (typeof ORG_MANAGER_ROLES)[number])) {
+    return c.json({ error: 'Insufficient organisation permissions', code: 'FORBIDDEN' }, 403);
+  }
+
+  const [student] = await db
+    .select({
+      id: users.id,
+      name: users.displayName,
+      firstName: users.firstName,
+      email: users.email,
+      lastActive: users.lastActiveAt,
+      memberStatus: orgMembers.status,
+      role: orgMembers.role,
+    })
+    .from(orgMembers)
+    .innerJoin(users, eq(orgMembers.userId, users.id))
+    .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, targetUserId)))
+    .limit(1);
+
+  if (!student) {
+    return c.json({ error: 'Student not found in organisation', code: 'NOT_FOUND' }, 404);
+  }
+
+  if (student.role !== 'student') {
+    return c.json({ error: 'Performance drill-down is only available for students', code: 'NOT_STUDENT' }, 400);
+  }
+
+  const [summary] = await db
+    .select({
+      sessions: sql<number>`COUNT(*)`,
+      avgWpm: sql<number>`AVG(${typingSessions.wpm})`,
+      avgAccuracy: sql<number>`AVG(${typingSessions.accuracy})`,
+      bestWpm: sql<number>`MAX(${typingSessions.wpm})`,
+      totalMinutes: sql<number>`SUM(COALESCE(${typingSessions.durationSeconds}, 0)) / 60`,
+      totalErrors: sql<number>`SUM(${typingSessions.errors})`,
+    })
+    .from(typingSessions)
+    .where(and(eq(typingSessions.userId, targetUserId), eq(typingSessions.status, 'completed')));
+
+  const recentSessions = await db
+    .select({
+      id: typingSessions.id,
+      lessonId: typingSessions.lessonId,
+      languageCode: typingSessions.languageCode,
+      layoutId: typingSessions.layoutId,
+      completedAt: typingSessions.completedAt,
+      durationSeconds: typingSessions.durationSeconds,
+      wpm: typingSessions.wpm,
+      accuracy: typingSessions.accuracy,
+      errors: typingSessions.errors,
+      consistency: typingSessions.consistency,
+    })
+    .from(typingSessions)
+    .where(and(eq(typingSessions.userId, targetUserId), eq(typingSessions.status, 'completed')))
+    .orderBy(desc(typingSessions.completedAt))
+    .limit(12);
+
+  const trendRows = await db
+    .select({
+      date: dailyStats.date,
+      languageCode: dailyStats.languageCode,
+      totalSessions: dailyStats.totalSessions,
+      totalMinutes: dailyStats.totalMinutes,
+      avgWpm: dailyStats.avgWpm,
+      avgAccuracy: dailyStats.avgAccuracy,
+      bestWpm: dailyStats.bestWpm,
+      lessonsCompleted: dailyStats.lessonsCompleted,
+    })
+    .from(dailyStats)
+    .where(eq(dailyStats.userId, targetUserId))
+    .orderBy(desc(dailyStats.date))
+    .limit(14);
+
+  const weakKeys = await db
+    .select({
+      key: keyMastery.key,
+      layoutId: keyMastery.layoutId,
+      masteryLevel: keyMastery.masteryLevel,
+      totalAttempts: keyMastery.totalAttempts,
+      correctAttempts: keyMastery.correctAttempts,
+      avgDwellTime: keyMastery.avgDwellTime,
+      lastPracticedAt: keyMastery.lastPracticedAt,
+    })
+    .from(keyMastery)
+    .where(eq(keyMastery.userId, targetUserId))
+    .orderBy(keyMastery.masteryLevel)
+    .limit(10);
+
+  return c.json({
+    student: {
+      id: student.id,
+      name: student.name || student.firstName || student.email?.split('@')[0] || 'Unknown',
+      email: student.email,
+      status: student.memberStatus,
+      lastActive: student.lastActive,
+    },
+    summary: {
+      sessions: Number(summary?.sessions || 0),
+      avgWpm: Math.round(Number(summary?.avgWpm || 0)),
+      avgAccuracy: Math.round(Number(summary?.avgAccuracy || 0)),
+      bestWpm: Math.round(Number(summary?.bestWpm || 0)),
+      totalMinutes: Math.round(Number(summary?.totalMinutes || 0)),
+      totalErrors: Number(summary?.totalErrors || 0),
+    },
+    recentSessions,
+    trend: trendRows.reverse(),
+    weakKeys,
+  });
 });
 
 /**

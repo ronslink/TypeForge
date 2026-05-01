@@ -70,7 +70,12 @@
 {:else if bestSession.wpm < 60 || !isSignedIn}
   <div class="min-h-screen flex items-center justify-center p-6">
     <div class="max-w-md bg-surface-container p-8 rounded border border-outline-variant/30 text-center">
-      <span class="material-symbols-outlined text-error text-5xl mb-4">lock</span>
+      <span class="inline-flex w-12 h-12 text-error mb-4 mx-auto" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="10" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </span>
       <h1 class="font-headline text-2xl mb-2">{$t('cert_locked_title')}</h1>
       <p class="text-on-surface-variant text-sm mb-6">
         {@html $t('cert_locked_desc')}
@@ -87,7 +92,13 @@
       {$t('cert_back')}
     </a>
     <button onclick={handlePrint} class="notched-button bg-primary text-background px-4 py-2 font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
-      <span class="material-symbols-outlined text-[18px]">print</span>
+      <span class="inline-flex w-4 h-4" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </svg>
+      </span>
       {$t('cert_print')}
     </button>
     <a 

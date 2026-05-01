@@ -17,6 +17,8 @@
   <button
     class="flex items-center gap-2 text-primary focus:outline-none"
     onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+    aria-label={mobileMenuOpen ? `Close ${title}` : `Open ${title}`}
+    aria-expanded={mobileMenuOpen}
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -49,6 +51,7 @@
     <button
       class="text-on-surface-variant hover:text-primary transition-colors focus:outline-none"
       onclick={() => (mobileMenuOpen = false)}
+      aria-label={`Close ${title}`}
     >
       <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="4" y1="4" x2="16" y2="16" /><line x1="16" y1="4" x2="4" y2="16" />

@@ -16,7 +16,7 @@
       reqAcc: 95,
       color: 'border-secondary text-secondary',
       bg: 'bg-secondary/10',
-      icon: 'school',
+      icon: 'book',
       description: 'Solid foundation'
     },
     {
@@ -26,7 +26,7 @@
       reqAcc: 95,
       color: 'border-primary text-primary',
       bg: 'bg-primary/10',
-      icon: 'workspace_premium',
+      icon: 'award',
       description: 'Professional grade'
     },
     {
@@ -36,7 +36,7 @@
       reqAcc: 98,
       color: 'border-tertiary text-tertiary',
       bg: 'bg-tertiary/10',
-      icon: 'local_fire_department',
+      icon: 'flame',
       description: 'Elite typist'
     }
   ];
@@ -71,7 +71,23 @@
       {@const unlocked = isUnlocked(m.reqWpm, m.reqAcc)}
       <div class="badge-card border {unlocked ? m.color : 'border-outline-variant/30 opacity-60 grayscale'} {unlocked ? m.bg : 'bg-surface-container'}">
         <div class="mb-4">
-          <span class="material-symbols-outlined text-4xl mb-2 {unlocked ? m.color : 'text-on-surface-variant'}">{m.icon}</span>
+          <span class="milestone-icon mb-2 {unlocked ? m.color : 'text-on-surface-variant'}" aria-hidden="true">
+            {#if m.icon === 'book'}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" />
+              </svg>
+            {:else if m.icon === 'award'}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.5 13 17 22l-5-3-5 3 1.5-9" />
+              </svg>
+            {:else}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 14.5A4.5 4.5 0 0 0 12 22a4.5 4.5 0 0 0 4.5-7.5c-1.5-2-1.25-4.25-.5-6.5-2.5 1.25-4.5 3.5-4 7-1.5-1-2.5-2.5-2.5-5-1.5 1.5-2.5 3-1 5z" />
+              </svg>
+            {/if}
+          </span>
           <h4 class="font-headline text-lg {unlocked ? 'text-on-surface' : 'text-on-surface-variant'}">{m.name}</h4>
           <p class="text-xs font-label uppercase tracking-widest {unlocked ? 'text-on-surface-variant' : 'text-on-surface-variant/50'}">{m.description}</p>
         </div>
@@ -87,7 +103,12 @@
         </div>
         {#if !unlocked}
           <div class="absolute inset-0 bg-background/40 backdrop-blur-[1px] flex items-center justify-center rounded transition-opacity duration-300">
-            <span class="material-symbols-outlined text-on-surface-variant/80 text-3xl">lock</span>
+            <span class="lock-icon text-on-surface-variant/80" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
           </div>
         {/if}
       </div>
@@ -114,5 +135,24 @@
   }
   .notched-button {
     clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .milestone-icon,
+  .lock-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .milestone-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .lock-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  .milestone-icon svg,
+  .lock-icon svg {
+    width: 100%;
+    height: 100%;
   }
 </style>
