@@ -286,7 +286,7 @@
 <nav class="fixed inset-block-start-0 w-full z-50 glass-panel border-b border-outline-variant/10">
   <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
     <div class="flex items-center gap-8">
-      <span class="text-xl font-black tracking-tighter text-primary-container uppercase font-label">TYPINGSCHOLAR</span>
+      <span class="text-xl font-black tracking-tighter text-primary-container font-label">TypingScholar</span>
       <div class="hidden md:flex gap-6 items-center">
         <a href="#features" class="text-primary border-b-2 border-primary pb-1 font-body text-sm">{$t('mkt_features') || 'Features'}</a>
         <a href="#languages" class="text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">{$t('mkt_languages') || 'Languages'}</a>
@@ -706,7 +706,7 @@
 <footer class="bg-surface-container-lowest border-t border-outline-variant/10">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 md:px-8 py-12 max-w-screen-2xl mx-auto">
     <div>
-      <span class="text-lg font-bold text-primary-container font-label">TYPINGSCHOLAR</span>
+      <span class="text-lg font-bold text-primary-container font-label">TypingScholar</span>
       <p class="mt-4 text-xs text-on-surface/50 leading-relaxed font-body">{$t('mkt_footer_desc')}</p>
     </div>
     <div class="flex flex-col gap-3">

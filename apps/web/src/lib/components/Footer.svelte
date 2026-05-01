@@ -41,10 +41,10 @@
       <div class="col-span-2 md:col-span-1">
         <a
           href="/"
-          class="text-xl font-black tracking-tighter text-primary uppercase font-label block mb-4"
+          class="text-xl font-black tracking-tighter text-primary font-label block mb-4"
           aria-label="TypingScholar Home"
         >
-          TYPINGSCHOLAR
+          TypingScholar
         </a>
         <p class="text-on-surface-variant text-sm font-body leading-relaxed max-w-[220px]">
           {$t('footer_tagline') || 'Forge your keystrokes. Master your craft.'}
