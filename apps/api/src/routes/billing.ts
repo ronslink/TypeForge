@@ -5,8 +5,8 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
-import { subscriptions, plans, invoices, planPrices, users } from '@typeforge/db';
-import { eq } from 'drizzle-orm';
+import { subscriptions, plans, invoices, planPrices, users, orgBilling } from '@typeforge/db';
+import { and, eq } from 'drizzle-orm';
 import Stripe from 'stripe';
 
 const app = new Hono();
@@ -32,6 +32,139 @@ function getStripe(): Stripe {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
   return new Stripe(secretKey, { apiVersion: '2023-10-16' });
+}
+
+function getEntityTypeFromMetadata(metadata: Stripe.Metadata | null | undefined): 'user' | 'organisation' {
+  return metadata?.orgId ? 'organisation' : 'user';
+}
+
+async function resolvePlanId(
+  db: any,
+  priceId: string | undefined,
+  entityType: 'user' | 'organisation',
+  interval: 'monthly' | 'annual' = 'monthly'
+): Promise<string> {
+  if (priceId) {
+    const [price] = await db
+      .select({ planId: planPrices.planId })
+      .from(planPrices)
+      .where(eq(planPrices.stripePriceId, priceId))
+      .limit(1) as unknown as { planId: string }[];
+
+    if (price?.planId) return price.planId;
+  }
+
+  const fallbackSlug = entityType === 'organisation' ? 'org-seats' : 'individual';
+  const fallbackPlanType = entityType === 'organisation' ? 'org_seat' : 'individual';
+
+  const [existingPlan] = await db
+    .select({ id: plans.id })
+    .from(plans)
+    .where(eq(plans.slug, fallbackSlug))
+    .limit(1) as unknown as { id: string }[];
+
+  if (existingPlan?.id) return existingPlan.id;
+
+  const createdPlans = await db
+    .insert(plans)
+    .values({
+      name: entityType === 'organisation' ? 'Organisation Seats' : 'Individual',
+      slug: fallbackSlug,
+      planType: fallbackPlanType,
+      interval,
+      priceUsdCents: entityType === 'organisation' ? 600 : 900,
+      priceEurCents: entityType === 'organisation' ? 600 : 900,
+      includedSeats: entityType === 'organisation' ? 1 : null,
+      features: {},
+      isPublic: false,
+      displayOrder: 999,
+    })
+    .onConflictDoUpdate({
+      target: plans.slug,
+      set: { updatedAt: new Date() },
+    })
+    .returning({ id: plans.id }) as unknown as { id: string }[];
+
+  return createdPlans[0]!.id;
+}
+
+async function upsertSubscriptionFromStripe(subscription: Stripe.Subscription, db: any): Promise<void> {
+  const userId = subscription.metadata?.userId;
+  const orgId = subscription.metadata?.orgId;
+  const entityId = userId || orgId;
+
+  if (!entityId) {
+    console.warn('Subscription missing entity ID in metadata');
+    return;
+  }
+
+  const entityType = getEntityTypeFromMetadata(subscription.metadata);
+  const status = mapStripeStatus(subscription.status);
+  const currentPeriodStart = new Date(subscription.current_period_start * 1000);
+  const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
+  const priceId = subscription.items.data[0]?.price.id;
+  const planId = await resolvePlanId(db, priceId, entityType);
+  const cancelAt = subscription.cancel_at_period_end ? currentPeriodEnd : null;
+
+  const [existingByStripeId] = await db
+    .select({ id: subscriptions.id })
+    .from(subscriptions)
+    .where(eq(subscriptions.stripeSubscriptionId, subscription.id))
+    .limit(1) as unknown as { id: string }[];
+
+  const [existingByEntity] = existingByStripeId?.id
+    ? []
+    : await db
+        .select({ id: subscriptions.id })
+        .from(subscriptions)
+        .where(and(eq(subscriptions.entityType, entityType), eq(subscriptions.entityId, entityId)))
+        .limit(1) as unknown as { id: string }[];
+
+  const existing = existingByStripeId || existingByEntity;
+
+  if (existing?.id) {
+    await db
+      .update(subscriptions)
+      .set({
+        planId,
+        status,
+        currentPeriodStart,
+        currentPeriodEnd,
+        cancelAt,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, existing.id));
+  } else {
+    await db
+      .insert(subscriptions)
+      .values({
+        entityType,
+        entityId,
+        planId,
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: subscription.customer as string,
+        status,
+        currentPeriodStart,
+        currentPeriodEnd,
+        cancelAt,
+      })
+      .returning();
+  }
+
+  if (orgId) {
+    const seatCount = Number(subscription.metadata?.seatCount || subscription.items.data[0]?.quantity || 1);
+    const cooldownDays = Number(subscription.metadata?.cooldownDays || 180);
+    await db
+      .update(orgBilling)
+      .set({
+        stripeSubscriptionId: subscription.id,
+        purchasedSeats: seatCount,
+        pendingSeatCount: null,
+        seatCooldownDays: cooldownDays,
+        updatedAt: new Date(),
+      })
+      .where(eq(orgBilling.orgId, orgId));
+  }
 }
 
 /**
@@ -207,7 +340,13 @@ app.get('/invoices', requireAuth, async (c) => {
     .where(eq(invoices.entityId, auth.userId))
     .orderBy(invoices.createdAt);
   
-  return c.json({ invoices: invoiceList });
+  return c.json({
+    invoices: invoiceList.map((invoice: any) => ({
+      ...invoice,
+      amount: invoice.totalCents,
+      pdfUrl: invoice.invoicePdfUrl,
+    })),
+  });
 });
 
 /**
@@ -282,66 +421,9 @@ async function handleSubscriptionUpdate(
   subscription: Stripe.Subscription,
   db: any
 ): Promise<void> {
-  const userId = subscription.metadata?.userId;
-  const orgId = subscription.metadata?.orgId;
-  const entityId = userId || orgId;
+  await upsertSubscriptionFromStripe(subscription, db);
   
-  if (!entityId) {
-    console.warn('Subscription missing entity ID in metadata');
-    return;
-  }
-  
-  const status = mapStripeStatus(subscription.status);
-  const currentPeriodStart = new Date(subscription.current_period_start * 1000);
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
-  
-  // Check if subscription exists
-  const existing = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.stripeSubscriptionId, subscription.id))
-    .limit(1) as unknown as { id: string }[];
-  
-  if (existing.length > 0) {
-    // Update existing subscription
-    await db
-      .update(subscriptions)
-      .set({
-        status,
-        currentPeriodStart,
-        currentPeriodEnd,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        updatedAt: new Date(),
-      })
-      .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
-  } else {
-    // Get plan ID from price ID
-    const priceId = subscription.items.data[0]?.price.id;
-    const planPrice = await db
-      .select({ planId: planPrices.planId })
-      .from(planPrices)
-      .where(eq(planPrices.stripePriceId, priceId || ''))
-      .limit(1) as unknown as { planId: string }[];
-    
-    const planId = planPrice[0]?.planId || 'individual';
-    
-    // Create new subscription record
-    await db
-      .insert(subscriptions)
-      .values({
-        entityId,
-        planId,
-        stripeSubscriptionId: subscription.id,
-        stripeCustomerId: subscription.customer as string,
-        status,
-        currentPeriodStart,
-        currentPeriodEnd,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      })
-      .returning();
-  }
-  
-  console.log(`[Billing] Subscription ${subscription.id} updated: ${status}`);
+  console.log(`[Billing] Subscription ${subscription.id} updated: ${subscription.status}`);
 }
 
 /**
@@ -355,7 +437,7 @@ async function handleSubscriptionDeletion(
     .update(subscriptions)
     .set({
       status: 'cancelled',
-      cancelAtPeriodEnd: true,
+      cancelledAt: new Date(),
       updatedAt: new Date(),
     })
     .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
@@ -375,43 +457,15 @@ async function handleCheckoutCompleted(
     return;
   }
   
-  const userId = session.metadata?.userId;
-  const orgId = session.metadata?.orgId;
-  const entityId = userId || orgId;
-  
-  if (!entityId || !session.subscription) {
+  if (!session.subscription) {
     return;
   }
   
   // Fetch the subscription details
   const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+  await upsertSubscriptionFromStripe(subscription, db);
   
-  // Get plan ID from price ID
-  const priceId = subscription.items.data[0]?.price.id;
-  const planPrice = await db
-    .select({ planId: planPrices.planId })
-    .from(planPrices)
-    .where(eq(planPrices.stripePriceId, priceId || ''))
-    .limit(1) as unknown as { planId: string }[];
-  
-  const planId = planPrice[0]?.planId || 'individual';
-  
-  // Create subscription record
-  await db
-    .insert(subscriptions)
-    .values({
-      entityId,
-      planId,
-      stripeSubscriptionId: subscription.id,
-      stripeCustomerId: session.customer as string,
-      status: 'active',
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    })
-    .returning();
-  
-  console.log(`[Billing] Checkout completed for ${entityId}, subscription ${subscription.id}`);
+  console.log(`[Billing] Checkout completed for subscription ${subscription.id}`);
 }
 
 /**
@@ -427,10 +481,14 @@ async function handleInvoicePaid(
   
   // Find the subscription
   const subRecord = await db
-    .select({ entityId: subscriptions.entityId })
+    .select({
+      id: subscriptions.id,
+      entityId: subscriptions.entityId,
+      entityType: subscriptions.entityType,
+    })
     .from(subscriptions)
     .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription as string))
-    .limit(1) as unknown as { entityId: string }[];
+    .limit(1) as unknown as { id: string; entityId: string; entityType: 'user' | 'organisation' }[];
   
   if (subRecord.length === 0) {
     return;
@@ -441,14 +499,35 @@ async function handleInvoicePaid(
     .insert(invoices)
     .values({
       entityId: subRecord[0]!.entityId,
+      entityType: subRecord[0]!.entityType,
+      subscriptionId: subRecord[0]!.id,
       stripeInvoiceId: invoice.id,
-      amount: invoice.amount_due,
       currency: invoice.currency,
       status: 'paid',
+      subtotalCents: invoice.subtotal || 0,
+      taxCents: invoice.tax || 0,
+      totalCents: invoice.total || invoice.amount_due || 0,
+      amountPaidCents: invoice.amount_paid || 0,
+      amountDueCents: invoice.amount_due || 0,
       paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions!.paid_at * 1000) : new Date(),
-      pdfUrl: invoice.invoice_pdf,
+      invoicePdfUrl: invoice.invoice_pdf,
+      invoiceNumber: invoice.number,
       periodStart: invoice.period_start ? new Date(invoice.period_start * 1000) : null,
       periodEnd: invoice.period_end ? new Date(invoice.period_end * 1000) : null,
+      dueDate: invoice.due_date ? new Date(invoice.due_date * 1000) : null,
+    })
+    .onConflictDoUpdate({
+      target: invoices.stripeInvoiceId,
+      set: {
+        status: 'paid',
+        subtotalCents: invoice.subtotal || 0,
+        taxCents: invoice.tax || 0,
+        totalCents: invoice.total || invoice.amount_due || 0,
+        amountPaidCents: invoice.amount_paid || 0,
+        amountDueCents: invoice.amount_due || 0,
+        invoicePdfUrl: invoice.invoice_pdf,
+        paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions!.paid_at * 1000) : new Date(),
+      },
     })
     .returning();
   

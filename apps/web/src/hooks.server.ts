@@ -21,10 +21,32 @@ const clerkHandler: Handle = async ({ event, resolve }) => {
   return clerkForApp({ event, resolve });
 };
 
+function requireEnv(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}
+
+function assertProductionClerkKeys(publishableKey: string, secretKey: string) {
+  const isProduction = privateEnv.VERCEL_ENV === 'production' || privateEnv.NODE_ENV === 'production';
+
+  if (!isProduction) return;
+
+  if (publishableKey.startsWith('pk_test_') || secretKey.startsWith('sk_test_')) {
+    throw new Error('Production is configured with Clerk test keys. Update Vercel to use live Clerk keys.');
+  }
+}
+
 const clerkForApp: Handle = async ({ event, resolve }) => {
+  const publishableKey = requireEnv('PUBLIC_CLERK_PUBLISHABLE_KEY', publicEnv.PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const secretKey = requireEnv('CLERK_SECRET_KEY', privateEnv.CLERK_SECRET_KEY);
+  assertProductionClerkKeys(publishableKey, secretKey);
+
   return withClerkHandler({
-    publishableKey: publicEnv.PUBLIC_CLERK_PUBLISHABLE_KEY || privateEnv.VITE_CLERK_PUBLISHABLE_KEY || privateEnv.CLERK_PUBLISHABLE_KEY,
-    secretKey: privateEnv.CLERK_SECRET_KEY,
+    publishableKey,
+    secretKey,
     signInUrl: '/sign-in',
     signUpUrl: '/sign-up',
   })({ event, resolve });

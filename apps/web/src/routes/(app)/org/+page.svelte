@@ -19,6 +19,9 @@
   let orgId = $state<string | null>(null);
   let api = $state<any>(null);
   let removingUserId = $state<string | null>(null);
+  let additionalSeats = $state(5);
+  let isBuyingSeats = $state(false);
+  let seatPurchaseError = $state<string | null>(null);
 
   onMount(async () => {
     if (!isSignedIn) { loading = false; return; }
@@ -112,8 +115,11 @@
   });
 
   let seatUsagePct = $derived(
-    seatData?.purchased > 0 ? Math.round((seatData.used / seatData.purchased) * 100) : 0
+    seatData?.purchased > 0 ? Math.round((seatData.activeMembers / seatData.purchased) * 100) : 0
   );
+
+  let availableSeats = $derived(seatData ? Math.max(0, seatData.available ?? seatData.purchased - seatData.activeMembers) : 0);
+  let monthlySeatCost = $derived(seatData ? additionalSeats * seatData.pricePerSeat : 0);
 
   let topPerformers = $derived(
     [...membersList].sort((a, b) => b.wpm - a.wpm).slice(0, 3)
@@ -122,6 +128,45 @@
   let atRiskStudents = $derived(
     membersList.filter(m => m.status === 'struggling')
   );
+
+  async function handleBuySeats() {
+    if (!orgId || !api || additionalSeats < 1) return;
+    isBuyingSeats = true;
+    seatPurchaseError = null;
+    try {
+      const endpoint = seatData?.hasActiveSubscription
+        ? api.api.v1.organisations[":id"].billing.seats.upgrade
+        : api.api.v1.organisations[":id"].billing.seats;
+      const res = seatData?.hasActiveSubscription
+        ? await endpoint.$post({
+            param: { id: orgId },
+            json: { additionalSeats }
+          })
+        : await endpoint.$post({
+            param: { id: orgId },
+            json: {
+              seatCount: (seatData?.purchased ?? 0) + additionalSeats,
+              cooldownDays: seatData?.seatCooldownDays === 90 ? 90 : 180,
+              successUrl: `${window.location.origin}/org/success?orgId=${orgId}&session_id={CHECKOUT_SESSION_ID}`,
+              cancelUrl: `${window.location.origin}/org`
+            }
+          });
+
+      const body = await res.json();
+      if (!res.ok) {
+        throw new Error(body?.error || 'Failed to update seats');
+      }
+      if (body?.checkoutUrl) {
+        window.location.href = body.checkoutUrl;
+        return;
+      }
+      await loadData();
+    } catch (e: any) {
+      seatPurchaseError = e.message || 'Failed to update seats';
+    } finally {
+      isBuyingSeats = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -162,8 +207,8 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
             <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('org_seat_quota')}</span>
-            <span class="font-mono text-sm font-bold {seatData.used >= seatData.purchased ? 'text-error' : 'text-primary'}">
-              {seatData.used} / {seatData.purchased} seats used
+            <span class="font-mono text-sm font-bold {seatData.activeMembers >= seatData.purchased ? 'text-error' : 'text-primary'}">
+              {seatData.activeMembers} / {seatData.purchased} seats used
             </span>
           </div>
           <div class="flex items-center gap-2 text-xs text-on-surface-variant">
@@ -177,11 +222,54 @@
             style="width: {Math.min(seatUsagePct, 100)}%"
           ></div>
         </div>
-        {#if seatData.used >= seatData.purchased}
+        {#if seatData.activeMembers >= seatData.purchased}
           <p class="text-error text-xs mt-2 font-label">All seats are in use. Remove a student or purchase more seats to invite new ones.</p>
         {:else}
-          <p class="text-on-surface-variant text-xs mt-2">{seatData.purchased - seatData.used} seat{seatData.purchased - seatData.used !== 1 ? 's' : ''} available</p>
+          <p class="text-on-surface-variant text-xs mt-2">{availableSeats} seat{availableSeats !== 1 ? 's' : ''} available</p>
         {/if}
+      </div>
+    {/if}
+
+    {#if seatData}
+      <div class="bg-surface-container-low border border-outline-variant/20 p-6 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-2">Institution Seats & Billing</h2>
+          <p class="font-body text-sm text-on-surface-variant">
+            Manage paid student capacity for {organizationData.name}. Added seats are billed at ${seatData.pricePerSeat}/seat/month.
+          </p>
+          {#if seatPurchaseError}
+            <p class="text-error text-sm mt-3 font-body">{seatPurchaseError}</p>
+          {/if}
+        </div>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <label for="additional-seats" class="sr-only">Additional seats</label>
+          <div class="flex items-center bg-surface-container border border-outline-variant/30">
+            <button
+              onclick={() => { if (additionalSeats > 1) additionalSeats--; }}
+              class="w-10 h-10 font-label text-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+              aria-label="Decrease seats"
+            >−</button>
+            <input
+              id="additional-seats"
+              type="number"
+              min="1"
+              bind:value={additionalSeats}
+              class="w-20 h-10 bg-transparent text-center font-mono text-sm text-on-surface border-x border-outline-variant/20 focus:outline-none"
+            />
+            <button
+              onclick={() => additionalSeats++}
+              class="w-10 h-10 font-label text-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+              aria-label="Increase seats"
+            >+</button>
+          </div>
+          <button
+            onclick={handleBuySeats}
+            disabled={isBuyingSeats || additionalSeats < 1}
+            class="notched-button bg-primary text-on-primary font-label font-bold text-sm px-6 py-3 hover:bg-primary-fixed-dim transition-colors disabled:opacity-50 disabled:cursor-wait"
+          >
+            {isBuyingSeats ? 'Updating...' : `Add ${additionalSeats} seats - $${monthlySeatCost}/mo`}
+          </button>
+        </div>
       </div>
     {/if}
 

@@ -56,24 +56,29 @@
       };
       const api = createApiClient('/', authFetch);
 
-      // Step 1: Create organisation
-      const orgRes = await api.api.v1.organisations.$post({
-        json: {
-          name: schoolName.trim(),
-          slug: schoolName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-          orgType: 'school',
-          countryCode: countryCode || undefined,
-          website: website || undefined,
+      const existingOrgsRes = await api.api.v1.organisations.$get();
+      const existingOrgsBody = existingOrgsRes.ok ? await existingOrgsRes.json() as any : { organisations: [] };
+      let orgId = existingOrgsBody.organisations?.[0]?.org?.id;
+
+      if (!orgId) {
+        const orgRes = await api.api.v1.organisations.$post({
+          json: {
+            name: schoolName.trim(),
+            slug: schoolName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+            orgType: 'school',
+            countryCode: countryCode.trim().slice(0, 2).toUpperCase() || undefined,
+            website: website || undefined,
+          }
+        });
+
+        if (!orgRes.ok) {
+          const body = await orgRes.json() as any;
+          throw new Error(body?.error || 'Failed to create organization');
         }
-      });
 
-      if (!orgRes.ok) {
-        const body = await orgRes.json() as any;
-        throw new Error(body?.error || 'Failed to create organization');
+        const { organisation } = await orgRes.json() as any;
+        orgId = organisation.id;
       }
-
-      const { organisation } = await orgRes.json() as any;
-      const orgId = organisation.id;
 
       // Step 2: Create Stripe checkout for seats
       const billingRes = await api.api.v1.organisations[':id'].billing.seats.$post({

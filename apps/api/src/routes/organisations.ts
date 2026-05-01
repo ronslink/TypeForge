@@ -4,7 +4,7 @@
  */
 
 import { Hono } from 'hono';
-import { requireAuth, requireRole, getAuth, getDb } from '../middleware/index.js';
+import { requireAuth, getAuth, getDb } from '../middleware/index.js';
 import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks } from '@typeforge/db';
 import { eq, and, or, sql, inArray } from 'drizzle-orm';
 import Stripe from 'stripe';
@@ -14,6 +14,7 @@ const app = new Hono();
 // Org seat pricing: $6/seat/month (in cents)
 const SEAT_PRICE_CENTS = 600;
 const SEAT_PRICE_ID = process.env.STRIPE_SEAT_PRICE_ID || 'price_seat_placeholder';
+const ORG_MANAGER_ROLES = ['admin', 'teacher'] as const;
 
 // All org routes require authentication
 app.use('*', requireAuth);
@@ -27,6 +28,42 @@ function getStripe(): Stripe {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
   return new Stripe(secretKey, { apiVersion: '2023-10-16' });
+}
+
+async function getOrgMembership(db: any, orgId: string, userId: string) {
+  const [membership] = await db
+    .select({ role: orgMembers.role, status: orgMembers.status })
+    .from(orgMembers)
+    .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, userId)))
+    .limit(1);
+
+  return membership;
+}
+
+async function markUserAsInstitutional(db: any, userId: string, role: 'org_admin' | 'teacher' = 'org_admin') {
+  await db
+    .update(users)
+    .set({
+      accountType: 'institutional',
+      role,
+      status: 'active',
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
+}
+
+async function requireOrgManager(c: any, orgId: string) {
+  const auth = getAuth(c)!;
+  const db = getDb(c);
+  const membership = await getOrgMembership(db, orgId, auth.userId);
+
+  if (!membership || membership.status !== 'active' || !ORG_MANAGER_ROLES.includes(membership.role)) {
+    return c.json({ error: 'Insufficient organisation permissions', code: 'FORBIDDEN' }, 403);
+  }
+
+  await markUserAsInstitutional(db, auth.userId, membership.role === 'admin' ? 'org_admin' : 'teacher');
+
+  return null;
 }
 
 /**
@@ -78,6 +115,8 @@ app.post('/', async (c) => {
       status: 'active',
       joinedAt: new Date(),
     });
+
+    await markUserAsInstitutional(db, auth.userId, 'org_admin');
     
     // Create default org settings
     await db.insert(orgSettings).values({
@@ -371,11 +410,12 @@ app.post('/:id/invite', async (c) => {
 /**
  * POST /organisations/:id/billing/seats - Create Stripe subscription for org seat licensing
  */
-app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async (c) => {
+app.post('/:id/billing/seats', async (c) => {
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe();
+  const permissionError = await requireOrgManager(c, orgId);
+  if (permissionError) return permissionError;
   
   const body = await c.req.json();
   const { seatCount, cooldownDays = 180, successUrl, cancelUrl } = body;
@@ -388,38 +428,6 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
     return c.json({ error: 'Cooldown days must be 90 or 180', code: 'INVALID_COOLDOWN' }, 400);
   }
   
-  // Get org details
-  const [org] = await db
-    .select({ name: organisations.name, stripeCustomerId: organisations.stripeCustomerId })
-    .from(organisations)
-    .where(eq(organisations.id, orgId))
-    .limit(1);
-  
-  if (!org) {
-    return c.json({ error: 'Organisation not found', code: 'NOT_FOUND' }, 404);
-  }
-  
-  // Get or create Stripe customer
-  let customerId = org.stripeCustomerId;
-  
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      name: org.name,
-      metadata: {
-        orgId,
-        type: 'organisation',
-      },
-    });
-    customerId = customer.id;
-    
-    // Store customer ID
-    await db
-      .update(organisations)
-      .set({ stripeCustomerId: customerId })
-      .where(eq(organisations.id, orgId));
-  }
-  
-  // Create checkout session for seats
   const priceId = cooldownDays === 90 
     ? (process.env.STRIPE_SEAT_PRICE_ID_90 || 'price_seat_90_placeholder') 
     : (process.env.STRIPE_SEAT_PRICE_ID_180 || 'price_seat_180_placeholder');
@@ -431,13 +439,60 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
     console.warn(`Mock checkout triggered for org plan. No real Stripe price ID configured.`);
     const mockSessionId = `mock_session_${Date.now()}`;
     const url = (successUrl || `${process.env.APP_URL || 'https://typeforge.io'}/org/${orgId}/billing/success?session_id={CHECKOUT_SESSION_ID}`).replace('{CHECKOUT_SESSION_ID}', mockSessionId);
+    await db
+      .update(orgBilling)
+      .set({
+        stripeSubscriptionId: mockSessionId,
+        purchasedSeats: seatCount,
+        pendingSeatCount: null,
+        seatCooldownDays: cooldownDays,
+        seatPriceCents: priceCents,
+        updatedAt: new Date(),
+      })
+      .where(eq(orgBilling.orgId, orgId));
     return c.json({ 
       checkoutUrl: url,
       sessionId: mockSessionId,
+      seatCount,
+      cooldownDays,
+      monthlyCost: (seatCount * priceCents) / 100,
     });
   }
 
   try {
+    const stripe = getStripe();
+
+    // Get org details
+    const [org] = await db
+      .select({ name: organisations.name, stripeCustomerId: organisations.stripeCustomerId })
+      .from(organisations)
+      .where(eq(organisations.id, orgId))
+      .limit(1);
+
+    if (!org) {
+      return c.json({ error: 'Organisation not found', code: 'NOT_FOUND' }, 404);
+    }
+
+    // Get or create Stripe customer
+    let customerId = org.stripeCustomerId;
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        name: org.name,
+        metadata: {
+          orgId,
+          type: 'organisation',
+        },
+      });
+      customerId = customer.id;
+
+      // Store customer ID
+      await db
+        .update(organisations)
+        .set({ stripeCustomerId: customerId })
+        .where(eq(organisations.id, orgId));
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId as string,
       line_items: [
@@ -491,11 +546,12 @@ app.post('/:id/billing/seats', requireRole('org_admin', 'platform_admin'), async
 /**
  * POST /organisations/:id/billing/seats/upgrade - Add seats with prorated billing
  */
-app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'), async (c) => {
+app.post('/:id/billing/seats/upgrade', async (c) => {
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe();
+  const permissionError = await requireOrgManager(c, orgId);
+  if (permissionError) return permissionError;
   
   const body = await c.req.json();
   const { additionalSeats } = body;
@@ -518,8 +574,28 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
   if (!billing?.stripeSubscriptionId) {
     return c.json({ error: 'No active subscription found', code: 'NO_SUBSCRIPTION' }, 404);
   }
+
+  if (billing.stripeSubscriptionId.startsWith('mock_session_')) {
+    const newQuantity = billing.purchasedSeats + additionalSeats;
+    await db
+      .update(orgBilling)
+      .set({
+        purchasedSeats: newQuantity,
+        updatedAt: new Date(),
+      })
+      .where(eq(orgBilling.orgId, orgId));
+
+    return c.json({
+      success: true,
+      previousSeats: billing.purchasedSeats,
+      newSeats: newQuantity,
+      additionalSeats,
+      proratedCharge: false,
+    });
+  }
   
   // Get current subscription
+  const stripe = getStripe();
   const subscription = await stripe.subscriptions.retrieve(billing.stripeSubscriptionId);
   
   // Find the seat item
@@ -563,11 +639,12 @@ app.post('/:id/billing/seats/upgrade', requireRole('org_admin', 'platform_admin'
 /**
  * POST /organisations/:id/billing/seats/downgrade - Remove seats at end of billing period
  */
-app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admin'), async (c) => {
+app.post('/:id/billing/seats/downgrade', async (c) => {
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
-  const stripe = getStripe();
+  const permissionError = await requireOrgManager(c, orgId);
+  if (permissionError) return permissionError;
   
   const body = await c.req.json();
   const { targetSeats } = body;
@@ -590,6 +667,36 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   if (!billing?.stripeSubscriptionId) {
     return c.json({ error: 'No active subscription found', code: 'NO_SUBSCRIPTION' }, 404);
   }
+
+  if (billing.stripeSubscriptionId.startsWith('mock_session_')) {
+    if (targetSeats >= billing.purchasedSeats) {
+      return c.json({ error: 'Target seats must be less than current purchased seats', code: 'INVALID_DOWNGRADE' }, 400);
+    }
+
+    if (targetSeats < billing.currentSeatCount) {
+      return c.json({
+        error: `Cannot reduce to ${targetSeats} seats when ${billing.currentSeatCount} seats are in use`,
+        code: 'SEATS_IN_USE',
+        currentSeatCount: billing.currentSeatCount,
+      }, 400);
+    }
+
+    await db
+      .update(orgBilling)
+      .set({
+        purchasedSeats: targetSeats,
+        updatedAt: new Date(),
+      })
+      .where(eq(orgBilling.orgId, orgId));
+
+    return c.json({
+      success: true,
+      previousSeats: billing.purchasedSeats,
+      newSeats: targetSeats,
+      effectiveAt: 'immediate',
+      nextBillingDate: new Date(),
+    });
+  }
   
   if (targetSeats >= billing.purchasedSeats) {
     return c.json({ error: 'Target seats must be less than current purchased seats', code: 'INVALID_DOWNGRADE' }, 400);
@@ -604,6 +711,7 @@ app.post('/:id/billing/seats/downgrade', requireRole('org_admin', 'platform_admi
   }
   
   // Get current subscription
+  const stripe = getStripe();
   const subscription = await stripe.subscriptions.retrieve(billing.stripeSubscriptionId);
   
   // Find the seat item
@@ -740,10 +848,12 @@ app.get('/:id/seats', async (c) => {
 /**
  * POST /organisations/:id/seats/assign - Assign a seat to a user
  */
-app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => {
+app.post('/:id/seats/assign', async (c) => {
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
+  const permissionError = await requireOrgManager(c, orgId);
+  if (permissionError) return permissionError;
   
   const body = await c.req.json();
   const { userId, role = 'learner' } = body;
@@ -850,11 +960,13 @@ app.post('/:id/seats/assign', requireRole('org_admin', 'teacher'), async (c) => 
 /**
  * DELETE /organisations/:id/seats/:userId - Remove a seat assignment
  */
-app.delete('/:id/seats/:userId', requireRole('org_admin', 'teacher'), async (c) => {
+app.delete('/:id/seats/:userId', async (c) => {
   getAuth(c);
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
   const targetUserId = c.req.param('userId') as string;
+  const permissionError = await requireOrgManager(c, orgId);
+  if (permissionError) return permissionError;
   
   // Get current billing info
   const [billing] = await db
