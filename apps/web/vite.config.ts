@@ -4,6 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [sveltekit()],
+  ssr: {
+    external: ['cloudflare:workers'],
+  },
   resolve: {
     alias: {
       '@': './src',

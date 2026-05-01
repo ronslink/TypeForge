@@ -15,7 +15,7 @@
  * });
  * ```
  */
-import { hc, ExtractSchema, MergeSchemaPath } from 'hono/client';
+import { hc } from 'hono/client';
 import type { Hono } from 'hono';
 
 // ============================================================================

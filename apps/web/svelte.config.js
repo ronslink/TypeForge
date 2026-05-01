@@ -5,7 +5,10 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: adapter({ runtime: 'nodejs20.x' }),
+    adapter: adapter({ 
+      runtime: 'nodejs20.x',
+      external: ['cloudflare:workers'],
+    }),
     alias: {
       '@': './src',
       '@typeforge/db': '../../packages/db',
