@@ -35,7 +35,7 @@
       api = createApiClient('/', authFetch);
       await loadData();
     } catch (e) {
-      error = 'Failed to load organization data';
+      error = $t('org_load_failed');
       console.error(e);
     } finally {
       loading = false;
@@ -44,7 +44,7 @@
 
   async function loadData() {
     const orgsRes = await api.api.v1.organisations.$get();
-    if (!orgsRes.ok) throw new Error('Failed to load organizations');
+    if (!orgsRes.ok) throw new Error($t('org_load_failed'));
     const { organisations } = await orgsRes.json();
     if (!organisations || organisations.length === 0) {
       goto('/onboarding/school');
@@ -88,7 +88,7 @@
     });
     if (!res.ok) {
       const body = await res.json() as any;
-      throw new Error(body?.error || 'Failed to send invite');
+      throw new Error(body?.error || $t('org_invite_failed'));
     }
   }
 
@@ -108,10 +108,12 @@
   }
 
   // Derived analytics
+  let studentMembers = $derived(membersList.filter(m => m.role === 'student'));
+
   let studentsByStatus = $derived({
-    active: membersList.filter(m => m.status === 'active').length,
-    struggling: membersList.filter(m => m.status === 'struggling').length,
-    inactive: membersList.filter(m => m.status === 'inactive').length,
+    active: studentMembers.filter(m => m.status === 'active').length,
+    struggling: studentMembers.filter(m => m.status === 'struggling').length,
+    inactive: studentMembers.filter(m => m.status === 'inactive').length,
   });
 
   let seatUsagePct = $derived(
@@ -122,11 +124,11 @@
   let monthlySeatCost = $derived(seatData ? additionalSeats * seatData.pricePerSeat : 0);
 
   let topPerformers = $derived(
-    [...membersList].sort((a, b) => b.wpm - a.wpm).slice(0, 3)
+    [...studentMembers].sort((a, b) => b.wpm - a.wpm).slice(0, 3)
   );
 
   let atRiskStudents = $derived(
-    membersList.filter(m => m.status === 'struggling')
+    studentMembers.filter(m => m.status === 'struggling')
   );
 
   async function handleBuySeats() {
@@ -154,7 +156,7 @@
 
       const body = await res.json();
       if (!res.ok) {
-        throw new Error(body?.error || 'Failed to update seats');
+        throw new Error(body?.error || $t('org_update_seats_failed'));
       }
       if (body?.checkoutUrl) {
         window.location.href = body.checkoutUrl;
@@ -162,7 +164,7 @@
       }
       await loadData();
     } catch (e: any) {
-      seatPurchaseError = e.message || 'Failed to update seats';
+      seatPurchaseError = e.message || $t('org_update_seats_failed');
     } finally {
       isBuyingSeats = false;
     }
@@ -197,7 +199,7 @@
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
           <line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
         </svg>
-        Invite Student
+        {$t('org_invite_student')}
       </button>
     </div>
 
@@ -208,12 +210,12 @@
           <div class="flex items-center gap-3">
             <span class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('org_seat_quota')}</span>
             <span class="font-mono text-sm font-bold {seatData.activeMembers >= seatData.purchased ? 'text-error' : 'text-primary'}">
-              {seatData.activeMembers} / {seatData.purchased} seats used
+              {$t('org_seats_used', { used: seatData.activeMembers, total: seatData.purchased })}
             </span>
           </div>
           <div class="flex items-center gap-2 text-xs text-on-surface-variant">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-            {seatData.cooldownDays}-day lock per seat
+            {$t('org_lock_per_seat', { days: seatData.cooldownDays })}
           </div>
         </div>
         <div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
@@ -223,9 +225,9 @@
           ></div>
         </div>
         {#if seatData.activeMembers >= seatData.purchased}
-          <p class="text-error text-xs mt-2 font-label">All seats are in use. Remove a student or purchase more seats to invite new ones.</p>
+          <p class="text-error text-xs mt-2 font-label">{$t('org_all_seats_used')}</p>
         {:else}
-          <p class="text-on-surface-variant text-xs mt-2">{availableSeats} seat{availableSeats !== 1 ? 's' : ''} available</p>
+          <p class="text-on-surface-variant text-xs mt-2">{$t('org_seats_available', { count: availableSeats })}</p>
         {/if}
       </div>
     {/if}
@@ -233,22 +235,22 @@
     {#if seatData}
       <div class="bg-surface-container-low border border-outline-variant/20 p-6 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-2">Institution Seats & Billing</h2>
+          <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-2">{$t('org_seats_billing_title')}</h2>
           <p class="font-body text-sm text-on-surface-variant">
-            Manage paid student capacity for {organizationData.name}. Added seats are billed at ${seatData.pricePerSeat}/seat/month.
+            {$t('org_seats_billing_desc', { org: organizationData.name, price: seatData.pricePerSeat })}
           </p>
           {#if seatPurchaseError}
             <p class="text-error text-sm mt-3 font-body">{seatPurchaseError}</p>
           {/if}
         </div>
         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-          <label for="additional-seats" class="sr-only">Additional seats</label>
+          <label for="additional-seats" class="sr-only">{$t('org_additional_seats')}</label>
           <div class="flex items-center bg-surface-container border border-outline-variant/30">
             <button
               onclick={() => { if (additionalSeats > 1) additionalSeats--; }}
               class="w-10 h-10 font-label text-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              aria-label="Decrease seats"
-            >−</button>
+              aria-label={$t('org_decrease_seats')}
+            >-</button>
             <input
               id="additional-seats"
               type="number"
@@ -259,7 +261,7 @@
             <button
               onclick={() => additionalSeats++}
               class="w-10 h-10 font-label text-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              aria-label="Increase seats"
+              aria-label={$t('org_increase_seats')}
             >+</button>
           </div>
           <button
@@ -267,7 +269,7 @@
             disabled={isBuyingSeats || additionalSeats < 1}
             class="notched-button bg-primary text-on-primary font-label font-bold text-sm px-6 py-3 hover:bg-primary-fixed-dim transition-colors disabled:opacity-50 disabled:cursor-wait"
           >
-            {isBuyingSeats ? 'Updating...' : `Add ${additionalSeats} seats - $${monthlySeatCost}/mo`}
+            {isBuyingSeats ? $t('org_updating') : $t('org_add_seats_cta', { count: additionalSeats, cost: monthlySeatCost })}
           </button>
         </div>
       </div>
@@ -322,7 +324,7 @@
       <div class="bg-surface-container-low border border-outline-variant/20 p-6">
         <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Top Performers
+          {$t('org_top_performers')}
         </h2>
         {#if topPerformers.length > 0}
           <div class="space-y-3">
@@ -340,7 +342,7 @@
                   </div>
                   <div>
                     <p class="font-mono text-sm font-bold text-secondary">{student.accuracy}%</p>
-                    <p class="font-label text-xs text-on-surface-variant">Acc</p>
+                    <p class="font-label text-xs text-on-surface-variant">{$t('org_accuracy_short')}</p>
                   </div>
                 </div>
               </div>
@@ -355,7 +357,7 @@
       <div class="bg-surface-container-low border {atRiskStudents.length > 0 ? 'border-error/30' : 'border-outline-variant/20'} p-6">
         <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-          Needs Attention <span class="ml-auto text-error">&lt;70% Accuracy</span>
+          {$t('org_needs_attention')} <span class="ml-auto text-error">{$t('org_below_accuracy')}</span>
         </h2>
         {#if atRiskStudents.length > 0}
           <div class="space-y-3">
@@ -373,7 +375,7 @@
                   </div>
                   <div>
                     <p class="font-mono text-sm font-bold text-error">{student.accuracy}%</p>
-                    <p class="font-label text-xs text-on-surface-variant">Acc</p>
+                    <p class="font-label text-xs text-on-surface-variant">{$t('org_accuracy_short')}</p>
                   </div>
                 </div>
               </div>
@@ -410,23 +412,23 @@
     <!-- ── Full Roster ─────────────────────────────────────── -->
     <div class="bg-surface-container-low border border-outline-variant/20 p-6">
       <div class="flex items-center justify-between mb-5">
-        <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant">Student Roster ({membersList.length})</h2>
-        <a href="/org/roster" class="font-label text-xs text-primary hover:underline">View Full Roster →</a>
+        <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('org_student_roster')} ({studentMembers.length})</h2>
+        <a href="/org/roster" class="font-label text-xs text-primary hover:underline">{$t('org_view_full_roster')}</a>
       </div>
-      {#if membersList.length === 0}
+      {#if studentMembers.length === 0}
         <div class="text-center py-10 text-on-surface-variant font-body text-sm">
-          No students yet — invite your first student to get started.
+          {$t('org_no_students')}
         </div>
       {:else}
         <div class="roster-table w-full">
           <div class="roster-header grid grid-cols-[1fr_100px_100px_80px_120px] gap-2 pb-2 border-b border-outline-variant/20 font-label text-xs uppercase tracking-widest text-on-surface-variant">
             <span>{$t('org_student_col')}</span>
             <span class="text-right">WPM</span>
-            <span class="text-right">Accuracy</span>
-            <span class="text-right">Streak</span>
+            <span class="text-right">{$t('org_accuracy')}</span>
+            <span class="text-right">{$t('org_streak')}</span>
             <span class="text-right">{$t('org_action_col')}</span>
           </div>
-          {#each membersList.slice(0, 10) as student}
+          {#each studentMembers.slice(0, 10) as student}
             <div class="roster-row grid grid-cols-[1fr_100px_100px_80px_120px] gap-2 py-3 border-b border-outline-variant/10 last:border-0 items-center hover:bg-surface-container/40 transition-colors">
               <div class="min-w-0">
                 <p class="font-label text-sm text-on-surface truncate">{student.name}</p>
@@ -440,16 +442,16 @@
                   onclick={() => handleRemoveStudent(student.id)}
                   disabled={removingUserId === student.id}
                   class="font-label text-xs px-3 py-1.5 border border-error/30 text-error hover:bg-error/10 transition-colors rounded disabled:opacity-50 disabled:cursor-wait"
-                  title="Remove student (seat enters cooldown)"
+                  title={$t('org_remove_title')}
                 >
-                  {removingUserId === student.id ? 'Removing…' : 'Remove'}
+                  {removingUserId === student.id ? $t('org_removing') : $t('org_remove')}
                 </button>
               </div>
             </div>
           {/each}
-          {#if membersList.length > 10}
+          {#if studentMembers.length > 10}
             <div class="pt-3 text-center">
-              <a href="/org/roster" class="font-label text-xs text-primary hover:underline">View all {membersList.length} students →</a>
+              <a href="/org/roster" class="font-label text-xs text-primary hover:underline">{$t('org_view_all', { count: studentMembers.length })}</a>
             </div>
           {/if}
         </div>

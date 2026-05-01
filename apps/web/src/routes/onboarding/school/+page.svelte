@@ -139,11 +139,11 @@
         {/each}
       </div>
 
-      <!-- Step 1: Sign In -->
+      <!-- Step 1: Sign in or create account -->
       {#if currentStep === 1}
         <div class="text-center mb-8">
-          <h1 class="font-headline text-3xl mb-2">{$t('school_create_account')}</h1>
-          <p class="text-on-surface-variant font-body">{$t('school_create_account_desc')}</p>
+          <h1 class="font-headline text-3xl mb-2">{$t('school_login_title')}</h1>
+          <p class="text-on-surface-variant font-body">{$t('school_login_desc')}</p>
         </div>
         <div class="bg-surface-container-low border border-outline-variant/20 p-8 flex justify-center">
           <SignIn

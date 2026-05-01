@@ -3,6 +3,7 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { ClassRoster, InviteStudentModal } from '@typeforge/ui';
+  import { t } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
   let isSignedIn = $derived(!!ctx?.user);
@@ -28,7 +29,7 @@
       api = createApiClient('/', authFetch);
       await loadData();
     } catch (e) {
-      error = 'Failed to load class roster data';
+      error = $t('org_roster_load_failed');
       console.error(e);
     } finally {
       loading = false;
@@ -37,7 +38,7 @@
 
   async function loadData() {
     const orgsRes = await api.api.v1.organisations.$get();
-    if (!orgsRes.ok) throw new Error('Failed to load organizations');
+    if (!orgsRes.ok) throw new Error($t('org_load_failed'));
     const { organisations } = await orgsRes.json();
     if (!organisations || organisations.length === 0) return;
 
@@ -71,7 +72,7 @@
     });
     if (!res.ok) {
       const body = await res.json() as any;
-      throw new Error(body?.error || 'Failed to send invite');
+      throw new Error(body?.error || $t('org_invite_failed'));
     }
     await loadData();
   }
@@ -82,27 +83,29 @@
     await loadData();
   }
 
+  let usedSeats = $derived(seatData?.activeMembers ?? seatData?.used ?? 0);
   let seatUsagePct = $derived(
-    seatData?.purchased > 0 ? Math.round((seatData.used / seatData.purchased) * 100) : 0
+    seatData?.purchased > 0 ? Math.round((usedSeats / seatData.purchased) * 100) : 0
   );
+  let studentMembers = $derived(membersList.filter(m => m.role === 'student'));
 </script>
 
 <svelte:head>
-  <title>Class Roster — TypeForge</title>
+  <title>{$t('org_roster_title')} — TypeForge</title>
 </svelte:head>
 
 {#if loading}
   <div class="h-64 flex items-center justify-center">
-    <div class="text-on-surface-variant font-label animate-pulse text-sm uppercase tracking-widest">Loading Roster...</div>
+    <div class="text-on-surface-variant font-label animate-pulse text-sm uppercase tracking-widest">{$t('org_roster_loading')}</div>
   </div>
 {:else if error}
   <div class="text-error bg-error-container/20 p-4 border border-error-container rounded">{error}</div>
 {:else if !organizationData}
   <div class="bg-surface-container-low border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center p-12 min-h-[300px] rounded-lg">
     <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-4">group_off</span>
-    <h2 class="font-headline text-xl mb-2">No Active Organization</h2>
+    <h2 class="font-headline text-xl mb-2">{$t('org_no_org')}</h2>
     <p class="font-body text-sm text-on-surface-variant max-w-sm text-center">
-      You are not currently a member of any organization. Ask your admin for an invite link.
+      {$t('org_no_org_roster_desc')}
     </p>
   </div>
 {:else}
@@ -111,7 +114,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <h1 class="font-headline text-2xl text-on-surface">Class Roster</h1>
+        <h1 class="font-headline text-2xl text-on-surface">{$t('org_roster_title')}</h1>
         <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mt-1">{organizationData.name}</p>
       </div>
       <button
@@ -123,7 +126,7 @@
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
           <line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
         </svg>
-        Invite Student
+        {$t('org_invite_student')}
       </button>
     </div>
 
@@ -132,9 +135,9 @@
       <div class="seat-info-bar flex items-center gap-4 bg-surface-container-low border border-outline-variant/20 px-5 py-3">
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Seat Quota</span>
-            <span class="font-mono text-xs font-bold {seatData.used >= seatData.purchased ? 'text-error' : 'text-primary'}">
-              {seatData.used} / {seatData.purchased}
+            <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_seat_quota')}</span>
+            <span class="font-mono text-xs font-bold {usedSeats >= seatData.purchased ? 'text-error' : 'text-primary'}">
+              {$t('org_seats_used', { used: usedSeats, total: seatData.purchased })}
             </span>
           </div>
           <div class="h-1.5 bg-surface-container-high rounded-full overflow-hidden">
@@ -146,13 +149,13 @@
         </div>
         <div class="font-label text-xs text-on-surface-variant shrink-0 flex items-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          {seatData.cooldownDays}-day lock on removed seats
+          {$t('org_lock_removed_seats', { days: seatData.cooldownDays })}
         </div>
       </div>
     {/if}
 
     <!-- Roster Component -->
-    <ClassRoster students={membersList} />
+    <ClassRoster students={studentMembers} />
   </div>
 
   {#if showInviteModal}

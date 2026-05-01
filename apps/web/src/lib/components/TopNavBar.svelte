@@ -11,7 +11,7 @@
     { href: '/learn',          label: $t('nav_learn')    },
     { href: '/practice',       label: $t('nav_practice') },
     { href: '/games/cascade',  label: $t('nav_play')     },
-    { href: '/progress',       label: $t('nav_progress') },
+    ...(!hasOrg ? [{ href: '/progress', label: $t('nav_progress') }] : []),
     ...(hasOrg ? [{ href: '/org', label: $t('nav_dashboard') }] : []),
   ]);
 
@@ -157,7 +157,13 @@
             href="/onboarding/school"
             class="text-sm font-body text-on-surface/70 hover:text-white transition-colors"
           >
-            For Teachers
+            {$t('nav_for_teachers')}
+          </a>
+          <a
+            href="/sign-in"
+            class="text-sm font-body text-on-surface/70 hover:text-white transition-colors"
+          >
+            {$t('nav_sign_in')}
           </a>
           <a
             href="/sign-up"
@@ -233,9 +239,17 @@
           <span class="font-label text-sm text-on-surface-variant">{user.firstName || user.username}</span>
         </div>
       {:else}
-        <a href="/sign-up" class="notched-button bg-primary text-on-primary w-full py-3 font-label font-bold text-sm uppercase tracking-widest text-center block">
-          {$t('lesson_start_cta')}
-        </a>
+        <div class="flex flex-col gap-3">
+          <a href="/sign-in" class="border border-outline-variant/30 text-on-surface w-full py-3 font-label font-bold text-sm uppercase tracking-widest text-center block hover:bg-surface-container-high transition-colors">
+            {$t('nav_sign_in')}
+          </a>
+          <a href="/onboarding/school" class="border border-outline-variant/30 text-on-surface w-full py-3 font-label font-bold text-sm uppercase tracking-widest text-center block hover:bg-surface-container-high transition-colors">
+            {$t('nav_institution_login')}
+          </a>
+          <a href="/sign-up" class="notched-button bg-primary text-on-primary w-full py-3 font-label font-bold text-sm uppercase tracking-widest text-center block">
+            {$t('lesson_start_cta')}
+          </a>
+        </div>
       {/if}
     </div>
   </div>

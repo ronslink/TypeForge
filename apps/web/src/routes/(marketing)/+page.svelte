@@ -296,9 +296,14 @@
         </div>
       </div>
     </div>
-      <a href="/sign-up" class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95 block">
-        {$t('mkt_start_typing') || 'Start Typing'}
-      </a>
+      <div class="flex items-center gap-4">
+        <a href="/sign-in" class="hidden sm:block text-on-surface/70 hover:text-on-surface transition-colors font-body text-sm">
+          {$t('nav_sign_in') || 'Sign In'}
+        </a>
+        <a href="/sign-up" class="notched-button bg-primary-container text-on-primary-container px-6 py-2.5 font-label font-bold text-sm tracking-widest hover:bg-primary-fixed-dim transition-all active:scale-95 block">
+          {$t('mkt_start_typing') || 'Start Typing'}
+        </a>
+      </div>
   </div>
 </nav>
 
@@ -335,7 +340,7 @@
         <a href="/sign-up" class="notched-button bg-primary-container text-on-primary-container px-10 py-4 font-label font-bold text-lg tracking-wider hover:amber-glow transition-all block">
           {$t('mkt_hero_cta') || 'Start free today'}
         </a>
-        <a href="#pricing" class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
+        <a href="/onboarding/school" class="font-label text-on-surface hover:text-primary transition-colors flex items-center gap-2 group">
           {$t('mkt_hero_secondary_cta') || 'Institutional Access'}
           <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </a>

@@ -2,18 +2,19 @@
   import SideNavBar from '$lib/components/SideNavBar.svelte';
   import type { LayoutProps } from './$types';
   import { page } from '$app/state';
+  import { t } from '$lib/stores/locale';
 
   let { children }: LayoutProps = $props();
 
-  const navItems = [
-    { href: '/org', label: 'Overview', icon: 'dashboard' },
-    { href: '/org/roster', label: 'Class Roster', icon: 'groups' },
-    { href: '/billing', label: 'Billing', icon: 'credit_card' }
-  ];
+  const navItems = $derived([
+    { href: '/org', label: $t('org_overview'), icon: 'dashboard' },
+    { href: '/org/roster', label: $t('org_roster_title'), icon: 'groups' },
+    { href: '/billing', label: $t('billing_title'), icon: 'credit_card' }
+  ]);
 </script>
 
 <div class="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] w-full relative">
-  <SideNavBar title="Org Dashboard">
+  <SideNavBar title={$t('org_dashboard_title')}>
     <div class="flex flex-col gap-2 w-full">
       {#each navItems as item}
         <a 

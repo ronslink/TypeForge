@@ -228,15 +228,17 @@ app.get('/:id/dashboard', async (c) => {
     return c.json({ error: 'Access denied', code: 'FORBIDDEN' }, 403);
   }
 
-  // Get all members
+  // Dashboard learning metrics are student-only. Teachers/admins can manage the org,
+  // but their practice stats should not skew classroom analytics.
   const allMembers = await db
-    .select({ status: orgMembers.status, userId: orgMembers.userId })
+    .select({ status: orgMembers.status, userId: orgMembers.userId, role: orgMembers.role })
     .from(orgMembers)
     .where(eq(orgMembers.orgId, orgId));
-    
-  const totalMembers = allMembers.length;
-  const activeMembers = allMembers.filter(m => m.status === 'active').length;
-  const userIds = allMembers.map(m => m.userId).filter(Boolean) as string[];
+
+  const studentMembers = allMembers.filter(m => m.role === 'student');
+  const totalMembers = studentMembers.length;
+  const activeMembers = studentMembers.filter(m => m.status === 'active').length;
+  const userIds = studentMembers.map(m => m.userId).filter(Boolean) as string[];
 
   let averageAccuracy = 0;
   let averageWpm = 0;
@@ -791,13 +793,15 @@ app.get('/:id/seats', async (c) => {
     return c.json({ error: 'Billing info not found', code: 'NOT_FOUND' }, 404);
   }
   
-  // Count active members
+  // Count active student members for seat display. Staff members manage seats; they
+  // are not student seats.
   const memberCount = await db
     .select({ count: sql<number>`count(*)` })
     .from(orgMembers)
     .where(and(
       eq(orgMembers.orgId, orgId),
-      eq(orgMembers.status, 'active')
+      eq(orgMembers.status, 'active'),
+      eq(orgMembers.role, 'student')
     ));
   
   const activeMembers = memberCount[0]?.count || 0;
