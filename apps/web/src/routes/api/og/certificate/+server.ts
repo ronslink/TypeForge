@@ -58,7 +58,7 @@ export const GET = async ({ url }) => {
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                     },
-                    children: 'TypeForge',
+                    children: 'TypingScholar',
                   },
                 },
               ],

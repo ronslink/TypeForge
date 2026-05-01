@@ -2,7 +2,7 @@ import { ALL_LANGUAGES } from '$lib/i18n/languages';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
-  const baseUrl = 'https://typeforge.app';
+  const baseUrl = 'https://typingscholar.com';
 
   // Core static routes
   const staticRoutes = [

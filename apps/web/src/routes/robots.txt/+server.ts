@@ -11,7 +11,7 @@ Disallow: /practice/
 Disallow: /progress/
 Disallow: /onboarding/
 
-Sitemap: https://typeforge.app/sitemap.xml
+Sitemap: https://typingscholar.com/sitemap.xml
 `;
 
   return new Response(robotsTxt, {

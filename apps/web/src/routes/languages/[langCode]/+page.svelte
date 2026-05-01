@@ -15,13 +15,13 @@
   <title>Learn to Type in {lang.englishName} ({lang.nativeName}) — TypingScholar</title>
   <meta name="description" content="Master touch typing in {lang.englishName}. Practice using the {lang.keyboard} keyboard layout. Improve your WPM and accuracy with our adaptive {lang.script} curriculum." />
   
-  <link rel="canonical" href="https://typeforge.app/languages/{lang.code}" />
+  <link rel="canonical" href="https://typingscholar.com/languages/{lang.code}" />
   
   <!-- SEO: hreflang tags for all languages -->
   {#each alternatives as alt}
-    <link rel="alternate" hreflang={alt.code} href="https://typeforge.app/languages/{alt.code}" />
+    <link rel="alternate" hreflang={alt.code} href="https://typingscholar.com/languages/{alt.code}" />
   {/each}
-  <link rel="alternate" hreflang="x-default" href="https://typeforge.app/languages" />
+  <link rel="alternate" hreflang="x-default" href="https://typingscholar.com/languages" />
 </svelte:head>
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col" dir={lang.rtl ? 'rtl' : 'ltr'}>
