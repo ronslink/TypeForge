@@ -233,7 +233,7 @@
   // Testimonials
   const testimonials = [
     {
-      quote: "TypeForge has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
+      quote: "TypingScholar has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
       author: 'Julianne H.',
       role: 'Tech Coordinator, St. Jude Academy',
       initials: 'JH',

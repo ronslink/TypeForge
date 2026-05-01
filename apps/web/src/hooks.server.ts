@@ -66,8 +66,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const detectedLocale = detectLocale(event.request.headers.get('Accept-Language'));
   event.locals.detectedLocale = detectedLocale;
 
+  const isRtl = ['ar', 'he'].includes(detectedLocale);
+  const htmlAttributes = \`lang="\${detectedLocale}"\${isRtl ? ' dir="rtl"' : ''}\`;
+
   return resolve(event, {
-    transformPageChunk: ({ html }) => html.replace('%sveltekit.htmlAttributes%', `lang="${detectedLocale}"`),
+    transformPageChunk: ({ html }) => html.replace('%sveltekit.htmlAttributes%', htmlAttributes),
   });
 };
 

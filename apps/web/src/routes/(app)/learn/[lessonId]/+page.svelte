@@ -846,6 +846,7 @@
       dir={isRTL ? 'rtl' : 'ltr'}
       role="region"
       aria-label="Typing area"
+      translate="no"
     >
       {#if showIntroAnimation && introKeys.length > 0}
         <LessonIntroModal
