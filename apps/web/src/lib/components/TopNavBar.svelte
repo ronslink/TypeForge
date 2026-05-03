@@ -3,6 +3,7 @@
   import { afterNavigate } from '$app/navigation';
   import { useClerkContext, UserButton } from 'svelte-clerk';
   import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, t, type UiLocale } from '$lib/stores/locale';
+  import { getDefaultLayoutForLanguage } from '@typeforge/layouts';
 
   // Navigation items using reactive translation keys
   let hasOrg = $state(false);
@@ -52,6 +53,10 @@
     localeSwitcherOpen = false;
     activeLocale = code;
     await setUiLocale(code);
+    try {
+      localStorage.setItem('tf-language', code);
+      localStorage.setItem('tf-keyboard-layout', getDefaultLayoutForLanguage(code));
+    } catch {}
     const token = await ctx?.session?.getToken();
     saveLocaleToApi(code, token ?? null);
   }

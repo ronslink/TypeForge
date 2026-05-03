@@ -4,11 +4,12 @@
   import { LessonCard, Button } from '@typeforge/ui';
   import { LESSON_CATALOG, getLessonById, type RegistryLesson as Lesson } from '@typeforge/curriculum';
   import { getLanguageByCode, ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
-  import { t } from '$lib/stores/locale';
+  import { t, uiLocale } from '$lib/stores/locale';
   import type { PageData } from './$types';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import SideNavBar from '$lib/components/SideNavBar.svelte';
+  import { getDefaultLayoutForLanguage } from '@typeforge/layouts';
 
   interface Props {
     data: PageData;
@@ -25,6 +26,8 @@
   let bannerDismissed = $state(false);
 
   let dataFetched = false;
+  const LS_LANGUAGE = 'tf-language';
+  const LS_LAYOUT = 'tf-keyboard-layout';
 
   $effect(() => {
     if (!ctx?.isLoaded || dataFetched) return;
@@ -73,12 +76,15 @@
     try { sessionStorage.setItem('tf_adaptive_banner_dismissed', '1'); } catch {}
   }
 
-  // User preferences from onboarding (would come from data/user store in production)
+  // Practice preferences. UI locale and typing language are separate settings,
+  // but the UI locale seeds the practice language when the curriculum supports it.
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
+  let lastSyncedLocale = $state('');
+  let hasMountedPreferences = $state(false);
 
   // Filter states
-  let selectedLanguage = $state(userLanguage);
+  let selectedLanguage = $state('en');
   let selectedDifficulty = $state('all');
   let selectedTag = $state('all');
   let searchQuery = $state('');
@@ -89,6 +95,47 @@
       .map((code) => getLanguageByCode(code))
       .filter(Boolean) as Language[]
   );
+
+  const lessonLanguageCodes = $derived(new Set(LESSON_CATALOG.map((lesson) => lesson.language)));
+
+  onMount(() => {
+    const localeLanguage = lessonLanguageCodes.has($uiLocale) ? $uiLocale : 'en';
+    const storedLanguage = localStorage.getItem(LS_LANGUAGE);
+    const initialLanguage = storedLanguage && lessonLanguageCodes.has(storedLanguage)
+      ? storedLanguage
+      : localeLanguage;
+
+    userLanguage = initialLanguage;
+    selectedLanguage = initialLanguage;
+    userLayout = localStorage.getItem(LS_LAYOUT) ?? getDefaultLayoutForLanguage(initialLanguage);
+    lastSyncedLocale = $uiLocale;
+    hasMountedPreferences = true;
+  });
+
+  $effect(() => {
+    const localeLanguage = $uiLocale;
+    if (!hasMountedPreferences || !lessonLanguageCodes.has(localeLanguage) || localeLanguage === lastSyncedLocale) return;
+
+    lastSyncedLocale = localeLanguage;
+    setCourseLanguage(localeLanguage);
+  });
+
+  function setCourseLanguage(languageCode: string) {
+    selectedLanguage = languageCode;
+    if (languageCode === 'all') return;
+
+    userLanguage = languageCode;
+    userLayout = getDefaultLayoutForLanguage(languageCode);
+    try {
+      localStorage.setItem(LS_LANGUAGE, languageCode);
+      localStorage.setItem(LS_LAYOUT, userLayout);
+    } catch {}
+  }
+
+  function setCourseLayout(layoutId: string) {
+    userLayout = layoutId;
+    try { localStorage.setItem(LS_LAYOUT, layoutId); } catch {}
+  }
 
   const difficultyLevels = $derived([
     { value: '1', label: $t('learn_diff_beginner_1') },
@@ -201,7 +248,7 @@
 
   // Clear all filters
   function clearFilters() {
-    selectedLanguage = 'all';
+    selectedLanguage = userLanguage;
     selectedDifficulty = 'all';
     selectedTag = 'all';
     searchQuery = '';
@@ -270,7 +317,8 @@
       <label for="lang-select" class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">{$t('learn_target_language')}</label>
       <select
         id="lang-select"
-        bind:value={selectedLanguage}
+        value={selectedLanguage}
+        onchange={(event) => setCourseLanguage((event.currentTarget as HTMLSelectElement).value)}
         class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
       >
         <option value="all">{$t('learn_all_languages')}</option>
@@ -286,7 +334,8 @@
       <select 
         id="global-layout"
         class="bg-surface-container/50 px-4 py-2.5 text-sm font-medium text-on-surface focus:outline-none focus:border-primary focus:bg-surface-container border border-transparent shadow-inner cursor-pointer transition-colors w-full"
-        bind:value={userLayout}
+        value={userLayout}
+        onchange={(event) => setCourseLayout((event.currentTarget as HTMLSelectElement).value)}
       >
         <option value="qwerty-us">QWERTY (US)</option>
         <option value="dvorak">Dvorak</option>
@@ -328,7 +377,7 @@
     </div>
 
     <!-- Clear Filters -->
-    {#if selectedLanguage !== 'all' || selectedDifficulty !== 'all' || selectedTag !== 'all' || searchQuery}
+    {#if selectedLanguage !== userLanguage || selectedDifficulty !== 'all' || selectedTag !== 'all' || searchQuery}
       <button
         class="mt-4 text-xs font-bold text-secondary hover:text-primary transition-colors tracking-widest uppercase border border-secondary/20 hover:border-primary/50 py-2 w-full text-center"
         onclick={clearFilters}
