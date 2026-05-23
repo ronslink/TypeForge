@@ -1,4 +1,4 @@
-import { withClerkHandler, buildClerkProps } from 'svelte-clerk/server';
+﻿import { withClerkHandler } from 'svelte-clerk/server';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 import { env as publicEnv } from '$env/dynamic/public';
@@ -53,7 +53,7 @@ const clerkForApp: Handle = async ({ event, resolve }) => {
 };
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  const { userId } = event.locals.auth ?? {};
+  const { userId } = event.locals.auth ?? { /* ignore */ };
   const currentPath = event.url.pathname;
 
   if (event.route.id === null) {

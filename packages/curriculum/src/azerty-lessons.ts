@@ -359,4 +359,3 @@ export const azertyLessons: Lesson[] = [
   },
 ];
 
-export default azertyLessons;

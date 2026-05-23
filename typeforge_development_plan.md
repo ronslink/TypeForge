@@ -1,7 +1,7 @@
 # TypeForge — Comprehensive Development & Implementation Plan
 
 **Product:** TypeForge — Multilingual Adaptive Typing Learning Platform  
-**Stack:** SvelteKit · Hono on Cloudflare Workers · PostgreSQL (Hetzner EU / Hetzner US / Vultr Africa) · Clerk · Cloudflare Pages/R2/Queues · Upstash Redis  
+**Stack:** SvelteKit · Hono on Vercel · PostgreSQL (Hetzner EU / Hetzner US / Vultr Africa) · Clerk · Vercel Services · Upstash Redis  
 **Agent Strategy:** Kimi Code multi-agent parallel execution  
 **Estimated Duration:** 22 weeks to production-ready v1.0
 
@@ -15,7 +15,7 @@
 typeforge/
 ├── apps/
 │   ├── web/                   # SvelteKit frontend
-│   └── api/                   # Hono API (Cloudflare Worker)
+│   └── api/                   # Hono API (Vercel Serverless)
 ├── packages/
 │   ├── db/                    # Drizzle schema + migrations (shared)
 │   ├── metrics/               # WPM/accuracy engine (browser + server)
@@ -50,7 +50,7 @@ typeforge/
 | Turbo | 2.x | Monorepo build |
 | pnpm | 9.x | Package manager |
 | Node | 20 LTS | Local dev |
-| Wrangler | 3.x | Cloudflare CLI |
+| Vercel CLI | latest | Vercel deployment |
 | Vitest | 1.x | Unit tests |
 | Playwright | 1.x | E2E tests |
 
@@ -73,7 +73,7 @@ hcloud server create \
   --ssh-key your-key
 
 # Step 2: Harden SSH, configure UFW firewall
-# Allow only: 22 (SSH from your IPs), 5432 (Postgres — Cloudflare IPs only), 6432 (PgBouncer)
+# Allow only: 22 (SSH from your IPs), 5432 (Postgres — Vercel IPs only), 6432 (PgBouncer)
 
 # Step 3: Install Postgres 16
 sudo apt install -y postgresql-16
@@ -104,21 +104,21 @@ Repeat identically for:
 - **Hetzner Ashburn US** — `typeforge-db-us` (CX32, €9.19/mo)
 - **Vultr Johannesburg** — `typeforge-db-af` (VHF-2C-4GB, $12/mo)
 
-### 2.2 Cloudflare Hyperdrive Setup (per region)
+### 2.2 Database Connection Pool Setup (per region)
 
 ```bash
-# Create one Hyperdrive config per regional Postgres
-wrangler hyperdrive create typeforge-eu \
-  --connection-string="postgresql://typeforge_api:PASSWORD@HETZNER_EU_IP:6432/typeforge_eu"
+# Create connection strings for each region to use with Vercel Edge/Serverless functions
+# EU Database
+postgres://typeforge_api:PASSWORD@HETZNER_EU_IP:6432/typeforge_eu
 
-wrangler hyperdrive create typeforge-us \
-  --connection-string="postgresql://typeforge_api:PASSWORD@HETZNER_US_IP:6432/typeforge_us"
+# US Database
+postgres://typeforge_api:PASSWORD@HETZNER_US_IP:6432/typeforge_us
 
-wrangler hyperdrive create typeforge-af \
-  --connection-string="postgresql://typeforge_api:PASSWORD@VULTR_AF_IP:6432/typeforge_af"
+# Africa Database
+postgres://typeforge_api:PASSWORD@VULTR_AF_IP:6432/typeforge_af
 ```
 
-These IDs go into `wrangler.toml` as named bindings.
+These connection strings go into Vercel Environment Variables.
 
 ### 2.3 Backup Automation
 
@@ -139,23 +139,19 @@ rclone copy $BACKUP_FILE r2:typeforge-backups/${REGION}/
 rm $BACKUP_FILE
 ```
 
-### 2.4 Cloudflare Services
+### 2.4 Vercel Services
 
 ```bash
-# Pages project (frontend)
-wrangler pages project create typeforge-web
+# Link project to Vercel (frontend & API)
+vercel link
 
-# R2 buckets
-wrangler r2 bucket create typeforge-assets    # lesson media, keyboard SVGs
-wrangler r2 bucket create typeforge-backups   # database backups
-
-# Queue
-wrangler queues create typeforge-jobs         # background jobs
+# Vercel Blob (assets and backups)
+# Managed via Vercel Dashboard or SDK
 ```
 
 ### 2.5 Third-Party Accounts to Create First
 
-- [ ] Cloudflare account — paid Workers plan ($5/mo)
+- [ ] Vercel account — Pro plan
 - [ ] Hetzner Cloud account — 2 VPS
 - [ ] Vultr account — 1 VPS
 - [ ] Clerk account — free tier to start
@@ -930,7 +926,7 @@ CREATE TABLE audit_logs_2026
   PARTITION OF audit_logs
   FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');
 
--- Notification queue (processed by Cloudflare Queue consumer)
+-- Notification queue (processed by Vercel Functions / Upstash QStash)
 CREATE TYPE notif_channel  AS ENUM ('email','push','in_app');
 CREATE TYPE notif_status   AS ENUM ('pending','sent','failed','skipped');
 
@@ -1208,23 +1204,22 @@ The application is decomposed into 8 independent agents running in parallel trac
 **Deliverables:**
 - VPS provisioning scripts (Hetzner EU/US, Vultr AF)
 - PgBouncer configuration per region
-- Cloudflare Hyperdrive bindings
-- GitHub Actions: lint → test → build → deploy to Pages/Workers
-- Backup cron scripts
-- Environment variable management (Cloudflare secrets)
+- GitHub Actions: lint → test → build → deploy to Vercel
+- Database connection pool bindings
+- Vercel Environment Variables
 - Sentry DSN wiring
 
 **Prompt template for Kimi:**
 ```
 You are Agent 1 - Infrastructure. Your scope is strictly:
 - /infra/** directories
-- wrangler.toml configuration
+- Vercel project configuration
 - .github/workflows/** CI/CD pipelines
 - Shell scripts for VPS setup
 
 Do NOT touch application code. Export only:
-- Named Hyperdrive bindings (HYPERDRIVE_EU, HYPERDRIVE_US, HYPERDRIVE_AF)
-- Named Queue binding (JOBS)
+- Database connection strings (DB_URL_EU, DB_URL_US, DB_URL_AF)
+- Queue bindings (JOBS)
 - Named R2 binding (ASSETS)
 
 Reference: infra/contracts/bindings.ts for the binding interface.
@@ -1387,18 +1382,18 @@ Do NOT fetch data. Components receive data via props and emit events upward.
 - `GET /organisations/:id/report` — class-level aggregate stats
 - `POST /billing/webhook` — Stripe webhook handler
 - Input validation: Zod on all routes
-- Rate limiting: Cloudflare rate limiting rules
+- Rate limiting: Vercel rate limiting / Upstash
+- Background jobs: Vercel Functions / Inngest
+- Analytics setup (PostHog + Sentry)
 
-**Prompt template:**
-```
-You are Agent 7 - API. Scope: apps/api/.
-Framework: Hono 4 on Cloudflare Workers runtime.
-Regional routing: middleware reads c.get('user').home_region → binds correct Hyperdrive.
+#### 8.3.2 Backend Implementation
+Framework: Hono 4 on Vercel runtime.
+Regional routing: middleware reads c.get('user').home_region → uses correct database connection.
 Import from: @typeforge/db (database), @typeforge/curriculum (lesson logic).
 Auth: all routes protected via Clerk JWT middleware EXCEPT /billing/webhook.
 Pattern:
   const user = await getCurrentUser(c)                    // from packages/auth
-  const db = getDb(env[`HYPERDRIVE_${user.region}`])      // regional Hyperdrive
+  const db = getDb(env[`DB_URL_${user.region}`])      // regional database
   const result = await queryHelper(db, ...)
 Return typed JSON. Use Hono's typed RPC for client generation.
 Do NOT write UI. apps/web imports the generated RPC client.
@@ -1619,7 +1614,7 @@ Routes marked ✅ are implemented. Routes marked ⬜ are planned but not yet cre
 ## Part 8 — Environment Variables
 
 ```bash
-# Cloudflare Workers (wrangler secret put)
+# Vercel Environment Variables (vercel env add)
 CLERK_SECRET_KEY=sk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
@@ -1651,13 +1646,13 @@ PUBLIC_APP_URL=https://typeforge.app
 ## Part 10 — Launch Checklist
 
 ### Technical
-- [ ] All 3 Postgres instances live with daily backups to R2
-- [ ] Hyperdrive bindings verified in Workers dashboard
+- [ ] All 3 Postgres instances live with daily backups
+- [ ] Database connection pooling verified
 - [ ] Clerk production instance (not dev)
 - [ ] Stripe live keys (not test)
 - [ ] Sentry error tracking receiving events
-- [ ] Cloudflare Analytics configured
-- [ ] DNS pointed to Cloudflare Pages
+- [ ] Vercel Web Analytics configured
+- [ ] DNS pointed to Vercel
 - [ ] Custom domain SSL verified
 - [ ] Rate limiting rules on all API routes
 - [ ] All environment variables in production

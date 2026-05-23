@@ -111,5 +111,3 @@ export const chineseWordlist: WordlistEntry[] = [
   { word: '民主', difficulty: 3, tags: ['politics'] },
   { word: '责任', difficulty: 3, tags: ['noun'] },
 ];
-
-export default chineseWordlist;

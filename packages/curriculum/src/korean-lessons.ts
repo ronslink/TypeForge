@@ -499,21 +499,3 @@ export const koreanLessons: Lesson[] = [
   },
 ];
 
-// Export individual lesson categories for convenience
-export const koreanConsonantLessons = koreanLessons.filter((l) =>
-  l.id.match(/ko-hangul-[1-5]/)
-);
-
-export const koreanVowelLessons = koreanLessons.filter((l) =>
-  l.id.match(/ko-hangul-(1|3)/)
-);
-
-export const koreanSyllableLessons = koreanLessons.filter((l) =>
-  l.id.match(/ko-hangul-[6-8]/)
-);
-
-export const koreanWordLessons = koreanLessons.filter((l) =>
-  l.id.match(/ko-hangul-(9|10)/)
-);
-
-export default koreanLessons;

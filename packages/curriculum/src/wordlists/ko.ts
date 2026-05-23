@@ -342,5 +342,3 @@ export const koreanWordlist: WordlistEntry[] = [
   { word: '별 헤는 밤', difficulty: 3, tags: ['literature', 'yun_dongju'] },
   { word: '하늘과 바람과 별과 시', difficulty: 3, tags: ['literature', 'yun_dongju'] },
 ];
-
-export default koreanWordlist;

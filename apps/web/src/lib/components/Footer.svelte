@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { t } from '$lib/stores/locale';
 
   // Footer links grouped by section
@@ -76,7 +76,7 @@
     <!-- Bottom row: copyright + scripts badge -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-8 border-t border-outline-variant/10">
       <p class="text-xs text-on-surface-variant font-body">
-        {$t('footer_copyright', { year }) || '© ' + year + ' TypingScholar. All rights reserved.'}
+        {$t('footer_copyright', { year }) || 'Â© ' + year + ' TypingScholar. All rights reserved.'}
       </p>
       <div class="flex gap-2 flex-wrap">
         {#each ['Latin', 'Arabic', 'Cyrillic', 'Hebrew', 'CJK', 'Devanagari', 'Thai', 'Korean'] as script}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TypeForge Language Registry
  * 29 languages organized by region, with native script rendering
  */
@@ -11,7 +11,7 @@ export type Region =
   | 'South & Southeast Asia'
   | 'Central & Eastern Europe';
 
-export type ScriptFamily =
+type ScriptFamily =
   | 'Latin'
   | 'Arabic'
   | 'Hebrew'
@@ -32,7 +32,7 @@ export interface Language {
   sampleText: string;
 }
 
-export const AMERICAS: Language[] = [
+const AMERICAS: Language[] = [
   {
     code: 'en',
     nativeName: 'English',
@@ -45,27 +45,27 @@ export const AMERICAS: Language[] = [
   },
   {
     code: 'es',
-    nativeName: 'Español',
+    nativeName: 'EspaÃ±ol',
     englishName: 'Spanish (Latin America)',
     region: 'Americas',
     script: 'Latin',
     keyboard: 'QWERTY (LA)',
     rtl: false,
-    sampleText: 'El veloz murciélago hindú comía feliz cardillo y kiwi.',
+    sampleText: 'El veloz murciÃ©lago hindÃº comÃ­a feliz cardillo y kiwi.',
   },
   {
     code: 'pt',
-    nativeName: 'Português',
+    nativeName: 'PortuguÃªs',
     englishName: 'Portuguese (Brazil)',
     region: 'Americas',
     script: 'Latin',
     keyboard: 'ABNT2',
     rtl: false,
-    sampleText: 'À noite, vovô Kowalsky vê o ímã cair junto ao junco.',
+    sampleText: 'Ã€ noite, vovÃ´ Kowalsky vÃª o Ã­mÃ£ cair junto ao junco.',
   },
 ];
 
-export const EUROPE: Language[] = [
+const EUROPE: Language[] = [
   {
     code: 'de',
     nativeName: 'Deutsch',
@@ -74,11 +74,11 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTZ',
     rtl: false,
-    sampleText: 'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.',
+    sampleText: 'Falsches Ãœben von Xylophonmusik quÃ¤lt jeden grÃ¶ÃŸeren Zwerg.',
   },
   {
     code: 'fr',
-    nativeName: 'Français',
+    nativeName: 'FranÃ§ais',
     englishName: 'French',
     region: 'Europe',
     script: 'Latin',
@@ -114,17 +114,17 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTY (PL)',
     rtl: false,
-    sampleText: 'Pchnąć w tę łódź jeża lub ośm skrzyń fig.',
+    sampleText: 'PchnÄ…Ä‡ w tÄ™ Å‚Ã³dÅº jeÅ¼a lub oÅ›m skrzyÅ„ fig.',
   },
   {
     code: 'cs',
-    nativeName: 'Čeština',
+    nativeName: 'ÄŒeÅ¡tina',
     englishName: 'Czech',
     region: 'Europe',
     script: 'Latin',
     keyboard: 'QWERTZ',
     rtl: false,
-    sampleText: 'Příliš žluťoučký kůň úpěl ďábelské kódy.',
+    sampleText: 'PÅ™Ã­liÅ¡ Å¾luÅ¥ouÄkÃ½ kÅ¯Åˆ ÃºpÄ›l ÄÃ¡belskÃ© kÃ³dy.',
   },
   {
     code: 'hu',
@@ -134,17 +134,17 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTZ',
     rtl: false,
-    sampleText: 'Árvízi tölgyért bolygott sírkövet döngetett.',
+    sampleText: 'ÃrvÃ­zi tÃ¶lgyÃ©rt bolygott sÃ­rkÃ¶vet dÃ¶ngetett.',
   },
   {
     code: 'el',
-    nativeName: 'Ελληνικά',
+    nativeName: 'Î•Î»Î»Î·Î½Î¹ÎºÎ¬',
     englishName: 'Greek',
     region: 'Europe',
     script: 'Greek' as unknown as ScriptFamily,
     keyboard: 'Greek',
     rtl: false,
-    sampleText: 'Το λαγός και η χελώνα έτρεξαν γρήγορα.',
+    sampleText: 'Î¤Î¿ Î»Î±Î³ÏŒÏ‚ ÎºÎ±Î¹ Î· Ï‡ÎµÎ»ÏŽÎ½Î± Î­Ï„ÏÎµÎ¾Î±Î½ Î³ÏÎ®Î³Î¿ÏÎ±.',
   },
   {
     code: 'sv',
@@ -154,7 +154,7 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTY (SE)',
     rtl: false,
-    sampleText: 'Gädda prygelnäbba fyrskrift växer franskt.',
+    sampleText: 'GÃ¤dda prygelnÃ¤bba fyrskrift vÃ¤xer franskt.',
   },
   {
     code: 'no',
@@ -174,7 +174,7 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTY (DK)',
     rtl: false,
-    sampleText: 'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.',
+    sampleText: 'Quizdeltagerne spiste jordbÃ¦r med flÃ¸de mens cirkusklovnen.',
   },
   {
     code: 'fi',
@@ -184,30 +184,30 @@ export const EUROPE: Language[] = [
     script: 'Latin',
     keyboard: 'QWERTY (FI)',
     rtl: false,
-    sampleText: 'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.',
+    sampleText: 'FyrvÃ¤skÃ¤rjÃ¤yhtymÃ¤n takaa lÃ¶ytyy vanha virolainen sauna.',
   },
 ];
 
-export const MIDDLE_EAST_AFRICA: Language[] = [
+const MIDDLE_EAST_AFRICA: Language[] = [
   {
     code: 'ar',
-    nativeName: 'العربية',
+    nativeName: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©',
     englishName: 'Arabic',
     region: 'Middle East & Africa',
     script: 'Arabic',
     keyboard: 'Arabic',
     rtl: true,
-    sampleText: 'نص حكيم له سرعان تسري به，就像是燃灯鱼.',
+    sampleText: 'Ù†Øµ Ø­ÙƒÙŠÙ… Ù„Ù‡ Ø³Ø±Ø¹Ø§Ù† ØªØ³Ø±ÙŠ Ø¨Ù‡ï¼Œå°±åƒæ˜¯ç‡ƒç¯é±¼.',
   },
   {
     code: 'he',
-    nativeName: 'עברית',
+    nativeName: '×¢×‘×¨×™×ª',
     englishName: 'Hebrew',
     region: 'Middle East & Africa',
     script: 'Hebrew',
     keyboard: 'Hebrew',
     rtl: true,
-    sampleText: 'איך בלשון הקודש, ספר צלחת פסיק',
+    sampleText: '××™×š ×‘×œ×©×•×Ÿ ×”×§×•×“×©, ×¡×¤×¨ ×¦×œ×—×ª ×¤×¡×™×§',
   },
   {
     code: 'sw',
@@ -221,69 +221,69 @@ export const MIDDLE_EAST_AFRICA: Language[] = [
   },
 ];
 
-export const EAST_ASIA: Language[] = [
+const EAST_ASIA: Language[] = [
   {
     code: 'ja',
-    nativeName: '日本語',
+    nativeName: 'æ—¥æœ¬èªž',
     englishName: 'Japanese',
     region: 'East Asia',
     script: 'CJK',
     keyboard: 'Romaji + Kana',
     rtl: false,
-    sampleText: 'いろはにほへとちりぬるを わかよたれそつねならむ',
+    sampleText: 'ã„ã‚ã¯ã«ã»ã¸ã¨ã¡ã‚Šã¬ã‚‹ã‚’ ã‚ã‹ã‚ˆãŸã‚Œãã¤ã­ãªã‚‰ã‚€',
   },
   {
     code: 'zh',
-    nativeName: '简体中文',
+    nativeName: 'ç®€ä½“ä¸­æ–‡',
     englishName: 'Chinese (Mandarin)',
     region: 'East Asia',
     script: 'CJK',
     keyboard: 'Pinyin',
     rtl: false,
-    sampleText: '天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。',
+    sampleText: 'å¤©åœ°çŽ„é»„ï¼Œå®‡å®™æ´ªè’ã€‚æ—¥æœˆç›ˆæ˜ƒï¼Œè¾°å®¿åˆ—å¼ ã€‚',
   },
   {
     code: 'ko',
-    nativeName: '한국어',
+    nativeName: 'í•œêµ­ì–´',
     englishName: 'Korean',
     region: 'East Asia',
     script: 'Korean',
     keyboard: 'Dubeolsik',
     rtl: false,
-    sampleText: '다람쥐 헌 쳇바퀴에 타고파.',
+    sampleText: 'ë‹¤ëžŒì¥ í—Œ ì³‡ë°”í€´ì— íƒ€ê³ íŒŒ.',
   },
 ];
 
-export const SOUTH_SOUTHEAST_ASIA: Language[] = [
+const SOUTH_SOUTHEAST_ASIA: Language[] = [
   {
     code: 'hi',
-    nativeName: 'हिन्दी',
+    nativeName: 'à¤¹à¤¿à¤¨à¥à¤¦à¥€',
     englishName: 'Hindi',
     region: 'South & Southeast Asia',
     script: 'Devanagari',
     keyboard: 'QWERTY (IN)',
     rtl: false,
-    sampleText: 'क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह',
+    sampleText: 'à¤• à¤– à¤— à¤˜ à¤™ à¤š à¤› à¤œ à¤ à¤ž à¤Ÿ à¤  à¤¡ à¤¢ à¤£ à¤¤ à¤¥ à¤¦ à¤§ à¤¨ à¤ª à¤« à¤¬ à¤­ à¤® à¤¯ à¤° à¤² à¤µ à¤¶ à¤· à¤¸ à¤¹',
   },
   {
     code: 'th',
-    nativeName: 'ไทย',
+    nativeName: 'à¹„à¸—à¸¢',
     englishName: 'Thai',
     region: 'South & Southeast Asia',
     script: 'Thai',
     keyboard: 'Kedmanee',
     rtl: false,
-    sampleText: 'กีฬาวิ่งเร็วสุดในงานแข่งขันระดับนานาชาติ',
+    sampleText: 'à¸à¸µà¸¬à¸²à¸§à¸´à¹ˆà¸‡à¹€à¸£à¹‡à¸§à¸ªà¸¸à¸”à¹ƒà¸™à¸‡à¸²à¸™à¹à¸‚à¹ˆà¸‡à¸‚à¸±à¸™à¸£à¸°à¸”à¸±à¸šà¸™à¸²à¸™à¸²à¸Šà¸²à¸•à¸´',
   },
   {
     code: 'vi',
-    nativeName: 'Tiếng Việt',
+    nativeName: 'Tiáº¿ng Viá»‡t',
     englishName: 'Vietnamese',
     region: 'South & Southeast Asia',
     script: 'Latin',
     keyboard: 'Telex / VNI',
     rtl: false,
-    sampleText: 'Con gà trốn đẹp trai bay qua vịnh Hạ Long.',
+    sampleText: 'Con gÃ  trá»‘n Ä‘áº¹p trai bay qua vá»‹nh Háº¡ Long.',
   },
   {
     code: 'id',
@@ -317,36 +317,36 @@ export const SOUTH_SOUTHEAST_ASIA: Language[] = [
   },
 ];
 
-export const CENTRAL_EASTERN_EUROPE: Language[] = [
+const CENTRAL_EASTERN_EUROPE: Language[] = [
   {
     code: 'ru',
-    nativeName: 'Русский',
+    nativeName: 'Ð ÑƒÑÑÐºÐ¸Ð¹',
     englishName: 'Russian',
     region: 'Central & Eastern Europe',
     script: 'Cyrillic',
-    keyboard: 'ЙЦУКЕН',
+    keyboard: 'Ð™Ð¦Ð£ÐšÐ•Ð',
     rtl: false,
-    sampleText: 'Эй, жлоб! Где туз? Прячь юных съёмных.',
+    sampleText: 'Ð­Ð¹, Ð¶Ð»Ð¾Ð±! Ð“Ð´Ðµ Ñ‚ÑƒÐ·? ÐŸÑ€ÑÑ‡ÑŒ ÑŽÐ½Ñ‹Ñ… ÑÑŠÑ‘Ð¼Ð½Ñ‹Ñ….',
   },
   {
     code: 'uk',
-    nativeName: 'Українська',
+    nativeName: 'Ð£ÐºÑ€Ð°Ñ—Ð½ÑÑŒÐºÐ°',
     englishName: 'Ukrainian',
     region: 'Central & Eastern Europe',
     script: 'Cyrillic',
-    keyboard: 'ЙЦУКЕН',
+    keyboard: 'Ð™Ð¦Ð£ÐšÐ•Ð',
     rtl: false,
-    sampleText: "Ей, барсу! Блискавично ховай юних оленят.",
+    sampleText: "Ð•Ð¹, Ð±Ð°Ñ€ÑÑƒ! Ð‘Ð»Ð¸ÑÐºÐ°Ð²Ð¸Ñ‡Ð½Ð¾ Ñ…Ð¾Ð²Ð°Ð¹ ÑŽÐ½Ð¸Ñ… Ð¾Ð»ÐµÐ½ÑÑ‚.",
   },
   {
     code: 'tr',
-    nativeName: 'Türkçe',
+    nativeName: 'TÃ¼rkÃ§e',
     englishName: 'Turkish',
     region: 'Central & Eastern Europe',
     script: 'Latin',
     keyboard: 'QWERTY (TR)',
     rtl: false,
-    sampleText: 'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.',
+    sampleText: 'Vakif bank fÄ±rtÄ±nasÄ±, mahsur kaldÄ±klarÄ± gemiyi yuttu.',
   },
 ];
 
@@ -358,8 +358,6 @@ export const ALL_LANGUAGES: Language[] = [
   ...SOUTH_SOUTHEAST_ASIA,
   ...CENTRAL_EASTERN_EUROPE,
 ];
-
-export const RTL_LANGUAGES = ALL_LANGUAGES.filter((l) => l.rtl);
 
 export const REGIONS: Region[] = [
   'Americas',
@@ -384,14 +382,3 @@ export function getLanguagesByRegion(region: Region): Language[] {
 export function getLanguageByCode(code: string): Language | undefined {
   return ALL_LANGUAGES.find((l) => l.code === code);
 }
-
-export const SCRIPT_GROUPS = [
-  { name: 'Latin', samples: ['Aa', 'Mm', 'Rr'], color: '#ffc56c' },
-  { name: 'Arabic', samples: ['أب', 'تث'], color: '#41e4c0', rtl: true },
-  { name: 'Cyrillic', samples: ['Аа', 'Мм'], color: '#ffb4ab' },
-  { name: 'CJK', samples: ['中文', '日本語'], color: '#ffc56c' },
-  { name: 'Hebrew', samples: ['אב', 'גד'], color: '#41e4c0', rtl: true },
-  { name: 'Thai', samples: ['กา', 'ไทย'], color: '#ffb4ab' },
-  { name: 'Korean', samples: ['한글', '한국어'], color: '#ffc56c' },
-  { name: 'Devanagari', samples: ['हिन', 'हिन्दी'], color: '#41e4c0' },
-];

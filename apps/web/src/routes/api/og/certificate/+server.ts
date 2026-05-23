@@ -1,5 +1,4 @@
-import { ImageResponse } from '@sveltejs/kit';
-import satori from 'satori';
+﻿import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 
 // Pre-fetch fonts (if running locally or serverless, we fetch once)
@@ -8,7 +7,9 @@ let fontBuffer: ArrayBuffer | null = null;
 async function getFont() {
   if (!fontBuffer) {
     // Fetch Inter from jsdelivr as it's very reliable
-    const response = await fetch('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf');
+    const response = await fetch(
+      'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf'
+    );
     fontBuffer = await response.arrayBuffer();
   }
   return fontBuffer;
@@ -33,7 +34,8 @@ export const GET = async ({ url }) => {
           width: '1200px',
           height: '630px',
           backgroundColor: '#1d2025',
-          backgroundImage: 'radial-gradient(ellipse at 50% -20%, rgba(240, 165, 0, 0.15), transparent 70%)',
+          backgroundImage:
+            'radial-gradient(ellipse at 50% -20%, rgba(240, 165, 0, 0.15), transparent 70%)',
           color: '#e3e2e6',
           fontFamily: 'Inter',
         },
@@ -210,7 +212,7 @@ export const GET = async ({ url }) => {
 
   const pngData = resvg.render().asPng();
 
-  return new Response(pngData, {
+  return new Response(new Uint8Array(pngData), {
     headers: {
       'Content-Type': 'image/png',
       // Cache heavily as this image is mostly static based on URL query

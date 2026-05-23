@@ -264,4 +264,3 @@ export const polishWordlist: WordlistEntry[] = [
   { word: 'ważny', difficulty: 3, tags: ['adjective', 'advanced'] },
 ];
 
-export default polishWordlist;

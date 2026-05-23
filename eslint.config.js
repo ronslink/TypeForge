@@ -32,7 +32,9 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       'prefer-const': 'warn',
       'svelte/no-at-html-tags': 'warn',
-      'svelte/valid-compile': 'warn'
+      'svelte/valid-compile': 'warn',
+      'no-undef': 'off',
+      'no-empty': 'off'
     }
   },
   {

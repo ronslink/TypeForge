@@ -253,4 +253,3 @@ export const dutchWordlist: WordlistEntry[] = [
   { word: 'nodig', difficulty: 3, tags: ['adjective', 'advanced'] },
 ];
 
-export default dutchWordlist;

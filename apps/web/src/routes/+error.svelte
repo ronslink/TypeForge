@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { page } from '$app/state';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-  <title>Error {page.status} — TypingScholar</title>
+  <title>Error {page.status} â€” TypingScholar</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col">

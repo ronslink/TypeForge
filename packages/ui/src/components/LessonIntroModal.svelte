@@ -142,7 +142,7 @@
 
   function handleStart() {
     stopAutoAdvance();
-    try { sessionStorage.setItem(`tf_intro_seen_${lessonId}`, '1'); } catch {}
+    try { sessionStorage.setItem(`tf_intro_seen_${lessonId}`, '1'); } catch { /* ignore */ }
     onStart();
   }
 

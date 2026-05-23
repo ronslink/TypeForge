@@ -121,6 +121,9 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    fs: {
+      allow: ['messages', '../../packages', '../..'],
+    },
   },
   build: {
     target: 'esnext',
@@ -136,11 +139,6 @@ export default defineConfig({
           core: ['@typeforge/metrics', '@typeforge/curriculum', '@typeforge/layouts'],
         },
       },
-    },
-  },
-  server: {
-    fs: {
-      allow: ['messages', '../../packages', '../..'],
     },
   },
   optimizeDeps: {

@@ -255,4 +255,3 @@ export const germanWordlist: WordlistEntry[] = [
   { word: 'notwendig', difficulty: 3, tags: ['adjective', 'advanced'] },
 ];
 
-export default germanWordlist;

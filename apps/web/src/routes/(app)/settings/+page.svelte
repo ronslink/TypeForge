@@ -1,14 +1,11 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { UserProfile } from 'svelte-clerk';
   import { Keyboard } from '@typeforge/ui';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import type { Layout } from '@typeforge/layouts';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
-  import type { PageProps } from './$types';
   import { t } from '$lib/stores/locale';
-
-  let { data }: PageProps = $props();
 
 
   // -------------------------------------------------------------------------
@@ -53,7 +50,7 @@
 </script>
 
 <svelte:head>
-  <title>Settings — TypeForge</title>
+  <title>Settings â€” TypeForge</title>
 </svelte:head>
 
 <div class="max-w-3xl mx-auto px-6 py-12">
@@ -84,7 +81,7 @@
           bind:value={selectedLanguage}
         >
           {#each ALL_LANGUAGES as lang}
-            <option value={lang.code}>{lang.nativeName} — {lang.englishName}</option>
+            <option value={lang.code}>{lang.nativeName} â€” {lang.englishName}</option>
           {/each}
         </select>
       </div>
@@ -148,7 +145,7 @@
       <div class="settings-card">
         <div class="settings-card-label">
           <span class="font-label text-sm" id="toggle-strict-label">{$t('settings_strict_mode') || 'Strict Mode'}</span>
-          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_strict_desc') || 'Prevents advancing on errors — you must type the correct key to continue.'}</p>
+          <p class="text-on-surface-variant text-xs mt-0.5">{$t('settings_strict_desc') || 'Prevents advancing on errors â€” you must type the correct key to continue.'}</p>
         </div>
         <label class="kf-toggle" aria-labelledby="toggle-strict-label">
           <input
@@ -176,7 +173,7 @@
     <p class="text-on-surface-variant text-sm mb-6 font-body">
       {$t('settings_preview_desc') || 'This is how your selected layout will appear during lessons.'}
       {#if previewLayout.rtl}
-        <span class="text-secondary font-label ml-1">{$t('settings_preview_rtl') || '↩ RTL Layout'}</span>
+        <span class="text-secondary font-label ml-1">{$t('settings_preview_rtl') || 'â†© RTL Layout'}</span>
       {/if}
     </p>
     <div class="bg-surface-container-low p-6 overflow-x-auto">
@@ -187,7 +184,7 @@
     </div>
     <p class="text-xs text-on-surface-variant mt-3 font-body">
       {$t('settings_preview_layout') || 'Layout:'} <strong class="text-on-surface font-label">{previewLayout.name}</strong>
-      &nbsp;·&nbsp;
+      &nbsp;Â·&nbsp;
       {$t('settings_preview_script') || 'Script:'} <strong class="text-on-surface font-label">{previewLayout.script}</strong>
     </p>
   </section>
@@ -206,7 +203,7 @@
 </div>
 
 <style>
-  /* Settings card – horizontal label + control row */
+  /* Settings card â€“ horizontal label + control row */
   :global(.settings-card) {
     display: flex;
     align-items: center;
@@ -241,7 +238,7 @@
     border-bottom-color: var(--primary);
   }
 
-  /* Kinetic Foundry toggle — no border-radius, uses clip-path for the notch feel */
+  /* Kinetic Foundry toggle â€” no border-radius, uses clip-path for the notch feel */
   :global(.kf-toggle) {
     display: inline-flex;
     align-items: center;

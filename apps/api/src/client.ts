@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable */
 // @ts-nocheck
 /**
  * TypeForge API - Typed Hono RPC Client
@@ -1199,8 +1199,3 @@ export type InferResponse<T extends (...args: any[]) => Promise<any>> =
 export type InferRequest<T extends (...args: any[]) => Promise<any>> =
   T extends (input: infer I) => Promise<any> ? I : never;
 
-// ============================================================================
-// Default export
-// ============================================================================
-
-export default api;

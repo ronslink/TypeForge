@@ -20,7 +20,7 @@ const requestCounts = new Map<string, { count: number; resetAt: number }>();
 /**
  * Rate limiting middleware
  */
-export function rateLimit(config: RateLimitConfig) {
+function rateLimit(config: RateLimitConfig) {
   return async (c: Context, next: Next) => {
     // Generate key for rate limiting
     const key = config.keyGenerator 

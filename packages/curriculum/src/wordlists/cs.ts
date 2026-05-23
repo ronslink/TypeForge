@@ -219,4 +219,3 @@ export const czechWordlist: WordlistEntry[] = [
   { word: "hlavní", difficulty: 3, tags: ['adjective'] },
 ];
 
-export default czechWordlist;

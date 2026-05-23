@@ -216,4 +216,3 @@ export const swedishWordlist: WordlistEntry[] = [
   { word: "speciell", difficulty: 3, tags: ['adjective'] },
   { word: "huvudsaklig", difficulty: 3, tags: ['adjective'] },
 ];
-export default swedishWordlist;

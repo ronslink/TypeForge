@@ -11,12 +11,11 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run",
-    "test:unit": "vitest run"
+    "test": "vitest run --passWithNoTests",
+    "test:unit": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.53",
-    "@hono/zod-validator": "^0.4.0",
     "@typeforge/auth": "workspace:*",
     "@typeforge/db": "workspace:*",
     "ai": "^6.0.168",

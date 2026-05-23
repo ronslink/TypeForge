@@ -284,4 +284,3 @@ export const hebrewWordlist: WordlistEntry[] = [
   { word: 'מקהלה', difficulty: 3, tags: ['noun', 'choir', 'advanced'] },
 ];
 
-export default hebrewWordlist;

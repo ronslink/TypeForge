@@ -204,4 +204,3 @@ export const tagalogWordlist: WordlistEntry[] = [
   { word: "espisyal", difficulty: 3, tags: ['adjective'] },
   { word: "pangunahing", difficulty: 3, tags: ['adjective'] },
 ];
-export default tagalogWordlist;

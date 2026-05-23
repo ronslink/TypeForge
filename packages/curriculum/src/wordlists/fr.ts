@@ -299,4 +299,3 @@ export const frenchWordlist: WordlistEntry[] = [
   { word: 'et cætera', difficulty: 3, tags: ['adverb', 'ligature', 'advanced'] },
 ];
 
-export default frenchWordlist;

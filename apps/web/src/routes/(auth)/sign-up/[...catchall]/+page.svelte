@@ -1,18 +1,22 @@
 <script lang="ts">
   import { SignUp } from 'svelte-clerk';
   import { page } from '$app/state';
+  import SeoHead from '$lib/components/SeoHead.svelte';
 
   let plan = $derived(page.url.searchParams.get('plan'));
   let redirectUrl = $derived(
-    plan && plan.startsWith('school') 
+    plan && plan.startsWith('school')
       ? `/onboarding/school?plan=${plan.split('-')[1] || 90}`
       : '/learn'
   );
 </script>
 
-<svelte:head>
-  <title>Sign Up - TypeForge</title>
-</svelte:head>
+<SeoHead
+  title="Sign Up"
+  description="Create a TypingScholar account and start free typing lessons."
+  path="/sign-up"
+  noindex
+/>
 
 <div class="clerk-container w-full">
   <SignUp fallbackRedirectUrl={redirectUrl} routing="path" path="/sign-up" />

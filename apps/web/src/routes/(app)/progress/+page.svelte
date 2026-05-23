@@ -1,5 +1,4 @@
-<script lang="ts">
-  import { onMount } from 'svelte';
+﻿<script lang="ts">
   import { useClerkContext } from 'svelte-clerk';
   import { ProgressRing, StatCard, WeaknessHeatmap, MilestoneCertifications } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
@@ -42,15 +41,6 @@
       zh: 'Chinese', ja: 'Japanese', ko: 'Korean',
     };
     return map[code] || code.toUpperCase();
-  }
-
-  function formatRelative(dateStr: string | null): string {
-    if (!dateStr) return 'Never';
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    return `${days}d ago`;
   }
 
   // Improvement label
@@ -206,7 +196,7 @@
       .sort((a: any, b: any) => (b.wpm || 0) - (a.wpm || 0))[0] || { wpm: 0, accuracy: 0 }
   );
 
-  // Map API weakness shape → WeaknessHeatmap shape
+  // Map API weakness shape â†’ WeaknessHeatmap shape
   let heatmapData = $derived(
     weakKeys.map((k) => ({
       key:       k.key,
@@ -223,7 +213,7 @@
 </script>
 
 <svelte:head>
-  <title>Progress — TypeForge</title>
+  <title>Progress â€” TypeForge</title>
   <meta name="description" content="Track your typing performance, WPM trends, accuracy, streak, and key weaknesses." />
 </svelte:head>
 
@@ -266,7 +256,7 @@
 
   {:else}
 
-    <!-- ──────────────────────────────────── Top hero ────────────────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Top hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="hero-strip mb-10">
       <!-- Level ring -->
       <div class="level-card">
@@ -291,7 +281,7 @@
       </div>
     </div>
 
-    <!-- ───────────────────────────── Certifications ───────────────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Certifications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="mb-8">
       <MilestoneCertifications 
         wpm={bestValidSession.wpm} 
@@ -300,7 +290,7 @@
       />
     </div>
 
-    <!-- ──────────────────────────────── This week vs last ───────────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ This week vs last â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     {#if stats}
       <div class="bg-surface-container border border-outline-variant/20 p-6 mb-8">
         <div class="flex items-center justify-between mb-5">
@@ -352,7 +342,7 @@
       </div>
     {/if}
 
-    <!-- ──────────────────────────────────── WPM Chart ──────────────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ WPM Chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="bg-surface-container border border-outline-variant/20 p-6 mb-8">
       <h2 class="font-headline text-xl mb-4">{$t('progress_wpm_chart')}</h2>
       <div class="h-64 w-full">
@@ -367,7 +357,7 @@
       </div>
     </div>
 
-    <!-- ──────────────────────────────── Key Weakness Heatmap ───────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Key Weakness Heatmap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="bg-surface-container border border-outline-variant/20 mb-8">
       {#if weakKeys.length > 0}
         <WeaknessHeatmap weaknesses={heatmapData} showLabels={true}>
@@ -399,7 +389,7 @@
       {/if}
     </div>
 
-    <!-- ──────────────────────────────────── Session Table ──────────────────────────── -->
+    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Session Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="bg-surface-container border border-outline-variant/20 p-6">
       <h2 class="font-headline text-xl mb-4">{$t('progress_sessions_heading')}</h2>
       {#if recentSessions.length > 0}

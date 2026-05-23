@@ -1,6 +1,8 @@
-<script lang="ts">
+﻿<script lang="ts">
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import SeoHead from '$lib/components/SeoHead.svelte';
+  import { SEO_PAGES, breadcrumbJsonLd, organizationJsonLd, webPageJsonLd } from '$lib/seo';
 
   let formState = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
   let errorMessage = $state<string | null>(null);
@@ -13,6 +15,16 @@
   let studentCount = $state('');
   let useCase = $state('');
   let message = $state('');
+
+  const seo = SEO_PAGES.contact;
+  const contactJsonLd = [
+    webPageJsonLd({ ...seo, type: 'ContactPage' }),
+    organizationJsonLd(),
+    breadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Contact', path: '/contact' },
+    ]),
+  ];
 
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
@@ -36,7 +48,7 @@
       }
 
       // Simulate submission (in production this would call an API endpoint)
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       // Success
       formState = 'success';
@@ -48,16 +60,12 @@
   }
 </script>
 
-<svelte:head>
-  <title>Contact Sales — TypingScholar</title>
-  <meta name="description" content="Get in touch with TypingScholar's sales team for school or institutional pricing, bulk licensing, and custom deployments." />
-</svelte:head>
+<SeoHead title={seo.title} description={seo.description} path={seo.path} jsonLd={contactJsonLd} />
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col">
   <TopNavBar />
   <main class="pt-20 flex-1">
     <section class="py-24 px-6 md:px-8 max-w-3xl mx-auto">
-
       <div class="text-center mb-16">
         <div class="flex justify-center mb-6">
           <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
@@ -66,7 +74,8 @@
         </div>
         <h1 class="font-headline text-5xl md:text-6xl tracking-tight mb-4">Talk to our team</h1>
         <p class="font-body text-xl text-on-surface-variant max-w-xl mx-auto">
-          School or institutional pricing? Bulk licensing? Custom deployment? Tell us about your needs and we'll get back to you within one business day.
+          School or institutional pricing? Bulk licensing? Custom deployment? Tell us about your
+          needs and we'll get back to you within one business day.
         </p>
       </div>
 
@@ -79,19 +88,30 @@
           </div>
           <h2 class="font-headline text-2xl mb-3">Message sent</h2>
           <p class="font-body text-on-surface-variant mb-6">
-            Thanks, <strong>{name}</strong>. We'll review your {organisation ? `inquiry for ${organisation}` : 'inquiry'} and respond to <strong>{email}</strong> within one business day.
+            Thanks, <strong>{name}</strong>. We'll review your {organisation
+              ? `inquiry for ${organisation}`
+              : 'inquiry'} and respond to <strong>{email}</strong> within one business day.
           </p>
-          <a href="/" class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold hover:bg-primary-fixed-dim transition-colors inline-block">
+          <a
+            href="/"
+            class="notched-button bg-primary text-on-primary px-6 py-3 font-label font-bold hover:bg-primary-fixed-dim transition-colors inline-block"
+          >
             Back to home
           </a>
         </div>
-
       {:else}
-        <form onsubmit={handleSubmit} novalidate class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 md:p-10">
+        <form
+          onsubmit={handleSubmit}
+          novalidate
+          class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-8 md:p-10"
+        >
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Name -->
             <div>
-              <label for="name" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="name"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Full Name <span class="text-primary">*</span>
               </label>
               <input
@@ -106,7 +126,10 @@
 
             <!-- Email -->
             <div>
-              <label for="email" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="email"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Work Email <span class="text-primary">*</span>
               </label>
               <input
@@ -121,7 +144,10 @@
 
             <!-- Organisation -->
             <div>
-              <label for="organisation" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="organisation"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Organisation
               </label>
               <input
@@ -135,7 +161,10 @@
 
             <!-- Role -->
             <div>
-              <label for="role" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="role"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Your Role
               </label>
               <input
@@ -149,7 +178,10 @@
 
             <!-- Student count -->
             <div>
-              <label for="studentCount" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="studentCount"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Number of Students
               </label>
               <select
@@ -158,18 +190,21 @@
                 class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-3 font-body text-on-surface focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="">Select range</option>
-                <option value="1-50">1 – 50</option>
-                <option value="51-200">51 – 200</option>
-                <option value="201-500">201 – 500</option>
-                <option value="501-1000">501 – 1,000</option>
-                <option value="1001-5000">1,001 – 5,000</option>
+                <option value="1-50">1 â€“ 50</option>
+                <option value="51-200">51 â€“ 200</option>
+                <option value="201-500">201 â€“ 500</option>
+                <option value="501-1000">501 â€“ 1,000</option>
+                <option value="1001-5000">1,001 â€“ 5,000</option>
                 <option value="5000+">5,000+</option>
               </select>
             </div>
 
             <!-- Use case -->
             <div>
-              <label for="useCase" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+              <label
+                for="useCase"
+                class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+              >
                 Primary Use Case
               </label>
               <select
@@ -190,7 +225,10 @@
 
           <!-- Message -->
           <div class="mb-8">
-            <label for="message" class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block">
+            <label
+              for="message"
+              class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-2 block"
+            >
               Tell us more <span class="text-primary">*</span>
             </label>
             <textarea
@@ -222,11 +260,11 @@
           </button>
 
           <p class="font-body text-xs text-on-surface-variant/50 text-center mt-4">
-            By submitting you agree to be contacted by our sales team. We don't share your data with third parties.
+            By submitting you agree to be contacted by our sales team. We don't share your data with
+            third parties.
           </p>
         </form>
       {/if}
-
     </section>
   </main>
   <Footer />

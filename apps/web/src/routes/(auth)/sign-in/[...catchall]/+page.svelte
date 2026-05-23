@@ -1,10 +1,14 @@
 <script lang="ts">
   import { SignIn } from 'svelte-clerk';
+  import SeoHead from '$lib/components/SeoHead.svelte';
 </script>
 
-<svelte:head>
-  <title>Sign In - TypeForge</title>
-</svelte:head>
+<SeoHead
+  title="Sign In"
+  description="Sign in to your TypingScholar account."
+  path="/sign-in"
+  noindex
+/>
 
 <!-- We apply some CSS overrides to match our design system -->
 <div class="clerk-container w-full">

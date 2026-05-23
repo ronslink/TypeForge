@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import SideNavBar from '$lib/components/SideNavBar.svelte';
   import type { LayoutProps } from './$types';
   import { page } from '$app/state';

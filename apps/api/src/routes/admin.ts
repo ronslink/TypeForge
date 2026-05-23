@@ -5,7 +5,7 @@
 
 import { Hono } from 'hono';
 import { requireRole, getDb } from '../middleware/index.js';
-import { users, organisations, subscriptions, sessions, auditLogs } from '@typeforge/db';
+import { users, organisations, subscriptions, typingSessions, auditLogs } from '@typeforge/db';
 import { desc, count, sql, eq } from 'drizzle-orm';
 
 const app = new Hono();
@@ -21,7 +21,7 @@ app.get('/stats', async (c) => {
   
   const [userCount] = await db.select({ count: count() }).from(users);
   const [orgCount] = await db.select({ count: count() }).from(organisations);
-  const [sessionCount] = await db.select({ count: count() }).from(sessions);
+  const [sessionCount] = await db.select({ count: count() }).from(typingSessions);
   const [activeSubCount] = await db
     .select({ count: count() })
     .from(subscriptions)

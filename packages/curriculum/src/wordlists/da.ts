@@ -216,4 +216,3 @@ export const danishWordlist: WordlistEntry[] = [
   { word: "speciel", difficulty: 3, tags: ['adjective'] },
   { word: "hoved", difficulty: 3, tags: ['adjective'] },
 ];
-export default danishWordlist;

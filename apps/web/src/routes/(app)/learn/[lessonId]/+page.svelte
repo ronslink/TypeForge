@@ -7,7 +7,6 @@
     TypingInput, 
     Keyboard, 
     MetricsBar, 
-    StatCard, 
     Button, 
     ConfettiCelebration,
     Badge,
@@ -16,9 +15,7 @@
   } from '@typeforge/ui';
   import { 
     getLessonById, 
-    LESSON_CATALOG, 
-    type Lesson, 
-    type LessonChar 
+    LESSON_CATALOG
   } from '@typeforge/curriculum';
   import { 
     WPMCalculator, 
@@ -26,13 +23,9 @@
   } from '@typeforge/metrics';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
-  import { getLanguageByCode, ALL_LANGUAGES } from '$lib/i18n/languages';
+  import { getLanguageByCode } from '$lib/i18n/languages';
   import { t } from '$lib/stores/locale';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
-  import type { PageProps } from './$types';
-
-  let { data }: PageProps = $props();
-
 
   // Get lesson ID from URL params (typed via page.params)
   const lessonId = $derived(page.params.lessonId);
@@ -49,8 +42,6 @@
   // Get authentication context natively during component initialization
   const ctx = useClerkContext();
 
-  // User preferences
-  let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
 
   // Auto-select the canonical keyboard layout whenever the lesson's language changes.
@@ -74,10 +65,8 @@
   let sessionSubmitted = $state(false);
   let isLocked = $state(false);
 
-  // Timer state — wall-clock elapsed (display only); active time lives in wpmCalculator
+  // Timer state — active time lives in wpmCalculator
   let startTime = $state<number | null>(null);
-  let elapsedSeconds = $state(0);
-  let timerInterval: ReturnType<typeof setInterval> | null = null;
   // Pause detection UI state — mirrors wpmCalculator.isPaused reactively
   let isPausedUI = $state(false);
   // Idle watcher interval
@@ -91,7 +80,6 @@
   let currentWPM = $state(0);
   let currentAccuracy = $state(100);
   let currentStreak = $state(0);
-  let maxStreak = $state(0);
   let previousStreak = $state(0);
 
   // Keystroke tracking for API
@@ -159,31 +147,6 @@
     return hand;
   }
 
-  // Finger Tutorial State
-  const FingerDescriptions: Record<string, string> = {
-    left_pinky: "Left Pinky",
-    left_ring: "Left Ring",
-    left_middle: "Left Middle",
-    left_index: "Left Index",
-    left_thumb: "Left Thumb",
-    right_thumb: "Right Thumb",
-    right_index: "Right Index",
-    right_middle: "Right Middle",
-    right_ring: "Right Ring",
-    right_pinky: "Right Pinky",
-    'left-pinky': "Left Pinky",
-    'left-ring': "Left Ring",
-    'left-middle': "Left Middle",
-    'left-index': "Left Index",
-    'left-thumb': "Left Thumb",
-    'right-thumb': "Right Thumb",
-    'right-index': "Right Index",
-    'right-middle': "Right Middle",
-    'right-ring': "Right Ring",
-    'right-pinky': "Right Pinky",
-    all: "Any Finger"
-  };
-
   // Check sessionStorage to skip intro for returning users
   let showIntroAnimation = $state(true);
   // Tracks which key is currently highlighted in the intro animation
@@ -239,16 +202,6 @@
         ariaLiveText = `Accuracy: ${accuracy}%`;
         lastAccuracyAnnouncement = accuracy;
       }
-    }
-  });
-
-  // Wall-clock timer (display only — no hard stop)
-  $effect(() => {
-    if (isStarted && !isComplete && !showIntroAnimation) {
-      timerInterval = setInterval(() => {
-        elapsedSeconds++;
-      }, 1000);
-      return () => { if (timerInterval) clearInterval(timerInterval); };
     }
   });
 
@@ -325,7 +278,6 @@
     if (isCorrect) {
       previousStreak = currentStreak;
       currentStreak++;
-      maxStreak = Math.max(maxStreak, currentStreak);
       currentIndex++; // Only advance on correct keystroke
     } else {
       previousStreak = currentStreak;
@@ -345,7 +297,7 @@
     }
   }
 
-  function handleKeyUp(event: KeyboardEvent) {
+  function handleKeyUp() {
     pressedKey = undefined;
   }
 
@@ -373,14 +325,12 @@
       sessionSubmitted = false;
       testFailed = false;
       startTime = null;
-      elapsedSeconds = 0;
       activeElapsedSeconds = 0;
       isPausedUI = false;
       currentWPM = 0;
       currentAccuracy = 100;
       currentStreak = 0;
       previousStreak = 0;
-      maxStreak = 0;
       keystrokes = [];
       finalWPM = 0;
       finalAccuracy = 0;
@@ -395,7 +345,6 @@
           if (seen) showIntroAnimation = false;
         }
       } catch {}
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     }
   });
@@ -410,7 +359,6 @@
     isComplete = true;
     showCelebration = true;
     
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
 
     // Calculate final metrics using active time (pauses excluded)
@@ -519,7 +467,6 @@
     showCelebration = false;
     sessionSubmitted = false;
     startTime = null;
-    elapsedSeconds = 0;
     activeElapsedSeconds = 0;
     isPausedUI = false;
     currentWPM = 0;
@@ -609,7 +556,6 @@
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     }
-    if (timerInterval) clearInterval(timerInterval);
     if (idleInterval) clearInterval(idleInterval);
   });
 </script>

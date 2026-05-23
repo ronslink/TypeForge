@@ -592,19 +592,3 @@ export const russianLessons: Lesson[] = [
   },
 ];
 
-// Export individual lesson categories for convenience
-export const russianHomeRowLessons = russianLessons.filter((l) => l.id.includes('home-row'));
-
-export const russianTopRowLessons = russianLessons.filter((l) => l.id.includes('top-row'));
-
-export const russianBottomRowLessons = russianLessons.filter((l) => l.id.includes('bottom-row'));
-
-export const russianAdvancedLessons = russianLessons.filter(
-  (l) => l.id.includes('all-rows') || l.id.includes('special') || l.id.includes('bigrams')
-);
-
-export const russianPhraseLessons = russianLessons.filter(
-  (l) => l.id.includes('words') || l.id.includes('phrases') || l.id.includes('speed')
-);
-
-export default russianLessons;

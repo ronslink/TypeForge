@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { page } from '$app/state';
   import { afterNavigate } from '$app/navigation';
   import { useClerkContext, UserButton } from 'svelte-clerk';
@@ -39,7 +39,7 @@
       try {
         const token = await ctx?.session?.getToken();
         const res = await fetch('/api/v1/organisations', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers: token ? { Authorization: `Bearer ${token}` } : { /* ignore */ },
         });
         if (res.ok) {
           const data = await res.json();
@@ -56,7 +56,7 @@
     try {
       localStorage.setItem('tf-language', code);
       localStorage.setItem('tf-keyboard-layout', getDefaultLayoutForLanguage(code));
-    } catch {}
+    } catch { /* ignore */ }
     const token = await ctx?.session?.getToken();
     saveLocaleToApi(code, token ?? null);
   }
@@ -261,7 +261,7 @@
 {/if}
 
 <style>
-  /* ─── UI Locale Switcher ─── */
+  /* â”€â”€â”€ UI Locale Switcher â”€â”€â”€ */
   .ui-locale-btn {
     display: flex;
     align-items: center;

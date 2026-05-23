@@ -221,5 +221,3 @@ export const hindiWordlist: WordlistEntry[] = [
   { word: 'मोती मानुष चून', difficulty: 3, tags: ['literature', 'kabir'] },
   { word: 'बुरा जो देखन मैं चला', difficulty: 3, tags: ['literature', 'kabir'] },
 ];
-
-export default hindiWordlist;

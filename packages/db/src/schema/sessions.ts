@@ -207,5 +207,3 @@ export const userPlacementResultsRelations = relations(userPlacementResults, ({ 
   }),
 }));
 
-// Alias for backwards compatibility with API
-export const sessions = typingSessions;

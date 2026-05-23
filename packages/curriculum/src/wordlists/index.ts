@@ -33,34 +33,11 @@ import { turkishWordlist } from './tr.js';
 // Re-export types
 export type { WordlistEntry };
 
-// Re-export wordlists
+// Re-export the wordlists that are part of the public curriculum API.
 export {
   frenchWordlist,
   spanishWordlist,
   arabicWordlist,
-  portugueseWordlist,
-  englishWordlist,
-  germanWordlist,
-  dutchWordlist,
-  polishWordlist,
-  finnishWordlist,
-  greekWordlist,
-  hebrewWordlist,
-  russianWordlist,
-  czechWordlist,
-  danishWordlist,
-  hindiWordlist,
-  hungarianWordlist,
-  malayWordlist,
-  norwegianWordlist,
-  swedishWordlist,
-  tagalogWordlist,
-  swahiliWordlist,
-  italianWordlist,
-  japaneseWordlist,
-  koreanWordlist,
-  chineseWordlist,
-  turkishWordlist,
 };
 
 // Language code mapping

@@ -69,7 +69,7 @@ export interface WeakArea {
 }
 
 /** User progress tracking for SM-2 spaced repetition */
-export interface LessonProgress {
+interface LessonProgress {
   lessonId: string;
   easeFactor: number;
   interval: number;
@@ -79,7 +79,7 @@ export interface LessonProgress {
 }
 
 /** Result from selectNextLesson */
-export interface SelectedLesson {
+interface SelectedLesson {
   lesson: Lesson;
   reason: 'weak_area' | 'next_row' | 'spaced_repetition' | 'new_lesson';
   priority: number;
@@ -270,83 +270,3 @@ function calculateLessonPriority(
   };
 }
 
-/**
- * Get recommended lessons for a user with full details
- *
- * @param userId - Unique user identifier
- * @param sessionHistory - Array of completed session history
- * @param weakAreas - Map of key/bigram -> weak area info
- * @param count - Number of recommendations to return
- * @returns Promise resolving to array of selected lessons with reasons
- */
-export async function getRecommendedLessons(
-  _userId: string,
-  sessionHistory: SessionHistoryEntry[],
-  weakAreas: Map<string, WeakArea>,
-  count: number = 5,
-  placementResults?: Array<{ testId: string; passed: boolean }>
-): Promise<SelectedLesson[]> {
-  const now = new Date();
-  const lessonProgressMap = buildLessonProgressMap(sessionHistory);
-  const skippedLanguages = getSkippedLanguagesFromPlacement(placementResults);
-
-  const scoredLessons: SelectedLesson[] = [];
-
-  for (const lesson of LESSON_CATALOG) {
-    const score = calculateLessonPriority(lesson, weakAreas, lessonProgressMap, now, skippedLanguages);
-    if (score.priority > 0) {
-      scoredLessons.push(score);
-    }
-  }
-
-  // Sort by priority (highest first)
-  scoredLessons.sort((a, b) => b.priority - a.priority);
-
-  return scoredLessons.slice(0, count);
-}
-
-/**
- * Update weak areas based on session performance
- *
- * @param weakAreas - Current weak areas map
- * @param lesson - The lesson that was practiced
- * @param accuracy - Accuracy achieved in the session
- * @returns Updated weak areas map
- */
-export function updateWeakAreas(
-  weakAreas: Map<string, WeakArea>,
-  lesson: Lesson,
-  accuracy: number
-): Map<string, WeakArea> {
-  const keyBigram = lesson.tags.key_bigram;
-  const now = new Date();
-
-  const existing = weakAreas.get(keyBigram);
-
-  if (accuracy < WEAK_AREA_THRESHOLD) {
-    // Add or update weak area
-    weakAreas.set(keyBigram, {
-      keyOrBigram: keyBigram,
-      accuracy,
-      lastPracticedAt: now,
-      attemptCount: existing ? existing.attemptCount + 1 : 1,
-    });
-  } else if (existing && accuracy >= WEAK_AREA_THRESHOLD) {
-    // Remove from weak areas if now above threshold
-    weakAreas.delete(keyBigram);
-  }
-
-  return weakAreas;
-}
-
-/**
- * Get weak areas that need practice
- *
- * @param weakAreas - Map of weak areas
- * @returns Array of weak areas sorted by priority (lowest accuracy first)
- */
-export function getPriorityWeakAreas(weakAreas: Map<string, WeakArea>): WeakArea[] {
-  return Array.from(weakAreas.values())
-    .filter((wa) => wa.accuracy < WEAK_AREA_THRESHOLD)
-    .sort((a, b) => a.accuracy - b.accuracy);
-}

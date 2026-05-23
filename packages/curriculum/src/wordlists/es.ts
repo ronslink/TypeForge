@@ -349,4 +349,3 @@ export const spanishWordlist: WordlistEntry[] = [
   { word: '¿cuánto', difficulty: 3, tags: ['adjective', 'interrogative', 'inverted-question', 'advanced'] },
 ];
 
-export default spanishWordlist;

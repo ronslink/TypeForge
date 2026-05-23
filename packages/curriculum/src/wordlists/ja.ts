@@ -189,5 +189,3 @@ export const japaneseWordlist: WordlistEntry[] = [
   { word: '春はあけぼの', difficulty: 3, tags: ['literature', 'sei_shonagon'] },
   { word: '祇園精舎の鐘の声', difficulty: 3, tags: ['literature', 'heike'] },
 ];
-
-export default japaneseWordlist;

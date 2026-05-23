@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
@@ -81,12 +81,6 @@
     await loadData();
   }
 
-  async function handleRemoveStudent() {
-    // Handled inline by ClassRoster component's onStudentClick
-    // Refreshed after action
-    await loadData();
-  }
-
   async function handleStudentClick(student: any) {
     selectedStudent = student;
     selectedPerformance = null;
@@ -99,7 +93,7 @@
         param: { id: orgId, userId: student.id },
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = await res.json().catch(() => ({ /* ignore */ }));
         throw new Error(body?.error || $t('org_student_drilldown_failed'));
       }
       selectedPerformance = await res.json();
@@ -145,7 +139,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t('org_roster_title')} — TypeForge</title>
+  <title>{$t('org_roster_title')} â€” TypeForge</title>
 </svelte:head>
 
 {#if loading}
@@ -347,7 +341,7 @@
                         <div
                           class="trend-bar"
                           style="height: {Math.max(10, Math.min(100, Number(day.avgAccuracy ?? 0)))}%"
-                          title={`${formatDate(day.date)} · ${Math.round(day.avgWpm ?? 0)} WPM · ${Math.round(day.avgAccuracy ?? 0)}%`}
+                          title={`${formatDate(day.date)} Â· ${Math.round(day.avgWpm ?? 0)} WPM Â· ${Math.round(day.avgAccuracy ?? 0)}%`}
                         ></div>
                       {/each}
                     </div>

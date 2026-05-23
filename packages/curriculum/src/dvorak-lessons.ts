@@ -456,4 +456,3 @@ export const dvorakLessons: Lesson[] = [
   },
 ];
 
-export default dvorakLessons;

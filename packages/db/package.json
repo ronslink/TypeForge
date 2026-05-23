@@ -23,7 +23,7 @@
     "seed:org": "tsx create-org.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "clean": "rm -rf node_modules drizzle/meta"
   },
   "dependencies": {

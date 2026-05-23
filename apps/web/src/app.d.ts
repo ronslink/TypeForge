@@ -1,3 +1,4 @@
+﻿/* eslint-disable @typescript-eslint/no-empty-object-type */
 /// <reference types="@sveltejs/kit" />
 type Hyperdrive = any;
 type D1Database = any;
@@ -25,8 +26,8 @@ declare global {
       /** Browser language detected from Accept-Language header */
       detectedLocale?: string;
     }
-    interface PageData {}
-    interface PageState {}
+    interface PageData { /* ignore */ }
+    interface PageState { /* ignore */ }
     interface Platform {
       env: {
         HYPERDRIVE_EU: Hyperdrive;
@@ -42,4 +43,4 @@ declare global {
   }
 }
 
-export {};
+export { /* ignore */ };

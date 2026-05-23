@@ -66,20 +66,6 @@ const ARABIC_KEY_MAP: Record<string, string> = {
   ' ': 'Space',
 };
 
-// Harakat (diacritics/vowel marks)
-// Arabic diacritics/marks mapping (reserved for future use)
-
-export const HARAKAT_MAP: Record<string, string> = {
-  'َ': 'Fatha', // fatha
-  'ُ': 'Damma', // damma
-  'ِ': 'Kasra', // kasra
-  'ْ': 'Sukun', // sukun
-  'ّ': 'Shadda', // shadda
-  'ً': 'Fathatan', // fathatan
-  'ٌ': 'Dammatan', // dammatan
-  'ٍ': 'Kasratan', // kasratan
-};
-
 /**
  * Arabic RTL Lessons - 10+ progressive lessons
  */
@@ -557,5 +543,3 @@ export const arabicGrammarLessons = arabicLessons.filter(
 export const arabicPhraseLessons = arabicLessons.filter(
   (l) => l.id.includes('simple-words') || l.id.includes('phrases')
 );
-
-export default arabicLessons;

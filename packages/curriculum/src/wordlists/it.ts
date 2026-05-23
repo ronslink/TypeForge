@@ -291,5 +291,3 @@ export const italianWordlist: WordlistEntry[] = [
   { word: 'Amor, ch\'a nullo amato amar perdona', difficulty: 3, tags: ['literature', 'dante'] },
   { word: 'L\'amor che move il sole e l\'altre stelle', difficulty: 3, tags: ['literature', 'dante'] },
 ];
-
-export default italianWordlist;

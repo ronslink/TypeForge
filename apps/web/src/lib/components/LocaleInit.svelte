@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { useClerkContext } from 'svelte-clerk';
@@ -25,7 +25,7 @@
     }
   });
 
-  // Full initialisation on mount — fetches DB preference for signed-in users
+  // Full initialisation on mount â€” fetches DB preference for signed-in users
   onMount(async () => {
     let dbLocale: string | null = null;
     let orgLocale: string | null = null;
@@ -43,7 +43,7 @@
           orgLocale = payload.orgDefaultUiLocale ?? null;
         }
       }
-    } catch {}
+    } catch { /* ignore */ }
 
     initLocale(dbLocale, orgLocale);
   });

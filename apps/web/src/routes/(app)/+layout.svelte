@@ -1,12 +1,12 @@
-<script lang="ts">
+﻿<script lang="ts">
   import type { LayoutProps } from './$types';
   import { page } from '$app/state';
-  import { goto, afterNavigate } from '$app/navigation';
+  import { afterNavigate } from '$app/navigation';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import { useClerkContext } from 'svelte-clerk';
 
-  let { children, data }: LayoutProps = $props();
+  let { children }: LayoutProps = $props();
 
   // Soft auth banner shown when signed out on soft-auth pages
   const softAuthPages = ['/learn', '/progress', '/practice'];

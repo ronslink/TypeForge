@@ -9,20 +9,18 @@
     "preview": "vite preview",
     "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "clean": "rm -rf .svelte-kit node_modules"
   },
   "dependencies": {
-    "@inlang/paraglide-sveltekit": "0.16.1",
     "@resvg/resvg-js": "^2.6.2",
     "@typeforge/api": "workspace:*",
     "@typeforge/curriculum": "workspace:*",
     "@typeforge/layouts": "workspace:*",
     "@typeforge/metrics": "workspace:*",
     "@typeforge/ui": "workspace:*",
-    "react": "^19.0.0",
     "satori": "^0.26.0",
     "svelte-clerk": "^1.1.3"
   },

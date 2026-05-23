@@ -1,10 +1,8 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
-  import type { PageProps } from './$types';
-  let { data }: PageProps = $props();
 
 
   const ctx = useClerkContext();
@@ -141,7 +139,7 @@
     error = null;
     try {
       const api = createApiClient();
-      const res = await api.api.v1.billing.portal.$post({ json: {} });
+      const res = await api.api.v1.billing.portal.$post({ json: { /* ignore */ } });
       const { portalUrl } = await res.json();
       if (portalUrl) window.location.href = portalUrl;
     } catch (err: any) {
@@ -159,7 +157,7 @@
   }
 
   function formatDate(iso?: string) {
-    if (!iso) return '—';
+    if (!iso) return 'â€”';
     return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(iso));
   }
 
@@ -178,7 +176,7 @@
     const url = new URL(window.location.href);
     if (url.searchParams.has('success')) {
       fetchBillingData();
-      window.history.replaceState({}, '', '/billing');
+      window.history.replaceState({ /* ignore */ }, '', '/billing');
     }
     if (url.searchParams.get('plan') === 'pro') {
       if (!isSignedIn) {
@@ -186,7 +184,7 @@
         window.location.href = `/sign-in#/?redirect_url=${encodeURIComponent('/billing?plan=pro')}`;
         return;
       }
-      window.history.replaceState({}, '', '/billing');
+      window.history.replaceState({ /* ignore */ }, '', '/billing');
       // Auto-trigger checkout for pro plan after data loads
       fetchBillingData().then(() => {
         const current = currentPlanId();
@@ -200,7 +198,7 @@
 </script>
 
 <svelte:head>
-  <title>Billing — TypeForge</title>
+  <title>Billing â€” TypeForge</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-6 py-12">
@@ -313,12 +311,12 @@
           <ul class="space-y-2 mb-6 flex-1">
             {#each plan.features as feat}
               <li class="flex gap-2 text-sm font-body text-on-surface">
-                <span class="text-secondary mt-0.5 shrink-0">✓</span>{feat}
+                <span class="text-secondary mt-0.5 shrink-0">âœ“</span>{feat}
               </li>
             {/each}
             {#each (plan.missingFeatures ?? []) as feat}
               <li class="flex gap-2 text-sm font-body text-on-surface-variant line-through">
-                <span class="mt-0.5 shrink-0">✗</span>{feat}
+                <span class="mt-0.5 shrink-0">âœ—</span>{feat}
               </li>
             {/each}
           </ul>
@@ -390,10 +388,10 @@
                       rel="noopener noreferrer"
                       class="text-primary hover:underline font-label text-xs"
                     >
-                      PDF ↗
+                      PDF â†—
                     </a>
                   {:else}
-                    <span class="text-on-surface-variant">—</span>
+                    <span class="text-on-surface-variant">â€”</span>
                   {/if}
                 </td>
               </tr>

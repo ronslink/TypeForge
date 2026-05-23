@@ -501,25 +501,3 @@ export const japaneseLessons: Lesson[] = [
   },
 ];
 
-// Export lesson categories
-export const japaneseVowelLessons = japaneseLessons.filter((l) =>
-  l.id.includes('romaji-1')
-);
-
-export const japaneseConsonantLessons = japaneseLessons.filter(
-  (l) => l.id.includes('romaji-2') || l.id.includes('romaji-3')
-);
-
-export const japaneseWordLessons = japaneseLessons.filter((l) =>
-  l.id.includes('romaji-4')
-);
-
-export const japanesePatternLessons = japaneseLessons.filter(
-  (l) => l.id.includes('romaji-5') || l.id.includes('romaji-6') || l.id.includes('romaji-7')
-);
-
-export const japanesePhraseLessons = japaneseLessons.filter(
-  (l) => l.id.includes('romaji-8') || l.id.includes('romaji-9') || l.id.includes('romaji-10')
-);
-
-export default japaneseLessons;

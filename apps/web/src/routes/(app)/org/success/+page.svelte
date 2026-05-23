@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { useClerkContext } from 'svelte-clerk';
@@ -36,7 +36,7 @@
 </script>
 
 <svelte:head>
-  <title>Welcome — TypeForge for Schools</title>
+  <title>Welcome â€” TypeForge for Schools</title>
 </svelte:head>
 
 <div class="max-w-2xl mx-auto px-6 py-16 text-center">
@@ -64,7 +64,7 @@
         {#if orgData.billing}
           <div class="flex justify-between">
             <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_seats_label')}</span>
-            <span class="font-body text-sm text-on-surface">{orgData.billing.purchasedSeats ?? orgData.billing.pendingSeatCount ?? '—'}</span>
+            <span class="font-body text-sm text-on-surface">{orgData.billing.purchasedSeats ?? orgData.billing.pendingSeatCount ?? 'â€”'}</span>
           </div>
           <div class="flex justify-between">
             <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{$t('org_success_cycle_label')}</span>

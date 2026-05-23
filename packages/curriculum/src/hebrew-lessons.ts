@@ -453,19 +453,3 @@ export const hebrewLessons: Lesson[] = [
   },
 ];
 
-// Export individual lesson categories for convenience
-export const hebrewAlphabetLessons = hebrewLessons.filter((l) =>
-  l.id.startsWith('he-alphabet')
-);
-
-export const hebrewWordLessons = hebrewLessons.filter(
-  (l) => l.id.includes('simple-words') || l.id.includes('final-words')
-);
-
-export const hebrewGrammarLessons = hebrewLessons.filter(
-  (l) => l.id.includes('shin-variants') || l.id.includes('vowels')
-);
-
-export const hebrewPhraseLessons = hebrewLessons.filter((l) => l.id.includes('phrases'));
-
-export default hebrewLessons;

@@ -406,4 +406,3 @@ export const greekLessons: Lesson[] = [
   },
 ];
 
-export default greekLessons;

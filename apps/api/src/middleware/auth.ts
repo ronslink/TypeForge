@@ -95,25 +95,6 @@ export async function requireAuth(c: Context, next: Next) {
 }
 
 /**
- * Require email verification
- */
-export async function requireVerifiedEmail(c: Context, next: Next) {
-  const auth = c.get('auth');
-  
-  if (!auth || !auth.isAuthenticated) {
-    c.status(401);
-    return c.json({ error: 'Authentication required', code: 'UNAUTHORIZED' });
-  }
-  
-  if (!auth.isEmailVerified) {
-    c.status(403);
-    return c.json({ error: 'Email verification required', code: 'EMAIL_NOT_VERIFIED' });
-  }
-  
-  await next();
-}
-
-/**
  * Require specific role
  */
 export function requireRole(...roles: AuthState['role'][]) {
@@ -139,19 +120,4 @@ export function requireRole(...roles: AuthState['role'][]) {
  */
 export function getAuth(c: Context): AuthState | undefined {
   return c.get('auth');
-}
-
-/**
- * Get current user ID from context
- */
-export function getUserId(c: Context): string | undefined {
-  return c.get('auth')?.userId;
-}
-
-/**
- * Check if user is authenticated
- */
-export function isAuthenticated(c: Context): boolean {
-  const auth = c.get('auth');
-  return auth?.isAuthenticated ?? false;
 }

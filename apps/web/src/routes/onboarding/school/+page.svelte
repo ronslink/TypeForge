@@ -1,5 +1,4 @@
-<script lang="ts">
-  import { onMount } from 'svelte';
+﻿<script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { useClerkContext, SignIn } from 'svelte-clerk';
@@ -10,7 +9,6 @@
 
   const ctx = useClerkContext();
   let isSignedIn = $derived(!!ctx?.user);
-  let user = $derived(ctx?.user);
 
   // Read plan from URL
   const planDays = $derived(page.url.searchParams.get('plan') === '180' ? 180 : 90);
@@ -112,7 +110,7 @@
 </script>
 
 <svelte:head>
-  <title>School Setup — TypeForge</title>
+  <title>School Setup â€” TypeForge</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col">
@@ -213,7 +211,7 @@
       {:else if currentStep === 3}
         <div class="text-center mb-8">
           <h1 class="font-headline text-3xl mb-2">{$t('school_choose_seats')}</h1>
-          <p class="text-on-surface-variant font-body">{planDays}-day plan · ${pricePerSeat}/seat/month</p>
+          <p class="text-on-surface-variant font-body">{planDays}-day plan Â· ${pricePerSeat}/seat/month</p>
         </div>
         <div class="bg-surface-container-low border border-outline-variant/20 p-8 space-y-6">
           <!-- Seat selector -->
@@ -224,7 +222,7 @@
                 onclick={() => { if (seatCount > 5) seatCount--; }}
                 disabled={seatCount <= 5}
                 class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center hover:bg-surface-container transition-colors disabled:opacity-30"
-              >−</button>
+              >âˆ’</button>
               <input
                 id="seat-count"
                 type="number"
@@ -250,7 +248,7 @@
           <!-- Cost breakdown -->
           <div class="bg-surface-container border border-outline-variant/20 p-6 space-y-3">
             <div class="flex justify-between font-body text-sm text-on-surface-variant">
-              <span>{seatCount} seats × ${pricePerSeat}/mo</span>
+              <span>{seatCount} seats Ã— ${pricePerSeat}/mo</span>
               <span class="text-on-surface font-bold">${monthlyCost}/mo</span>
             </div>
             <div class="flex justify-between font-body text-sm text-on-surface-variant">
@@ -265,7 +263,7 @@
 
           <!-- Plan summary -->
           <div class="bg-primary/5 border border-primary/20 p-4 text-sm font-body text-on-surface-variant space-y-1">
-            <p>✓ <strong>{schoolName}</strong> — {seatCount} student seats</p>
+            <p>âœ“ <strong>{schoolName}</strong> â€” {seatCount} student seats</p>
             <p>{$t('school_summary_dashboard')}</p>
             <p>{$t('school_summary_roster')}</p>
             <p>{$t('school_summary_compliance')}</p>

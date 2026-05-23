@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { uiLocale, setUiLocale, UI_LOCALES } from '$lib/stores/locale';
   import type { UiLocale } from '$lib/stores/locale';
 
@@ -23,7 +23,7 @@
   >
     {#each UI_LOCALES as locale}
       <option value={locale.code} class="bg-surface-container text-on-surface normal-case tracking-normal">
-        {locale.code.toUpperCase()} — {locale.nativeName}
+        {locale.code.toUpperCase()} â€” {locale.nativeName}
       </option>
     {/each}
   </select>

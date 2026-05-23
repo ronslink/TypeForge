@@ -279,4 +279,3 @@ export const englishWordlist: WordlistEntry[] = [
   { word: 'although', difficulty: 3, tags: ['conjunction'] },
 ];
 
-export default englishWordlist;

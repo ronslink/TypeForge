@@ -313,4 +313,3 @@ export const greekWordlist: WordlistEntry[] = [
   { word: 'Αθήνα', difficulty: 3, tags: ['noun'] },
 ];
 
-export default greekWordlist;

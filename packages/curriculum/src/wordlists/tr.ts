@@ -118,5 +118,3 @@ export const turkishWordlist: WordlistEntry[] = [
   { word: 'kalkınma', difficulty: 3, tags: ['noun'] },
   { word: 'araştırma', difficulty: 3, tags: ['science'] },
 ];
-
-export default turkishWordlist;

@@ -208,4 +208,3 @@ export const hungarianWordlist: WordlistEntry[] = [
   { word: "fő", difficulty: 3, tags: ['adjective'] },
 ];
 
-export default hungarianWordlist;

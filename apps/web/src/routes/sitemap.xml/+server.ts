@@ -1,43 +1,27 @@
-import { ALL_LANGUAGES } from '$lib/i18n/languages';
+﻿import { ALL_LANGUAGES } from '$lib/i18n/languages';
+import { PUBLIC_SITEMAP_ROUTES, absoluteUrl } from '$lib/seo';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
-  const baseUrl = 'https://typingscholar.com';
-
-  // Core static routes
-  const staticRoutes = [
-    '',
-    '/languages',
-    '/pricing',
-    '/contact',
-    '/typing-guide',
-    '/privacy-policy',
-    '/terms-of-service',
-    '/sign-up',
-    '/sign-in'
-  ];
-
-  const now = new Date().toISOString();
-
-  // Generate URL elements for static routes
-  const staticUrls = staticRoutes.map((route) => `
+  const staticUrls = PUBLIC_SITEMAP_ROUTES.map(
+    (route) => `
     <url>
-      <loc>${baseUrl}${route}</loc>
-      <lastmod>${now}</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>${route === '' ? '1.0' : '0.8'}</priority>
+      <loc>${absoluteUrl(route.path)}</loc>
+      <changefreq>${route.changefreq}</changefreq>
+      <priority>${route.priority}</priority>
     </url>
-  `).join('');
+  `
+  ).join('');
 
-  // Generate URL elements for dynamic language landing pages
-  const dynamicUrls = ALL_LANGUAGES.map((lang) => `
+  const dynamicUrls = ALL_LANGUAGES.map(
+    (lang) => `
     <url>
-      <loc>${baseUrl}/languages/${lang.code}</loc>
-      <lastmod>${now}</lastmod>
+      <loc>${absoluteUrl(`/languages/${lang.code}`)}</loc>
       <changefreq>monthly</changefreq>
       <priority>0.9</priority>
     </url>
-  `).join('');
+  `
+  ).join('');
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -48,7 +32,7 @@ ${dynamicUrls}
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=3600'
-    }
+      'Cache-Control': 'public, max-age=3600',
+    },
   });
 };

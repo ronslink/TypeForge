@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
@@ -51,7 +51,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t('cert_official')} — TypingScholar</title>
+  <title>{$t('cert_official')} â€” TypingScholar</title>
   {#if bestSession.wpm > 0}
     <meta property="og:title" content="My TypingScholar Certificate" />
     <meta property="og:image" content={`https://typingscholar.com/api/og/certificate?wpm=${bestSession.wpm}&acc=${bestSession.accuracy}`} />

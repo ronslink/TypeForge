@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { writable } from 'svelte/store';
   import { t } from '$lib/stores/locale';
   import { ALL_LANGUAGES, type Language } from '$lib/i18n/languages';
@@ -76,13 +76,13 @@
       id: 'arabic',
       name: 'Arabic',
       languageCode: 'ar',
-      preview: ['ض', 'ص', 'ث', 'ق', 'ف', 'غ'],
+      preview: ['Ø¶', 'Øµ', 'Ø«', 'Ù‚', 'Ù', 'Øº'],
     },
     {
       id: 'cyrillic',
-      name: 'Cyrillic (ЙЦУКЕН)',
+      name: 'Cyrillic (Ð™Ð¦Ð£ÐšÐ•Ð)',
       languageCode: 'ru',
-      preview: ['Й', 'Ц', 'У', 'К', 'Е', 'Н'],
+      preview: ['Ð™', 'Ð¦', 'Ð£', 'Ðš', 'Ð•', 'Ð'],
     },
     {
       id: 'romaji',
@@ -141,7 +141,6 @@
   let userInput = $state('');
   let testStarted = $state(false);
   let testEnded = $state(false);
-  let elapsedSeconds = $state(0);          // wall-clock (for display only)
   let activeElapsedSeconds = $state(0);    // wall-clock minus pauses
   let isPausedUI = $state(false);
   let testStartTime = $state<number | null>(null);
@@ -149,7 +148,6 @@
   let accuracyCalculator = $state(new AccuracyCalculator());
   let currentWPM = $state(0);
   let currentAccuracy = $state(100);
-  let testInterval: ReturnType<typeof setInterval> | null = null;
   let idleInterval: ReturnType<typeof setInterval> | null = null;
   let pressedKey = $state<string | undefined>(undefined);
   let highlightKeys = $state<Set<string>>(new Set());
@@ -166,7 +164,6 @@
     userInput = '';
     testStarted = false;
     testEnded = false;
-    elapsedSeconds = 0;
     activeElapsedSeconds = 0;
     isPausedUI = false;
     testStartTime = null;
@@ -176,16 +173,12 @@
     currentAccuracy = 100;
     pressedKey = undefined;
     highlightKeys = new Set();
-    if (testInterval) { clearInterval(testInterval); testInterval = null; }
     if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
   }
 
   function startTest() {
     testStarted = true;
     testStartTime = Date.now();
-
-    // Wall-clock tick
-    testInterval = setInterval(() => { elapsedSeconds++; }, 1000);
 
     // Idle / pause detection + metrics refresh every 500ms
     idleInterval = setInterval(() => {
@@ -249,12 +242,11 @@
     pressedKey = event.key.toLowerCase();
   }
 
-  function handleKeyup(event: KeyboardEvent) {
+  function handleKeyup() {
     pressedKey = undefined;
   }
 
   function endTest() {
-    if (testInterval) { clearInterval(testInterval); testInterval = null; }
     if (idleInterval) { clearInterval(idleInterval); idleInterval = null; }
     testEnded = true;
     testStarted = false;
@@ -419,7 +411,7 @@
 </script>
 
 <svelte:head>
-  <title>Onboarding — TypeForge</title>
+  <title>Onboarding â€” TypeForge</title>
 </svelte:head>
 
 <svelte:window onkeydown={handleKeydown} onkeyup={handleKeyup} />
@@ -640,7 +632,7 @@
             {#if !testStarted && !testEnded}
               <div class="text-center py-4">
                 <p class="font-label text-sm text-on-surface-variant animate-pulse">
-                  Start typing to begin — type as much as you like, then hit "Stop & See Results"
+                  Start typing to begin â€” type as much as you like, then hit "Stop & See Results"
                 </p>
               </div>
             {/if}
@@ -771,7 +763,7 @@
 </div>
 
 <style>
-  /* ─── Onboarding pause indicators ─── */
+  /* â”€â”€â”€ Onboarding pause indicators â”€â”€â”€ */
   .ob-pause-dot, .ob-active-dot {
     display: inline-block;
     width: 7px;

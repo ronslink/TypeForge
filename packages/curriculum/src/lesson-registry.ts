@@ -5,7 +5,6 @@
 // Import RTL lessons and wordlists
 import { arabicLessons } from './rtl-lessons.js';
 import { getRandomWords, getSupportedLanguages } from './wordlists/index.js';
-export { getRandomWords, getSupportedLanguages };
 
 export type Finger =
   | 'left_pinky'

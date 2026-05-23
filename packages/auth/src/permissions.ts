@@ -82,31 +82,3 @@ export function canViewStudentData(
   return false;
 }
 
-/**
- * Check if user can manage billing
- */
-export function canManageBilling(ctx: PermissionContext): boolean {
-  return ['org_admin', 'platform_admin'].includes(ctx.role) || ctx.orgRole === 'admin';
-}
-
-/**
- * Check if user can create custom lessons
- */
-export function canCreateCustomLessons(ctx: PermissionContext): boolean {
-  if (ctx.role === 'platform_admin') return true;
-  if (isTeacher(ctx)) return true;
-  return false;
-}
-
-/**
- * Get the permission level for a context
- */
-export function getPermissionLevel(ctx: PermissionContext): number {
-  switch (ctx.role) {
-    case 'platform_admin': return 100;
-    case 'org_admin': return 75;
-    case 'teacher': return 50;
-    case 'learner': return 25;
-    default: return 0;
-  }
-}

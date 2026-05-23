@@ -388,5 +388,3 @@ export const arabicWordlist: WordlistEntry[] = [
   { word: 'والسيف والرمح والقرطاس والقلم', difficulty: 3, tags: ['literature', 'mutanabbi'] },
   { word: 'وما نيل المطالب بالتمني', difficulty: 3, tags: ['literature', 'shawqi'] },
 ];
-
-export default arabicWordlist;

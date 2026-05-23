@@ -204,4 +204,3 @@ export const malayWordlist: WordlistEntry[] = [
   { word: "khas", difficulty: 3, tags: ['adjective'] },
   { word: "utama", difficulty: 3, tags: ['adjective'] },
 ];
-export default malayWordlist;

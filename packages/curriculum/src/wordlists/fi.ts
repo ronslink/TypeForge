@@ -278,4 +278,3 @@ export const finnishWordlist: WordlistEntry[] = [
   { word: 'vaikka', difficulty: 3, tags: ['conjunction'] },
 ];
 
-export default finnishWordlist;

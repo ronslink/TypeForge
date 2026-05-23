@@ -1,23 +1,29 @@
-import type { RequestHandler } from './$types';
+﻿import type { RequestHandler } from './$types';
+import { SITE } from '$lib/seo';
 
 export const GET: RequestHandler = async () => {
   const robotsTxt = `User-agent: *
 Allow: /
 
-# Do not index private application routes to avoid crawl errors
-Disallow: /settings/
-Disallow: /learn/
-Disallow: /practice/
-Disallow: /progress/
-Disallow: /onboarding/
+# Keep private and low-value application surfaces out of crawl paths.
+Disallow: /api/
+Disallow: /settings
+Disallow: /billing
+Disallow: /org
+Disallow: /progress
+Disallow: /certificate
+Disallow: /onboarding
 
-Sitemap: https://typingscholar.com/sitemap.xml
+# Keep individual app lesson screens out while allowing the /learn landing page.
+Disallow: /learn/
+
+Sitemap: ${SITE.url}/sitemap.xml
 `;
 
   return new Response(robotsTxt, {
     headers: {
       'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=3600'
-    }
+      'Cache-Control': 'public, max-age=3600',
+    },
   });
 };

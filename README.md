@@ -18,12 +18,12 @@ A high-fidelity industrial foundry for digital precision. Engineer your typing s
 | Layer | Technology |
 |-------|------------|
 | Frontend | SvelteKit 2.x |
-| API | Hono 4.x on Cloudflare Workers |
+| API | Hono 4.x on Vercel |
 | Database | PostgreSQL 17 (Regional) |
 | ORM | Drizzle 0.30.x |
 | Auth | Clerk 5.x |
 | Cache | Upstash Redis |
-| Storage | Cloudflare R2 |
+| Storage | S3-compatible Storage |
 | Build | Turbo 2.x |
 
 ## Getting Started
@@ -32,7 +32,7 @@ A high-fidelity industrial foundry for digital precision. Engineer your typing s
 
 - Node.js 20 LTS
 - pnpm 9.x
-- Wrangler CLI (for Cloudflare Workers)
+- Vercel CLI (optional, for deployment)
 
 ### Installation
 
@@ -93,7 +93,7 @@ pnpm test
 typeforge/
 ├── apps/
 │   ├── web/                   # SvelteKit frontend
-│   └── api/                   # Hono API (Cloudflare Worker)
+│   └── api/                   # Hono API (Vercel Serverless)
 ├── packages/
 │   ├── db/                    # Drizzle schema + migrations
 │   ├── metrics/               # WPM/accuracy engine
@@ -133,7 +133,7 @@ TypeForge maintains regional databases for data residency compliance:
 | US | Hetzner | Ashburn, Virginia |
 | Africa | Vultr | Johannesburg, South Africa |
 
-Users are automatically routed to their home region via Cloudflare Hyperdrive.
+Users are automatically routed to their home region via Edge routing.
 
 ## Contributing
 

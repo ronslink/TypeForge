@@ -216,4 +216,3 @@ export const norwegianWordlist: WordlistEntry[] = [
   { word: "spesiell", difficulty: 3, tags: ['adjective'] },
   { word: "hoved", difficulty: 3, tags: ['adjective'] },
 ];
-export default norwegianWordlist;

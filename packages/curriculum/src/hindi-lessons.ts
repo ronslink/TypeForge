@@ -419,19 +419,3 @@ export const hindiLessons: Lesson[] = [
   },
 ];
 
-// Export individual lesson categories for convenience
-export const hindiAlphabetLessons = hindiLessons.filter((l) =>
-  l.id.startsWith('hi-alphabet')
-);
-
-export const hindiWordLessons = hindiLessons.filter(
-  (l) => l.id.includes('simple-words') || l.id.includes('greetings')
-);
-
-export const hindiGrammarLessons = hindiLessons.filter(
-  (l) => l.id.includes('pronouns') || l.id.includes('verbs')
-);
-
-export const hindiPhraseLessons = hindiLessons.filter((l) => l.id.includes('family'));
-
-export default hindiLessons;

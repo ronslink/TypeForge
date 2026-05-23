@@ -23,7 +23,7 @@
 
 import type { WordlistEntry } from './index.js';
 
-export const brasileiroWordlist: WordlistEntry[] = [
+const brasileiroWordlist: WordlistEntry[] = [
   // ── Difficulty 1 ────────────────────────────────────────────────────────────
   { word: 'o', difficulty: 1, tags: ['article'] },
   { word: 'a', difficulty: 1, tags: ['article'] },

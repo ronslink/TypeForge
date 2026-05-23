@@ -1,4 +1,4 @@
-import type { LayoutServerLoad } from './$types';
+﻿import type { LayoutServerLoad } from './$types';
 import { buildClerkProps } from 'svelte-clerk/server';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
@@ -15,7 +15,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
     }
   ];
 
-  const auth = locals.auth ?? {};
+  const auth = locals.auth ?? { /* ignore */ };
   const userId = typeof auth === 'object' && auth !== null ? auth.userId : null;
 
   return {

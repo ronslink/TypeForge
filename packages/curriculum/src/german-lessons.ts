@@ -532,4 +532,3 @@ export const germanLessons: Lesson[] = [
   },
 ];
 
-export default germanLessons;
