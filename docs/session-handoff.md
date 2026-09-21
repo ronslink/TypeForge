@@ -1,6 +1,6 @@
 # Session handoff
 
-State of `master` at the end of the session that produced commits `58c3361`..`a9e0220`.
+State of `master` at the end of the session that produced commits `58c3361`..`720b024`.
 Written so a fresh session can continue without re-deriving any of it.
 
 ## Where things stand
@@ -11,7 +11,7 @@ is green and runs typecheck, lint and test on every push to `master` and every P
 Verified locally with `pnpm exec turbo run typecheck lint test --force` (26/26 tasks).
 Run it before trusting any change; turbo's cache will otherwise hide regressions.
 
-## What landed this session
+## What landed
 
 | Commit | Change |
 | --- | --- |
@@ -24,56 +24,87 @@ Run it before trusting any change; turbo's cache will otherwise hide regressions
 | `e7f9039` | Restored CI |
 | `24da715` | Server-side idempotency for `POST /sessions` (migration 0003) |
 | `a9e0220` | Translated the 48 `recovery_*` keys into all 15 locales |
+| `720b024` | **Wired the typing engine.** Scoring is by physical key against grapheme prompt units, composition-aware, using the previously inert primitives |
 
-## Highest-value work remaining
+## The typing engine (was item 1, now largely done)
 
-**1. Wire the typing engine — by a wide margin the most important thing on this list.**
+`apps/web/src/lib/typing/typing-session.ts` is the single scoring kernel. All three
+scoring sites go through it: `(app)/practice/+page.svelte`, `(app)/learn/[lessonId]/+page.svelte`
+and `onboarding/+page.svelte` (the placement test). Nothing compares
+`event.key === expectedChar.char` any more.
 
-The typing primitives ported in `58c3361` are **inert**: `strict-typing`, `activity-outcome`,
-`grapheme`, `committed-text` and `IMEHandler` have no consumer in `apps/`. Nothing under
-`apps/` uses `MetricsEngine`, `CharComparator`, `ConsistencyAnalyzer`, `KeystrokeAnalyzer`,
-`HesitationDetector`, `SessionRecorder` or `RTLHandler` either. Only `WPMCalculator` and
-`AccuracyTracker` are live.
+The model, in one paragraph: a prompt is a list of **NFC grapheme units**, one per
+curriculum or generated character. Each unit's expected **physical key** is resolved from
+the layout the learner is being shown (`findCodeByChar` in `@typeforge/layouts`), falling
+back to the curriculum's own `code`. A keystroke is correct when it is that physical key,
+or when the produced grapheme equals the expected one (for characters no layout key can
+name). A miss never advances the cursor. Terminal states go through
+`transitionActivityOutcome`, so `text-finished` requires exact grapheme exhaustion and
+`user-stopped` requires the prompt not to be exhausted.
 
-The live scorer is inline in the pages:
+What is live now that was inert before: `grapheme` (`normalizeText`), `committed-text`,
+`IMEHandler`, `strict-typing` (`getStrictInputDecision` is enforced on `beforeinput`),
+`activity-outcome`, and the new layout lookups.
 
-```ts
-const typedChar = event.key;
-const isCorrect = typedChar === expectedChar.char;   // practice/+page.svelte:326
-```
+Fixes that fell out of it, each verified in a browser:
 
-Meanwhile the curriculum is defined by **physical key code**:
+- Non-Latin drills are answerable on any OS layout. Verified: pressing `KeyA`/`KeyS`
+  scores `अ`/`स` in `learn/hi-alphabet-1` on a US keyboard layout (6/6 correct); the old
+  code scored all six as misses.
+- Modifiers, arrows, Escape and IME-owned keys are ignored instead of counting as misses
+  and resetting the streak.
+- `TypingInput` rendered `text.split('')` (UTF-16 code units), so a Devanagari conjunct was
+  three spans and the cursor index disagreed with the page's unit index. It now renders
+  prompt units.
+- **`TypingInput` was rendering a visible space between every letter.** Svelte 5 emits a
+  whitespace text node from the template formatting inside each character span. Keep the
+  prompt `{#each}` on one line and do not put an `{#if}` next to its text expression; the
+  cursor is drawn with `.char.current::before` for exactly this reason.
+- `TypingInput` now hosts an off-screen capture field, focused once per drill, so an OS
+  input method can compose. Composition commits are scored; pre-edit text is not; the
+  post-`compositionend` input echo is suppressed.
 
-```ts
-char('र', 'KeyR', 'right_index')    // hindi-lessons.ts
-```
+### What is still open in the engine
 
-Correctness compares the *produced character*; guidance and metrics use the *physical code*.
-They agree only when the user's OS keyboard layout matches the target language. Related:
-there is **no `compositionstart`/`compositionend`/`isComposing` handling anywhere** outside the
-unused `IMEHandler`, so IME-composed input (Korean Dubeolsik) cannot be scored per keydown, and
-`TypingInput` renders with `text.split('')` (UTF-16 code units, not graphemes).
+- **`consistency` and `rawWpm` are still fake.** Both drill pages send
+  `consistency: finalAccuracy` and `rawWpm: finalWPM`. `MetricsEngine` and
+  `ConsistencyAnalyzer` are the primitives that should compute these, and they are still
+  unused.
+- Still unused anywhere under `apps/`: `KeystrokeAnalyzer`, `HesitationDetector`,
+  `SessionRecorder`, `RTLHandler`, `CharComparator` (the kernel uses `normalizeText`
+  instead), and `applyStrictCommittedText` outside its own test.
+- **The onboarding placement test has no capture field**, so composition is not scored
+  there and `handleKeydown` bails out while `event.isComposing`. Wiring it means giving it
+  a `TypingInput`, which it does not currently use.
+- **Only synthetic composition events were tested.** No real OS IME (Korean Dubeolsik,
+  Chinese pinyin, macOS Devanagari transliteration) has been exercised. `ime.test.ts` and
+  the kernel tests cover the state machine; a real IME is still unverified.
+- Practice wordlists for non-Latin languages contain clusters no single key produces
+  (Hindi `क्या`), so those rely on the commit path. The curriculum lessons are defined at
+  key granularity and are the better-tested surface.
+- `TypingInput`'s `onWordComplete` is still only used by the lesson page.
 
-Japanese is **not** affected: those lessons are deliberately romaji on QWERTY (`script: 'latin'`).
+## Other work remaining
 
-Not yet verified in a browser with a non-Latin OS layout. Confirm the exact failure mode before
-filing it as a bug.
+**1. `caf3`'s unique file.** `apps/api/src/routes/lessons.commerce.test.ts` in the Codex
+worktree `C:/Users/ronon/.codex/worktrees/caf3/TypeForge` is the only artifact in that
+whole set referenced by no git ref. `dbde`'s state is safe (it equals the Codex checkpoint
+tree `e5293c9`).
 
-**2. `caf3`'s unique file.** `apps/api/src/routes/lessons.commerce.test.ts` in the Codex worktree
-`C:/Users/ronon/.codex/worktrees/caf3/TypeForge` is the only artifact in that whole set referenced
-by no git ref. `dbde`'s state is safe (it equals the Codex checkpoint tree `e5293c9`).
+**2. Decide on the Codex `dbde` governance work.** Billing canonical pipeline, privacy
+lifecycle, adult eligibility, 601 new files. Unmounted, large, and its own manifest
+declares all 9 gates blocked. A product decision, not a technical one.
 
-**3. Decide on the Codex `dbde` governance work.** Billing canonical pipeline, privacy lifecycle,
-adult eligibility, 601 new files. Unmounted, large, and its own manifest declares all 9 gates
-blocked. A product decision, not a technical one.
+**3. Auth provider portability** (see below).
 
-**4. Auth provider portability** (see below).
+**4. Prettier is not enforced.** 21+ files were already unformatted at HEAD, so a format
+gate would be red on arrival. Deliberately excluded from CI. Note that the one-line prompt
+`{#each}` in `TypingInput.svelte` is long on purpose (see the whitespace gotcha above);
+do not let `prettier --write` reflow it.
 
-**5. Prettier is not enforced.** 21+ files were already unformatted at HEAD, so a format gate
-would be red on arrival. Deliberately excluded from CI.
-
-**6. No Postgres integration test for idempotency.** The 25 tests are pure unit tests on the
-library; the route path is covered by typecheck only. Migration 0003 has never been applied.
+**5. No Postgres integration test for idempotency.** The 25 tests are pure unit tests on
+the library; the route path is covered by typecheck only. Migration 0003 has never been
+applied.
 
 ## Auth / Clerk — lock-in is a strategy concern
 
@@ -108,9 +139,18 @@ institutional customers, or the enterprise-SSO tier that `packages/auth/src/sso.
 
 ## Gotchas that will bite a fresh session
 
-- **BOMs.** The file-edit tools strip UTF-8 BOMs, and many files have one at HEAD. After edits,
-  compare against `git show HEAD:<path>` and restore any BOM that was lost, or the diff fills
-  with unrelated churn.
+- **BOMs.** The file-edit tools strip UTF-8 BOMs, and many files have one at HEAD. After
+  edits, compare against `git show HEAD:<path>` and restore any BOM that was lost, or the
+  diff fills with unrelated churn. `apps/web/src/routes/onboarding/+page.svelte` has one.
+- **`packages/ui` changes need a dev-server restart with a cleared dep cache.** Vite
+  pre-bundles the workspace package into `apps/web/node_modules/.vite/deps/@typeforge_ui.js`,
+  and editing `packages/ui` does **not** invalidate it. Symptom: the old component keeps
+  rendering and your markup changes appear to have no effect. Fix:
+  `Remove-Item -Recurse -Force apps/web/node_modules/.vite` then restart `vite dev`.
+- **Svelte 5 whitespace.** Template indentation inside an element becomes a real text node.
+  A prompt rendered one unit per span will show a space between every letter if you let
+  Prettier or habit put the expression on its own line, and an `{#if}` next to a text
+  expression emits an extra space node. Keep both on one line.
 - **`apps/web` type-checks `apps/api`.** `svelte-check` pulls api sources in through the
   `@typeforge/api` path mapping. Under `apps/web`'s config this used to be non-strict, where
   truthiness narrowing on a discriminant silently fails. Use `parsedBody.ok === false`, not
@@ -128,9 +168,22 @@ institutional customers, or the enterprise-SSO tier that `packages/auth/src/sso.
   `$lib/api/idempotency.ts`; the server stores only a versioned SHA-256 plus a payload
   fingerprint. Client requests pass it as `header: { 'Idempotency-Key': key }` because the Hono
   RPC client takes `header` in its args, not as a `RequestInit`.
+- **Keystroke payloads now carry the layout's character, not the OS's.** `attempt.produced`
+  is the character the *active layout* prints for the pressed physical key, so stored
+  `character`/`expected` stay comparable for a learner on a different OS layout. One
+  `POST /sessions` record is written per scored unit, so a multi-unit IME commit produces
+  several records.
 - **Migration journal is at `0003`.** `db:generate` works offline from the local snapshot, but
   `db:migrate` has not been run against any database.
 - **CI status can be read from the public API** without auth:
   `https://api.github.com/repos/ronslink/TypeForge/actions/workflows/249489584/runs`. The
   workflow id is reused from the pre-migration CI that commit `91aa446` removed, so run numbers
   are continuous with the old history (runs #90–#91 are the old, failing ones).
+- **Browser verification recipe that works here.** The `browser` tool session is read-only
+  (no clicks/typing). Playwright is installed globally, not in this repo — import it from
+  `file:///C:/Users/ronon/AppData/Roaming/npm/node_modules/@playwright/test/node_modules/playwright/index.mjs`,
+  launch `chromium`, and drive `http://localhost:5173` from a throwaway script. `@typeforge/ui`
+  components are pre-bundled (see above), so clear `.vite` first. Locators: use
+  `page.locator("button").filter({ hasText: "..." })`; `getByRole` with an exact name does not
+  match these cards, and `element.click()` from inside `page.evaluate` does not trigger
+  Svelte's delegated handlers — use a real `locator.click()`.
