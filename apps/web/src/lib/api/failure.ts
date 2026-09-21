@@ -304,6 +304,40 @@ export function formatFailureMessage(failure: ApiFailure): string {
   return failure.requestId ? `${failure.message} Reference: ${failure.requestId}` : failure.message;
 }
 
+/**
+ * Build a safe failure from a status alone. Used where a typed client has
+ * already consumed the response body and only the status survives, so there are
+ * no headers or body facts to read.
+ */
+export function failureFromStatus(status: number): ApiFailure {
+  const code = normalizeFailureCode(undefined, status);
+  const decision = statusDecision(status, code);
+
+  return {
+    ...decision,
+    code,
+    status,
+    requestId: null,
+    retryAfterSeconds: null,
+    outcome: status === 408 || status >= 500 ? 'unverified' : 'verified_rejected',
+  };
+}
+
+/**
+ * Resolve a thrown value from the typed RPC client. That client reports only a
+ * status code for a failed response, so anything else is classified as a
+ * transport failure.
+ */
+export function readThrownApiFailure(error: unknown): ApiFailure {
+  const status = (error as { statusCode?: unknown } | null | undefined)?.statusCode;
+
+  if (typeof status === 'number' && Number.isInteger(status) && status >= 400 && status <= 599) {
+    return failureFromStatus(status);
+  }
+
+  return readTransportFailure(error);
+}
+
 /** Map stable failure facts to localizable presentation without changing recovery policy. */
 export function apiFailureRecoveryMessage(failure: ApiFailure): RecoveryMessage {
   let key: RecoveryMessage['parts'][number];

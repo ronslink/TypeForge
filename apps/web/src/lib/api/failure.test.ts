@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  failureFromStatus,
   formatFailureMessage,
   invalidResponseFailure,
   normalizeRequestId,
   readApiFailure,
+  readThrownApiFailure,
   readTransportFailure,
 } from './failure';
 
@@ -141,5 +143,54 @@ describe('API failure recovery contract', () => {
     );
     expect(normalizeRequestId('tsr_customer@example.test')).toBeNull();
     expect(normalizeRequestId('trace_01e139ec-8615-4f44-bc0b-e9f38fa974ab')).toBeNull();
+  });
+});
+
+describe('status-only failure resolution', () => {
+  it.each([
+    [401, 'unauthenticated'],
+    [403, 'forbidden'],
+    [429, 'rate_limited'],
+    [500, 'server'],
+  ])('classifies HTTP %i as %s', (status, kind) => {
+    const failure = failureFromStatus(status);
+
+    expect(failure.kind).toBe(kind);
+    expect(failure.status).toBe(status);
+    expect(failure.requestId).toBeNull();
+    expect(failure.retryAfterSeconds).toBeNull();
+    expect(failure.message).not.toBe('');
+  });
+
+  it('keeps only 408 and 5xx outcomes unverified', () => {
+    expect(failureFromStatus(408).outcome).toBe('unverified');
+    expect(failureFromStatus(503).outcome).toBe('unverified');
+    expect(failureFromStatus(401).outcome).toBe('verified_rejected');
+    expect(failureFromStatus(409).outcome).toBe('verified_rejected');
+  });
+
+  it('resolves a typed client status error without copying server prose', () => {
+    const error = Object.assign(new Error('401 Unauthorized'), {
+      statusCode: 401,
+      detail: { data: { error: '<script>unsafe</script>' } },
+    });
+
+    const failure = readThrownApiFailure(error);
+
+    expect(failure.kind).toBe('unauthenticated');
+    expect(failure.status).toBe(401);
+    expect(formatFailureMessage(failure)).not.toContain('unsafe');
+  });
+
+  it.each([
+    ['a plain error', new Error('boom')],
+    ['a DOMException abort', new DOMException('aborted', 'AbortError')],
+    ['a non-numeric status', { statusCode: 'teapot' }],
+    ['an out-of-range status', { statusCode: 99 }],
+  ])('falls back to a transport failure for %s', (_label, error) => {
+    const failure = readThrownApiFailure(error);
+
+    expect(failure.kind === 'timeout' || failure.kind === 'offline').toBe(true);
+    expect(failure.outcome).toBe('unverified');
   });
 });

@@ -1,9 +1,15 @@
 ﻿<script lang="ts">
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+    type ApiFailure,
+  } from '$lib/api/failure';
 
 
   const ctx = useClerkContext();
@@ -38,7 +44,13 @@
   let isCheckingOut = $state(false);
   let isOpeningPortal = $state(false);
   let error         = $state<string | null>(null);
+  let loadFailure   = $state<ApiFailure | null>(null);
   let billingInterval = $state<'monthly' | 'annual'>('monthly');
+
+  /** Localized, product-owned copy for a failure. Server prose is never shown. */
+  function describeFailure(failure: ApiFailure): string {
+    return formatLocalizedFailureMessage(failure, get(t));
+  }
 
   // -------------------------------------------------------------------------
   // Plans definition (mirrors backend INDIVIDUAL_PRICES)
@@ -100,6 +112,7 @@
   // -------------------------------------------------------------------------
   async function fetchBillingData() {
     if (!isSignedIn) { isLoading = false; return; }
+    loadFailure = null;
     try {
       const api = createApiClient('/', authFetch);
       const [subRes, invRes] = await Promise.all([
@@ -109,8 +122,10 @@
       subscription = subRes.subscription ?? null;
       invoices     = invRes.invoices ?? [];
     } catch (err) {
+      // A free plan is a successful response with no subscription record, so a
+      // thrown error here is a real failure and must not look like a free plan.
+      loadFailure = readThrownApiFailure(err);
       console.error('Failed to fetch billing data', err);
-      // Non-fatal: user may be on free plan with no subscription record
     } finally {
       isLoading = false;
     }
@@ -132,8 +147,8 @@
       });
       const { checkoutUrl } = await res.json();
       if (checkoutUrl) window.location.href = checkoutUrl;
-    } catch (err: any) {
-      error = err?.message ?? 'Failed to start checkout. Please try again.';
+    } catch (err) {
+      error = describeFailure(readThrownApiFailure(err));
     } finally {
       isCheckingOut = false;
     }
@@ -147,8 +162,8 @@
       const res = await api.api.v1.billing.portal.$post({ json: { /* ignore */ } });
       const { portalUrl } = await res.json();
       if (portalUrl) window.location.href = portalUrl;
-    } catch (err: any) {
-      error = err?.message ?? 'Failed to open billing portal.';
+    } catch (err) {
+      error = describeFailure(readThrownApiFailure(err));
     } finally {
       isOpeningPortal = false;
     }
@@ -230,6 +245,19 @@
 
       {#if isLoading}
         <div class="bg-surface-container-low p-8 animate-pulse h-28"></div>
+      {:else if loadFailure}
+        <div class="bg-error/10 border border-error/30 px-8 py-6" role="alert">
+          <p class="font-body text-sm text-error mb-4">
+            {formatLocalizedFailureMessage(loadFailure, $t)}
+          </p>
+          <button
+            type="button"
+            class="notched-button bg-primary-container text-on-primary-container px-6 py-2 font-label text-sm font-bold tracking-wider"
+            onclick={() => { isLoading = true; void fetchBillingData(); }}
+          >
+            {$t('recovery_retry_label')}
+          </button>
+        </div>
       {:else}
         <div class="bg-surface-container-low p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
