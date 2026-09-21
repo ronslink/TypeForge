@@ -4,6 +4,12 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    failureFromStatus,
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+    type ApiFailure,
+  } from '$lib/api/failure';
   import { t } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
@@ -13,6 +19,7 @@
   });
   let orgData = $state<any>(null);
   let loading = $state(true);
+  let loadFailure = $state<ApiFailure | null>(null);
 
   onMount(async () => {
     try {
@@ -22,11 +29,14 @@
       const api = createApiClient('/', authFetch);
 
       const res = await api.api.v1.organisations[':id'].$get({ param: { id: orgId } });
-      if (res.ok) {
-        const data = await res.json() as any;
-        orgData = data.organisation;
+      if (!res.ok) {
+        loadFailure = failureFromStatus(res.status);
+        return;
       }
+      const data = await res.json() as any;
+      orgData = data.organisation;
     } catch (e) {
+      loadFailure = readThrownApiFailure(e);
       console.error('Failed to load org data:', e);
     } finally {
       loading = false;
@@ -41,6 +51,19 @@
 <div class="max-w-2xl mx-auto px-6 py-16 text-center">
   {#if loading}
     <div class="animate-pulse text-on-surface-variant font-label text-sm uppercase tracking-widest">{$t('org_loading')}</div>
+  {:else if loadFailure}
+    <div class="bg-error/10 border border-error/30 px-6 py-5 text-center" role="alert">
+      <p class="text-error text-sm mb-4">
+        {formatLocalizedFailureMessage(loadFailure, $t)}
+      </p>
+      <button
+        type="button"
+        class="notched-button bg-primary-container text-on-primary-container px-6 py-2 font-label text-sm font-bold tracking-wider"
+        onclick={() => window.location.reload()}
+      >
+        {$t('recovery_retry_label')}
+      </button>
+    </div>
   {:else}
     <!-- Success Icon -->
     <div class="flex justify-center mb-8">

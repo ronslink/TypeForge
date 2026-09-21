@@ -2,7 +2,9 @@
   import { useClerkContext } from 'svelte-clerk';
   import { ProgressRing, StatCard, WeaknessHeatmap, MilestoneCertifications } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
+  import { get } from 'svelte/store';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import { formatLocalizedFailureMessage, readThrownApiFailure } from '$lib/api/failure';
   import { t } from '$lib/stores/locale';
 
   // Auth state
@@ -173,7 +175,7 @@
           weakKeys = j.weakKeys ?? [];
         }
       } catch (e) {
-        error = 'Failed to load progress data';
+        error = formatLocalizedFailureMessage(readThrownApiFailure(e), get(t));
         console.error(e);
       } finally {
         loading = false;

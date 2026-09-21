@@ -3,6 +3,12 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    failureFromStatus,
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+    type ApiFailure,
+  } from '$lib/api/failure';
   import { t } from '$lib/stores/locale';
   
   const ctx = useClerkContext();
@@ -14,6 +20,7 @@
   
   let bestSession = $state({ wpm: 0, accuracy: 0, date: new Date().toISOString() });
   let loading = $state(true);
+  let loadFailure = $state<ApiFailure | null>(null);
   
   onMount(async () => {
     if (!isSignedIn) {
@@ -25,14 +32,19 @@
       const api = createApiClient('/', authFetch);
       
       const res = await api.api.v1.progress.$get();
-      if (res.ok) {
-        const progress = await res.json();
-        const validSessions = (progress?.history || []).filter((s: any) => (s.accuracy || 0) >= 95);
-        if (validSessions.length > 0) {
-          bestSession = validSessions.sort((a: any, b: any) => (b.wpm || 0) - (a.wpm || 0))[0];
-        }
+      if (!res.ok) {
+        // Rendering the certificate anyway would show 0 WPM and 0% accuracy as
+        // if they were real results.
+        loadFailure = failureFromStatus(res.status);
+        return;
+      }
+      const progress = await res.json();
+      const validSessions = (progress?.history || []).filter((s: any) => (s.accuracy || 0) >= 95);
+      if (validSessions.length > 0) {
+        bestSession = validSessions.sort((a: any, b: any) => (b.wpm || 0) - (a.wpm || 0))[0];
       }
     } catch (e) {
+      loadFailure = readThrownApiFailure(e);
       console.error(e);
     } finally {
       loading = false;
@@ -64,6 +76,22 @@
     <div class="animate-pulse flex flex-col items-center">
       <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
       <p class="font-label tracking-widest uppercase text-on-surface-variant text-sm">{$t('cert_validating')}</p>
+    </div>
+  </div>
+{:else if loadFailure}
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md bg-surface-container p-8 rounded border border-error/30 text-center" role="alert">
+      <h1 class="font-headline text-2xl mb-2">{$t('cert_locked_title')}</h1>
+      <p class="text-error text-sm mb-6">
+        {formatLocalizedFailureMessage(loadFailure, $t)}
+      </p>
+      <button
+        type="button"
+        class="notched-button bg-primary-container text-on-primary-container px-6 py-2 font-label text-sm font-bold tracking-wider"
+        onclick={() => window.location.reload()}
+      >
+        {$t('recovery_retry_label')}
+      </button>
     </div>
   </div>
 {:else if bestSession.wpm < 60 || !isSignedIn}
