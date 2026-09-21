@@ -1,9 +1,11 @@
 ﻿<script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { get } from 'svelte/store';
   import { useClerkContext, SignIn } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import { formatLocalizedFailureMessage, readThrownApiFailure } from '$lib/api/failure';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import { t } from '$lib/stores/locale';
@@ -101,8 +103,10 @@
         // Fallback: go directly to dashboard
         goto(`/org/success?orgId=${orgId}`);
       }
-    } catch (e: any) {
-      errorMsg = e.message || 'Something went wrong. Please try again.';
+    } catch (e) {
+      // Render product-owned recovery copy rather than the client's message,
+      // which is derived from the server response.
+      errorMsg = formatLocalizedFailureMessage(readThrownApiFailure(e), get(t));
       isSubmitting = false;
     }
   }

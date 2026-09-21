@@ -14,6 +14,11 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+    type ApiFailure,
+  } from '$lib/api/failure';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import { FAMOUS_BOOKS } from './books';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
@@ -67,6 +72,8 @@
   let isStarted = $state(false);
   let showCelebration = $state(false);
   let sessionSubmitted = $state(false);
+  let isSubmitting = $state(false);
+  let submitFailure = $state<ApiFailure | null>(null);
 
   // Timer state
   let startTime = $state<number | null>(null);
@@ -267,6 +274,8 @@
       isStarted = false;
       showCelebration = false;
       sessionSubmitted = false;
+      isSubmitting = false;
+      submitFailure = null;
       startTime = null;
       activeElapsedSeconds = 0;
       isPausedUI = false;
@@ -365,7 +374,9 @@
   }
 
   async function submitSession() {
-    if (sessionSubmitted) return;
+    if (sessionSubmitted || isSubmitting) return;
+    isSubmitting = true;
+    submitFailure = null;
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
 
@@ -388,7 +399,13 @@
       });
       sessionSubmitted = true;
     } catch (error) {
+      // A failed save must not be reported as logged. `outcome` distinguishes a
+      // rejected request from one whose result is unknown, and the recovery copy
+      // already says which.
+      submitFailure = readThrownApiFailure(error);
       console.error('Failed to submit practice session:', error);
+    } finally {
+      isSubmitting = false;
     }
   }
 
@@ -581,9 +598,25 @@
           <h2 class="font-headline text-3xl mb-2 text-primary">
             {$t('lesson_complete') || 'Drill Complete!'}
           </h2>
-          <p class="text-on-surface-variant mb-6 text-sm">
-            {$t('practice_logged') || 'Your session has been logged to your daily streak.'}
-          </p>
+          {#if submitFailure}
+            <div class="bg-error/10 border border-error/30 px-4 py-3 mb-6 text-start" role="alert">
+              <p class="text-error text-sm mb-3">
+                {formatLocalizedFailureMessage(submitFailure, $t)}
+              </p>
+              <button
+                type="button"
+                class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
+                disabled={isSubmitting}
+                onclick={() => void submitSession()}
+              >
+                {$t('recovery_retry_label')}
+              </button>
+            </div>
+          {:else}
+            <p class="text-on-surface-variant mb-6 text-sm">
+              {$t('practice_logged') || 'Your session has been logged to your daily streak.'}
+            </p>
+          {/if}
 
           <div class="grid grid-cols-2 gap-4 mb-8">
             <div class="bg-surface-container p-4 rounded text-center">
