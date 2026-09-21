@@ -6,6 +6,11 @@
 import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 import { typingSessions, userXp, streaks, keyMastery, userPlacementResults, orgMembers, orgSettings, lessons } from '@typeforge/db';
 import { eq, desc, and, gte, lte, lt } from 'drizzle-orm';
 const app = new Hono();
@@ -290,7 +295,17 @@ app.post('/placement', async (c) => {
   const db = getDb(c);
   const userId = auth.userId;
 
-  const body = await c.req.json<{ testId: string; passed: boolean; accuracy?: number; wpm?: number }>();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.placementTestResult
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    testId: string;
+    passed: boolean;
+    accuracy?: number;
+    wpm?: number;
+  };
 
   // Look up org membership and its placement policy
   const orgMemberRow = await db

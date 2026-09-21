@@ -5,6 +5,11 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 import { organisations, orgMembers, orgClasses, orgInvitations, orgSettings, orgBilling, subscriptionSeats, users, dailyStats, streaks, typingSessions, keyMastery } from '@typeforge/db';
 import { eq, and, or, sql, inArray, desc } from 'drizzle-orm';
 import Stripe from 'stripe';
@@ -94,7 +99,18 @@ app.post('/', async (c) => {
     const auth = getAuth(c)!;
     const db = getDb(c);
     
-    const body = await c.req.json();
+    const parsedBody = await readBoundedJsonBody(
+      c.req.raw,
+      BOUNDED_JSON_BODY_POLICIES.organisationCreation
+    );
+    if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+    const body = parsedBody.value as {
+      name: string;
+      slug: string;
+      orgType?: typeof organisations.$inferInsert.orgType;
+      countryCode?: string | null;
+      website?: string | null;
+    };
     const { name, slug, orgType, countryCode, website } = body;
     
     const [org] = await db.insert(organisations).values({
@@ -501,7 +517,16 @@ app.post('/:id/invite', async (c) => {
   const db = getDb(c);
   const orgId = c.req.param('id') as string;
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.organisationInvitation
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    email: string;
+    role?: NonNullable<typeof orgInvitations.$inferInsert.role>;
+    classId?: string | null;
+  };
   const { email, role, classId } = body;
   
   // Check if we have available seats
@@ -548,7 +573,17 @@ app.post('/:id/billing/seats', async (c) => {
   const permissionError = await requireOrgManager(c, orgId);
   if (permissionError) return permissionError;
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.organisationSeatCheckout
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    seatCount: number;
+    cooldownDays?: number;
+    successUrl?: string;
+    cancelUrl?: string;
+  };
   const { seatCount, cooldownDays = 180, successUrl, cancelUrl } = body;
   
   if (!seatCount || seatCount < 1) {
@@ -684,7 +719,12 @@ app.post('/:id/billing/seats/upgrade', async (c) => {
   const permissionError = await requireOrgManager(c, orgId);
   if (permissionError) return permissionError;
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.organisationSeatUpgrade
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as { additionalSeats?: number };
   const { additionalSeats } = body;
   
   if (!additionalSeats || additionalSeats < 1) {
@@ -777,7 +817,12 @@ app.post('/:id/billing/seats/downgrade', async (c) => {
   const permissionError = await requireOrgManager(c, orgId);
   if (permissionError) return permissionError;
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.organisationSeatDowngrade
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as { targetSeats?: number };
   const { targetSeats } = body;
   
   if (!targetSeats || targetSeats < 1) {
@@ -988,7 +1033,15 @@ app.post('/:id/seats/assign', async (c) => {
   const permissionError = await requireOrgManager(c, orgId);
   if (permissionError) return permissionError;
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.organisationSeatAssignment
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    userId: string;
+    role?: string;
+  };
   const { userId, role = 'learner' } = body;
   
   // Check available seats
@@ -1043,7 +1096,7 @@ app.post('/:id/seats/assign', async (c) => {
   await db.insert(orgMembers).values({
     orgId,
     userId,
-    role,
+    role: role as NonNullable<typeof orgMembers.$inferInsert.role>,
     status: 'active',
     joinedAt: new Date(),
   });

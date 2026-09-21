@@ -7,6 +7,11 @@ import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
 import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
+import {
   lessons,
   exercises,
   lessonCategories,
@@ -209,7 +214,12 @@ app.post('/adaptive', requireAuth, async (c) => {
     return c.json({ error: 'Premium subscription required for AI Adaptive Drills', code: 'FORBIDDEN' }, 403);
   }
 
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.adaptiveDrillRequest
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as Record<string, unknown>;
   const weakKeys = Array.isArray(body.weakKeys) ? (body.weakKeys as string[]) : [];
   const language = typeof body.language === 'string' ? body.language : 'en';
 

@@ -5,6 +5,11 @@
 
 import { Hono } from 'hono';
 import { requireRole, getDb } from '../middleware/index.js';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 import { users, organisations, subscriptions, typingSessions, auditLogs } from '@typeforge/db';
 import { desc, count, sql, eq } from 'drizzle-orm';
 
@@ -98,7 +103,9 @@ app.put('/users/:id/status', async (c) => {
   const db = getDb(c);
   const userId = c.req.param('id');
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(c.req.raw, BOUNDED_JSON_BODY_POLICIES.adminAction);
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as { status: typeof users.$inferInsert.status };
   const { status } = body;
   
   const [user] = await db

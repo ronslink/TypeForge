@@ -8,6 +8,7 @@ const FIXED_AUTHENTICATED_API_TARGETS = new Set([
   '/api/v1/privacy/requests',
   '/api/v1/progress',
   '/api/v1/sessions',
+  '/api/v1/users/me',
   '/api/v1/users/me/locale',
   '/api/v1/users/me/preferences',
 ]);

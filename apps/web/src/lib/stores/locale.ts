@@ -8,6 +8,7 @@
  */
 
 import { browser } from '$app/environment';
+import { requestApiJson } from '$lib/api/request';
 import {
   SUPPORTED_UI_LOCALES,
   UI_LOCALES,
@@ -154,7 +155,7 @@ export function initLocale(
 export async function saveLocaleToApi(code: UiLocale, token: string | null) {
   if (!token) return;
   try {
-    await fetch('/api/v1/users/me/locale', {
+    await requestApiJson('/api/v1/users/me/locale', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

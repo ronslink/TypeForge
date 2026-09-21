@@ -1,5 +1,10 @@
 import { Hono } from 'hono';
 import nodemailer from 'nodemailer';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 
 const router = new Hono();
 
@@ -20,7 +25,12 @@ function sanitizeHeader(value: unknown): string {
 
 router.post('/', async (c) => {
   try {
-    const payload = await c.req.json();
+    const parsedBody = await readBoundedJsonBody(
+      c.req.raw,
+      BOUNDED_JSON_BODY_POLICIES.contactRequest
+    );
+    if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+    const payload = parsedBody.value as Record<string, string | undefined>;
     const { name, email, phone, company, notes, subject, description, honeypot } = payload;
 
     // Silent discard for bots triggering honeypot

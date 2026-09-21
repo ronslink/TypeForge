@@ -2,6 +2,7 @@
   import { page } from '$app/state';
   import { afterNavigate } from '$app/navigation';
   import { useClerkContext, UserButton } from 'svelte-clerk';
+  import { requestApiJson } from '$lib/api/request';
   import { UI_LOCALES, getPersistedLocale, setUiLocale, saveLocaleToApi, t, type UiLocale } from '$lib/stores/locale';
   import { getDefaultLayoutForLanguage } from '@typeforge/layouts';
 
@@ -38,12 +39,13 @@
     (async () => {
       try {
         const token = await ctx?.session?.getToken();
-        const res = await fetch('/api/v1/organisations', {
-          headers: token ? { Authorization: `Bearer ${token}` } : { /* ignore */ },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          hasOrg = data.organisations?.length > 0;
+        if (!token) { hasOrg = false; return; }
+        const result = await requestApiJson<{ organisations?: unknown[] | null }>(
+          '/api/v1/organisations',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (result.ok) {
+          hasOrg = (result.data.organisations?.length ?? 0) > 0;
         }
       } catch { /* ignore */ }
     })();

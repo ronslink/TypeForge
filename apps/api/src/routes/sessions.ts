@@ -7,6 +7,11 @@ import { Hono } from 'hono';
 import { requireAuth, getAuth } from '../middleware/index.js';
 import { getDb } from '../middleware/regional-routing.js';
 import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
+import {
   typingSessions,
   keystrokeEvents,
   userXp,
@@ -241,7 +246,12 @@ app.post('/', async (c) => {
   const db = getDb(c);
   const userId = auth.userId;
 
-  const payload = await c.req.json<SessionPayload>();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.sessionSubmission
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const payload = parsedBody.value as SessionPayload;
 
   // Validate required fields
   if (
@@ -546,7 +556,23 @@ app.put('/:id', async (c) => {
   const db = getDb(c);
   const sessionId = c.req.param('id');
 
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.sessionCompletion
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    status: NonNullable<typeof typingSessions.$inferInsert.status>;
+    durationSeconds?: number;
+    totalCharacters?: number;
+    correctCharacters?: number;
+    errors?: number;
+    wpm?: number;
+    accuracy?: number;
+    rawWpm?: number;
+    consistency?: number;
+    burstWpm?: number;
+  };
   const {
     status,
     durationSeconds,
@@ -613,8 +639,12 @@ app.post('/:id/keystrokes', async (c) => {
   const db = getDb(c);
   const sessionId = c.req.param('id');
 
-  const body = await c.req.json();
-  const { keystrokes } = body as {
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.keystrokeBatch
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const { keystrokes } = parsedBody.value as {
     keystrokes: Array<{
       character: string;
       expected: string;

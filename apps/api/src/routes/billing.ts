@@ -5,6 +5,11 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 import { subscriptions, plans, invoices, planPrices, users, orgBilling } from '@typeforge/db';
 import { and, eq } from 'drizzle-orm';
 import Stripe from 'stripe';
@@ -209,7 +214,12 @@ app.post('/checkout', requireAuth, async (c) => {
   const auth = getAuth(c)!;
   const stripe = getStripe();
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.billingCheckout
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as { interval?: string; successUrl?: string; cancelUrl?: string };
   const { interval = 'monthly', successUrl, cancelUrl } = body;
   
   if (interval !== 'monthly' && interval !== 'annual') {

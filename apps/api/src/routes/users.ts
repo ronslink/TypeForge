@@ -5,6 +5,11 @@
 
 import { Hono } from 'hono';
 import { requireAuth, getAuth, getDb } from '../middleware/index.js';
+import {
+  BOUNDED_JSON_BODY_POLICIES,
+  boundedJsonBodyFailureResponse,
+  readBoundedJsonBody,
+} from '../bounded-json-body.js';
 import { users, userProfiles, userPreferences, dailyStats, userProgress, keyMastery } from '@typeforge/db';
 import { orgMembers, orgSettings } from '@typeforge/db';
 import { eq, and, desc, gte } from 'drizzle-orm';
@@ -63,7 +68,12 @@ app.patch('/me/locale', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
 
-  const body = await c.req.json<{ locale: string }>();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.userLocalePreference
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as { locale: string };
   if (!SUPPORTED_UI_LOCALES.includes(body.locale as (typeof SUPPORTED_UI_LOCALES)[number])) {
     return c.json({ error: 'Unsupported locale', supported: SUPPORTED_UI_LOCALES }, 400);
   }
@@ -83,7 +93,17 @@ app.put('/me', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.userProfileUpdate
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as {
+    displayName?: string;
+    firstName?: string;
+    lastName?: string;
+    avatarUrl?: string;
+  };
   const { displayName, firstName, lastName, avatarUrl } = body;
   
   const [user] = await db
@@ -108,7 +128,12 @@ app.put('/me/preferences', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
   
-  const body = await c.req.json();
+  const parsedBody = await readBoundedJsonBody(
+    c.req.raw,
+    BOUNDED_JSON_BODY_POLICIES.userAccountPreferences
+  );
+  if (parsedBody.ok === false) return boundedJsonBodyFailureResponse(c, parsedBody);
+  const body = parsedBody.value as Partial<typeof userPreferences.$inferInsert>;
   
   const [preferences] = await db
     .update(userPreferences)

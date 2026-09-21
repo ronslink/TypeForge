@@ -45,6 +45,23 @@ describe('bounded authenticated JSON body reader', () => {
       privacyRequest: { maxBytes: 4_096, maxDepth: 4, maxNodes: 128 },
       localePreference: { maxBytes: 1_024, maxDepth: 2, maxNodes: 16 },
       accountPreferences: { maxBytes: 4_096, maxDepth: 2, maxNodes: 64 },
+      sessionSubmission: { maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 },
+      keystrokeBatch: { maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 },
+      sessionCompletion: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
+      placementTestResult: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
+      userLocalePreference: { maxBytes: 1_024, maxDepth: 2, maxNodes: 16 },
+      userProfileUpdate: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
+      userAccountPreferences: { maxBytes: 4_096, maxDepth: 2, maxNodes: 64 },
+      adminAction: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      billingCheckout: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      contactRequest: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      adaptiveDrillRequest: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      organisationCreation: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      organisationInvitation: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
+      organisationSeatCheckout: { maxBytes: 16_384, maxDepth: 4, maxNodes: 256 },
+      organisationSeatUpgrade: { maxBytes: 4_096, maxDepth: 2, maxNodes: 16 },
+      organisationSeatDowngrade: { maxBytes: 4_096, maxDepth: 2, maxNodes: 16 },
+      organisationSeatAssignment: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
     });
   });
 

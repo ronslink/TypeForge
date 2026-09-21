@@ -11,6 +11,42 @@ export const BOUNDED_JSON_BODY_POLICIES = Object.freeze({
   privacyRequest: Object.freeze({ maxBytes: 4_096, maxDepth: 4, maxNodes: 128 }),
   localePreference: Object.freeze({ maxBytes: 1_024, maxDepth: 2, maxNodes: 16 }),
   accountPreferences: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 64 }),
+
+  // POST /sessions — a completed session summary that carries the session's
+  // keystroke array, so it is the one route that legitimately ships bulk data.
+  sessionSubmission: Object.freeze({ maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 }),
+  // POST /sessions/:id/keystrokes — a batch of per-keypress events for one session.
+  keystrokeBatch: Object.freeze({ maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 }),
+  // PUT /sessions/:id — the session's scalar completion metrics only.
+  sessionCompletion: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
+  // POST /progress/placement — one placement-test result.
+  placementTestResult: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
+  // PATCH /users/me/locale — a single supported UI locale code.
+  userLocalePreference: Object.freeze({ maxBytes: 1_024, maxDepth: 2, maxNodes: 16 }),
+  // PUT /users/me — display name, name parts, and avatar URL.
+  userProfileUpdate: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
+  // PUT /users/me/preferences — the flat per-user preference object.
+  userAccountPreferences: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 64 }),
+  // PUT /admin/users/:id/status — the single requested account status.
+  adminAction: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /billing/checkout — checkout interval plus its return URLs.
+  billingCheckout: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /contact — the public contact form, including free-text notes.
+  contactRequest: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /lessons/adaptive — weak-key list and target language for an AI drill.
+  adaptiveDrillRequest: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /organisations — the new organisation's profile fields.
+  organisationCreation: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /organisations/:id/invite — invitee email, role, and optional class.
+  organisationInvitation: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
+  // POST /organisations/:id/billing/seats — seat count, cooldown, return URLs.
+  organisationSeatCheckout: Object.freeze({ maxBytes: 16_384, maxDepth: 4, maxNodes: 256 }),
+  // POST /organisations/:id/billing/seats/upgrade — the seat increment.
+  organisationSeatUpgrade: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 16 }),
+  // POST /organisations/:id/billing/seats/downgrade — the target seat count.
+  organisationSeatDowngrade: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 16 }),
+  // POST /organisations/:id/seats/assign — the seat's user and requested role.
+  organisationSeatAssignment: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
 } satisfies Record<string, BoundedJsonBodyPolicy>);
 
 export const PAYLOAD_TOO_LARGE = Object.freeze({

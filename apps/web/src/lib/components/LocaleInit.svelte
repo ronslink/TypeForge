@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { useClerkContext } from 'svelte-clerk';
+  import { requestApiJson } from '$lib/api/request';
   import { initLocale, setUiLocale, type UiLocale } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
@@ -34,13 +35,15 @@
     try {
       const token = await ctx?.session?.getToken();
       if (token) {
-        const res = await fetch('/api/v1/users/me', {
+        const result = await requestApiJson<{
+          user?: { locale?: string | null } | null;
+          orgDefaultUiLocale?: string | null;
+        }>('/api/v1/users/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.ok) {
-          const payload = await res.json();
-          dbLocale = payload.user?.locale ?? null;
-          orgLocale = payload.orgDefaultUiLocale ?? null;
+        if (result.ok) {
+          dbLocale = result.data.user?.locale ?? null;
+          orgLocale = result.data.orgDefaultUiLocale ?? null;
         }
       }
     } catch { /* ignore */ }
