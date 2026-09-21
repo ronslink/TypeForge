@@ -9,3 +9,4 @@ export { default as organisationsRoutes } from './organisations.js';
 export { default as billingRoutes } from './billing.js';
 export { default as adminRoutes } from './admin.js';
 export { default as progressRoutes } from './progress.js';
+export { default as contactRoutes } from './contact.js';

@@ -29,20 +29,20 @@
     intermediate: 'bg-warning-container text-on-warning-container',
     advanced: 'bg-error-container text-on-error-container',
   };
+
+  function cardClass(): string {
+    return `lesson-card block w-full bg-surface-container-low p-6 rounded-2xl text-left transition-all focus-indicator ${
+      selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : ''
+    } ${locked ? 'opacity-50 grayscale cursor-not-allowed locked-card' : ''}`;
+  }
 </script>
 
-<svelte:element
-  this={href && !locked ? 'a' : 'button'}
-  href={locked ? undefined : href}
-  type={href && !locked ? undefined : 'button'}
-  class="lesson-card block w-full bg-surface-container-low p-6 rounded-2xl text-left transition-all focus-indicator {selected
-    ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface'
-    : ''} {locked ? 'opacity-50 grayscale cursor-not-allowed locked-card' : ''}"
-  onclick={locked ? undefined : onclick}
->
+{#snippet cardContent()}
   <div class="flex items-start justify-between mb-4 relative z-10">
     <div class="flex-1">
-      <h3 class="font-headline text-xl font-bold text-on-surface mb-1 drop-shadow-sm flex items-center gap-2">
+      <h3
+        class="font-headline text-xl font-bold text-on-surface mb-1 drop-shadow-sm flex items-center gap-2"
+      >
         {lesson.title}
         {#if locked}
           <span class="text-on-surface-variant text-base">🔒</span>
@@ -62,7 +62,9 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-3 mb-4 relative z-10">
-    <span class="text-[0.65rem] tracking-wider font-label uppercase text-on-surface-variant bg-surface-container px-2 py-1 rounded">
+    <span
+      class="text-[0.65rem] tracking-wider font-label uppercase text-on-surface-variant bg-surface-container px-2 py-1 rounded"
+    >
       ⏱️ {lesson.duration} min
     </span>
     <span
@@ -70,7 +72,11 @@
         lesson.difficulty
       ]}"
     >
-      {lesson.difficulty === 'beginner' ? '🟢 ' : lesson.difficulty === 'intermediate' ? '🟡 ' : '🔴 '}
+      {lesson.difficulty === 'beginner'
+        ? '🟢 '
+        : lesson.difficulty === 'intermediate'
+          ? '🟡 '
+          : '🔴 '}
       {lesson.difficulty}
     </span>
   </div>
@@ -86,7 +92,23 @@
       {@render children()}
     </div>
   {/if}
-</svelte:element>
+{/snippet}
+
+{#if href && !locked}
+  <a {href} class={cardClass()} {onclick} aria-current={selected ? 'page' : undefined}>
+    {@render cardContent()}
+  </a>
+{:else}
+  <button
+    type="button"
+    class={cardClass()}
+    disabled={locked}
+    onclick={locked ? undefined : onclick}
+    aria-pressed={selected}
+  >
+    {@render cardContent()}
+  </button>
+{/if}
 
 <style>
   .lesson-card {
@@ -116,11 +138,7 @@
     right: 0;
     width: 200px;
     height: 200px;
-    background: radial-gradient(
-      circle at 100% 0%,
-      rgba(240, 165, 0, 0.08),
-      transparent 70%
-    );
+    background: radial-gradient(circle at 100% 0%, rgba(240, 165, 0, 0.08), transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 0;

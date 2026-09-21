@@ -157,7 +157,7 @@
   }
 
   function formatDate(iso?: string) {
-    if (!iso) return 'â€”';
+    if (!iso) return '—';
     return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(iso));
   }
 
@@ -198,7 +198,7 @@
 </script>
 
 <svelte:head>
-  <title>Billing â€” TypeForge</title>
+  <title>Billing — TypeForge</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-6 py-12">
@@ -311,12 +311,12 @@
           <ul class="space-y-2 mb-6 flex-1">
             {#each plan.features as feat}
               <li class="flex gap-2 text-sm font-body text-on-surface">
-                <span class="text-secondary mt-0.5 shrink-0">âœ“</span>{feat}
+                <span class="text-secondary mt-0.5 shrink-0">✓</span>{feat}
               </li>
             {/each}
             {#each (plan.missingFeatures ?? []) as feat}
               <li class="flex gap-2 text-sm font-body text-on-surface-variant line-through">
-                <span class="mt-0.5 shrink-0">âœ—</span>{feat}
+                <span class="mt-0.5 shrink-0">✗</span>{feat}
               </li>
             {/each}
           </ul>
@@ -388,10 +388,10 @@
                       rel="noopener noreferrer"
                       class="text-primary hover:underline font-label text-xs"
                     >
-                      PDF â†—
+                      PDF ↗
                     </a>
                   {:else}
-                    <span class="text-on-surface-variant">â€”</span>
+                    <span class="text-on-surface-variant">—</span>
                   {/if}
                 </td>
               </tr>

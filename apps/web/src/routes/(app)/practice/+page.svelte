@@ -110,7 +110,7 @@
     }
   });
 
-  // Idle / pause detection â€” ticks every 500ms
+  // Idle / pause detection — ticks every 500ms
   $effect(() => {
     if (isStarted && !isComplete) {
       idleInterval = setInterval(() => {
@@ -517,7 +517,7 @@
             >
               {#each currentBooks as book}
                 <option value={book.id}
-                  >{book.title} â€” {book.author} ({book.year < 0
+                  >{book.title} — {book.author} ({book.year < 0
                     ? Math.abs(book.year) + ' BCE'
                     : book.year})</option
                 >
@@ -531,7 +531,7 @@
                 <p
                   class="text-xs text-on-surface-variant/70 italic line-clamp-2 leading-relaxed border-l-2 border-primary/30 pl-3"
                 >
-                  "{selected.excerpt.slice(0, 120)}â€¦"
+                  "{selected.excerpt.slice(0, 120)}…"
                 </p>
               {/if}
             {/if}

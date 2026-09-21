@@ -76,13 +76,13 @@
       id: 'arabic',
       name: 'Arabic',
       languageCode: 'ar',
-      preview: ['Ø¶', 'Øµ', 'Ø«', 'Ù‚', 'Ù', 'Øº'],
+      preview: ['ض', 'ص', 'ث', 'ق', 'ف', 'غ'],
     },
     {
       id: 'cyrillic',
-      name: 'Cyrillic (Ð™Ð¦Ð£ÐšÐ•Ð)',
+      name: 'Cyrillic (ЙЦУКЕН)',
       languageCode: 'ru',
-      preview: ['Ð™', 'Ð¦', 'Ð£', 'Ðš', 'Ð•', 'Ð'],
+      preview: ['Й', 'Ц', 'У', 'К', 'Е', 'Н'],
     },
     {
       id: 'romaji',
@@ -411,7 +411,7 @@
 </script>
 
 <svelte:head>
-  <title>Onboarding â€” TypeForge</title>
+  <title>Onboarding — TypeForge</title>
 </svelte:head>
 
 <svelte:window onkeydown={handleKeydown} onkeyup={handleKeyup} />
@@ -632,7 +632,7 @@
             {#if !testStarted && !testEnded}
               <div class="text-center py-4">
                 <p class="font-label text-sm text-on-surface-variant animate-pulse">
-                  Start typing to begin â€” type as much as you like, then hit "Stop & See Results"
+                  Start typing to begin — type as much as you like, then hit "Stop & See Results"
                 </p>
               </div>
             {/if}
@@ -763,7 +763,7 @@
 </div>
 
 <style>
-  /* â”€â”€â”€ Onboarding pause indicators â”€â”€â”€ */
+  /* ─── Onboarding pause indicators ─── */
   .ob-pause-dot, .ob-active-dot {
     display: inline-block;
     width: 7px;
@@ -942,6 +942,7 @@
   /* Line clamp utility */
   .line-clamp-2 {
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;

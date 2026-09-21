@@ -18,7 +18,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 1: AZERTY Home Row Left Hand (Q S D F G) ===
   {
     id: 'azerty-home-left',
-    title: 'AZERTY Home Row - Left Hand (Q S D F G)',
+    title: 'Rangée de repos AZERTY — main gauche (Q S D F G)',
     language: 'fr',
     script: 'latin',
     difficulty: 1,
@@ -50,7 +50,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 2: AZERTY Home Row Right Hand (H J K L M) ===
   {
     id: 'azerty-home-right',
-    title: 'AZERTY Home Row - Right Hand (H J K L M)',
+    title: 'Rangée de repos AZERTY — main droite (H J K L M)',
     language: 'fr',
     script: 'latin',
     difficulty: 1,
@@ -82,7 +82,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 3: AZERTY Home Row Combined ===
   {
     id: 'azerty-home-combined',
-    title: 'AZERTY Home Row - Combined',
+    title: 'Rangée de repos AZERTY — mains combinées',
     language: 'fr',
     script: 'latin',
     difficulty: 2,
@@ -119,7 +119,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 4: AZERTY Top Row Left Hand (A Z E R T) ===
   {
     id: 'azerty-top-left',
-    title: 'AZERTY Top Row - Left Hand (A Z E R T)',
+    title: 'Rangée supérieure AZERTY — main gauche (A Z E R T)',
     language: 'fr',
     script: 'latin',
     difficulty: 2,
@@ -151,7 +151,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 5: AZERTY Top Row Right Hand (Y U I O P) ===
   {
     id: 'azerty-top-right',
-    title: 'AZERTY Top Row - Right Hand (Y U I O P)',
+    title: 'Rangée supérieure AZERTY — main droite (Y U I O P)',
     language: 'fr',
     script: 'latin',
     difficulty: 2,
@@ -183,7 +183,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 6: AZERTY Bottom Row (W X C V B N) ===
   {
     id: 'azerty-bottom-row',
-    title: 'AZERTY Bottom Row (W X C V B N)',
+    title: 'Rangée inférieure AZERTY (W X C V B N)',
     language: 'fr',
     script: 'latin',
     difficulty: 3,
@@ -212,7 +212,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 7: Common French Bigrams (ER, RE, EN, NE) ===
   {
     id: 'azerty-bigrams-common',
-    title: 'French Common Bigrams',
+    title: 'Digrammes français courants',
     language: 'fr',
     script: 'latin',
     difficulty: 3,
@@ -249,7 +249,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 8: Common French Words ===
   {
     id: 'azerty-words-common',
-    title: 'Common French Words',
+    title: 'Mots français courants',
     language: 'fr',
     script: 'latin',
     difficulty: 3,
@@ -285,7 +285,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 9: AZERTY Speed Drill ===
   {
     id: 'azerty-speed-drill',
-    title: 'AZERTY Speed Drill',
+    title: 'Exercice de vitesse AZERTY',
     language: 'fr',
     script: 'latin',
     difficulty: 4,
@@ -322,7 +322,7 @@ export const azertyLessons: Lesson[] = [
   // === Lesson 10: AZERTY Endurance - Full Keyboard ===
   {
     id: 'azerty-endurance',
-    title: 'AZERTY Endurance - Full Keyboard',
+    title: 'Endurance AZERTY — clavier complet',
     language: 'fr',
     script: 'latin',
     difficulty: 5,

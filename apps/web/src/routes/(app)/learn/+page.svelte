@@ -270,7 +270,7 @@
 
   // Get difficulty stars display
   function getDifficultyStars(level: number): string {
-    return 'â˜…'.repeat(level) + 'â˜†'.repeat(5 - level);
+    return '★'.repeat(level) + '☆'.repeat(5 - level);
   }
 
   // Clear all filters
@@ -339,7 +339,7 @@
           class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
           onclick={() => (searchQuery = '')}
         >
-          âœ•
+          ✕
         </button>
       {/if}
     </div>
@@ -493,12 +493,12 @@
       </div>
     </div>
 
-    <!-- â”€â”€ Adaptive Drill Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Adaptive Drill Banner ────────────────────────────────────────── -->
     <!-- Show when: signed in, has weak keys, not searching/filtering, not dismissed -->
     {#if isSignedIn && weakKeys.length > 0 && !bannerDismissed && !searchQuery && selectedDifficulty === 'all' && selectedTag === 'all'}
       <div class="adaptive-banner" role="alert" aria-label="Adaptive drill recommendation">
         <div class="adaptive-banner-left">
-          <span class="adaptive-icon" aria-hidden="true">ðŸ“ˆ</span>
+          <span class="adaptive-icon" aria-hidden="true">📈</span>
           <div>
             <p class="adaptive-title">{$t('adaptive_banner_title')}</p>
             <p class="adaptive-body">
@@ -520,7 +520,7 @@
           <button
             onclick={dismissBanner}
             class="dismiss-btn"
-            aria-label="Dismiss adaptive drill banner">âœ•</button
+            aria-label="Dismiss adaptive drill banner">✕</button
           >
         </div>
       </div>
@@ -639,7 +639,7 @@
                                   : 'bg-primary text-background'} p-3 rounded-full shadow-lg"
                               >
                                 {#if isLocked}
-                                  <span class="text-xl">ðŸ”’</span>
+                                  <span class="text-xl">🔒</span>
                                 {:else}
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -789,7 +789,7 @@
 </div>
 
 <style>
-  /* â”€â”€â”€ Adaptive Drill Banner â”€â”€â”€ */
+  /* ─── Adaptive Drill Banner ─── */
   .adaptive-banner {
     display: flex;
     align-items: center;

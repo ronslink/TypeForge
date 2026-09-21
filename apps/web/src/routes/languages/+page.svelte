@@ -26,7 +26,7 @@
           Master typing in any language
         </h1>
         <p class="font-body text-xl text-on-surface-variant max-w-2xl mx-auto">
-          From Latin to CJK, from Arabic RTL to Devanagari â€” TypingScholar's adaptive engine tailors
+          From Latin to CJK, from Arabic RTL to Devanagari — TypingScholar's adaptive engine tailors
           to each language's unique layout and script.
         </p>
       </div>

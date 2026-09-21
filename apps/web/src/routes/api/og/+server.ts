@@ -78,7 +78,7 @@ export const GET = async ({ url }) => {
                       color: '#41e4c0',
                       fontSize: '26px',
                     },
-                    children: ['Aa', '××‘', 'Ð–Ð¶', 'í•œê¸€', 'à¤•à¤–'].map((sample) => ({
+                    children: ['Aa', 'אב', 'Жж', '한글', 'कख'].map((sample) => ({
                       type: 'span',
                       props: { children: sample },
                     })),

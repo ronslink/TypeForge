@@ -23,7 +23,7 @@
   >
     {#each UI_LOCALES as locale}
       <option value={locale.code} class="bg-surface-container text-on-surface normal-case tracking-normal">
-        {locale.code.toUpperCase()} â€” {locale.nativeName}
+        {locale.code.toUpperCase()} — {locale.nativeName}
       </option>
     {/each}
   </select>

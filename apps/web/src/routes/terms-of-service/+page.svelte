@@ -71,15 +71,15 @@
           <h2 class="font-headline text-2xl mb-4">4. Subscription & Billing</h2>
           <ul class="list-disc pl-6 space-y-2">
             <li>
-              <strong>Free tier</strong> â€” limited access, no credit card required. We reserve the right
+              <strong>Free tier</strong> — limited access, no credit card required. We reserve the right
               to change free-tier limits with notice.
             </li>
             <li>
-              <strong>Power User ($9/mo)</strong> â€” billed monthly or annually ($79/year). Cancel anytime;
+              <strong>Power User ($9/mo)</strong> — billed monthly or annually ($79/year). Cancel anytime;
               access continues to end of billing period.
             </li>
             <li>
-              <strong>School ($6/seat/mo)</strong> â€” billed per active seat monthly. Seats can be added/removed;
+              <strong>School ($6/seat/mo)</strong> — billed per active seat monthly. Seats can be added/removed;
               billing adjusts on next cycle.
             </li>
             <li>
@@ -143,7 +143,7 @@
           <p>
             To the maximum extent permitted by law, TypingScholar shall not be liable for any
             indirect, incidental, special, consequential, or punitive damages, or any loss of
-            profits, data, or goodwill, arising from your use of the Service â€” even if we have been
+            profits, data, or goodwill, arising from your use of the Service — even if we have been
             advised of the possibility of such damages.
           </p>
           <p class="mt-4">

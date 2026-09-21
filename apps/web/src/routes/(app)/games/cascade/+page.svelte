@@ -80,7 +80,7 @@
         <div
           class="w-20 h-20 mx-auto bg-primary/20 rounded-full flex items-center justify-center text-4xl mb-2"
         >
-          ðŸŒ§ï¸
+          🌧️
         </div>
         <div>
           <h2 class="text-2xl font-black font-headline text-on-surface mb-2">

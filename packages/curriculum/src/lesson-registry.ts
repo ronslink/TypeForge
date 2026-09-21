@@ -539,6 +539,97 @@ LESSON_CATALOG.push(...hindiLessons);
 import { japaneseLessons } from './japanese-lessons.js';
 LESSON_CATALOG.push(...japaneseLessons);
 
+type LocalizedLessonTitles = {
+  basic: string;
+  speed: string;
+  final: string;
+  stage: string;
+};
+
+const LOCALIZED_LESSON_TITLES: Record<string, LocalizedLessonTitles> = {
+  en: {
+    basic: 'Basic Words Drill',
+    speed: 'Speed & Endurance Run',
+    final: 'Final Proficiency Test',
+    stage: 'Stage {level} Certification Test',
+  },
+  es: {
+    basic: 'Práctica de palabras básicas',
+    speed: 'Ejercicio de velocidad y resistencia',
+    final: 'Prueba final de dominio',
+    stage: 'Prueba de certificación de la etapa {level}',
+  },
+  fr: {
+    basic: 'Exercice de mots de base',
+    speed: 'Exercice de vitesse et d’endurance',
+    final: 'Test final de maîtrise',
+    stage: 'Test de certification de l’étape {level}',
+  },
+  de: {
+    basic: 'Übung mit Grundwörtern',
+    speed: 'Geschwindigkeits- und Ausdauerübung',
+    final: 'Abschließender Kompetenztest',
+    stage: 'Zertifizierungstest Stufe {level}',
+  },
+  pt: {
+    basic: 'Exercício de palavras básicas',
+    speed: 'Exercício de velocidade e resistência',
+    final: 'Teste final de proficiência',
+    stage: 'Teste de certificação da etapa {level}',
+  },
+  ja: {
+    basic: '基本単語練習',
+    speed: '速度と持久力の練習',
+    final: '最終習熟度テスト',
+    stage: 'ステージ{level}認定テスト',
+  },
+  ko: {
+    basic: '기본 단어 연습',
+    speed: '속도 및 지구력 연습',
+    final: '최종 숙련도 시험',
+    stage: '{level}단계 인증 시험',
+  },
+  zh: {
+    basic: '基础词语练习',
+    speed: '速度与耐力练习',
+    final: '最终熟练度测试',
+    stage: '第 {level} 阶段认证测试',
+  },
+  ar: {
+    basic: 'تدريب الكلمات الأساسية',
+    speed: 'تدريب السرعة والتحمل',
+    final: 'اختبار الكفاءة النهائي',
+    stage: 'اختبار اعتماد المرحلة {level}',
+  },
+  hi: {
+    basic: 'मूल शब्द अभ्यास',
+    speed: 'गति और सहनशक्ति अभ्यास',
+    final: 'अंतिम दक्षता परीक्षा',
+    stage: 'चरण {level} प्रमाणन परीक्षा',
+  },
+  tr: {
+    basic: 'Temel Kelime Alıştırması',
+    speed: 'Hız ve Dayanıklılık Alıştırması',
+    final: 'Final Yeterlilik Sınavı',
+    stage: '{level}. Aşama Sertifika Sınavı',
+  },
+  it: {
+    basic: 'Esercizio con parole di base',
+    speed: 'Esercizio di velocità e resistenza',
+    final: 'Test finale di competenza',
+    stage: 'Test di certificazione della fase {level}',
+  },
+  ru: {
+    basic: 'Упражнение с базовыми словами',
+    speed: 'Упражнение на скорость и выносливость',
+    final: 'Итоговый тест на уровень владения',
+    stage: 'Сертификационный тест этапа {level}',
+  },
+};
+
+const titleForLanguage = (language: string): LocalizedLessonTitles =>
+  LOCALIZED_LESSON_TITLES[language] ?? LOCALIZED_LESSON_TITLES.en!;
+
 // Synthesize full curriculum states for every natively mapped language
 const masterLanguages = getSupportedLanguages();
 
@@ -608,6 +699,8 @@ const getScript = (lang: string) => SCRIPT_MAP[lang] || 'latin';
 const isRtl = (lang: string) => RTL_LANGS.includes(lang);
 
 masterLanguages.forEach(lang => {
+  const localizedTitles = titleForLanguage(lang);
+
   // 1. Synthesize Basic Practice Modules if not hardcoded
   const existingLessons = LESSON_CATALOG.filter(l => l.language === lang && !l.isTest);
   if (existingLessons.length === 0) {
@@ -617,7 +710,7 @@ masterLanguages.forEach(lang => {
     if (basicWords.length > 0) {
        LESSON_CATALOG.push({
          id: `${lang}-basic-1`,
-         title: `Basic Words Drill`,
+         title: localizedTitles.basic,
          language: lang,
          script: getScript(lang),
          difficulty: 1,
@@ -627,7 +720,7 @@ masterLanguages.forEach(lang => {
        });
        LESSON_CATALOG.push({
          id: `${lang}-speed-1`,
-         title: `Speed & Endurance Run`,
+         title: localizedTitles.speed,
          language: lang,
          script: getScript(lang),
          difficulty: 3,
@@ -647,7 +740,9 @@ masterLanguages.forEach(lang => {
       const text = words.join(' ');
       LESSON_CATALOG.push({
         id: `${lang}-test-${level}`,
-        title: isFinal ? 'Final Proficiency Test' : `Stage ${level} Certification Test`,
+        title: isFinal
+          ? localizedTitles.final
+          : localizedTitles.stage.replace('{level}', String(level)),
         language: lang,
         script: getScript(lang),
         difficulty: level,

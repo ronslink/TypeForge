@@ -23,6 +23,7 @@ import {
   billingRoutes,
   adminRoutes,
   progressRoutes,
+  contactRoutes,
 } from './routes/index.js';
 
 const app = new Hono();
@@ -34,6 +35,8 @@ app.use(
   '*',
   cors({
     origin: [
+      'https://typingscholar.com',
+      'https://www.typingscholar.com',
       'https://typeforge.io',
       'https://www.typeforge.io',
       'https://typeforge.com',
@@ -48,6 +51,17 @@ app.use(
 );
 app.use('*', prettyJSON());
 
+const healthPayload = () => ({
+  status: 'healthy' as const,
+  timestamp: new Date().toISOString(),
+  version: '0.0.1',
+  environment: process.env.NODE_ENV || 'production',
+});
+
+// Keep health checks outside the authenticated/database-backed API middleware.
+app.get('/health', (c) => c.json(healthPayload()));
+app.get('/api/health', (c) => c.json(healthPayload()));
+
 // Rate limiting
 app.use('/api/*', rateLimits.api);
 
@@ -57,16 +71,6 @@ app.use('/api/*', dbMiddleware);
 // Authentication middleware
 app.use('/api/*', authMiddleware);
 
-// Health check (no auth required)
-app.get('/health', (c) => {
-  return c.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: '0.0.1',
-    environment: process.env.NODE_ENV || 'production',
-  });
-});
-
 // Mount API routes
 app.route('/api/v1/sessions', sessionsRoutes);
 app.route('/api/v1/lessons', lessonsRoutes);
@@ -75,6 +79,7 @@ app.route('/api/v1/users', usersRoutes);
 app.route('/api/v1/organisations', organisationsRoutes);
 app.route('/api/v1/billing', billingRoutes);
 app.route('/api/v1/admin', adminRoutes);
+app.route('/api/v1/contact', contactRoutes);
 
 // API version info
 app.get('/api/v1', (c) => {
@@ -82,6 +87,7 @@ app.get('/api/v1', (c) => {
     name: 'TypeForge API',
     version: '1.0.0',
     endpoints: {
+      health: '/api/health',
       sessions: '/api/v1/sessions',
       lessons: '/api/v1/lessons',
       progress: '/api/v1/progress',
@@ -89,6 +95,7 @@ app.get('/api/v1', (c) => {
       organisations: '/api/v1/organisations',
       billing: '/api/v1/billing',
       admin: '/api/v1/admin',
+      contact: '/api/v1/contact',
     },
   });
 });

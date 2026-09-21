@@ -1,23 +1,37 @@
 <script lang="ts">
-  let { children, defaultTheme = 'light' }: { children: any; defaultTheme?: 'light' | 'dark' | 'system' } = $props();
+  import type { Snippet } from 'svelte';
 
-  let currentTheme = $state(defaultTheme);
+  type Theme = 'light' | 'dark' | 'system';
+
+  let { children, defaultTheme = 'light' }: { children: Snippet; defaultTheme?: Theme } = $props();
+
+  let currentTheme: Theme = $state('light');
   let mounted = $state(false);
 
   $effect(() => {
-    mounted = true;
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-      if (stored && ['light', 'dark'].includes(stored)) {
-        currentTheme = stored;
-      }
+      const stored = localStorage.getItem('theme') as Theme | null;
+      currentTheme = stored && ['light', 'dark', 'system'].includes(stored) ? stored : defaultTheme;
+      mounted = true;
     }
   });
 
   $effect(() => {
     if (typeof window !== 'undefined' && mounted) {
-      document.documentElement.setAttribute('data-theme', currentTheme);
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const applyTheme = () => {
+        const resolvedTheme =
+          currentTheme === 'system' ? (media.matches ? 'dark' : 'light') : currentTheme;
+        document.documentElement.setAttribute('data-theme', resolvedTheme);
+      };
+
+      applyTheme();
       localStorage.setItem('theme', currentTheme);
+
+      if (currentTheme === 'system') {
+        media.addEventListener('change', applyTheme);
+        return () => media.removeEventListener('change', applyTheme);
+      }
     }
   });
 </script>

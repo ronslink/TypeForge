@@ -21,12 +21,10 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
       "outputLogs": "errors-only"
     },
     "test:unit": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": ["^build"]
     },
     "test:e2e": {
       "dependsOn": ["^build"],

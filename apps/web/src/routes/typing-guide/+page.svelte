@@ -185,7 +185,7 @@
             <h3 class="font-label text-sm uppercase tracking-wider text-primary mb-3">Cyrillic</h3>
             <p class="font-body text-sm text-on-surface-variant">
               The layout follows the QWERTY physical positions even though the letters are
-              different. Your fingers move the same paths â€” the visual changes, not the motor
+              different. Your fingers move the same paths — the visual changes, not the motor
               pattern.
             </p>
           </div>
@@ -202,7 +202,7 @@
             <h3 class="font-label text-sm uppercase tracking-wider text-primary mb-3">CJK</h3>
             <p class="font-body text-sm text-on-surface-variant">
               Typing CJK characters involves multi-key sequences via pinyin (Chinese) or romaji
-              (Japanese). Accuracy and tone markers matter â€” slow and correct beats fast and wrong.
+              (Japanese). Accuracy and tone markers matter — slow and correct beats fast and wrong.
             </p>
           </div>
           <div>
@@ -210,7 +210,7 @@
               Korean Hangul
             </h3>
             <p class="font-body text-sm text-on-surface-variant">
-              Hangul is phonetic â€” each key corresponds to a jamo (letter). Letters combine into
+              Hangul is phonetic — each key corresponds to a jamo (letter). Letters combine into
               syllable blocks. Learning the individual jamo first makes typing intuitive.
             </p>
           </div>

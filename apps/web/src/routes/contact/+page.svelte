@@ -190,11 +190,11 @@
                 class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-3 font-body text-on-surface focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="">Select range</option>
-                <option value="1-50">1 â€“ 50</option>
-                <option value="51-200">51 â€“ 200</option>
-                <option value="201-500">201 â€“ 500</option>
-                <option value="501-1000">501 â€“ 1,000</option>
-                <option value="1001-5000">1,001 â€“ 5,000</option>
+                <option value="1-50">1 – 50</option>
+                <option value="51-200">51 – 200</option>
+                <option value="201-500">201 – 500</option>
+                <option value="501-1000">501 – 1,000</option>
+                <option value="1001-5000">1,001 – 5,000</option>
                 <option value="5000+">5,000+</option>
               </select>
             </div>

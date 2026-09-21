@@ -261,7 +261,7 @@
 {/if}
 
 <style>
-  /* â”€â”€â”€ UI Locale Switcher â”€â”€â”€ */
+  /* ─── UI Locale Switcher ─── */
   .ui-locale-btn {
     display: flex;
     align-items: center;

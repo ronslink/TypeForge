@@ -3,16 +3,18 @@ import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 import { env as publicEnv } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
-
-const SUPPORTED_LOCALES = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh', 'ar', 'hi', 'tr', 'it', 'ru'] as const;
-type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+import {
+  isRtlUiLocale,
+  isUiLocale,
+  type UiLocale,
+} from '$lib/i18n/locales';
 
 /** Parse Accept-Language header and return the best matching supported locale */
-function detectLocale(acceptLanguage: string | null): SupportedLocale {
+function detectLocale(acceptLanguage: string | null): UiLocale {
   if (!acceptLanguage) return 'en';
   for (const part of acceptLanguage.split(',')) {
     const code = part.trim().split(';')[0]!.split('-')[0]!.toLowerCase();
-    if (SUPPORTED_LOCALES.includes(code as SupportedLocale)) return code as SupportedLocale;
+    if (isUiLocale(code)) return code;
   }
   return 'en';
 }
@@ -90,7 +92,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const detectedLocale = detectLocale(event.request.headers.get('Accept-Language'));
   event.locals.detectedLocale = detectedLocale;
 
-  const isRtl = ['ar', 'he'].includes(detectedLocale);
+  const isRtl = isRtlUiLocale(detectedLocale);
   const htmlAttributes = `lang="${detectedLocale}"${isRtl ? ' dir="rtl"' : ''}`;
 
   return resolve(event, {

@@ -8,10 +8,17 @@
  */
 
 import { browser } from '$app/environment';
+import {
+  SUPPORTED_UI_LOCALES,
+  UI_LOCALES,
+  isRtlUiLocale,
+  isUiLocale,
+  type UiLocale,
+} from '$lib/i18n/locales';
 import { writable, derived } from 'svelte/store';
 
-// â”€â”€ Message imports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Bundled at build time â€” small JSON files (~5 KB each), tree-shakeable later
+// ── Message imports ──────────────────────────────────────────────────────────
+// Bundled at build time — small JSON files (~5 KB each), tree-shakeable later
 // when migrating to full Paraglide codegen.
 import en from '../../../messages/en.json';
 import es from '../../../messages/es.json';
@@ -26,45 +33,44 @@ import hi from '../../../messages/hi.json';
 import tr from '../../../messages/tr.json';
 import it from '../../../messages/it.json';
 import ru from '../../../messages/ru.json';
+import id from '../../../messages/id.json';
+import vi from '../../../messages/vi.json';
+import pl from '../../../messages/pl.json';
 
-// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SUPPORTED = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh', 'ar', 'hi', 'tr', 'it', 'ru'] as const;
-export type UiLocale = (typeof SUPPORTED)[number];
+// ── Types ────────────────────────────────────────────────────────────────────
+export { SUPPORTED_UI_LOCALES, UI_LOCALES, type UiLocale } from '$lib/i18n/locales';
 
 type Messages = typeof en;
 type MessageKey = keyof Messages;
 
-const MESSAGES: Record<UiLocale, Partial<Messages>> = { en, es, fr, de, pt, ja, ko, zh, ar, hi, tr, it, ru } as any;
+const MESSAGES: Record<UiLocale, Partial<Messages>> = {
+  en,
+  es,
+  fr,
+  de,
+  pt,
+  ja,
+  ko,
+  zh,
+  ar,
+  hi,
+  tr,
+  it,
+  ru,
+  id,
+  vi,
+  pl,
+};
 
-export const UI_LOCALES: { code: UiLocale; nativeName: string; englishName: string }[] = [
-  { code: 'en', nativeName: 'English',   englishName: 'English'    },
-  { code: 'es', nativeName: 'EspaÃ±ol',   englishName: 'Spanish'    },
-  { code: 'fr', nativeName: 'FranÃ§ais',  englishName: 'French'     },
-  { code: 'de', nativeName: 'Deutsch',   englishName: 'German'     },
-  { code: 'pt', nativeName: 'PortuguÃªs', englishName: 'Portuguese' },
-  { code: 'ja', nativeName: 'æ—¥æœ¬èªž',    englishName: 'Japanese'   },
-  { code: 'ko', nativeName: 'í•œêµ­ì–´',    englishName: 'Korean'     },
-  { code: 'zh', nativeName: 'ä¸­æ–‡',      englishName: 'Chinese'    },
-  { code: 'ar', nativeName: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©',   englishName: 'Arabic'     },
-  { code: 'hi', nativeName: 'à¤¹à¤¿à¤¨à¥à¤¦à¥€',    englishName: 'Hindi'      },
-  { code: 'tr', nativeName: 'TÃ¼rkÃ§e',    englishName: 'Turkish'    },
-  { code: 'it', nativeName: 'Italiano',  englishName: 'Italian'    },
-  { code: 'ru', nativeName: 'Ð ÑƒÑÑÐºÐ¸Ð¹',   englishName: 'Russian'    },
-];
-
-// â”€â”€ Core writable store â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Core writable store ───────────────────────────────────────────────────────
 const STORAGE_KEY = 'tf_ui_locale';
 
-function isSupported(code: string): code is UiLocale {
-  return SUPPORTED.includes(code as UiLocale);
-}
-
-/** The active UI locale â€” reactive Svelte store. */
+/** The active UI locale — reactive Svelte store. */
 export const uiLocale = writable<UiLocale>('en');
 
-// â”€â”€ Reactive translation function â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Reactive translation function ────────────────────────────────────────────
 /**
- * `$t` â€” reactive translation derived store.
+ * `$t` — reactive translation derived store.
  *
  * Usage in Svelte templates:
  *   import { t } from '$lib/stores/locale';
@@ -91,34 +97,35 @@ export const t = derived(uiLocale, ($locale) => {
   };
 });
 
-// â”€â”€ Locale management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Locale management ─────────────────────────────────────────────────────────
 
 /** Read persisted locale from localStorage (browser only). */
 export function getPersistedLocale(): UiLocale {
   if (!browser) return 'en';
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && isSupported(stored)) return stored;
+    if (stored && isUiLocale(stored)) return stored;
   } catch { /* ignore */ }
   // Fall back to browser language matching
   for (const lang of navigator.languages ?? []) {
     const code = lang.split('-')[0]!.toLowerCase();
-    if (isSupported(code)) return code;
+    if (isUiLocale(code)) return code;
   }
   return 'en';
 }
 
-/** Apply a locale: updates the store, localStorage, and <html lang>. */
+/** Apply a locale: updates the store, localStorage, and document language/direction. */
 export function setUiLocale(code: UiLocale) {
   uiLocale.set(code);
   if (!browser) return;
   try { localStorage.setItem(STORAGE_KEY, code); } catch { /* ignore */ }
   document.documentElement.lang = code;
+  document.documentElement.dir = isRtlUiLocale(code) ? 'rtl' : 'ltr';
 }
 
 /**
  * Initialise locale on app boot.
- * Priority: DB personal â†’ org default â†’ localStorage â†’ browser language â†’ 'en'
+ * Priority: DB personal → org default → localStorage → browser language → 'en'
  */
 export function initLocale(
   dbLocale: string | null = null,
@@ -126,11 +133,11 @@ export function initLocale(
 ): UiLocale {
   let resolved: UiLocale = 'en';
 
-  if (dbLocale && isSupported(dbLocale)) {
-    // Personal DB preference â€” highest priority
+  if (dbLocale && isUiLocale(dbLocale)) {
+    // Personal DB preference — highest priority
     resolved = dbLocale;
-  } else if (orgLocale && isSupported(orgLocale) && !localStorage.getItem(STORAGE_KEY)) {
-    // Org default â€” only when no personal override stored
+  } else if (orgLocale && isUiLocale(orgLocale) && !localStorage.getItem(STORAGE_KEY)) {
+    // Org default — only when no personal override stored
     resolved = orgLocale;
   } else {
     resolved = getPersistedLocale();
@@ -142,7 +149,7 @@ export function initLocale(
 
 /**
  * Persist the locale to the user's DB profile via PATCH /users/me/locale.
- * Fire-and-forget â€” non-critical.
+ * Fire-and-forget — non-critical.
  */
 export async function saveLocaleToApi(code: UiLocale, token: string | null) {
   if (!token) return;

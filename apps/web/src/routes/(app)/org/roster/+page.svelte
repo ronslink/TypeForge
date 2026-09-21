@@ -139,7 +139,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t('org_roster_title')} â€” TypeForge</title>
+  <title>{$t('org_roster_title')} — TypeForge</title>
 </svelte:head>
 
 {#if loading}
@@ -341,7 +341,7 @@
                         <div
                           class="trend-bar"
                           style="height: {Math.max(10, Math.min(100, Number(day.avgAccuracy ?? 0)))}%"
-                          title={`${formatDate(day.date)} Â· ${Math.round(day.avgWpm ?? 0)} WPM Â· ${Math.round(day.avgAccuracy ?? 0)}%`}
+                          title={`${formatDate(day.date)} · ${Math.round(day.avgWpm ?? 0)} WPM · ${Math.round(day.avgAccuracy ?? 0)}%`}
                         ></div>
                       {/each}
                     </div>

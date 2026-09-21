@@ -43,6 +43,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/.svelte-kit/**',
       '**/.turbo/**',
+      '**/.vercel/**',
       '**/.wrangler/**',
       '**/coverage/**',
       '**/build/**',

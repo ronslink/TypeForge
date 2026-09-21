@@ -20,7 +20,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 1: Home Row Left Hand
   {
     id: 'de-home-left',
-    title: 'German Home Row - Left Hand (A S D F G)',
+    title: 'Deutsche Grundreihe — linke Hand (A S D F G)',
     language: 'de',
     script: 'latin',
     difficulty: 1,
@@ -52,7 +52,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 2: Home Row Right Hand
   {
     id: 'de-home-right',
-    title: 'German Home Row - Right Hand (H J K L)',
+    title: 'Deutsche Grundreihe — rechte Hand (H J K L)',
     language: 'de',
     script: 'latin',
     difficulty: 1,
@@ -81,7 +81,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 3: Home Row Combined
   {
     id: 'de-home-combined',
-    title: 'German Home Row - Combined',
+    title: 'Deutsche Grundreihe — kombiniert',
     language: 'de',
     script: 'latin',
     difficulty: 2,
@@ -116,7 +116,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 4: German Eszett (ß)
   {
     id: 'de-eszett',
-    title: 'German Eszett (ß)',
+    title: 'Deutsches Eszett (ß)',
     language: 'de',
     script: 'latin',
     difficulty: 2,
@@ -146,7 +146,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 5: Top Row Left Hand (Q W E R T)
   {
     id: 'de-top-left',
-    title: 'German Top Row - Left Hand (Q W E R T)',
+    title: 'Deutsche obere Reihe — linke Hand (Q W E R T)',
     language: 'de',
     script: 'latin',
     difficulty: 2,
@@ -178,7 +178,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 6: Top Row Right Hand (Z U I O P)
   {
     id: 'de-top-right',
-    title: 'German Top Row - Right Hand (Z U I O P)',
+    title: 'Deutsche obere Reihe — rechte Hand (Z U I O P)',
     language: 'de',
     script: 'latin',
     difficulty: 2,
@@ -210,7 +210,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 7: Full Top Row (QWERTZ)
   {
     id: 'de-top-full',
-    title: 'German Top Row - Full QWERTZ',
+    title: 'Deutsche obere Reihe — vollständiges QWERTZ',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -247,7 +247,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 8: Common German Bigrams
   {
     id: 'de-bigrams',
-    title: 'German Common Bigrams (ER, EN, CH)',
+    title: 'Häufige deutsche Bigramme (ER, EN, CH)',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -284,7 +284,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 9: German Words Practice
   {
     id: 'de-words-basic',
-    title: 'German Basic Words',
+    title: 'Deutsche Grundwörter',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -322,7 +322,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 10: Bottom Row Left Hand (Y X C V B)
   {
     id: 'de-bottom-left',
-    title: 'German Bottom Row - Left Hand (Y X C V B)',
+    title: 'Deutsche untere Reihe — linke Hand (Y X C V B)',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -354,7 +354,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 11: Bottom Row Right Hand (N M)
   {
     id: 'de-bottom-right',
-    title: 'German Bottom Row - Right Hand (N M)',
+    title: 'Deutsche untere Reihe — rechte Hand (N M)',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -386,7 +386,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 12: Full Bottom Row
   {
     id: 'de-bottom-full',
-    title: 'German Bottom Row - Full (Y X C V B N M)',
+    title: 'Deutsche untere Reihe — vollständig (Y X C V B N M)',
     language: 'de',
     script: 'latin',
     difficulty: 3,
@@ -419,7 +419,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 13: German Umlauts (Ä Ö Ü)
   {
     id: 'de-umlauts',
-    title: 'German Umlauts (Ä Ö Ü)',
+    title: 'Deutsche Umlaute (Ä Ö Ü)',
     language: 'de',
     script: 'latin',
     difficulty: 4,
@@ -455,7 +455,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 14: German Words with Umlauts
   {
     id: 'de-words-umlauts',
-    title: 'German Words with Umlauts',
+    title: 'Deutsche Wörter mit Umlauten',
     language: 'de',
     script: 'latin',
     difficulty: 4,
@@ -494,7 +494,7 @@ export const germanLessons: Lesson[] = [
   // Lesson 15: German Endurance - Full Keyboard
   {
     id: 'de-endurance',
-    title: 'German Endurance - Full Keyboard',
+    title: 'Deutsche Ausdauerübung — komplette Tastatur',
     language: 'de',
     script: 'latin',
     difficulty: 5,

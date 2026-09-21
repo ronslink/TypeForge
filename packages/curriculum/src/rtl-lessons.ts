@@ -73,7 +73,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 1: Arabic Alphabet - Isolated Letters (Part 1) ===
   {
     id: 'ar-alphabet-1',
-    title: 'Arabic Alphabet - Part 1 (ا-ب-ت-ث)',
+    title: 'الأبجدية العربية — الجزء 1 (ا-ب-ت-ث)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -102,7 +102,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 2: Arabic Alphabet - Isolated Letters (Part 2) ===
   {
     id: 'ar-alphabet-2',
-    title: 'Arabic Alphabet - Part 2 (ج-ح-خ-د)',
+    title: 'الأبجدية العربية — الجزء 2 (ج-ح-خ-د)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -131,7 +131,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 3: Arabic Alphabet - Isolated Letters (Part 3) ===
   {
     id: 'ar-alphabet-3',
-    title: 'Arabic Alphabet - Part 3 (ر-ز-س-ش)',
+    title: 'الأبجدية العربية — الجزء 3 (ر-ز-س-ش)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -160,7 +160,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 4: Arabic Alphabet - Isolated Letters (Part 4) ===
   {
     id: 'ar-alphabet-4',
-    title: 'Arabic Alphabet - Part 4 (ص-ض-ط-ظ)',
+    title: 'الأبجدية العربية — الجزء 4 (ص-ض-ط-ظ)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -189,7 +189,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 5: Arabic Alphabet - Isolated Letters (Part 5) ===
   {
     id: 'ar-alphabet-5',
-    title: 'Arabic Alphabet - Part 5 (ع-غ-ف-ق)',
+    title: 'الأبجدية العربية — الجزء 5 (ع-غ-ف-ق)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -218,7 +218,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 6: Arabic Alphabet - Isolated Letters (Part 6) ===
   {
     id: 'ar-alphabet-6',
-    title: 'Arabic Alphabet - Part 6 (ك-ل-م-ن)',
+    title: 'الأبجدية العربية — الجزء 6 (ك-ل-م-ن)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -247,7 +247,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 7: Arabic Alphabet - Isolated Letters (Part 7) ===
   {
     id: 'ar-alphabet-7',
-    title: 'Arabic Alphabet - Part 7 (ه-و-ي-ء)',
+    title: 'الأبجدية العربية — الجزء 7 (ه-و-ي-ء)',
     language: 'ar',
     script: 'arabic',
     difficulty: 1,
@@ -276,7 +276,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 8: Arabic Alphabet - Special Letters ===
   {
     id: 'ar-alphabet-special',
-    title: 'Arabic Alphabet - Special Letters (ة-ى-ئ-ؤ)',
+    title: 'الأبجدية العربية — الحروف الخاصة (ة-ى-ئ-ؤ)',
     language: 'ar',
     script: 'arabic',
     difficulty: 2,
@@ -305,7 +305,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 9: Harakat (Short Vowels) ===
   {
     id: 'ar-harakat',
-    title: 'Harakat - Short Vowel Marks',
+    title: 'الحركات — علامات الحركات القصيرة',
     language: 'ar',
     script: 'arabic',
     difficulty: 2,
@@ -338,7 +338,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 10: Simple Arabic Words ===
   {
     id: 'ar-simple-words',
-    title: 'Simple Arabic Words',
+    title: 'كلمات عربية بسيطة',
     language: 'ar',
     script: 'arabic',
     difficulty: 2,
@@ -375,7 +375,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 11: Weak Letters (Alif, Waw, Ya) ===
   {
     id: 'ar-weak-letters',
-    title: 'Weak Letters - Alif, Waw, Ya',
+    title: 'حروف العلة — الألف والواو والياء',
     language: 'ar',
     script: 'arabic',
     difficulty: 3,
@@ -411,7 +411,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 12: Sun Letters (الحروف الشمسية) ===
   {
     id: 'ar-sun-letters',
-    title: 'Sun Letters - Al-Shamsiyyah',
+    title: 'الحروف الشمسية — اللام الشمسية',
     language: 'ar',
     script: 'arabic',
     difficulty: 3,
@@ -443,7 +443,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 13: Moon Letters (الحروف القمرية) ===
   {
     id: 'ar-moon-letters',
-    title: 'Moon Letters - Al-Qamariyyah',
+    title: 'الحروف القمرية — اللام القمرية',
     language: 'ar',
     script: 'arabic',
     difficulty: 3,
@@ -475,7 +475,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 14: Arabic Numbers ===
   {
     id: 'ar-numbers',
-    title: 'Arabic-Indic Numerals',
+    title: 'الأرقام العربية الهندية',
     language: 'ar',
     script: 'arabic',
     difficulty: 2,
@@ -502,7 +502,7 @@ export const arabicLessons: Lesson[] = [
   // === Lesson 15: Common Phrases ===
   {
     id: 'ar-common-phrases',
-    title: 'Common Arabic Phrases',
+    title: 'عبارات عربية شائعة',
     language: 'ar',
     script: 'arabic',
     difficulty: 3,

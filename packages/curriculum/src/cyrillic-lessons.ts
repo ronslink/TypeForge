@@ -78,7 +78,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 1: Home Row Left Hand (фыва) ===
   {
     id: 'ru-home-row-left',
-    title: 'Home Row Left Hand - ФЫВА',
+    title: 'Исходный ряд — левая рука: ФЫВА',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 1,
@@ -107,7 +107,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 2: Home Row Right Hand (пролджэ) ===
   {
     id: 'ru-home-row-right',
-    title: 'Home Row Right Hand - ПРОЛДЖЭ',
+    title: 'Исходный ряд — правая рука: ПРОЛДЖЭ',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 1,
@@ -145,7 +145,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 3: Home Row Combined ===
   {
     id: 'ru-home-row-combined',
-    title: 'Home Row - Combined Practice',
+    title: 'Исходный ряд — совместная практика',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 1,
@@ -173,7 +173,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 4: Top Row Left Hand (йцук) ===
   {
     id: 'ru-top-row-left',
-    title: 'Top Row Left Hand - ЙЦУК',
+    title: 'Верхний ряд — левая рука: ЙЦУК',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -205,7 +205,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 5: Top Row Right Hand (нгшщзхъ) ===
   {
     id: 'ru-top-row-right',
-    title: 'Top Row Right Hand - НГШЩЗХЪ',
+    title: 'Верхний ряд — правая рука: НГШЩЗХЪ',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -236,7 +236,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 6: Top Row Combined ===
   {
     id: 'ru-top-row-combined',
-    title: 'Top Row - Combined Practice',
+    title: 'Верхний ряд — совместная практика',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -265,7 +265,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 7: Bottom Row Left Hand (ячсм) ===
   {
     id: 'ru-bottom-row-left',
-    title: 'Bottom Row Left Hand - ЯЧСМ',
+    title: 'Нижний ряд — левая рука: ЯЧСМ',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -297,7 +297,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 8: Bottom Row Right Hand (тьбю) ===
   {
     id: 'ru-bottom-row-right',
-    title: 'Bottom Row Right Hand - ТЬБЮ',
+    title: 'Нижний ряд — правая рука: ТЬБЮ',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -326,7 +326,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 9: Bottom Row Combined ===
   {
     id: 'ru-bottom-row-combined',
-    title: 'Bottom Row - Combined Practice',
+    title: 'Нижний ряд — совместная практика',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 2,
@@ -352,7 +352,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 10: All Rows Combined ===
   {
     id: 'ru-all-rows',
-    title: 'All Rows - Full Keyboard Practice',
+    title: 'Все ряды — практика на всей клавиатуре',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 3,
@@ -399,7 +399,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 11: Special Characters (ё, х, ъ, ж, э) ===
   {
     id: 'ru-special-chars',
-    title: 'Special Characters - ЁХЪЖЭ',
+    title: 'Особые символы — ЁХЪЖЭ',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 3,
@@ -431,7 +431,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 12: Common Russian Bigrams ===
   {
     id: 'ru-bigrams',
-    title: 'Common Russian Bigrams',
+    title: 'Распространённые русские биграммы',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 3,
@@ -473,7 +473,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 13: Simple Russian Words ===
   {
     id: 'ru-simple-words',
-    title: 'Simple Russian Words',
+    title: 'Простые русские слова',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 3,
@@ -509,7 +509,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 14: Common Russian Phrases ===
   {
     id: 'ru-phrases',
-    title: 'Common Russian Phrases',
+    title: 'Распространённые русские фразы',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 4,
@@ -542,7 +542,7 @@ export const russianLessons: Lesson[] = [
   // === Lesson 15: Speed Drill ===
   {
     id: 'ru-speed-drill',
-    title: 'Speed Drill - Full Keyboard',
+    title: 'Упражнение на скорость — вся клавиатура',
     language: 'ru',
     script: 'cyrillic',
     difficulty: 5,

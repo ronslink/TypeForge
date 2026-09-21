@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-  <title>Error {page.status} â€” TypingScholar</title>
+  <title>Error {page.status} — TypingScholar</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background text-on-background grid-texture flex flex-col">

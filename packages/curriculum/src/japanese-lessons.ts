@@ -23,7 +23,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 1: Basic Hiragana Romaji - Home Row Vowels (a-i-u-e-o) ===
   {
     id: 'ja-romaji-1',
-    title: 'Japanese Romaji - Basic Vowels (a-i-u-e-o)',
+    title: '日本語ローマ字 — 基本母音（a-i-u-e-o）',
     language: 'ja',
     script: 'latin',
     difficulty: 1,
@@ -64,7 +64,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 2: Basic Consonant-Vowel Combinations (ka-sa-ta-na) ===
   {
     id: 'ja-romaji-2',
-    title: 'Japanese Romaji - K/S/T/N Row (ka-ki-ku-ke-ko)',
+    title: '日本語ローマ字 — K/S/T/N行（ka-ki-ku-ke-ko）',
     language: 'ja',
     script: 'latin',
     difficulty: 1,
@@ -107,7 +107,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 3: More Consonant Rows (ha-ma-ya-ra-wa) ===
   {
     id: 'ja-romaji-3',
-    title: 'Japanese Romaji - H/M/Y/R/W Rows',
+    title: '日本語ローマ字 — H/M/Y/R/W行',
     language: 'ja',
     script: 'latin',
     difficulty: 1,
@@ -150,7 +150,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 4: Simple Japanese Words ===
   {
     id: 'ja-romaji-4',
-    title: 'Japanese Romaji - Simple Words',
+    title: '日本語ローマ字 — 簡単な単語',
     language: 'ja',
     script: 'latin',
     difficulty: 2,
@@ -192,7 +192,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 5: Long Vowels (double vowels: aa, ii, uu, ee, oo) ===
   {
     id: 'ja-romaji-5',
-    title: 'Japanese Romaji - Long Vowels (aa, ii, uu, ee, oo)',
+    title: '日本語ローマ字 — 長音（aa、ii、uu、ee、oo）',
     language: 'ja',
     script: 'latin',
     difficulty: 2,
@@ -237,7 +237,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 6: Doubled Consonants (small tsu: kk, ss, tt, pp) ===
   {
     id: 'ja-romaji-6',
-    title: 'Japanese Romaji - Doubled Consonants (kk, ss, tt, pp)',
+    title: '日本語ローマ字 — 促音（kk、ss、tt、pp）',
     language: 'ja',
     script: 'latin',
     difficulty: 2,
@@ -283,7 +283,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 7: Nasal 'n' (n before consonants) ===
   {
     id: 'ja-romaji-7',
-    title: 'Japanese Romaji - Nasal "n" (n before consonants)',
+    title: '日本語ローマ字 — 撥音「n」（子音の前）',
     language: 'ja',
     script: 'latin',
     difficulty: 2,
@@ -327,7 +327,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 8: Common Phrases Part 1 ===
   {
     id: 'ja-romaji-8',
-    title: 'Japanese Romaji - Common Phrases (Part 1)',
+    title: '日本語ローマ字 — よく使うフレーズ（パート1）',
     language: 'ja',
     script: 'latin',
     difficulty: 3,
@@ -376,7 +376,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 9: Common Phrases Part 2 (Polite Forms) ===
   {
     id: 'ja-romaji-9',
-    title: 'Japanese Romaji - Polite Phrases & Expressions',
+    title: '日本語ローマ字 — 丁寧なフレーズと表現',
     language: 'ja',
     script: 'latin',
     difficulty: 3,
@@ -436,7 +436,7 @@ export const japaneseLessons: Lesson[] = [
   // === Lesson 10: Advanced Romaji - Mixed Patterns ===
   {
     id: 'ja-romaji-10',
-    title: 'Japanese Romaji - Advanced Mixed Patterns',
+    title: '日本語ローマ字 — 上級混合パターン',
     language: 'ja',
     script: 'latin',
     difficulty: 3,

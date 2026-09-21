@@ -244,7 +244,7 @@
 </script>
 
 <svelte:head>
-  <title>Teacher Dashboard â€” TypeForge</title>
+  <title>Teacher Dashboard — TypeForge</title>
 </svelte:head>
 
 {#if loading}
@@ -336,7 +336,7 @@
                 onclick={() => setupPlanDays = 90}
               >
                 <span class="font-label text-sm text-on-surface">{$t('school_plan_flexible')}</span>
-                <span class="font-body text-xs text-on-surface-variant">$6/seat/mo Â· 90 days</span>
+                <span class="font-body text-xs text-on-surface-variant">$6/seat/mo · 90 days</span>
               </button>
               <button
                 type="button"
@@ -344,7 +344,7 @@
                 onclick={() => setupPlanDays = 180}
               >
                 <span class="font-label text-sm text-on-surface">{$t('school_plan_semester')}</span>
-                <span class="font-body text-xs text-on-surface-variant">$8/seat/mo Â· 180 days</span>
+                <span class="font-body text-xs text-on-surface-variant">$8/seat/mo · 180 days</span>
               </button>
             </div>
           </div>
@@ -381,7 +381,7 @@
 {:else}
   <div class="dashboard-root px-6 py-8 max-w-screen-xl mx-auto space-y-8">
 
-    <!-- â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Header ─────────────────────────────────────────── -->
     <div class="flex items-start justify-between gap-4 flex-wrap">
       <div>
         <h1 class="font-headline text-3xl text-on-surface">{organizationData.name}</h1>
@@ -400,7 +400,7 @@
       </button>
     </div>
 
-    <!-- â”€â”€ Seat Quota Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Seat Quota Bar ──────────────────────────────────── -->
     {#if seatData}
       <div class="seat-bar bg-surface-container-low border border-outline-variant/20 p-5">
         <div class="flex items-center justify-between mb-3">
@@ -472,7 +472,7 @@
       </div>
     {/if}
 
-    <!-- â”€â”€ Stat Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Stat Cards ──────────────────────────────────────── -->
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
       <div class="stat-card">
         <span class="stat-icon bg-primary/10 text-primary">
@@ -515,7 +515,7 @@
       </div>
     </div>
 
-    <!-- â”€â”€ Main Grid: Top Performers + At Risk â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Main Grid: Top Performers + At Risk ─────────────── -->
     <div class="grid md:grid-cols-2 gap-6">
       <!-- Top Performers -->
       <div class="bg-surface-container-low border border-outline-variant/20 p-6">
@@ -587,7 +587,7 @@
       </div>
     </div>
 
-    <!-- â”€â”€ Class Activity Breakdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Class Activity Breakdown ──────────────────────────── -->
     <div class="bg-surface-container-low border border-outline-variant/20 p-6">
       <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant mb-5">{$t('org_class_breakdown')}</h2>
       <div class="grid grid-cols-3 gap-4">
@@ -606,7 +606,7 @@
       </div>
     </div>
 
-    <!-- â”€â”€ Full Roster â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Full Roster ─────────────────────────────────────── -->
     <div class="bg-surface-container-low border border-outline-variant/20 p-6">
       <div class="flex items-center justify-between mb-5">
         <h2 class="font-label text-sm uppercase tracking-widest text-on-surface-variant">{$t('org_student_roster')} ({studentMembers.length})</h2>
@@ -633,7 +633,7 @@
               </div>
               <span class="font-mono text-sm font-bold text-primary text-right">{student.wpm}</span>
               <span class="font-mono text-sm font-bold text-right {student.accuracy >= 90 ? 'text-primary' : student.accuracy >= 70 ? 'text-secondary' : 'text-error'}">{student.accuracy}%</span>
-              <span class="font-mono text-sm text-on-surface-variant text-right">{student.streak}ðŸ”¥</span>
+              <span class="font-mono text-sm text-on-surface-variant text-right">{student.streak}🔥</span>
               <div class="flex justify-end">
                 <button
                   onclick={() => handleRemoveStudent(student.id)}
@@ -657,7 +657,7 @@
 
   </div>
 
-  <!-- â”€â”€ Invite Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── Invite Modal ─────────────────────────────────────── -->
   {#if showInviteModal}
     <InviteStudentModal
       onInvite={handleInviteStudent}

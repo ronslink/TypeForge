@@ -25,7 +25,7 @@
     }
   });
 
-  // Full initialisation on mount â€” fetches DB preference for signed-in users
+  // Full initialisation on mount — fetches DB preference for signed-in users
   onMount(async () => {
     let dbLocale: string | null = null;
     let orgLocale: string | null = null;

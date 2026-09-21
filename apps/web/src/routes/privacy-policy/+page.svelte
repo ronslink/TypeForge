@@ -31,17 +31,17 @@
           <p class="mb-4">We collect information you provide directly:</p>
           <ul class="list-disc pl-6 space-y-2">
             <li>
-              <strong>Account data</strong> â€” email address, name, and authentication via Clerk (our third-party
+              <strong>Account data</strong> — email address, name, and authentication via Clerk (our third-party
               auth provider).
             </li>
             <li>
-              <strong>Typing performance data</strong> â€” WPM, accuracy, session timestamps, and lesson
+              <strong>Typing performance data</strong> — WPM, accuracy, session timestamps, and lesson
               completion records.
             </li>
             <li>
-              <strong>Preferences</strong> â€” selected language, locale settings, and UI customization.
+              <strong>Preferences</strong> — selected language, locale settings, and UI customization.
             </li>
-            <li><strong>Communications</strong> â€” any messages or feedback you send us.</li>
+            <li><strong>Communications</strong> — any messages or feedback you send us.</li>
           </ul>
           <p class="mt-4">
             We do not collect keystroke-level data beyond aggregated WPM and accuracy metrics.
@@ -66,17 +66,17 @@
           </p>
           <ul class="list-disc pl-6 space-y-2">
             <li>
-              <strong>Auth provider</strong> â€” Clerk handles account management. Their privacy policy
+              <strong>Auth provider</strong> — Clerk handles account management. Their privacy policy
               applies to auth data.
             </li>
             <li>
-              <strong>Billing</strong> â€” Stripe processes payments. We never store card details.
+              <strong>Billing</strong> — Stripe processes payments. We never store card details.
             </li>
             <li>
-              <strong>Legal obligations</strong> â€” if required by law or to prevent fraud/harm.
+              <strong>Legal obligations</strong> — if required by law or to prevent fraud/harm.
             </li>
             <li>
-              <strong>Service providers</strong> â€” hosting (Cloudflare/Vercel) and analytics â€” bound by
+              <strong>Service providers</strong> — hosting (Cloudflare/Vercel) and analytics — bound by
               strict data processing agreements.
             </li>
           </ul>
@@ -111,10 +111,10 @@
           <h2 class="font-headline text-2xl mb-4">6. Cookies</h2>
           <p class="mb-4">We use cookies for:</p>
           <ul class="list-disc pl-6 space-y-2">
-            <li><strong>Authentication</strong> â€” session management via Clerk (essential)</li>
-            <li><strong>Preferences</strong> â€” locale and UI settings (functional)</li>
+            <li><strong>Authentication</strong> — session management via Clerk (essential)</li>
+            <li><strong>Preferences</strong> — locale and UI settings (functional)</li>
             <li>
-              <strong>Analytics</strong> â€” anonymised usage stats (opt-in, never used for advertising)
+              <strong>Analytics</strong> — anonymised usage stats (opt-in, never used for advertising)
             </li>
           </ul>
           <p class="mt-4">You can manage or disable cookies via your browser settings.</p>

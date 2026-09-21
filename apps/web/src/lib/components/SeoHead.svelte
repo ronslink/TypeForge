@@ -70,6 +70,6 @@
   {/each}
 
   {#each jsonLdItems as item}
-    {@html `<script type="application/ld+json">${jsonLdScript(item)}<\\/script>`}
+    <svelte:element this={'script'} type="application/ld+json">{jsonLdScript(item)}</svelte:element>
   {/each}
 </svelte:head>

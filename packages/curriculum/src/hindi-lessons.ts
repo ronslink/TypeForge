@@ -71,7 +71,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 1: Home Row Left Hand (अ-स-द-फ-ग) ===
   {
     id: 'hi-alphabet-1',
-    title: 'Devanagari Home Row - Left Hand (अ-स-द-फ-ग)',
+    title: 'देवनागरी होम रो — बायाँ हाथ (अ-स-द-फ-ग)',
     language: 'hi',
     script: 'devanagari',
     difficulty: 1,
@@ -103,7 +103,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 2: Home Row Right Hand (ह-ज-क-ल) ===
   {
     id: 'hi-alphabet-2',
-    title: 'Devanagari Home Row - Right Hand (ह-ज-क-ल)',
+    title: 'देवनागरी होम रो — दायाँ हाथ (ह-ज-क-ल)',
     language: 'hi',
     script: 'devanagari',
     difficulty: 1,
@@ -132,7 +132,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 3: Top Row Vowels (ए-र-त-य-उ-ई) ===
   {
     id: 'hi-alphabet-3',
-    title: 'Devanagari Vowels - Top Row (ए-र-त-य-उ-ई)',
+    title: 'देवनागरी स्वर — ऊपरी पंक्ति (ए-र-त-य-उ-ई)',
     language: 'hi',
     script: 'devanagari',
     difficulty: 1,
@@ -161,7 +161,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 4: Bottom Row Consonants (व-ब-न-म) ===
   {
     id: 'hi-alphabet-4',
-    title: 'Devanagari Bottom Row (व-ब-न-म)',
+    title: 'देवनागरी निचली पंक्ति (व-ब-न-म)',
     language: 'hi',
     script: 'devanagari',
     difficulty: 1,
@@ -190,7 +190,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 5: Special Consonants (क्ष-छ-ध-घ-ख-झ) ===
   {
     id: 'hi-alphabet-5',
-    title: 'Devanagari Special Consonants',
+    title: 'देवनागरी विशेष व्यंजन',
     language: 'hi',
     script: 'devanagari',
     difficulty: 2,
@@ -219,7 +219,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 6: Common Two-Letter Words ===
   {
     id: 'hi-simple-words',
-    title: 'Simple Hindi Words',
+    title: 'सरल हिंदी शब्द',
     language: 'hi',
     script: 'devanagari',
     difficulty: 2,
@@ -258,7 +258,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 7: Greetings and Common Words ===
   {
     id: 'hi-greetings',
-    title: 'Hindi Greetings',
+    title: 'हिंदी अभिवादन',
     language: 'hi',
     script: 'devanagari',
     difficulty: 2,
@@ -297,7 +297,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 8: Common Pronouns ===
   {
     id: 'hi-pronouns',
-    title: 'Hindi Pronouns',
+    title: 'हिंदी सर्वनाम',
     language: 'hi',
     script: 'devanagari',
     difficulty: 3,
@@ -335,7 +335,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 9: Common Verbs and Questions ===
   {
     id: 'hi-verbs-questions',
-    title: 'Common Verbs and Questions',
+    title: 'सामान्य क्रियाएँ और प्रश्न',
     language: 'hi',
     script: 'devanagari',
     difficulty: 3,
@@ -378,7 +378,7 @@ export const hindiLessons: Lesson[] = [
   // === Lesson 10: Family and Common Nouns ===
   {
     id: 'hi-family-nouns',
-    title: 'Family and Common Nouns',
+    title: 'परिवार और सामान्य संज्ञाएँ',
     language: 'hi',
     script: 'devanagari',
     difficulty: 3,

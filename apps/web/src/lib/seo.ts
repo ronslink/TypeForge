@@ -13,7 +13,7 @@ export interface SitemapEntry {
 
 export const SITE = {
   name: 'TypingScholar',
-  url: 'https://typingscholar.com',
+  url: 'https://www.typingscholar.com',
   defaultTitle: 'TypingScholar - Free Multilingual Typing Tutor',
   defaultDescription:
     'Learn touch typing with adaptive typing lessons, real-time WPM tracking, multilingual keyboard layouts, and classroom-ready progress tools.',

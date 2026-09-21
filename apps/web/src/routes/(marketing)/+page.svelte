@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
-  import { onMount } from 'svelte';
-  import { t } from '$lib/stores/locale';
+  import { t, uiLocale } from '$lib/stores/locale';
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
+  import { MARKETING_DEMO_SCENES } from '$lib/marketing/demo-scenes';
   import SeoHead from '$lib/components/SeoHead.svelte';
   import {
     SEO_PAGES,
@@ -13,89 +13,24 @@
   // Script diversity grid data
   let scripts = $state([
     { name: 'Latin', sample: 'Aa', layout: 'QWERTY', active: true },
-    { name: 'Cyrillic', sample: 'ÐÐ°', layout: 'Ð™Ð¦Ð£ÐšÐ•Ð', active: false },
-    { name: 'Arabic', sample: 'Ø£Ø¨', layout: 'Arabic', active: false },
-    { name: 'CJK', sample: 'ä¸­æ–‡', layout: 'Pinyin', active: false },
-    { name: 'Greek', sample: 'Î‘Î±', layout: 'Greek', active: false },
-    { name: 'Hebrew', sample: '××‘', layout: 'Hebrew', active: false },
-    { name: 'Korean', sample: 'í•œê¸€', layout: 'Dubeolsik', active: false },
-    { name: 'Japanese', sample: 'ã²ã‚‰', layout: 'Romaji', active: false },
+    { name: 'Cyrillic', sample: 'Аа', layout: 'ЙЦУКЕН', active: false },
+    { name: 'Arabic', sample: 'أب', layout: 'Arabic', active: false },
+    { name: 'CJK', sample: '中文', layout: 'Pinyin', active: false },
+    { name: 'Greek', sample: 'Αα', layout: 'Greek', active: false },
+    { name: 'Hebrew', sample: 'אב', layout: 'Hebrew', active: false },
+    { name: 'Korean', sample: '한글', layout: 'Dubeolsik', active: false },
+    { name: 'Japanese', sample: 'ひら', layout: 'Romaji', active: false },
+    { name: 'Devanagari', sample: 'अआ', layout: 'Devanagari', active: false },
   ]);
 
-  // â”€â”€ Animated cycling demo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  interface DemoScene {
-    script: string;
-    lang: string;
-    layout: string;
-    rtl: boolean;
-    text: string;
-    wpm: number; // target WPM for this scene
-    accuracy: number; // final accuracy shown
-    accentClass: string;
-  }
-
-  const DEMO_SCENES: DemoScene[] = [
-    {
-      script: 'Latin',
-      lang: 'FranÃ§ais',
-      layout: 'AZERTY',
-      rtl: false,
-      text: "L'apprentissage de la dactylographie sur un clavier AZERTY nÃ©cessite une prÃ©cision mÃ©canique absolue.",
-      wpm: 94,
-      accuracy: 98.4,
-      accentClass: 'text-primary',
-    },
-    {
-      script: 'Cyrillic',
-      lang: 'Ð ÑƒÑÑÐºÐ¸Ð¹',
-      layout: 'Ð™Ð¦Ð£ÐšÐ•Ð',
-      rtl: false,
-      text: 'Ð£Ñ‡Ð¸Ñ‚ÐµÐ»ÑŒ Ð±Ñ‹ÑÑ‚Ñ€Ð¾ Ð¿ÐµÑ‡Ð°Ñ‚Ð°ÐµÑ‚ Ð½Ð° ÐºÐ»Ð°Ð²Ð¸Ð°Ñ‚ÑƒÑ€Ðµ Ð±ÐµÐ· ÐµÐ´Ð¸Ð½Ð¾Ð¹ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ Ð¸ ÑƒÐ´Ð¸Ð²Ð»ÑÐµÑ‚ Ð²ÑÐµÑ… ÑÐ²Ð¾ÐµÐ¹ ÑÐºÐ¾Ñ€Ð¾ÑÑ‚ÑŒÑŽ.',
-      wpm: 78,
-      accuracy: 96.1,
-      accentClass: 'text-secondary',
-    },
-    {
-      script: 'Arabic',
-      lang: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©',
-      layout: 'Arabic',
-      rtl: true,
-      text: 'ØªØ¹Ù„Ù… Ø§Ù„ÙƒØªØ§Ø¨Ø© Ø¹Ù„Ù‰ Ù„ÙˆØ­Ø© Ø§Ù„Ù…ÙØ§ØªÙŠØ­ Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© ÙŠØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ Ø§Ù„Ù…Ø³ØªÙ…Ø± ÙˆØ§Ù„Ø¯Ù‚Ø© ÙÙŠ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ø£Ø­Ø±Ù.',
-      wpm: 61,
-      accuracy: 97.2,
-      accentClass: 'text-tertiary',
-    },
-    {
-      script: 'CJK',
-      lang: 'æ—¥æœ¬èªž',
-      layout: 'Romaji',
-      rtl: false,
-      text: 'æ—¥æœ¬èªžã®ã‚¿ã‚¤ãƒ”ãƒ³ã‚°ã¯ãƒ­ãƒ¼ãƒžå­—å…¥åŠ›ã¨ã‹ãªå…¥åŠ›ã‚’é¸ã¶ã“ã¨ãŒã§ãã¾ã™ã€‚ç·´ç¿’ã‚’é‡ã­ã‚‹ã¨é€Ÿåº¦ãŒä¸ŠãŒã‚Šã¾ã™ã€‚',
-      wpm: 55,
-      accuracy: 99.1,
-      accentClass: 'text-primary',
-    },
-    {
-      script: 'Korean',
-      lang: 'í•œêµ­ì–´',
-      layout: 'Dubeolsik',
-      rtl: false,
-      text: 'í•œê¸€ íƒ€ìž ì—°ìŠµì€ ì •í™•ë„ì™€ ì†ë„ë¥¼ ë™ì‹œì— í–¥ìƒì‹œí‚¤ëŠ” ê³¼ì •ìž…ë‹ˆë‹¤. ê¾¸ì¤€í•œ ì—°ìŠµì´ í•µì‹¬ìž…ë‹ˆë‹¤.',
-      wpm: 70,
-      accuracy: 95.8,
-      accentClass: 'text-secondary',
-    },
-  ];
-
-  // Reactive demo state
-  let demoSceneIdx = $state(0);
+  // ── Selected-language demo ───────────────────────────────────────────────
   let demoTypedLen = $state(0);
   let demoFading = $state(false);
   let currentWpm = $state(0);
   let currentAccuracy = $state(100);
   let streak = $state(0);
 
-  const demoScene = $derived(DEMO_SCENES[demoSceneIdx]!);
+  const demoScene = $derived(MARKETING_DEMO_SCENES[$uiLocale]);
   const demoTyped = $derived(demoScene.text.slice(0, demoTypedLen));
   const demoCurrent = $derived(demoScene.text[demoTypedLen] ?? '');
   const demoRemaining = $derived(demoScene.text.slice(demoTypedLen + 1));
@@ -108,8 +43,8 @@
     scripts = scripts; // trigger reactivity
   });
 
-  let demoGeneration = $state(0);
-  let activeTimers = new Set<ReturnType<typeof setTimeout>>();
+  let demoGeneration = 0;
+  const activeTimers = new Set<ReturnType<typeof setTimeout>>();
 
   function safeTimeout(cb: () => void, delay: number) {
     const id = setTimeout(() => {
@@ -125,26 +60,6 @@
     activeTimers.clear();
   }
 
-  function jumpToScene(name: string) {
-    const idx = DEMO_SCENES.findIndex((s) => s.script === name);
-    if (idx === -1 || idx === demoSceneIdx) return;
-
-    demoGeneration++;
-    const currentGen = demoGeneration;
-    clearAllTimers();
-
-    triggerFade(() => {
-      if (demoGeneration !== currentGen) return;
-      demoSceneIdx = idx;
-      demoTypedLen = 0;
-      currentWpm = 0;
-      currentAccuracy = 100;
-      streak = 0;
-
-      safeTimeout(() => scheduleNextChar(currentGen), 600);
-    });
-  }
-
   function triggerFade(callback: () => void) {
     demoFading = true;
     safeTimeout(() => {
@@ -155,7 +70,7 @@
 
   function scheduleNextChar(gen: number) {
     if (demoGeneration !== gen) return;
-    const scene = DEMO_SCENES[demoSceneIdx]!;
+    const scene = MARKETING_DEMO_SCENES[$uiLocale];
     const msPerChar = Math.round(60000 / (scene.wpm * 5));
     const jitter = msPerChar * 0.25;
     const delay = msPerChar + (Math.random() * jitter * 2 - jitter);
@@ -175,136 +90,141 @@
       } else {
         safeTimeout(() => {
           if (demoGeneration !== gen) return;
-          advanceScene(gen);
+          repeatDemo(gen);
         }, 2200);
       }
     }, delay);
   }
 
-  function advanceScene(gen: number) {
+  function repeatDemo(gen: number) {
     if (demoGeneration !== gen) return;
-    demoGeneration++;
-    const nextGen = demoGeneration;
 
     triggerFade(() => {
-      if (demoGeneration !== nextGen) return;
-      demoSceneIdx = (demoSceneIdx + 1) % DEMO_SCENES.length;
+      if (demoGeneration !== gen) return;
       demoTypedLen = 0;
       currentWpm = 0;
       currentAccuracy = 100;
       streak = 0;
-      safeTimeout(() => scheduleNextChar(nextGen), 600);
+      safeTimeout(() => scheduleNextChar(gen), 600);
     });
   }
 
-  onMount(() => {
+  // Reset before the next paint whenever the locale switcher changes. The demo
+  // then keeps replaying that locale until the user selects another one.
+  $effect.pre(() => {
+    const selectedLocale = $uiLocale;
     demoGeneration++;
-    safeTimeout(() => scheduleNextChar(demoGeneration), 800);
+    const currentGen = demoGeneration;
+    clearAllTimers();
+    demoFading = false;
+    demoTypedLen = 0;
+    currentWpm = 0;
+    currentAccuracy = 100;
+    streak = 0;
+    safeTimeout(() => scheduleNextChar(currentGen), 150);
 
     return () => {
-      demoGeneration++; // kill any pending loops
+      void selectedLocale;
+      demoGeneration++;
       clearAllTimers();
     };
   });
 
   // Progression steps
-  const steps = [
+  const steps = $derived([
     {
       number: '01',
-      title: 'Placement Test',
-      description:
-        'Our 120-second kinetic analysis maps your current speed, posture, and error distribution.',
+      title: $t('mkt_step_1_title'),
+      description: $t('mkt_step_1_desc'),
     },
     {
       number: '02',
-      title: 'Weakness Model',
-      description:
-        'Artificial intelligence generates a unique "heat map" of your physical typing limitations.',
+      title: $t('mkt_step_2_title'),
+      description: $t('mkt_step_2_desc'),
     },
     {
       number: '03',
-      title: 'Adaptive Lessons',
-      description:
-        'Dynamic content that shifts difficulty in real-time based on your momentary accuracy.',
+      title: $t('mkt_step_3_title'),
+      description: $t('mkt_step_3_desc'),
     },
     {
       number: '04',
-      title: 'Compound Progress',
-      description:
-        'Witness your evolution through high-density technical readouts and milestone certifications.',
+      title: $t('mkt_step_4_title'),
+      description: $t('mkt_step_4_desc'),
     },
-  ];
+  ]);
 
   // Pricing plans
-  const pricingPlans = [
+  const pricingPlans = $derived([
     {
-      name: $t('pricing_plan_individual') || 'Individual',
-      price: 'Free',
+      name: $t('pricing_plan_individual'),
+      price: $t('billing_free'),
       period: '',
-      features: ['All Basic Layouts', 'Weekly Progress Stats'],
-      cta: $t('pricing_cta_select') || 'Select Plan',
+      features: [$t('mkt_plan_free_features_1'), $t('mkt_plan_free_features_2')],
+      cta: $t('mkt_select_plan'),
       ctaHref: '/sign-up',
       popular: false,
     },
     {
-      name: 'Power User',
+      name: $t('pricing_plan_power_user'),
       price: '$9',
-      period: '/mo',
+      period: $t('pricing_permonth'),
       features: [
-        'Full AI Weakness Modeling',
-        'Priority Multi-language Packs',
-        'Custom Practice Engines',
+        $t('mkt_plan_power_features_1'),
+        $t('mkt_plan_power_features_2'),
+        $t('mkt_plan_power_features_3'),
       ],
-      cta: 'Go Pro Now',
+      cta: $t('mkt_go_pro'),
       ctaHref: '/billing?plan=pro',
       popular: true,
     },
     {
-      name: $t('pricing_plan_schools') || 'Schools',
-      price: 'From $6',
-      period: '/seat/mo',
-      features: ['Teacher Dashboards', 'COPPA & GDPR Certification', 'SSO Integration'],
+      name: $t('pricing_plan_schools'),
+      price: '$6',
+      period: $t('pricing_perseatmo'),
+      features: [
+        $t('mkt_plan_school_features_1'),
+        $t('mkt_plan_school_features_2'),
+        $t('mkt_plan_school_features_3'),
+      ],
       ctas: [
         {
-          label: $t('pricing_cta_school_90') || 'Sign up (90-day)',
+          label: $t('pricing_cta_school_90'),
           href: '/sign-up?plan=school-90',
         },
         {
-          label: $t('pricing_cta_school_180') || 'Sign up (180-day)',
+          label: $t('pricing_cta_school_180'),
           href: '/sign-up?plan=school-180',
         },
       ],
       popular: false,
     },
-  ];
+  ]);
 
   // Testimonials
-  const testimonials = [
+  const testimonials = $derived([
     {
-      quote:
-        "TypingScholar has transformed our digital literacy curriculum. The zero-latency feedback loop is addictive for students, driving engagement levels we've never seen with traditional software.",
+      quote: $t('mkt_testimonial_1_quote'),
       author: 'Julianne H.',
-      role: 'Tech Coordinator, St. Jude Academy',
+      role: $t('mkt_testimonial_1_role'),
       initials: 'JH',
       featured: true,
     },
     {
-      quote:
-        'The multi-language support allowed us to deploy the same platform across our international campuses in Tokyo and Paris seamlessly.',
-      author: 'Global Education Partners',
+      quote: $t('mkt_testimonial_2_quote'),
+      author: $t('mkt_testimonial_2_author'),
       role: '',
       initials: 'GE',
       featured: false,
     },
     {
-      quote:
-        "I went from 40wpm to 95wpm in three weeks. The AI weakness detection actually worksâ€”it stopped me from making the same 'S' and 'D' key mistakes.",
-      author: 'Computer Science Student',
+      quote: $t('mkt_testimonial_3_quote'),
+      author: $t('mkt_testimonial_3_author'),
       role: '',
       initials: 'CS',
       featured: false,
     },
-  ];
+  ]);
 
   const footerLinks = $derived({
     product: [
@@ -398,17 +318,17 @@
       <!-- Script diversity grid -->
       <div class="flex flex-wrap justify-center gap-3 mb-10 max-w-2xl mx-auto">
         {#each scripts as script}
-          <button
-            class="px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors border border-outline-variant/20 flex items-center gap-2"
+          <div
+            class="px-4 py-2 bg-surface-container-low border border-outline-variant/20 flex items-center gap-2"
             class:border-primary={script.active}
             class:text-primary={script.active}
-            onclick={() => jumpToScene(script.name)}
+            aria-current={script.active ? 'true' : undefined}
           >
             <span class="font-label text-lg">{script.sample}</span>
             <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant"
               >{script.layout}</span
             >
-          </button>
+          </div>
         {/each}
       </div>
 
@@ -459,7 +379,7 @@
             class="font-label text-sm text-on-surface-variant"
             dir={demoScene.rtl ? 'rtl' : 'ltr'}
           >
-            {demoScene.lang}
+            {demoScene.languageName}
           </span>
           <span class="text-on-surface-variant/30 text-xs font-label uppercase ml-1"
             >{demoScene.layout}</span
@@ -514,8 +434,8 @@
           class="demo-text font-label text-xl md:text-2xl lg:text-3xl leading-relaxed tracking-tight"
           class:demo-fading={demoFading}
           dir={demoScene.rtl ? 'rtl' : 'ltr'}
-          lang={demoScene.lang}
-          aria-label="Animated typing demonstration"
+          lang={demoScene.code}
+          aria-label={$t('mkt_demo_live')}
           aria-live="off"
         >
           <!-- Typed chars -->
@@ -527,7 +447,7 @@
             >
             <span class="demo-cursor" aria-hidden="true"></span>
           {:else}
-            <!-- Finished â€”  blinking cursor at end -->
+            <!-- Finished —  blinking cursor at end -->
             <span class="demo-cursor demo-cursor-end" aria-hidden="true"></span>
           {/if}
           <!-- Remaining chars -->
@@ -647,11 +567,11 @@
       <h3
         class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
       >
-        <span>ðŸŒŽ</span>
+        <span>🌎</span>
         {$t('mkt_region_americas')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {#each [{ code: 'en', native: 'English', text: 'The quick brown fox jumps over the lazy dog.', rtl: false, flag: 'us' }, { code: 'es', native: 'EspaÃ±ol', text: 'El veloz murciÃ©lago hindÃº comÃ­a feliz cardillo y kiwi.', rtl: false, flag: 'es' }, { code: 'pt', native: 'PortuguÃªs', text: 'Ã€ noite, vovÃ´ Kowalsky vÃª o Ã­mÃ£ cair junto ao junco.', rtl: false, flag: 'br' }] as lang}
+        {#each [{ code: 'en', native: 'English', text: 'The quick brown fox jumps over the lazy dog.', rtl: false, flag: 'us' }, { code: 'es', native: 'Español', text: 'El veloz murciélago hindú comía feliz cardillo y kiwi.', rtl: false, flag: 'es' }, { code: 'pt', native: 'Português', text: 'À noite, vovô Kowalsky vê o ímã cair junto ao junco.', rtl: false, flag: 'br' }] as lang}
           <div
             class="bg-surface-container-low p-4 flex items-start gap-4 group hover:bg-surface-container transition-colors"
             dir={lang.rtl ? 'rtl' : 'ltr'}
@@ -681,11 +601,11 @@
       <h3
         class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
       >
-        <span>ðŸŒ</span>
+        <span>🌍</span>
         {$t('mkt_region_europe')}
       </h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {#each [{ n: 'Deutsch', c: 'de', s: 'Falsches Ãœben von Xylophonmusik quÃ¤lt jeden grÃ¶ÃŸeren Zwerg.', f: 'de' }, { n: 'FranÃ§ais', c: 'fr', s: 'Portez ce vieux whisky au juge blond qui fume.', f: 'fr' }, { n: 'Italiano', c: 'it', s: 'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.', f: 'it' }, { n: 'Nederlands', c: 'nl', s: "Pa's wijsje: fox lyophiliseert glad jodiumacetylide.", f: 'nl' }, { n: 'Polski', c: 'pl', s: 'PchnÄ…Ä‡ w tÄ™ Å‚Ã³dÅº jeÅ¼a lub oÅ›m skrzyÅ„ fig.', f: 'pl' }, { n: 'Î•Î»Î»Î·Î½Î¹ÎºÎ¬', c: 'el', s: 'Î¤Î¿ Î»Î±Î³ÏŒÏ‚ ÎºÎ±Î¹ Î· Ï‡ÎµÎ»ÏŽÎ½Î± Î­Ï„ÏÎµÎ¾Î±Î½ Î³ÏÎ®Î³Î¿ÏÎ±.', g: true, f: 'gr' }, { n: 'ÄŒeÅ¡tina', c: 'cs', s: 'PÅ™Ã­liÅ¡ Å¾luÅ¥ouÄkÃ½ kÅ¯Åˆ ÃºpÄ›l ÄÃ¡belskÃ© kÃ³dy.', f: 'cz' }, { n: 'Magyar', c: 'hu', s: 'ÃrvÃ­zi tÃ¶lgyÃ©rt bolygott sÃ­rkÃ¶vet dÃ¶ngetett.', f: 'hu' }, { n: 'Svenska', c: 'sv', s: 'GÃ¤dda prygelnÃ¤bba fyrskrift vÃ¤xer franskt.', f: 'se' }, { n: 'Norsk', c: 'no', s: 'Kjevveisk mot tre, eg snur og vinker til hunden.', f: 'no' }, { n: 'Dansk', c: 'da', s: 'Quizdeltagerne spiste jordbÃ¦r med flÃ¸de mens cirkusklovnen.', f: 'dk' }, { n: 'Suomi', c: 'fi', s: 'FyrvÃ¤skÃ¤rjÃ¤yhtymÃ¤n takaa lÃ¶ytyy vanha virolainen sauna.', f: 'fi' }] as lang}
+        {#each [{ n: 'Deutsch', c: 'de', s: 'Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.', f: 'de' }, { n: 'Français', c: 'fr', s: 'Portez ce vieux whisky au juge blond qui fume.', f: 'fr' }, { n: 'Italiano', c: 'it', s: 'Ma la volpe, con il suo balzo, raggiunse il quieto fiume.', f: 'it' }, { n: 'Nederlands', c: 'nl', s: "Pa's wijsje: fox lyophiliseert glad jodiumacetylide.", f: 'nl' }, { n: 'Polski', c: 'pl', s: 'Pchnąć w tę łódź jeża lub ośm skrzyń fig.', f: 'pl' }, { n: 'Ελληνικά', c: 'el', s: 'Το λαγός και η χελώνα έτρεξαν γρήγορα.', g: true, f: 'gr' }, { n: 'Čeština', c: 'cs', s: 'Příliš žluťoučký kůň úpěl ďábelské kódy.', f: 'cz' }, { n: 'Magyar', c: 'hu', s: 'Árvízi tölgyért bolygott sírkövet döngetett.', f: 'hu' }, { n: 'Svenska', c: 'sv', s: 'Gädda prygelnäbba fyrskrift växer franskt.', f: 'se' }, { n: 'Norsk', c: 'no', s: 'Kjevveisk mot tre, eg snur og vinker til hunden.', f: 'no' }, { n: 'Dansk', c: 'da', s: 'Quizdeltagerne spiste jordbær med fløde mens cirkusklovnen.', f: 'dk' }, { n: 'Suomi', c: 'fi', s: 'Fyrväskärjäyhtymän takaa löytyy vanha virolainen sauna.', f: 'fi' }] as lang}
           <div
             class="bg-surface-container-low p-3 flex flex-col gap-2 group hover:bg-surface-container transition-colors"
           >
@@ -716,11 +636,11 @@
       <h3
         class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
       >
-        <span>ðŸŒ</span>
+        <span>🌏</span>
         {$t('mkt_region_mea')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {#each [{ n: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©', c: 'ar', s: 'Ù†Øµ Ø­ÙƒÙŠÙ… Ù„Ù‡ Ø³Ø±Ø¹Ø§Ù† ØªØ³Ø±ÙŠ Ø¨Ù‡', rtl: true, f: 'sa' }, { n: '×¢×‘×¨×™×ª', c: 'he', s: '××™×š ×‘×œ×©×•×Ÿ ×”×§×•×“×©, ×¡×¤×¨ ×¦×œ×—×ª ×¤×¡×™×§', rtl: true, f: 'il' }] as lang}
+        {#each [{ n: 'العربية', c: 'ar', s: 'نص حكيم له سرعان تسري به', rtl: true, f: 'sa' }, { n: 'עברית', c: 'he', s: 'איך בלשון הקודש, ספר צלחת פסיק', rtl: true, f: 'il' }] as lang}
           <div
             class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors"
             dir={lang.rtl ? 'rtl' : 'ltr'}
@@ -755,11 +675,11 @@
       <h3
         class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
       >
-        <span>ðŸŒ</span>
+        <span>🌏</span>
         {$t('mkt_region_east_asia')}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {#each [{ n: 'æ—¥æœ¬èªž', c: 'ja', s: 'ã„ã‚ã¯ã«ã»ã¸ã¨ã¡ã‚Šã¬ã‚‹ã‚’ ã‚ã‹ã‚ˆãŸã‚Œãã¤ã­ãªã‚‰ã‚€', f: 'jp' }, { n: 'ç®€ä½“ä¸­æ–‡', c: 'zh', s: 'å¤©åœ°çŽ„é»„ï¼Œå®‡å®™æ´ªè’ã€‚æ—¥æœˆç›ˆæ˜ƒï¼Œè¾°å®¿åˆ—å¼ ã€‚', f: 'cn' }, { n: 'í•œêµ­ì–´', c: 'ko', s: 'ë‹¤ëžŒì¥ í—Œ ì³‡ë°”í€´ì— íƒ€ê³ íŒŒ.', f: 'kr' }] as lang}
+        {#each [{ n: '日本語', c: 'ja', s: 'いろはにほへとちりぬるを わかよたれそつねならむ', f: 'jp' }, { n: '简体中文', c: 'zh', s: '天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。', f: 'cn' }, { n: '한국어', c: 'ko', s: '다람쥐 헌 쳇바퀴에 타고파.', f: 'kr' }] as lang}
           <div
             class="bg-surface-container-low p-5 group hover:bg-surface-container transition-colors"
           >
@@ -789,10 +709,10 @@
         <h3
           class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
         >
-          <span>ðŸŒ</span> South & Southeast Asia
+          <span>🌏</span> {$t('mkt_region_south_se_asia')}
         </h3>
         <div class="grid grid-cols-2 gap-3">
-          {#each [{ n: 'à¤¹à¤¿à¤¨à¥à¤¦à¥€', c: 'hi', s: 'à¤• à¤– à¤— à¤˜ à¤™ à¤š à¤› à¤œ à¤', f: 'in' }, { n: 'à¹„à¸—à¸¢', c: 'th', s: 'à¸à¸µà¸¬à¸²à¸§à¸´à¹ˆà¸‡à¹€à¸£à¹‡à¸§à¸ªà¸¸à¸”', f: 'th' }, { n: 'Tiáº¿ng Viá»‡t', c: 'vi', s: 'Con gÃ  trá»‘n Ä‘áº¹p trai bay qua vá»‹nh.', f: 'vn' }, { n: 'Indonesia', c: 'id', s: 'Muhammad fox bermimpi dengan wajar.', f: 'id' }, { n: 'Bahasa Melayu', c: 'ms', s: 'Lebuh rayanya berliku-liku di antara.', f: 'my' }, { n: 'Tagalog', c: 'tl', s: 'Ang magandang paruparo ay lumilipad sa hardin.', f: 'ph' }] as lang}
+          {#each [{ n: 'हिन्दी', c: 'hi', s: 'क ख ग घ ङ च छ ज झ', f: 'in' }, { n: 'ไทย', c: 'th', s: 'กีฬาวิ่งเร็วสุด', f: 'th' }, { n: 'Tiếng Việt', c: 'vi', s: 'Con gà trốn đẹp trai bay qua vịnh.', f: 'vn' }, { n: 'Indonesia', c: 'id', s: 'Muhammad fox bermimpi dengan wajar.', f: 'id' }, { n: 'Bahasa Melayu', c: 'ms', s: 'Lebuh rayanya berliku-liku di antara.', f: 'my' }, { n: 'Tagalog', c: 'tl', s: 'Ang magandang paruparo ay lumilipad sa hardin.', f: 'ph' }] as lang}
             <div
               class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors"
             >
@@ -821,11 +741,11 @@
         <h3
           class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"
         >
-          <span>ðŸŒ</span>
+          <span>🌏</span>
           {$t('mkt_region_cee')}
         </h3>
         <div class="grid grid-cols-2 gap-3">
-          {#each [{ n: 'Ð ÑƒÑÑÐºÐ¸Ð¹', c: 'ru', s: 'Ð­Ð¹, Ð¶Ð»Ð¾Ð±! Ð“Ð´Ðµ Ñ‚ÑƒÐ·? ÐŸÑ€ÑÑ‡ÑŒ ÑŽÐ½Ñ‹Ñ… ÑÑŠÑ‘Ð¼Ð½Ñ‹Ñ….', f: 'ru' }, { n: 'Ð£ÐºÑ€Ð°Ñ—Ð½ÑÑŒÐºÐ°', c: 'uk', s: 'Ð•Ð¹, Ð±Ð°Ñ€ÑÑƒ! Ð‘Ð»Ð¸ÑÐºÐ°Ð²Ð¸Ñ‡Ð½Ð¾ Ñ…Ð¾Ð²Ð°Ð¹ ÑŽÐ½Ð¸Ñ….', f: 'ua' }, { n: 'TÃ¼rkÃ§e', c: 'tr', s: 'Vakif bank fÄ±rtÄ±nasÄ±, mahsur kaldÄ±klarÄ± gemiyi yuttu.', f: 'tr' }] as lang}
+          {#each [{ n: 'Русский', c: 'ru', s: 'Эй, жлоб! Где туз? Прячь юных съёмных.', f: 'ru' }, { n: 'Українська', c: 'uk', s: 'Ей, барсу! Блискавично ховай юних.', f: 'ua' }, { n: 'Türkçe', c: 'tr', s: 'Vakif bank fırtınası, mahsur kaldıkları gemiyi yuttu.', f: 'tr' }] as lang}
             <div
               class="bg-surface-container-low p-3 group hover:bg-surface-container transition-colors"
             >
@@ -1138,6 +1058,7 @@
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
+    font-feature-settings: 'liga';
     -webkit-font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
     font-variation-settings:
@@ -1147,7 +1068,7 @@
       'opsz' 24;
   }
 
-  /* â”€â”€ Live Demo CSS â”€â”€ */
+  /* ── Live Demo CSS ── */
   .demo-text {
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }

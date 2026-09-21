@@ -1,7 +1,6 @@
 <script lang="ts">
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import { ALL_LANGUAGES } from '$lib/i18n/languages';
   import type { PageProps } from './$types';
   import SeoHead from '$lib/components/SeoHead.svelte';
   import { breadcrumbJsonLd, courseJsonLd } from '$lib/seo';
@@ -9,17 +8,11 @@
   let { data }: PageProps = $props();
   const lang = $derived(data.language);
 
-  // For hreflang we can map out all alternatives
-  const alternatives = ALL_LANGUAGES;
   const seoTitle = $derived(`Learn to Type in ${lang.englishName} (${lang.nativeName})`);
   const seoDescription = $derived(
     `Master touch typing in ${lang.englishName}. Practice using the ${lang.keyboard} keyboard layout and improve WPM and accuracy with an adaptive ${lang.script} curriculum.`
   );
   const seoPath = $derived(`/languages/${lang.code}`);
-  const alternateLinks = $derived([
-    ...alternatives.map((alt) => ({ hreflang: alt.code, href: `/languages/${alt.code}` })),
-    { hreflang: 'x-default', href: '/languages' },
-  ]);
   const languageJsonLd = $derived([
     courseJsonLd({ name: seoTitle, description: seoDescription, path: seoPath }),
     breadcrumbJsonLd([
@@ -34,7 +27,6 @@
   title={seoTitle}
   description={seoDescription}
   path={seoPath}
-  alternates={alternateLinks}
   jsonLd={languageJsonLd}
 />
 

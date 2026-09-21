@@ -68,7 +68,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 1: Right Hand Vowels (ㅏ, ㅑ, ㅓ, ㅕ, ㅛ) ===
   {
     id: 'ko-hangul-1',
-    title: 'Korean Vowels - Right Hand (ㅏ, ㅑ, ㅓ, ㅕ, ㅛ)',
+    title: '한글 모음 — 오른손 (ㅏ, ㅑ, ㅓ, ㅕ, ㅛ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 1,
@@ -105,7 +105,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 2: Left Hand Consonants - First Group (ㄱ, ㄴ, ㄷ, ㄹ, ㅁ) ===
   {
     id: 'ko-hangul-2',
-    title: 'Korean Consonants - Left Hand Part 1 (ㄱ, ㄴ, ㄷ, ㄹ, ㅁ)',
+    title: '한글 자음 — 왼손 1부 (ㄱ, ㄴ, ㄷ, ㄹ, ㅁ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 1,
@@ -142,7 +142,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 3: Right Hand Vowels Part 2 (ㅜ, ㅠ, ㅡ, ㅣ) ===
   {
     id: 'ko-hangul-3',
-    title: 'Korean Vowels - Right Hand Part 2 (ㅜ, ㅠ, ㅡ, ㅣ)',
+    title: '한글 모음 — 오른손 2부 (ㅜ, ㅠ, ㅡ, ㅣ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 1,
@@ -175,7 +175,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 4: Left Hand Consonants Part 2 (ㅂ, ㅅ, ㅇ, ㅈ, ㅊ) ===
   {
     id: 'ko-hangul-4',
-    title: 'Korean Consonants - Left Hand Part 2 (ㅂ, ㅅ, ㅇ, ㅈ, ㅊ)',
+    title: '한글 자음 — 왼손 2부 (ㅂ, ㅅ, ㅇ, ㅈ, ㅊ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 1,
@@ -212,7 +212,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 5: Bottom Row Consonants (ㅋ, ㅌ, ㅍ, ㅎ) ===
   {
     id: 'ko-hangul-5',
-    title: 'Korean Consonants - Bottom Row (ㅋ, ㅌ, ㅍ, ㅎ)',
+    title: '한글 자음 — 아랫줄 (ㅋ, ㅌ, ㅍ, ㅎ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 1,
@@ -245,7 +245,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 6: Simple Korean Syllables (가, 나, 다, 라, 마) ===
   {
     id: 'ko-hangul-6',
-    title: 'Korean Syllables - Part 1 (가, 나, 다, 라, 마)',
+    title: '한글 음절 — 1부 (가, 나, 다, 라, 마)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 2,
@@ -291,7 +291,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 7: Simple Korean Syllables Part 2 (바, 사, 아, 자, 차) ===
   {
     id: 'ko-hangul-7',
-    title: 'Korean Syllables - Part 2 (바, 사, 아, 자, 차)',
+    title: '한글 음절 — 2부 (바, 사, 아, 자, 차)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 2,
@@ -337,7 +337,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 8: Compound Vowels (ㅘ, ㅙ, ㅚ, ㅝ, ㅞ, ㅟ, ㅢ) ===
   {
     id: 'ko-hangul-8',
-    title: 'Korean Compound Vowels (ㅘ, ㅙ, ㅚ, ㅝ, ㅞ, ㅟ, ㅢ)',
+    title: '한글 복합 모음 (ㅘ, ㅙ, ㅚ, ㅝ, ㅞ, ㅟ, ㅢ)',
     language: 'ko',
     script: 'Hangul',
     difficulty: 2,
@@ -395,7 +395,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 9: Common Korean Words (가수, 가족, 강아지, 나무, 바다) ===
   {
     id: 'ko-hangul-9',
-    title: 'Common Korean Words - Nature & Animals',
+    title: '자주 쓰는 한국어 단어 — 자연과 동물',
     language: 'ko',
     script: 'Hangul',
     difficulty: 2,
@@ -443,7 +443,7 @@ export const koreanLessons: Lesson[] = [
   // === Lesson 10: Common Korean Phrases (안녕하세요, 감사합니다, 처음 뵙겠습니다) ===
   {
     id: 'ko-hangul-10',
-    title: 'Common Korean Phrases - Greetings',
+    title: '자주 쓰는 한국어 표현 — 인사',
     language: 'ko',
     script: 'Hangul',
     difficulty: 3,

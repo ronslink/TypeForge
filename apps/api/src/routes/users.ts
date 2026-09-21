@@ -10,6 +10,7 @@ import { orgMembers, orgSettings } from '@typeforge/db';
 import { eq, and, desc, gte } from 'drizzle-orm';
 
 const app = new Hono();
+const SUPPORTED_UI_LOCALES = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh', 'ar', 'hi', 'tr', 'it', 'ru', 'id', 'vi', 'pl'] as const;
 
 // All user routes require authentication
 app.use('*', requireAuth);
@@ -56,17 +57,15 @@ app.get('/me', async (c) => {
 
 /**
  * PATCH /users/me/locale - Update the user's personal UI locale preference
- * Body: { locale: 'en' | 'es' | 'fr' | 'de' | 'pt' }
+ * Body: { locale: one of SUPPORTED_UI_LOCALES }
  */
 app.patch('/me/locale', async (c) => {
   const auth = getAuth(c)!;
   const db = getDb(c);
 
   const body = await c.req.json<{ locale: string }>();
-  const SUPPORTED = ['en', 'es', 'fr', 'de', 'pt'];
-
-  if (!SUPPORTED.includes(body.locale)) {
-    return c.json({ error: 'Unsupported locale', supported: SUPPORTED }, 400);
+  if (!SUPPORTED_UI_LOCALES.includes(body.locale as (typeof SUPPORTED_UI_LOCALES)[number])) {
+    return c.json({ error: 'Unsupported locale', supported: SUPPORTED_UI_LOCALES }, 400);
   }
 
   await db
