@@ -37,7 +37,7 @@ export const planIntervalEnum = pgEnum('plan_interval', [
 export const orgBilling = pgTable('org_billing', {
   orgId: uuid('org_id').primaryKey().references(() => organisations.id, { onDelete: 'cascade' }),
   stripeSubscriptionId: text('stripe_subscription_id'),
-  seatPriceCents: integer('seat_price_cents').notNull().default(600),
+  seatPriceCents: integer('seat_price_cents').notNull().default(0),
   billingInterval: planIntervalEnum('billing_interval').notNull().default('monthly'),
   currentSeatCount: integer('current_seat_count').notNull().default(0),
   purchasedSeats: integer('purchased_seats').notNull().default(0),

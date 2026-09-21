@@ -1,28 +1,45 @@
 /**
- * IMEHandler — Composition event manager for CJK and other IME input
+ * Composition-aware committed-text controller.
  *
- * Handles compositionstart / compositionupdate / compositionend events
- * so the typing engine ignores intermediate IME states and only scores
- * the final committed characters.
- *
- * Rules (per Agent 4 spec):
- * - No fetch() calls — pure browser computation
- * - Uses KeyboardEvent.code (physical key), not .key
- * - All comparisons via CharComparator (NFC normalisation)
+ * Pre-edit updates are state only. A consumer scores text solely when this
+ * controller emits an `IMECommitEvent`; keyboard events are never converted to
+ * authoritative text here.
  */
 
+export const COMPOSITION_INPUT_VERSION = 'composition-input-v1' as const;
+
 export interface IMEState {
-  /** True while an IME composition is in progress */
+  /** True while an IME composition is in progress. */
   isComposing: boolean;
-  /** The current composition string (intermediate, not yet committed) */
+  /** Current pre-edit text. It has not been committed and must not be scored. */
   compositionText: string;
 }
 
 export interface IMECommitEvent {
-  /** The final committed string from the IME */
+  /** Final committed text from a composition or native input event. */
   committed: string;
-  /** Timestamp of the compositionend event */
+  /** Local observation time. This is not intended for persisted raw telemetry. */
   timestamp: number;
+  /** Version of the composition-to-commit behavior. */
+  inputVersion: typeof COMPOSITION_INPUT_VERSION;
+  source: 'composition' | 'input';
+}
+
+export interface NativeInputCommit {
+  data?: string | null;
+  /** Current value of an otherwise empty capture input, used for paste/input fallbacks. */
+  value?: string;
+  inputType?: string;
+  isComposing?: boolean;
+}
+
+/** Minimal cross-runtime keyboard state consumed by the shared package. */
+export interface KeyboardCompositionState {
+  isComposing?: boolean;
+}
+
+interface CompositionData {
+  data?: string | null;
 }
 
 type CommitCallback = (event: IMECommitEvent) => void;
@@ -31,51 +48,90 @@ export class IMEHandler {
   private _isComposing = false;
   private _compositionText = '';
   private _onCommit: CommitCallback | null = null;
+  private _pendingCompositionEcho: string | null = null;
 
-  /**
-   * Register a callback to be invoked when an IME composition is committed
-   */
+  /** Register the single committed-text callback. */
   onCommit(callback: CommitCallback): void {
     this._onCommit = callback;
   }
 
-  /**
-   * Call this from the element's compositionstart event listener
-   */
-  handleCompositionStart(_event: CompositionEvent): void {
+  handleCompositionStart(_event?: unknown): void {
     this._isComposing = true;
     this._compositionText = '';
+    this._pendingCompositionEcho = null;
   }
 
-  /**
-   * Call this from the element's compositionupdate event listener
-   */
-  handleCompositionUpdate(event: CompositionEvent): void {
+  handleCompositionUpdate(event: CompositionData): void {
     if (this._isComposing) {
       this._compositionText = event.data ?? '';
     }
   }
 
   /**
-   * Call this from the element's compositionend event listener.
-   * Fires the commit callback with the final committed string.
+   * Commit the final composition result. An empty result is treated as cancel.
+   * The return value makes the state transition usable without a callback.
    */
-  handleCompositionEnd(event: CompositionEvent): void {
-    this._isComposing = false;
+  handleCompositionEnd(event: CompositionData): IMECommitEvent | null {
+    if (!this._isComposing) return null;
+
     const committed = event.data ?? this._compositionText;
+    this._isComposing = false;
     this._compositionText = '';
 
-    if (committed && this._onCommit) {
-      this._onCommit({ committed, timestamp: Date.now() });
+    if (committed.length === 0) {
+      this._pendingCompositionEcho = null;
+      return null;
     }
+
+    this._pendingCompositionEcho = committed;
+    return this.emitCommit(committed, 'composition');
+  }
+
+  /** Explicitly cancel pre-edit without committing it. */
+  handleCompositionCancel(): void {
+    this._isComposing = false;
+    this._compositionText = '';
+    this._pendingCompositionEcho = null;
   }
 
   /**
-   * Call this from the element's keydown event listener.
-   * Returns true if the keystroke should be suppressed (IME in progress).
+   * Handle native `input` data. Inputs marked as composing and
+   * `insertCompositionText` are pre-edit updates. Some browsers send a final
+   * input event after `compositionend`; the matching echo is suppressed once.
    */
-  shouldSuppressKeystroke(_event: KeyboardEvent): boolean {
-    return this._isComposing;
+  handleInput(event: NativeInputCommit): IMECommitEvent | null {
+    if (
+      this._isComposing ||
+      event.isComposing === true ||
+      event.inputType === 'insertCompositionText'
+    ) {
+      if (this._isComposing && event.value !== undefined) {
+        this._compositionText = event.value;
+      }
+      return null;
+    }
+
+    const committed = event.data ?? event.value ?? '';
+    if (committed.length === 0) return null;
+
+    if (this._pendingCompositionEcho !== null) {
+      const isEcho =
+        committed === this._pendingCompositionEcho ||
+        event.value === this._pendingCompositionEcho;
+      this._pendingCompositionEcho = null;
+      if (isEcho) return null;
+    }
+
+    return this.emitCommit(committed, 'input');
+  }
+
+  /**
+   * Retained for compatibility with existing callers. `true` only means a
+   * keyboard shortcut/navigation handler should stand down during pre-edit;
+   * keydown must not be treated as committed text in either state.
+   */
+  shouldSuppressKeystroke(event: KeyboardCompositionState): boolean {
+    return this._isComposing || event.isComposing === true;
   }
 
   get state(): IMEState {
@@ -89,14 +145,12 @@ export class IMEHandler {
     return this._isComposing;
   }
 
-  /**
-   * Attach all composition event listeners to a target element.
-   * Returns a cleanup function that removes them.
-   */
   attach(target: EventTarget): () => void {
-    const onStart = (e: Event) => this.handleCompositionStart(e as CompositionEvent);
-    const onUpdate = (e: Event) => this.handleCompositionUpdate(e as CompositionEvent);
-    const onEnd = (e: Event) => this.handleCompositionEnd(e as CompositionEvent);
+    const onStart = (event: Event) => this.handleCompositionStart(event);
+    const onUpdate = (event: Event) =>
+      this.handleCompositionUpdate(event as unknown as CompositionData);
+    const onEnd = (event: Event) =>
+      this.handleCompositionEnd(event as unknown as CompositionData);
 
     target.addEventListener('compositionstart', onStart);
     target.addEventListener('compositionupdate', onUpdate);
@@ -110,7 +164,20 @@ export class IMEHandler {
   }
 
   reset(): void {
-    this._isComposing = false;
-    this._compositionText = '';
+    this.handleCompositionCancel();
+  }
+
+  private emitCommit(
+    committed: string,
+    source: IMECommitEvent['source'],
+  ): IMECommitEvent {
+    const commit: IMECommitEvent = {
+      committed,
+      timestamp: Date.now(),
+      inputVersion: COMPOSITION_INPUT_VERSION,
+      source,
+    };
+    this._onCommit?.(commit);
+    return commit;
   }
 }

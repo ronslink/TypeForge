@@ -74,7 +74,7 @@ export const userProfiles = pgTable('user_profiles', {
   typingGoal: text('typing_goal'),
   wpmTarget: smallint('wpm_target'),
   publicProfile: boolean('public_profile').notNull().default(false),
-  showOnLeaderboard: boolean('show_on_leaderboard').notNull().default(true),
+  showOnLeaderboard: boolean('show_on_leaderboard').notNull().default(false),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -97,8 +97,8 @@ export const userPreferences = pgTable('user_preferences', {
   reduceMotion: boolean('reduce_motion').notNull().default(false),
   lessonEndAction: text('lesson_end_action').notNull().default('show_results'),
   dailyGoalMinutes: smallint('daily_goal_minutes').notNull().default(10),
-  emailStreakReminder: boolean('email_streak_reminder').notNull().default(true),
-  emailWeeklyReport: boolean('email_weekly_report').notNull().default(true),
+  emailStreakReminder: boolean('email_streak_reminder').notNull().default(false),
+  emailWeeklyReport: boolean('email_weekly_report').notNull().default(false),
   emailProductUpdates: boolean('email_product_updates').notNull().default(false),
   pushEnabled: boolean('push_enabled').notNull().default(false),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

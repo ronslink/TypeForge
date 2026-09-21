@@ -15,6 +15,13 @@
       "when": 1777649305891,
       "tag": "0001_add_org_settings_policy_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789978514314,
+      "tag": "0002_privacy_defaults_and_seat_price",
+      "breakpoints": true
     }
   ]
 }
