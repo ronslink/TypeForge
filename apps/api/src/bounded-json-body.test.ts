@@ -45,8 +45,8 @@ describe('bounded authenticated JSON body reader', () => {
       privacyRequest: { maxBytes: 4_096, maxDepth: 4, maxNodes: 128 },
       localePreference: { maxBytes: 1_024, maxDepth: 2, maxNodes: 16 },
       accountPreferences: { maxBytes: 4_096, maxDepth: 2, maxNodes: 64 },
-      sessionSubmission: { maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 },
-      keystrokeBatch: { maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 },
+      sessionSubmission: { maxBytes: 2_097_152, maxDepth: 6, maxNodes: 262_144 },
+      keystrokeBatch: { maxBytes: 2_097_152, maxDepth: 6, maxNodes: 262_144 },
       sessionCompletion: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
       placementTestResult: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
       userLocalePreference: { maxBytes: 1_024, maxDepth: 2, maxNodes: 16 },
@@ -63,6 +63,45 @@ describe('bounded authenticated JSON body reader', () => {
       organisationSeatDowngrade: { maxBytes: 4_096, maxDepth: 2, maxNodes: 16 },
       organisationSeatAssignment: { maxBytes: 4_096, maxDepth: 2, maxNodes: 32 },
     });
+  });
+
+  it('bounds session keystroke payloads without rejecting realistic drills', () => {
+    // A keystroke event as the clients actually build it. The learn surface adds
+    // dwell/flight timings, which makes each event larger.
+    const practiceEvent = {
+      character: 'a',
+      expected: 'a',
+      correct: true,
+      timestamp: '2026-09-21T10:15:30.123Z',
+      keyDownAt: '2026-09-21T10:15:30.123Z',
+      finger: 'left-pinky',
+    };
+    const learnEvent = {
+      ...practiceEvent,
+      keyUpAt: '2026-09-21T10:15:30.145Z',
+      dwellTime: 22,
+      flightTime: 105,
+      hand: 'left',
+    };
+
+    const envelopeBytes = 512;
+    const sessionPolicy = BOUNDED_JSON_BODY_POLICIES.sessionSubmission;
+    const practiceCapacity = Math.floor(
+      (sessionPolicy.maxBytes - envelopeBytes) / JSON.stringify(practiceEvent).length
+    );
+    const learnCapacity = Math.floor(
+      (sessionPolicy.maxBytes - envelopeBytes) / JSON.stringify(learnEvent).length
+    );
+
+    // A ten-minute session at 100 WPM is roughly 5,000 keystrokes. The cap must
+    // clear that with room for retyped characters, or long drills are lost.
+    expect(practiceCapacity).toBeGreaterThan(10_000);
+    expect(learnCapacity).toBeGreaterThan(8_000);
+
+    // The node limit must not bind before the byte limit does.
+    expect(sessionPolicy.maxNodes).toBeGreaterThan(
+      learnCapacity * Object.keys(learnEvent).length
+    );
   });
 
   it('accepts an exact byte-limit body and rejects the next byte', async () => {

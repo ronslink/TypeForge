@@ -14,9 +14,14 @@ export const BOUNDED_JSON_BODY_POLICIES = Object.freeze({
 
   // POST /sessions — a completed session summary that carries the session's
   // keystroke array, so it is the one route that legitimately ships bulk data.
-  sessionSubmission: Object.freeze({ maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 }),
+  // Sized from the real event shape (~150-230 bytes per keystroke depending on
+  // whether dwell/flight timings are present): 2 MiB holds roughly 9,000-13,000
+  // keystrokes, i.e. well over an hour of continuous typing at any realistic
+  // speed. A tighter cap silently rejects long drills with 413 and loses them,
+  // which is why this is generous while still bounded.
+  sessionSubmission: Object.freeze({ maxBytes: 2_097_152, maxDepth: 6, maxNodes: 262_144 }),
   // POST /sessions/:id/keystrokes — a batch of per-keypress events for one session.
-  keystrokeBatch: Object.freeze({ maxBytes: 262_144, maxDepth: 6, maxNodes: 32_768 }),
+  keystrokeBatch: Object.freeze({ maxBytes: 2_097_152, maxDepth: 6, maxNodes: 262_144 }),
   // PUT /sessions/:id — the session's scalar completion metrics only.
   sessionCompletion: Object.freeze({ maxBytes: 4_096, maxDepth: 2, maxNodes: 32 }),
   // POST /progress/placement — one placement-test result.
