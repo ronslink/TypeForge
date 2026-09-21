@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -50,7 +50,7 @@
   // Keep selection synchronized when language changes
   $effect(() => {
     if (currentBooks.length > 0 && !currentBooks.find((b) => b.id === selectedBookId)) {
-      selectedBookId = currentBooks[0].id;
+      selectedBookId = currentBooks[0]!.id;
     }
   });
 
@@ -188,7 +188,7 @@
       const words = getRandomWords(userLanguage, 50);
       let text = '';
       for (let i = 0; i < words.length; i++) {
-        let w = words[i];
+        let w = words[i]!;
         if (i % 8 === 0) w = w.charAt(0).toUpperCase() + w.slice(1);
         text += w + (i % 8 === 7 || i === words.length - 1 ? '.' : '') + ' ';
       }

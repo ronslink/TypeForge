@@ -29,7 +29,7 @@
 
   // Get lesson ID from URL params (typed via page.params)
   const lessonId = $derived(page.params.lessonId);
-  const lesson = $derived(getLessonById(lessonId));
+  const lesson = $derived(getLessonById(lessonId ?? ''));
 
   // Derived values needed early
   const lessonText = $derived(lesson?.content.map((c) => c.char).join('') || '');

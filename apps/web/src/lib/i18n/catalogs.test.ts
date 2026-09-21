@@ -122,7 +122,7 @@ describe('translation catalogs', () => {
 
       const allowedUnchanged = new Set([...globallyInvariantKeys, ...localeInvariantKeys[locale]]);
       for (const [key, source] of Object.entries(english)) {
-        const translation = catalog[key];
+        const translation = catalog[key] ?? '';
         expect(translation, `${locale}.${key} must be non-empty`).toBeTruthy();
         expect(placeholderNames(translation), `${locale}.${key} changed its placeholders`).toEqual(placeholderNames(source));
         if (key !== 'adaptive_banner_body') {

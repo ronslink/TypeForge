@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { t, uiLocale } from '$lib/stores/locale';
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
   import { MARKETING_DEMO_SCENES } from '$lib/marketing/demo-scenes';
@@ -225,6 +225,10 @@
       featured: false,
     },
   ]);
+
+  // The featured card always renders the first testimonial, which is a literal
+  // non-empty entry, so the index lookup is known to be present.
+  const featuredTestimonial = $derived(testimonials[0]!);
 
   const footerLinks = $derived({
     product: [
@@ -903,16 +907,16 @@
             class="material-symbols-outlined text-primary/20 text-6xl absolute inset-block-start-4 inset-inline-end-4"
             >format_quote</span
           >
-          <p class="font-body text-lg italic mb-6 leading-relaxed">"{testimonials[0].quote}"</p>
+          <p class="font-body text-lg italic mb-6 leading-relaxed">"{featuredTestimonial.quote}"</p>
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 bg-primary-container flex items-center justify-center font-label font-bold text-on-primary-container"
             >
-              {testimonials[0].initials}
+              {featuredTestimonial.initials}
             </div>
             <div>
-              <div class="font-label text-sm font-bold">{testimonials[0].author}</div>
-              <div class="font-label text-xs text-on-surface-variant">{testimonials[0].role}</div>
+              <div class="font-label text-sm font-bold">{featuredTestimonial.author}</div>
+              <div class="font-label text-xs text-on-surface-variant">{featuredTestimonial.role}</div>
             </div>
           </div>
         </div>

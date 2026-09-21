@@ -31,8 +31,9 @@ export interface Key {
   requiresAltGr?: boolean;
   /** Finger responsible for this key */
   finger?: Finger | string;
-  /** Hand that owns this key */
-  hand?: Hand;
+  /** Hand that owns this key. Layout data is JSON-imported, so it is not
+   *  narrowed to the Hand union at build time; mirrors `finger` above. */
+  hand?: Hand | string;
   /** Whether this key is marked for RTL rendering */
   rtl?: boolean;
   /** Visual width hint for special keys */

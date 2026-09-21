@@ -13,9 +13,9 @@ const NATIVE_SCRIPT: Partial<Record<(typeof SUPPORTED_UI_LOCALES)[number], RegEx
 
 describe('native-language book coverage', () => {
   it.each(SUPPORTED_UI_LOCALES)('%s has at least two complete training samples', (locale) => {
-    const books = FAMOUS_BOOKS[locale];
+    const books = FAMOUS_BOOKS[locale] ?? [];
 
-    expect(books).toBeDefined();
+    expect(FAMOUS_BOOKS[locale]).toBeDefined();
     expect(books.length).toBeGreaterThanOrEqual(2);
     expect(new Set(books.map((book) => book.id)).size).toBe(books.length);
 
@@ -30,6 +30,6 @@ describe('native-language book coverage', () => {
   });
 
   it.each(Object.entries(NATIVE_SCRIPT))('%s samples use the native script', (locale, script) => {
-    expect(FAMOUS_BOOKS[locale].every((book) => script.test(`${book.title} ${book.excerpt}`))).toBe(true);
+    expect(FAMOUS_BOOKS[locale]?.every((book) => script.test(`${book.title} ${book.excerpt}`)) ?? false).toBe(true);
   });
 });
