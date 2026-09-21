@@ -13,6 +13,7 @@
   import { WPMCalculator, AccuracyTracker } from '@typeforge/metrics';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import { FAMOUS_BOOKS } from './books';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
@@ -30,6 +31,10 @@
   ];
 
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let userLanguage = $state('en');
   let userLayout = $state('qwerty-us');
 
@@ -225,12 +230,6 @@
     mode = 'adaptive';
     isGeneratingAI = true;
     try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
-      };
 
       const api = createApiClient('/', authFetch);
       const res = await api.api.v1.lessons.adaptive.$post({
@@ -369,12 +368,6 @@
     if (sessionSubmitted) return;
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
-      };
 
       const api = createApiClient('/', authFetch);
       await api.api.v1.sessions.$post({

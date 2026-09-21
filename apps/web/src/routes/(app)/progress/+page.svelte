@@ -2,10 +2,15 @@
   import { useClerkContext } from 'svelte-clerk';
   import { ProgressRing, StatCard, WeaknessHeatmap, MilestoneCertifications } from '@typeforge/ui';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { t } from '$lib/stores/locale';
 
   // Auth state
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
 
   // Data states
@@ -153,12 +158,6 @@
     dataFetched = true;
     (async () => {
       try {
-        const token = await ctx?.session?.getToken();
-        const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-          const h = new Headers(init?.headers);
-          if (token) h.set('Authorization', `Bearer ${token}`);
-          return fetch(input, { ...init, headers: h });
-        };
         const api = createApiClient('/', authFetch);
 
         const [progressRes, statsRes, weakRes] = await Promise.all([

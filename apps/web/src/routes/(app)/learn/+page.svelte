@@ -10,6 +10,7 @@
   import { t, uiLocale } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import SideNavBar from '$lib/components/SideNavBar.svelte';
   import { getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import SeoHead from '$lib/components/SeoHead.svelte';
@@ -17,6 +18,10 @@
 
   // Auth & Progress Tracking State
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
   let completedLessonIds = $state(new Set<string>());
   // Weak keys for the adaptive drill banner
@@ -34,12 +39,6 @@
     dataFetched = true;
     (async () => {
       try {
-        const token = await ctx?.session?.getToken();
-        const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-          const defaultHeaders = new Headers(init?.headers);
-          if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-          return fetch(input, { ...init, headers: defaultHeaders });
-        };
         const api = createApiClient('/', authFetch);
 
         // Fetch completed lessons + weak keys in parallel

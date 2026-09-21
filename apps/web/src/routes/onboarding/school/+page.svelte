@@ -3,11 +3,16 @@
   import { page } from '$app/state';
   import { useClerkContext, SignIn } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import TopNavBar from '$lib/components/TopNavBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import { t } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
 
   // Read plan from URL
@@ -46,12 +51,6 @@
     errorMsg = null;
 
     try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const headers = new Headers(init?.headers);
-        if (token) headers.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers });
-      };
       const api = createApiClient('/', authFetch);
 
       const existingOrgsRes = await api.api.v1.organisations.$get();

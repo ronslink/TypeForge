@@ -23,6 +23,7 @@
   } from '@typeforge/metrics';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { getLanguageByCode } from '$lib/i18n/languages';
   import { t } from '$lib/stores/locale';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
@@ -41,6 +42,10 @@
 
   // Get authentication context natively during component initialization
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
 
   let userLayout = $state('qwerty-us');
 
@@ -391,12 +396,6 @@
 
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const h = new Headers(init?.headers);
-        if (token) h.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: h });
-      };
       const api = createApiClient('/', authFetch);
 
       // If this is a placement test, record the result separately
@@ -510,10 +509,7 @@
 
     // Fetch placement retry policy (needed to show correct retry messaging)
     try {
-      const token = await ctx?.session?.getToken();
-      const res = await fetch('/api/v1/progress/placement/policy', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await authFetch('/api/v1/progress/placement/policy');
       if (res.ok) {
         const policy = await res.json();
         isOrgMember = policy.isOrgMember ?? false;
@@ -525,10 +521,7 @@
 
     // Enforce locked curriculum logic
     try {
-      const token = await ctx?.session?.getToken();
-      const progressRes = await fetch('/api/v1/progress/lessons', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const progressRes = await authFetch('/api/v1/progress/lessons');
       if (progressRes.ok) {
         const payload = await progressRes.json();
         const completedLessonIds = new Set<string>(payload.completedLessons || []);

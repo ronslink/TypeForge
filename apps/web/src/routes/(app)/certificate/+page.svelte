@@ -2,9 +2,14 @@
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { t } from '$lib/stores/locale';
   
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
   
   let bestSession = $state({ wpm: 0, accuracy: 0, date: new Date().toISOString() });
@@ -17,12 +22,6 @@
     }
     
     try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const h = new Headers(init?.headers);
-        if (token) h.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: h });
-      };
       const api = createApiClient('/', authFetch);
       
       const res = await api.api.v1.progress.$get();

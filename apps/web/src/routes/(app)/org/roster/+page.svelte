@@ -2,10 +2,15 @@
   import { onMount } from 'svelte';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { ClassRoster, InviteStudentModal } from '@typeforge/ui';
   import { t } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
   
   let organizationData = $state<any>(null);
@@ -24,12 +29,6 @@
   onMount(async () => {
     if (!isSignedIn) { loading = false; return; }
     try {
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const defaultHeaders = new Headers(init?.headers);
-        if (token) defaultHeaders.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers: defaultHeaders });
-      };
       api = createApiClient('/', authFetch);
       await loadData();
     } catch (e) {

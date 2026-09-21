@@ -3,9 +3,14 @@
   import { page } from '$app/state';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
   import { t } from '$lib/stores/locale';
 
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let orgData = $state<any>(null);
   let loading = $state(true);
 
@@ -14,12 +19,6 @@
       const orgId = page.url.searchParams.get('orgId');
       if (!orgId) { loading = false; return; }
 
-      const token = await ctx?.session?.getToken();
-      const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const headers = new Headers(init?.headers);
-        if (token) headers.set('Authorization', `Bearer ${token}`);
-        return fetch(input, { ...init, headers });
-      };
       const api = createApiClient('/', authFetch);
 
       const res = await api.api.v1.organisations[':id'].$get({ param: { id: orgId } });

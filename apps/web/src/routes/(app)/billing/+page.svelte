@@ -3,9 +3,14 @@
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
+  import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
 
 
   const ctx = useClerkContext();
+
+  const authFetch = createAuthenticatedFetch({
+    getToken: async () => (await ctx?.session?.getToken()) ?? null,
+  });
   let isSignedIn = $derived(!!ctx?.user);
 
   // -------------------------------------------------------------------------
@@ -96,7 +101,7 @@
   async function fetchBillingData() {
     if (!isSignedIn) { isLoading = false; return; }
     try {
-      const api = createApiClient();
+      const api = createApiClient('/', authFetch);
       const [subRes, invRes] = await Promise.all([
         api.api.v1.billing.subscription.$get(),
         api.api.v1.billing.invoices.$get(),
@@ -117,7 +122,7 @@
     isCheckingOut = true;
     error = null;
     try {
-      const api = createApiClient();
+      const api = createApiClient('/', authFetch);
       const res = await api.api.v1.billing.checkout.$post({
         json: {
           interval: billingInterval,
@@ -138,7 +143,7 @@
     isOpeningPortal = true;
     error = null;
     try {
-      const api = createApiClient();
+      const api = createApiClient('/', authFetch);
       const res = await api.api.v1.billing.portal.$post({ json: { /* ignore */ } });
       const { portalUrl } = await res.json();
       if (portalUrl) window.location.href = portalUrl;
