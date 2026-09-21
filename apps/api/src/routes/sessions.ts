@@ -21,8 +21,16 @@ import {
   dailyStats,
   userProgress,
   lessons,
+  sessionSummaryIdempotency,
 } from '@typeforge/db';
 import { eq, desc, and, sql } from 'drizzle-orm';
+import {
+  decideExistingIdempotency,
+  fingerprintSessionRequest,
+  idempotencyExpiry,
+  idempotencyIdentity,
+  normalizeIdempotencyKey,
+} from '../sessions/idempotency.js';
 const app = new Hono();
 
 // All session routes require authentication
@@ -268,6 +276,127 @@ app.post('/', async (c) => {
     );
   }
 
+  // Idempotent submission.
+  //
+  // A browser that never saw the acknowledgement for a save retries with the
+  // same key. Rather than creating a second session, the stored response is
+  // replayed. The unique index on the record is what makes this safe under
+  // concurrency: a competing request cannot reserve the same key twice.
+  const rawIdempotencyKey = c.req.header('Idempotency-Key');
+  const idempotencyKey =
+    rawIdempotencyKey === undefined ? null : normalizeIdempotencyKey(rawIdempotencyKey);
+
+  if (rawIdempotencyKey !== undefined && idempotencyKey === null) {
+    return c.json(
+      {
+        error: 'The Idempotency-Key header is not a valid opaque key.',
+        code: 'INVALID_IDEMPOTENCY_KEY',
+      },
+      400
+    );
+  }
+
+  const idempotencyOperation = 'create' as const;
+  const idempotencyTarget = 'sessions';
+  let reservedIdempotencyId: string | null = null;
+
+  if (idempotencyKey) {
+    const identity = idempotencyIdentity({
+      userId,
+      operation: idempotencyOperation,
+      operationTarget: idempotencyTarget,
+      key: idempotencyKey,
+    });
+    const requestHash = fingerprintSessionRequest({
+      operation: idempotencyOperation,
+      operationTarget: idempotencyTarget,
+      payload,
+    });
+
+    const [existing] = await db
+      .select()
+      .from(sessionSummaryIdempotency)
+      .where(
+        and(
+          eq(sessionSummaryIdempotency.userId, identity.userId),
+          eq(sessionSummaryIdempotency.operation, identity.operation),
+          eq(sessionSummaryIdempotency.operationTarget, identity.operationTarget),
+          eq(sessionSummaryIdempotency.keyHash, identity.keyHash)
+        )
+      )
+      .limit(1);
+
+    if (existing) {
+      const decision = decideExistingIdempotency(existing, requestHash, new Date());
+
+      if (decision.kind === 'replay') {
+        c.header('Idempotent-Replay', 'true');
+        return c.json(decision.responseBody, decision.responseStatus as 201);
+      }
+
+      if (decision.kind === 'in_progress') {
+        c.header('Retry-After', '1');
+        return c.json(
+          {
+            error: 'An identical request is still being processed.',
+            code: 'IDEMPOTENCY_REQUEST_IN_PROGRESS',
+          },
+          409
+        );
+      }
+
+      if (decision.kind === 'mismatch') {
+        return c.json(
+          {
+            error: 'This Idempotency-Key was already used for a different request.',
+            code: 'IDEMPOTENCY_KEY_REUSED',
+          },
+          409
+        );
+      }
+
+      if (decision.kind === 'invalid_replay') {
+        return c.json(
+          {
+            error: 'This request was already recorded but cannot be replayed.',
+            code: 'IDEMPOTENCY_RECORD_INVALID',
+          },
+          409
+        );
+      }
+
+      // Expired: the record no longer protects anything, so replace it. The
+      // unique index still serialises a race with a competing request.
+      await db
+        .delete(sessionSummaryIdempotency)
+        .where(eq(sessionSummaryIdempotency.id, existing.id));
+    }
+
+    const [reserved] = await db
+      .insert(sessionSummaryIdempotency)
+      .values({
+        ...identity,
+        requestHash,
+        status: 'pending',
+        expiresAt: idempotencyExpiry(new Date()),
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    if (!reserved) {
+      c.header('Retry-After', '1');
+      return c.json(
+        {
+          error: 'An identical request is still being processed.',
+          code: 'IDEMPOTENCY_REQUEST_IN_PROGRESS',
+        },
+        409
+      );
+    }
+
+    reservedIdempotencyId = reserved.id;
+  }
+
   const now = new Date();
 
   // Convert payload.lessonId (slug) to internal DB UUID if necessary
@@ -450,16 +579,30 @@ app.post('/', async (c) => {
     .set({ lastActiveAt: now })
     .where(eq(users.id, userId));
 
-  return c.json(
-    {
-      session: session as SessionResponse,
-      xpEarned,
-      totalXp,
-      currentLevel,
-      streak: newStreak,
-    },
-    201
-  );
+  const responseBody = {
+    session: session as SessionResponse,
+    xpEarned,
+    totalXp,
+    currentLevel,
+    streak: newStreak,
+  };
+
+  // Record the outcome so a retry carrying the same key replays it instead of
+  // creating a second session.
+  if (reservedIdempotencyId) {
+    await db
+      .update(sessionSummaryIdempotency)
+      .set({
+        status: 'completed',
+        sessionId: session!.id,
+        responseStatus: 201,
+        responseBody,
+        completedAt: new Date(),
+      })
+      .where(eq(sessionSummaryIdempotency.id, reservedIdempotencyId));
+  }
+
+  return c.json(responseBody, 201);
 });
 
 /**

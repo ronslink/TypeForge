@@ -29,6 +29,7 @@
     readThrownApiFailure,
     type ApiFailure,
   } from '$lib/api/failure';
+  import { createSessionSummaryIdempotencyKey } from '$lib/api/idempotency';
   import { getLanguageByCode } from '$lib/i18n/languages';
   import { t } from '$lib/stores/locale';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
@@ -75,6 +76,7 @@
   let sessionSubmitted = $state(false);
   let isSubmitting = $state(false);
   let submitFailure = $state<ApiFailure | null>(null);
+  let sessionIdempotencyKey = $state('');
   let isLocked = $state(false);
 
   // Timer state — active time lives in wpmCalculator
@@ -337,6 +339,8 @@
       sessionSubmitted = false;
       isSubmitting = false;
       submitFailure = null;
+      // One key per attempt, so a retry of this same lesson dedupes server-side.
+      sessionIdempotencyKey = createSessionSummaryIdempotencyKey('lesson');
       testFailed = false;
       startTime = null;
       activeElapsedSeconds = 0;
@@ -452,6 +456,7 @@
           rawWpm: finalWPM,
           consistency: finalAccuracy,
         },
+        header: { 'Idempotency-Key': sessionIdempotencyKey },
       });
 
       // Only now is the attempt actually recorded.
@@ -489,6 +494,7 @@
     sessionSubmitted = false;
     isSubmitting = false;
     submitFailure = null;
+    sessionIdempotencyKey = createSessionSummaryIdempotencyKey('lesson');
     startTime = null;
     activeElapsedSeconds = 0;
     isPausedUI = false;
@@ -779,16 +785,14 @@
               <p class="text-error text-sm mb-3">
                 {formatLocalizedFailureMessage(submitFailure, $t)}
               </p>
-              {#if submitFailure.outcome === 'verified_rejected'}
-                <button
-                  type="button"
-                  class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
-                  disabled={isSubmitting}
-                  onclick={() => void submitSession()}
-                >
-                  {$t('recovery_retry_label')}
-                </button>
-              {/if}
+              <button
+                type="button"
+                class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
+                disabled={isSubmitting}
+                onclick={() => void submitSession()}
+              >
+                {$t('recovery_retry_label')}
+              </button>
             </div>
           {/if}
 

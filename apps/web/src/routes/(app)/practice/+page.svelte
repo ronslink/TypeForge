@@ -19,6 +19,7 @@
     readThrownApiFailure,
     type ApiFailure,
   } from '$lib/api/failure';
+  import { createSessionSummaryIdempotencyKey } from '$lib/api/idempotency';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
   import { FAMOUS_BOOKS } from './books';
   import { ALL_LANGUAGES } from '$lib/i18n/languages';
@@ -74,6 +75,7 @@
   let sessionSubmitted = $state(false);
   let isSubmitting = $state(false);
   let submitFailure = $state<ApiFailure | null>(null);
+  let sessionIdempotencyKey = $state('');
 
   // Timer state
   let startTime = $state<number | null>(null);
@@ -276,6 +278,8 @@
       sessionSubmitted = false;
       isSubmitting = false;
       submitFailure = null;
+      // One key per attempt, so a retry of this same drill dedupes server-side.
+      sessionIdempotencyKey = createSessionSummaryIdempotencyKey('practice');
       startTime = null;
       activeElapsedSeconds = 0;
       isPausedUI = false;
@@ -396,12 +400,14 @@
           rawWpm: finalWPM,
           consistency: finalAccuracy,
         },
+        header: { 'Idempotency-Key': sessionIdempotencyKey },
       });
       sessionSubmitted = true;
     } catch (error) {
-      // A failed save must not be reported as logged. `outcome` distinguishes a
-      // rejected request from one whose result is unknown, and the recovery copy
-      // already says which.
+      // A failed save must not be reported as logged. Retrying is safe because
+      // the request carries a stable Idempotency-Key, so a retry after an
+      // unverified outcome replays the original result instead of recording a
+      // second session.
       submitFailure = readThrownApiFailure(error);
       console.error('Failed to submit practice session:', error);
     } finally {
@@ -603,16 +609,14 @@
               <p class="text-error text-sm mb-3">
                 {formatLocalizedFailureMessage(submitFailure, $t)}
               </p>
-              {#if submitFailure.outcome === 'verified_rejected'}
-                <button
-                  type="button"
-                  class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
-                  disabled={isSubmitting}
-                  onclick={() => void submitSession()}
-                >
-                  {$t('recovery_retry_label')}
-                </button>
-              {/if}
+              <button
+                type="button"
+                class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
+                disabled={isSubmitting}
+                onclick={() => void submitSession()}
+              >
+                {$t('recovery_retry_label')}
+              </button>
             </div>
           {:else}
             <p class="text-on-surface-variant mb-6 text-sm">

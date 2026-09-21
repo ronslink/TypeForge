@@ -13,6 +13,10 @@ import {
   boolean,
   smallint,
   real,
+  char,
+  jsonb,
+  index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, lessons, exercises } from './index.js';
@@ -48,6 +52,49 @@ export const typingSessions = pgTable('typing_sessions', {
   burstWpm: real('burst_wpm'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Idempotency records for session summary submission.
+//
+// A browser that retries a save it never saw acknowledged sends the same
+// Idempotency-Key. The unique index below is what makes that safe: a second
+// attempt with the same key and an identical request fingerprints to the same
+// row, so the stored response is replayed instead of a second session being
+// created.
+export const sessionSummaryIdempotency = pgTable(
+  'session_summary_idempotency',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** Discriminates operations that could otherwise share a key. */
+    operation: text('operation').notNull(),
+    /** The specific subject the operation targets. */
+    operationTarget: text('operation_target').notNull(),
+    /** SHA-256 of the client key. The key itself is never stored. */
+    keyHash: char('key_hash', { length: 64 }).notNull(),
+    /** Fingerprint of the request payload, so a reused key is detected. */
+    requestHash: char('request_hash', { length: 64 }).notNull(),
+    status: text('status').notNull().default('pending'),
+    sessionId: uuid('session_id').references(() => typingSessions.id, {
+      onDelete: 'set null',
+    }),
+    responseStatus: smallint('response_status'),
+    responseBody: jsonb('response_body'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    uniqueIndex('session_summary_idempotency_subject_operation_key').on(
+      table.userId,
+      table.operation,
+      table.operationTarget,
+      table.keyHash
+    ),
+    index('session_summary_idempotency_expiry_idx').on(table.expiresAt),
+  ]
+);
 
 // Keystroke events table (for detailed analysis)
 export const keystrokeEvents = pgTable('keystroke_events', {
