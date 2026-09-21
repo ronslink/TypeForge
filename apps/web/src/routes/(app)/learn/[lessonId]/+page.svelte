@@ -24,6 +24,11 @@
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+    type ApiFailure,
+  } from '$lib/api/failure';
   import { getLanguageByCode } from '$lib/i18n/languages';
   import { t } from '$lib/stores/locale';
   import { layouts, getDefaultLayoutForLanguage } from '@typeforge/layouts';
@@ -68,6 +73,8 @@
   let showCelebration = $state(false);
   let errorFlash = $state(false);
   let sessionSubmitted = $state(false);
+  let isSubmitting = $state(false);
+  let submitFailure = $state<ApiFailure | null>(null);
   let isLocked = $state(false);
 
   // Timer state — active time lives in wpmCalculator
@@ -328,6 +335,8 @@
       isStarted = false;
       showCelebration = false;
       sessionSubmitted = false;
+      isSubmitting = false;
+      submitFailure = null;
       testFailed = false;
       startTime = null;
       activeElapsedSeconds = 0;
@@ -391,8 +400,9 @@
   }
 
   async function submitSession() {
-    if (sessionSubmitted || !lesson) return;
-    sessionSubmitted = true;
+    if (sessionSubmitted || isSubmitting || !lesson) return;
+    isSubmitting = true;
+    submitFailure = null;
 
     try {
       const correctKeystrokes = keystrokes.filter((k) => k.correct).length;
@@ -416,7 +426,13 @@
           const body = await placementRes.json().catch(() => ({}));
           cooldownHoursRemaining = body.hoursRemaining ?? (orgRetryPolicy?.cooldownHours ?? 24);
           cooldownActive = true;
-          sessionSubmitted = false; // allow retry once cooldown lifts
+          return;
+        }
+
+        if (!placementRes.ok) {
+          // The placement result drives progression, so a rejection must not be
+          // reported as a completed lesson.
+          submitFailure = readThrownApiFailure({ statusCode: placementRes.status });
           return;
         }
       }
@@ -437,8 +453,14 @@
           consistency: finalAccuracy,
         },
       });
+
+      // Only now is the attempt actually recorded.
+      sessionSubmitted = true;
     } catch (error) {
+      submitFailure = readThrownApiFailure(error);
       console.error('Failed to submit session:', error);
+    } finally {
+      isSubmitting = false;
     }
   }
 
@@ -465,6 +487,8 @@
     isStarted = false;
     showCelebration = false;
     sessionSubmitted = false;
+    isSubmitting = false;
+    submitFailure = null;
     startTime = null;
     activeElapsedSeconds = 0;
     isPausedUI = false;
@@ -749,7 +773,25 @@
             <h2 id="completion-title" class="font-headline text-3xl mb-2 text-primary">{$t('lesson_complete')}</h2>
             <p id="completion-description" class="text-on-surface-variant mb-8">{$t('lesson_complete_body')}</p>
           {/if}
-          
+
+          {#if submitFailure}
+            <div class="bg-error/10 border border-error/30 px-4 py-3 mb-8 text-start relative z-10" role="alert">
+              <p class="text-error text-sm mb-3">
+                {formatLocalizedFailureMessage(submitFailure, $t)}
+              </p>
+              {#if submitFailure.outcome === 'verified_rejected'}
+                <button
+                  type="button"
+                  class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
+                  disabled={isSubmitting}
+                  onclick={() => void submitSession()}
+                >
+                  {$t('recovery_retry_label')}
+                </button>
+              {/if}
+            </div>
+          {/if}
+
           <!-- Results Grid -->
           <div class="grid grid-cols-3 gap-4 mb-8 relative z-10" role="region" aria-label="Your results">
             <div class="bg-surface-container p-4">

@@ -1,9 +1,11 @@
 ﻿<script lang="ts">
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { t } from '$lib/stores/locale';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import { formatLocalizedFailureMessage, readThrownApiFailure } from '$lib/api/failure';
   import { InviteStudentModal } from '@typeforge/ui';
 
   const ctx = useClerkContext();
@@ -172,8 +174,8 @@
         return;
       }
       await loadData();
-    } catch (e: any) {
-      seatPurchaseError = e.message || $t('org_update_seats_failed');
+    } catch (e) {
+      seatPurchaseError = formatLocalizedFailureMessage(readThrownApiFailure(e), get(t));
     } finally {
       isBuyingSeats = false;
     }
@@ -234,8 +236,8 @@
       }
 
       await loadData();
-    } catch (e: any) {
-      setupError = e?.message || $t('org_create_failed');
+    } catch (e) {
+      setupError = formatLocalizedFailureMessage(readThrownApiFailure(e), get(t));
     } finally {
       isSettingUpInstitution = false;
     }

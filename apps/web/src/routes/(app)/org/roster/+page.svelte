@@ -1,8 +1,14 @@
 ﻿<script lang="ts">
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
+  import {
+    failureFromStatus,
+    formatLocalizedFailureMessage,
+    readThrownApiFailure,
+  } from '$lib/api/failure';
   import { ClassRoster, InviteStudentModal } from '@typeforge/ui';
   import { t } from '$lib/stores/locale';
 
@@ -74,8 +80,8 @@
       json: { email, classId, role: 'student' }
     });
     if (!res.ok) {
-      const body = await res.json() as any;
-      throw new Error(body?.error || $t('org_invite_failed'));
+      // The modal renders this message, so it must not carry server prose.
+      throw new Error(formatLocalizedFailureMessage(failureFromStatus(res.status), get(t)));
     }
     await loadData();
   }
@@ -92,12 +98,13 @@
         param: { id: orgId, userId: student.id },
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({ /* ignore */ }));
-        throw new Error(body?.error || $t('org_student_drilldown_failed'));
+        // Surface the status, never the server's error prose.
+        performanceError = formatLocalizedFailureMessage(failureFromStatus(res.status), get(t));
+        return;
       }
       selectedPerformance = await res.json();
-    } catch (e: any) {
-      performanceError = e?.message || $t('org_student_drilldown_failed');
+    } catch (e) {
+      performanceError = formatLocalizedFailureMessage(readThrownApiFailure(e), get(t));
     } finally {
       performanceLoading = false;
     }
