@@ -1,12 +1,12 @@
 import {
   normalizeText,
-  scoreCommittedText,
   segmentGraphemes,
   type CommittedTextScoringOptions,
 } from '@typeforge/metrics';
+import { scoreCommittedText, type TypingPromptUnit } from './typing-session';
 
 export interface StrictTypingAttempt {
-  /** Grapheme-cluster position in the prompt when this attempt was scored. */
+  /** Prompt position in the expected text when this attempt was scored. */
   expectedIndex: number;
   expected: string | null;
   committed: string;
@@ -32,10 +32,18 @@ export interface StrictInputDecision {
   announcement?: string;
 }
 
+export function initialStrictTypingState(): StrictTypingState {
+  return { currentIndex: 0, errors: new Set<number>() };
+}
+
 /**
  * Strict mode advances only after a correct committed grapheme. A commit may
  * contain several graphemes (for example an IME phrase); each one is scored in
  * order against the cursor position produced by the preceding unit.
+ *
+ * The scoring itself lives in `scoreCommittedText`, which is the same routine
+ * the lesson and practice runners use, so a commit cannot be judged one way in
+ * a drill and another way here.
  *
  * This function is deliberately pure. Raw committed text remains in the
  * caller's in-memory session state and is never a transport payload.
@@ -47,44 +55,34 @@ export function applyStrictCommittedText(
   options: CommittedTextScoringOptions = {},
 ): StrictTypingCommitResult {
   const normalization = options.normalization ?? 'NFC';
-  const normalizedExpected = normalizeText(expectedText, normalization);
-  const normalizedCommitted = normalizeText(committedText, normalization);
-  const expectedGraphemes = segmentGraphemes(normalizedExpected, {
+  const expectedGraphemes = segmentGraphemes(normalizeText(expectedText, normalization), {
     locale: options.locale,
     normalization: 'none',
   });
-  const committedGraphemes = segmentGraphemes(normalizedCommitted, {
-    locale: options.locale,
-    normalization: 'none',
-  });
+  const prompt: TypingPromptUnit[] = expectedGraphemes.map((grapheme) => ({
+    grapheme,
+    code: null,
+    finger: 'left_thumb',
+  }));
 
-  let currentIndex = Math.max(0, Math.min(state.currentIndex, expectedGraphemes.length));
-  const errors = new Set(state.errors);
-  const attempts: StrictTypingAttempt[] = [];
-
-  for (const committed of committedGraphemes) {
-    const expected = expectedGraphemes[currentIndex] ?? null;
-    const unitScore = scoreCommittedText(committed, expected ?? '', {
-      ...options,
-      normalization: 'none',
-    });
-    const correct = expected !== null && unitScore.isExact;
-
-    attempts.push({ expectedIndex: currentIndex, expected, committed, correct });
-
-    if (correct) {
-      currentIndex += 1;
-    } else if (expected !== null) {
-      errors.add(currentIndex);
-    }
-  }
+  const result = scoreCommittedText(
+    { currentIndex: state.currentIndex, errors: state.errors },
+    committedText,
+    prompt,
+    { normalization },
+  );
 
   return {
-    currentIndex,
-    errors,
-    attempts,
-    expectedCount: expectedGraphemes.length,
-    complete: currentIndex >= expectedGraphemes.length,
+    currentIndex: result.state.currentIndex,
+    errors: result.state.errors,
+    attempts: result.attempts.map((attempt) => ({
+      expectedIndex: attempt.expectedIndex,
+      expected: attempt.expected,
+      committed: attempt.produced,
+      correct: attempt.correct,
+    })),
+    expectedCount: prompt.length,
+    complete: result.state.currentIndex >= prompt.length,
   };
 }
 
@@ -129,4 +127,3 @@ export function getStrictInputDecision(inputType: string): StrictInputDecision {
 
   return { allow: true };
 }
-

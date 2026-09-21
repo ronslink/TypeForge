@@ -11,6 +11,19 @@
   import SideNavBar from '$lib/components/SideNavBar.svelte';
   import { getRandomWords, type LessonChar, type Finger } from '@typeforge/curriculum';
   import { WPMCalculator, AccuracyTracker } from '@typeforge/metrics';
+  import {
+    activityTextFinished,
+  } from '$lib/typing/activity-outcome';
+  import {
+    createTypingPrompt,
+    initialTypingState,
+    resolveTypingOutcome,
+    scoreCommittedText,
+    scoreKeystrokeIfTyping,
+    type TypingState,
+    type TypingStepResult,
+  } from '$lib/typing/typing-session';
+  import { getStrictInputDecision } from '$lib/typing/strict-typing';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
@@ -67,8 +80,7 @@
 
   // Typing Session State
   let lessonChars = $state<LessonChar[]>([]);
-  let currentIndex = $state(0);
-  let errors = $state<Set<number>>(new Set());
+  let typingState = $state<TypingState>(initialTypingState());
   let isComplete = $state(false);
   let isStarted = $state(false);
   let showCelebration = $state(false);
@@ -100,11 +112,16 @@
   let finalAccuracy = $state(0);
   let finalDuration = $state(0);
 
-  const lessonText = $derived(lessonChars.map((c) => c.char).join(''));
-  const currentChar = $derived(lessonChars[currentIndex]);
+  // The scorable prompt: one unit per generated character, with each unit's
+  // physical key resolved through the layout the learner is being shown. It is
+  // derived so changing the layout mid-drill re-points the expected keys.
   const activeKeyboardLayout = $derived(
     layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']
   );
+  const prompt = $derived(createTypingPrompt(lessonChars, activeKeyboardLayout));
+  const currentIndex = $derived(typingState.currentIndex);
+  const errors = $derived(typingState.errors);
+  const currentChar = $derived(prompt[currentIndex]);
 
   // Can the student stop early?
   const canStop = $derived(
@@ -118,7 +135,7 @@
 
   $effect(() => {
     if (currentChar) {
-      highlightKeys = new Set([currentChar.char.toLowerCase()]);
+      highlightKeys = new Set([currentChar.grapheme.toLowerCase()]);
     } else {
       highlightKeys = new Set();
     }
@@ -184,7 +201,9 @@
   };
 
   function generateLessonSequence(text: string): LessonChar[] {
-    return text.split('').map((char) => {
+    // Code points, not UTF-16 code units: a pasted emoji or an astral-script
+    // character must stay one scorable unit.
+    return Array.from(text).map((char) => {
       const lower = char.toLowerCase();
       const mapped = PRACTICE_FINGER_MAP[lower];
       if (mapped) return { char, code: mapped.code, expectedFinger: mapped.finger };
@@ -214,8 +233,7 @@
     }
 
     // Reset state
-    currentIndex = 0;
-    errors = new Set();
+    typingState = initialTypingState();
     isComplete = false;
     isStarted = false;
     showCelebration = false;
@@ -270,8 +288,7 @@
       lessonChars = chars;
 
       // Reset state
-      currentIndex = 0;
-      errors = new Set();
+      typingState = initialTypingState();
       isComplete = false;
       isStarted = false;
       showCelebration = false;
@@ -305,51 +322,93 @@
     if (mode === 'select') return;
     if (isComplete) return;
 
+    // An input method owns the keystroke; its committed text is scored instead,
+    // so that a composing learner is not judged on the intermediate key.
+    if (event.isComposing) return;
+
     if (event.key.length === 1 || event.key === 'Backspace') {
       event.preventDefault();
     }
 
-    if (event.key === 'Backspace') {
-      return; // Disabled in strict mode since cursor never advances on error
-    }
+    // Visual keyboard feedback, including keys that are never scored.
+    pressedKey = event.key.toLowerCase();
+
+    const result = scoreKeystrokeIfTyping(
+      typingState,
+      {
+        code: event.code,
+        key: event.key,
+        isComposing: event.isComposing,
+        keyCode: event.keyCode,
+      },
+      prompt,
+      activeKeyboardLayout
+    );
+    if (result === null) return;
 
     if (!isStarted) {
       isStarted = true;
       startTime = Date.now();
     }
 
-    pressedKey = event.key.toLowerCase();
-    const expectedChar = lessonChars[currentIndex];
-    if (!expectedChar) return;
+    applyTypingResult(result);
+  }
 
-    const typedChar = event.key;
-    const isCorrect = typedChar === expectedChar.char;
-    const now = new Date().toISOString();
+  /** Text an operating-system input method committed. */
+  function handleCommittedText(text: string) {
+    if (mode === 'select' || isComplete || text.length === 0) return;
 
-    keystrokes.push({
-      character: typedChar,
-      expected: expectedChar.char,
-      correct: isCorrect,
-      timestamp: now,
-      keyDownAt: now,
-      finger: expectedChar.expectedFinger,
-    });
+    const result = scoreCommittedText(typingState, text, prompt);
+    if (result.attempts.length === 0) return;
 
-    wpmCalculator.onKeystroke(event.code, isCorrect, Date.now());
-    accuracyTracker.onKeystroke(event.code, isCorrect);
-
-    if (isCorrect) {
-      previousStreak = currentStreak;
-      currentStreak++;
-      currentIndex++; // Only advance on correct keystroke
-    } else {
-      previousStreak = currentStreak;
-      currentStreak = 0;
-      errors.add(currentIndex);
-      errors = new Set(errors);
+    if (!isStarted) {
+      isStarted = true;
+      startTime = Date.now();
     }
 
-    if (currentIndex >= lessonChars.length) completePractice();
+    applyTypingResult(result);
+  }
+
+  function applyTypingResult(result: TypingStepResult) {
+    const now = Date.now();
+    const timestamp = new Date(now).toISOString();
+    let correctInStep = 0;
+
+    for (const attempt of result.attempts) {
+      const unit = prompt[attempt.expectedIndex];
+      const code = unit?.code ?? 'Unknown';
+
+      keystrokes.push({
+        character: attempt.produced,
+        expected: attempt.expected,
+        correct: attempt.correct,
+        timestamp,
+        keyDownAt: timestamp,
+        finger: unit?.finger,
+      });
+
+      wpmCalculator.onKeystroke(code, attempt.correct, now);
+      accuracyTracker.onKeystroke(code, attempt.correct);
+      if (attempt.correct) correctInStep++;
+    }
+
+    previousStreak = currentStreak;
+    currentStreak =
+      result.state.currentIndex > typingState.currentIndex ? currentStreak + correctInStep : 0;
+    typingState = result.state;
+
+    if (activityTextFinished(result.outcome)) completePractice();
+  }
+
+  /**
+   * Student-initiated finish. The transition itself decides whether stopping is
+   * legal — it is rejected once the prompt has been exhausted — so the button
+   * cannot record a drill twice.
+   */
+  function requestStop() {
+    const outcome = resolveTypingOutcome(typingState, prompt, 'user-stopped', isStarted);
+    if (outcome.kind !== 'user-stopped') return;
+    completePractice();
   }
 
   function handleKeyUp() {
@@ -592,7 +651,7 @@
         <div class="h-1 bg-surface-container-highest relative overflow-hidden mb-2">
           <div
             class="h-full bg-secondary transition-all duration-300"
-            style="width: {(currentIndex / Math.max(1, lessonChars.length)) * 100}%"
+            style="width: {(currentIndex / Math.max(1, prompt.length)) * 100}%"
           ></div>
         </div>
       </div>
@@ -708,7 +767,7 @@
               {#if canStop}
                 <button
                   id="practice-stop-btn"
-                  onclick={completePractice}
+                  onclick={requestStop}
                   class="pr-stop-btn font-label text-xs font-bold uppercase tracking-widest px-4 py-2
                   border border-outline-variant/40 text-on-surface-variant
                   hover:border-primary hover:text-primary transition-all duration-200"
@@ -723,7 +782,13 @@
           <div
             class="p-8 bg-surface-container-low rounded-2xl shadow-lg border border-surface-container relative"
           >
-            <TypingInput text={lessonText} {currentIndex} {errors} />
+            <TypingInput
+              units={prompt}
+              {currentIndex}
+              {errors}
+              onCommittedText={handleCommittedText}
+              onInputPolicy={getStrictInputDecision}
+            />
           </div>
 
           <Keyboard layout={activeKeyboardLayout} {pressedKey} {highlightKeys} />

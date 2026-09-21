@@ -42,7 +42,8 @@
     "clean": "rm -rf node_modules .svelte-kit"
   },
   "dependencies": {
-    "@typeforge/layouts": "workspace:^"
+    "@typeforge/layouts": "workspace:^",
+    "@typeforge/metrics": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20.17.12",

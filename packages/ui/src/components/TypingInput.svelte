@@ -1,79 +1,173 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
+  import { IMEHandler } from '@typeforge/metrics';
+
+  /**
+   * Minimal display contract. The typing kernel's `TypingPromptUnit` satisfies
+   * it structurally, so this package stays independent of the web app.
+   */
+  interface DisplayUnit {
+    readonly grapheme: string;
+  }
+
+  /** Strict-input verdict supplied by the caller. Mirrors `getStrictInputDecision`. */
+  interface InputPolicyDecision {
+    readonly allow: boolean;
+    readonly announcement?: string;
+  }
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
-    text: string;
+    /** Grapheme prompt units. Each is one scorable position. */
+    units: readonly DisplayUnit[];
     currentIndex: number;
-    errors: Set<number>;
+    errors: ReadonlySet<number>;
     isRTL?: boolean;
     language?: string;
     onWordComplete?: (word: string, accuracy: number) => void;
+    /**
+     * Text an operating-system input method committed. The caller scores this;
+     * pre-edit composition text is never emitted.
+     */
+    onCommittedText?: (text: string) => void;
+    /**
+     * Verdict for a native `beforeinput` type. Direct insertion is always
+     * suppressed — scoring comes from physical keys and composition commits —
+     * so this is consulted for the announcement that explains a blocked edit.
+     */
+    onInputPolicy?: (inputType: string) => InputPolicyDecision;
     onEscape?: () => void;
     onArrowLeft?: () => void;
     onArrowRight?: () => void;
   }
 
-  let { 
-    text, 
-    currentIndex, 
-    errors, 
+  let {
+    units,
+    currentIndex,
+    errors,
     isRTL = false,
     language = 'en',
     onWordComplete,
+    onCommittedText,
+    onInputPolicy,
     onEscape,
     onArrowLeft,
     onArrowRight,
-    class: className = '', 
-    ...restProps 
+    class: className = '',
+    ...restProps
   }: Props = $props();
 
-  let chars = $derived(text.split(''));
-  
   // Track current word for screen reader announcements
   let currentWord = $state('');
-  let wordStartIndex = $state(0);
   let isTypingMode = $state(false);
   let ariaLiveText = $state('');
   let lastAnnouncedIndex = $state(-1);
 
+  /**
+   * Off-screen capture field. It exists so an operating-system input method can
+   * compose: composition events only fire on a focused editable element. It is
+   * never a source of physical-key scoring, and it is kept empty.
+   */
+  let captureEl = $state<HTMLInputElement | null>(null);
+
+  const ime = new IMEHandler();
+  ime.onCommit(({ committed }) => {
+    onCommittedText?.(committed);
+  });
+
+  function clearCapture() {
+    if (captureEl) captureEl.value = '';
+  }
+
+  function focusCapture() {
+    // preventScroll keeps the page from jumping when a drill area is clicked.
+    captureEl?.focus({ preventScroll: true });
+  }
+
+  // Take focus once, as soon as there is a drill to type, so an input method can
+  // compose without the learner having to click first. Re-focusing on every
+  // prompt object change would steal focus from the layout selector.
+  let captureFocusTaken = $state(false);
+  $effect(() => {
+    if (captureFocusTaken || units.length === 0) return;
+    captureFocusTaken = true;
+    focusCapture();
+  });
+
+  function handleCompositionStart() {
+    ime.handleCompositionStart();
+  }
+
+  function handleCompositionUpdate(event: CompositionEvent) {
+    ime.handleCompositionUpdate(event);
+  }
+
+  function handleCompositionEnd(event: CompositionEvent) {
+    ime.handleCompositionEnd(event);
+    clearCapture();
+  }
+
+  function handleCaptureInput(event: Event) {
+    if (ime.isComposing) return;
+    const value = (event.target as HTMLInputElement).value;
+    ime.handleInput({ value, inputType: (event as InputEvent).inputType });
+    clearCapture();
+  }
+
+  function handleBeforeInput(event: InputEvent) {
+    const inputType = event.inputType ?? '';
+    if (ime.isComposing || inputType.startsWith('insertComposition')) return;
+
+    const decision = onInputPolicy?.(inputType) ?? { allow: true };
+    if (!decision.allow && decision.announcement) {
+      ariaLiveText = decision.announcement;
+    }
+    // Whether or not the policy allows it, the capture field must not collect
+    // text: that would double-score against the physical keystroke path.
+    event.preventDefault();
+  }
+
   // Find word boundaries for screen reader
   $effect(() => {
     if (currentIndex !== lastAnnouncedIndex) {
-      // Find word start (previous space or beginning)
       let start = currentIndex;
-      while (start > 0 && text[start - 1] !== ' ' && text[start - 1] !== '\n') {
-        start--;
-      }
-      
-      // Find word end (next space or end)
+      while (start > 0 && !isBoundary(start - 1)) start--;
+
       let end = currentIndex;
-      while (end < text.length && text[end] !== ' ' && text[end] !== '\n') {
-        end++;
-      }
-      
-      currentWord = text.slice(start, end);
-      wordStartIndex = start;
-      
+      while (end < units.length && !isBoundary(end)) end++;
+
+      currentWord = units
+        .slice(start, end)
+        .map((unit) => unit.grapheme)
+        .join('');
+
       // Announce word completion
-      if (currentIndex > 0 && (text[currentIndex - 1] === ' ' || currentIndex === text.length)) {
-        const completedWordStart = wordStartIndex;
-        const completedWordEnd = currentIndex > 0 ? currentIndex - 1 : currentIndex;
-        const completedWord = text.slice(completedWordStart, completedWordEnd + 1).trim();
-        
+      if (currentIndex > 0 && (isBoundary(currentIndex - 1) || currentIndex === units.length)) {
+        const completedUnitCount = currentIndex > 0 ? currentIndex - 1 : 0;
+        const completedWord = units
+          .slice(start, completedUnitCount + 1)
+          .map((unit) => unit.grapheme)
+          .join('')
+          .trim();
+
         if (completedWord && onWordComplete) {
-          // Calculate accuracy for this word
           let wordErrors = 0;
-          for (let i = completedWordStart; i <= completedWordEnd; i++) {
+          for (let i = start; i <= completedUnitCount; i++) {
             if (errors.has(i)) wordErrors++;
           }
-          const accuracy = Math.round(((completedWord.length - wordErrors) / completedWord.length) * 100);
+          const length = completedUnitCount - start + 1;
+          const accuracy = Math.round(((length - wordErrors) / length) * 100);
           onWordComplete(completedWord, accuracy);
         }
       }
-      
+
       lastAnnouncedIndex = currentIndex;
     }
   });
+
+  function isBoundary(index: number): boolean {
+    const grapheme = units[index]?.grapheme;
+    return grapheme === undefined || grapheme === ' ' || grapheme === '\n';
+  }
 
   // Handle keyboard navigation
   function handleKeyDown(event: KeyboardEvent) {
@@ -82,7 +176,7 @@
       onEscape?.();
       return;
     }
-    
+
     // Arrow key navigation when not in typing mode
     if (!isTypingMode) {
       if (event.key === 'ArrowLeft') {
@@ -96,20 +190,21 @@
         return;
       }
     }
-    
+
     // Enter or Space to enter typing mode
     if ((event.key === 'Enter' || event.key === ' ') && !isTypingMode) {
       event.preventDefault();
       isTypingMode = true;
+      focusCapture();
       return;
     }
   }
 
-  function handleFocus() {
+  function handleFocusIn() {
     isTypingMode = true;
   }
 
-  function handleBlur() {
+  function handleFocusOut() {
     isTypingMode = false;
   }
 
@@ -143,8 +238,9 @@
   tabindex="0"
   dir={isRTL ? 'rtl' : 'ltr'}
   onkeydown={handleKeyDown}
-  onfocus={handleFocus}
-  onblur={handleBlur}
+  onfocusin={handleFocusIn}
+  onfocusout={handleFocusOut}
+  onpointerdown={focusCapture}
   {...restProps}
 >
   <!-- Visually hidden instructions for screen readers -->
@@ -162,23 +258,27 @@
     Current word: {currentWord}
   </div>
 
-  <!-- Text display with character-level status -->
-  {#each chars as char, i}
-    <span
-      class="char"
-      class:is-space={char === ' '}
-      class:correct={i < currentIndex && !errors.has(i)}
-      class:error={errors.has(i)}
-      class:current={i === currentIndex}
-      aria-label={getCharStatus(i)}
-      lang={isRTL && language === 'ar' ? 'ar' : undefined}
-    >
-      {#if i === currentIndex}
-        <span class="cursor" aria-hidden="true"></span>
-      {/if}
-      {char === ' ' ? '·' : char}
-    </span>
-  {/each}
+  <input
+    bind:this={captureEl}
+    class="capture-field"
+    type="text"
+    tabindex="-1"
+    aria-label="Typing input capture. Compose with your input method here; physical key presses are scored directly."
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+    oncompositionstart={handleCompositionStart}
+    oncompositionupdate={handleCompositionUpdate}
+    oncompositionend={handleCompositionEnd}
+    onbeforeinput={handleBeforeInput}
+    oninput={handleCaptureInput}
+  />
+
+  <!-- Text display with character-level status. Every unit is written as a
+       single text expression with no surrounding whitespace, so the rendered
+       text is exactly the prompt. The cursor is drawn with ::before rather than
+       as a child element, which would otherwise introduce a stray space. -->
+  {#each units as unit, i}<span class="char" class:is-space={unit.grapheme === ' '} class:correct={i < currentIndex && !errors.has(i)} class:error={errors.has(i)} class:current={i === currentIndex} aria-label={getCharStatus(i)} lang={isRTL && language === 'ar' ? 'ar' : undefined}>{unit.grapheme === ' ' ? '·' : unit.grapheme}</span>{/each}
 </div>
 
 <style>
@@ -200,9 +300,12 @@
     outline-offset: 4px;
   }
 
-  /* Typing mode state */
+  /* Typing mode state — also carries the focus ring, because focus normally
+     lands on the off-screen capture field rather than on this element. */
   .typing-input.is-typing {
     opacity: 0.8;
+    outline: 2px solid var(--primary, #ffc56c);
+    outline-offset: 4px;
   }
 
   /* RTL support */
@@ -210,6 +313,26 @@
     text-align: right;
     direction: rtl;
     unicode-bidi: bidi-override;
+  }
+
+  /*
+    The capture field must stay focusable and laid out (display:none and
+    visibility:hidden both disable composition), so it is made a one-pixel
+    transparent field instead.
+  */
+  .capture-field {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    pointer-events: none;
   }
 
   .char {
@@ -231,7 +354,8 @@
     opacity: 1;
   }
 
-  .cursor {
+  .char.current::before {
+    content: '';
     position: absolute;
     left: 0;
     bottom: -4px;
@@ -254,7 +378,7 @@
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    .cursor {
+    .char.current::before {
       animation: none;
       opacity: 1;
     }

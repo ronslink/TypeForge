@@ -254,6 +254,9 @@ importers:
       '@typeforge/layouts':
         specifier: workspace:^
         version: link:../layouts
+      '@typeforge/metrics':
+        specifier: workspace:^
+        version: link:../metrics
     devDependencies:
       '@types/node':
         specifier: ^20.17.12

@@ -15,8 +15,50 @@ import greek from './layouts/greek.json' with { type: 'json' };
 import dubeolsik from './layouts/dubeolsik.json' with { type: 'json' };
 import devanagariPhonetic from './layouts/devanagari-phonetic.json' with { type: 'json' };
 import romaji from './layouts/romaji.json' with { type: 'json' };
+import type { Key, Layout } from './types.js';
 
 export type { Layout, Key, Finger, Hand, LayoutName, KeyboardLayout, KeyDefinition } from './types.js';
+
+/** Every key in a layout, flattened out of its rows. */
+export function getAllKeys(layout: Layout): Key[] {
+  return layout.rows.flat();
+}
+
+/**
+ * Resolve the physical key that produces `char` on this layout.
+ *
+ * Layouts are the app's own statement of which physical key types which
+ * character, so this is the authoritative mapping for scoring: it makes a drill
+ * answerable on any operating-system keyboard layout. `charShift` is included
+ * so shifted symbols (for example `?`) resolve to their physical key.
+ */
+export function findKeyByChar(layout: Layout, char: string): Key | undefined {
+  if (char.length === 0) return undefined;
+  const keys = getAllKeys(layout);
+  return keys.find((key) => key.char === char) ?? keys.find((key) => key.charShift === char);
+}
+
+/**
+ * Resolve the physical key code that produces `char` on this layout.
+ * Returns `null` when the layout does not define the character.
+ */
+export function findCodeByChar(layout: Layout, char: string): string | null {
+  return findKeyByChar(layout, char)?.code ?? null;
+}
+
+/** Resolve a physical key by its `KeyboardEvent.code`. */
+export function findKeyByCode(layout: Layout, code: string): Key | undefined {
+  return getAllKeys(layout).find((key) => key.code === code);
+}
+
+/**
+ * Resolve the character this layout prints for a physical key.
+ * This is the label the learner was told to press, which is not necessarily
+ * what their operating-system layout produces.
+ */
+export function findCharByCode(layout: Layout, code: string): string | null {
+  return findKeyByCode(layout, code)?.char ?? null;
+}
 
 /** All built-in layouts keyed by their ID */
 export const layouts = {

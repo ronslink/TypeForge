@@ -7,6 +7,13 @@
   import { layouts } from '@typeforge/layouts';
   import { api } from '@typeforge/api/client';
   import { goto } from '$app/navigation';
+  import { activityTextFinished } from '$lib/typing/activity-outcome';
+  import {
+    createTypingPrompt,
+    initialTypingState,
+    scoreKeystrokeIfTyping,
+    type TypingState,
+  } from '$lib/typing/typing-session';
 
   // ============================================================================
   // Types
@@ -138,7 +145,7 @@
   // ============================================================================
 
   let testText = $state('');
-  let userInput = $state('');
+  let typingState = $state<TypingState>(initialTypingState());
   let testStarted = $state(false);
   let testEnded = $state(false);
   let activeElapsedSeconds = $state(0);    // wall-clock minus pauses
@@ -155,13 +162,13 @@
   // Minimum correct chars before "Stop & See Results" appears
   const canStopTest = $derived(
     testStarted && !testEnded &&
-    userInput.length >= 10
+    typingState.currentIndex >= 10
   );
 
   function initPlacementTest() {
     const lang = getSelectedLanguage();
     testText = lang?.sampleText || 'The quick brown fox jumps over the lazy dog.';
-    userInput = '';
+    typingState = initialTypingState();
     testStarted = false;
     testEnded = false;
     activeElapsedSeconds = 0;
@@ -210,36 +217,44 @@
 
     if (testEnded) return;
 
-    // Prevent default for printable characters
+    // An input method owns the keystroke; committed text is not available on
+    // this screen, so composition is left alone rather than mis-scored.
+    if (event.isComposing) return;
+
+    // Visual keyboard feedback, including keys that are never scored.
+    pressedKey = event.key.toLowerCase();
+
     if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
       event.preventDefault();
-
-      const expectedChar = testText[userInput.length];
-      const isCorrect = event.key === expectedChar;
-
-      // Update calculators
-      wpmCalculator.onKeystroke(event.code, isCorrect, Date.now());
-      accuracyCalculator.onKeystroke(event.code, isCorrect);
-
-      if (isCorrect) {
-        userInput += event.key;
-
-        // Highlight next key
-        const nextChar = testText[userInput.length];
-        if (nextChar) {
-          highlightKeys = new Set([nextChar.toLowerCase()]);
-        }
-      }
-
-      // (metrics refreshed by idleInterval)
-
-      // Check if test is complete
-      if (userInput.length >= testText.length) {
-        endTest();
-      }
     }
 
-    pressedKey = event.key.toLowerCase();
+    const result = scoreKeystrokeIfTyping(
+      typingState,
+      {
+        code: event.code,
+        key: event.key,
+        isComposing: event.isComposing,
+        keyCode: event.keyCode,
+      },
+      testPrompt,
+      currentLayout
+    );
+    if (result === null || result.attempts.length === 0) return;
+
+    for (const attempt of result.attempts) {
+      const code = testPrompt[attempt.expectedIndex]?.code ?? 'Unknown';
+      wpmCalculator.onKeystroke(code, attempt.correct, Date.now());
+      accuracyCalculator.onKeystroke(code, attempt.correct);
+    }
+
+    typingState = result.state;
+
+    const nextChar = testPrompt[typingState.currentIndex]?.grapheme;
+    if (nextChar) {
+      highlightKeys = new Set([nextChar.toLowerCase()]);
+    }
+
+    if (activityTextFinished(result.outcome)) endTest();
   }
 
   function handleKeyup() {
@@ -401,6 +416,22 @@
     const layoutId = $onboardingStore.selectedLayout || 'qwerty-us';
     return layouts[layoutId as keyof typeof layouts] || layouts['qwerty-us'];
   });
+
+  /**
+   * The placement test is scored by the same kernel the drills use, so it
+   * accepts the physical key the selected layout prints each sample character
+   * on rather than requiring the learner's OS layout to match the language.
+   */
+  const testPrompt = $derived(
+    createTypingPrompt(
+      Array.from(testText).map((char) => ({
+        char,
+        code: 'Unknown',
+        expectedFinger: 'left_thumb' as const,
+      })),
+      currentLayout,
+    ),
+  );
 
   // Metrics for display
   let metrics = $derived([
@@ -608,14 +639,15 @@
           <div class="typing-area bg-surface-container-low p-8 relative">
             <!-- Text Display -->
             <div class="font-body text-2xl leading-relaxed mb-8 min-h-[120px]">
-              {#each testText.split('') as char, i}
+              {#each testPrompt as unit, i}
                 <span
                   class="char"
-                  class:correct={i < userInput.length}
-                  class:current={i === userInput.length}
-                  class:pending={i > userInput.length}
+                  class:correct={i < typingState.currentIndex}
+                  class:error={typingState.errors.has(i)}
+                  class:current={i === typingState.currentIndex}
+                  class:pending={i > typingState.currentIndex}
                 >
-                  {char}
+                  {unit.grapheme}
                 </span>
               {/each}
             </div>
@@ -624,7 +656,7 @@
             <div class="w-full h-1 bg-surface-container-high mb-6">
               <div
                 class="h-full bg-primary transition-all duration-300"
-                style="width: {(userInput.length / testText.length) * 100}%"
+                style="width: {(typingState.currentIndex / Math.max(1, testPrompt.length)) * 100}%"
               ></div>
             </div>
 

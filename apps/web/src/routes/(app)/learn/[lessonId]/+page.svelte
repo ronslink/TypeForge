@@ -21,6 +21,19 @@
     WPMCalculator, 
     AccuracyTracker 
   } from '@typeforge/metrics';
+  import {
+    activityTextFinished,
+  } from '$lib/typing/activity-outcome';
+  import {
+    createTypingPrompt,
+    initialTypingState,
+    resolveTypingOutcome,
+    scoreCommittedText,
+    scoreKeystrokeIfTyping,
+    type TypingState,
+    type TypingStepResult,
+  } from '$lib/typing/typing-session';
+  import { getStrictInputDecision } from '$lib/typing/strict-typing';
   import { useClerkContext } from 'svelte-clerk';
   import { createApiClient } from '@typeforge/api/client';
   import { createAuthenticatedFetch } from '$lib/api/authenticated-fetch';
@@ -39,10 +52,7 @@
   const lesson = $derived(getLessonById(lessonId ?? ''));
 
   // Derived values needed early
-  const lessonText = $derived(lesson?.content.map((c) => c.char).join('') || '');
-  let currentIndex = $state(0);
   const lessonChars = $derived(lesson?.content || []);
-  const currentChar = $derived(lessonChars[currentIndex]);
   const language = $derived(lesson ? getLanguageByCode(lesson.language) : null);
 
 
@@ -67,8 +77,7 @@
   const isRTL = $derived(lesson?.rtl || language?.rtl || false);
 
   // Session state
-  // let currentIndex = $state(0); // MOVED UP
-  let errors = $state<Set<number>>(new Set());
+  let typingState = $state<TypingState>(initialTypingState());
   let isComplete = $state(false);
   let isStarted = $state(false);
   let showCelebration = $state(false);
@@ -126,6 +135,17 @@
   // Derived values
 
   const keyboardLayout = $derived(layouts[userLayout as keyof typeof layouts] || layouts['qwerty-us']);
+
+  /**
+   * The scorable prompt. Each curriculum unit keeps its position, and its
+   * expected physical key comes from the layout the learner is being shown, so
+   * the drill is answerable even when the operating-system layout differs from
+   * the target language.
+   */
+  const prompt = $derived(createTypingPrompt(lessonChars, keyboardLayout));
+  const currentIndex = $derived(typingState.currentIndex);
+  const errors = $derived(typingState.errors);
+  const currentChar = $derived(prompt[currentIndex]);
 
   // RTL-aware keyboard layout - swaps left/right finger assignments
   const rtlKeyboardLayout = $derived({
@@ -198,7 +218,7 @@
        highlightKeys = new Set([charData.char.toLowerCase()]);
     } else {
        if (currentChar) {
-         highlightKeys = new Set([currentChar.char.toLowerCase()]);
+         highlightKeys = new Set([currentChar.grapheme.toLowerCase()]);
        } else {
          highlightKeys = new Set();
        }
@@ -252,63 +272,103 @@
     
     if (isComplete) return;
 
+    // An input method owns the keystroke; its committed text is scored instead,
+    // so that a composing learner is not judged on the intermediate key.
+    if (event.isComposing) return;
+
     // Prevent default for typing keys
     if (event.key.length === 1 || event.key === 'Backspace') {
       event.preventDefault();
     }
 
-    if (event.key === 'Backspace') {
-      return; // Disabled in strict mode since cursor never advances on error
-    }
+    pressedKey = event.key.toLowerCase();
+
+    const result = scoreKeystrokeIfTyping(
+      typingState,
+      {
+        code: event.code,
+        key: event.key,
+        isComposing: event.isComposing,
+        keyCode: event.keyCode,
+      },
+      prompt,
+      keyboardLayout
+    );
+    if (result === null) return;
 
     if (!isStarted) {
       isStarted = true;
       startTime = Date.now();
     }
 
-    pressedKey = event.key.toLowerCase();
+    applyTypingResult(result);
+  }
 
-    const expectedChar = lessonChars[currentIndex];
-    if (!expectedChar) return;
+  /** Text an operating-system input method committed. */
+  function handleCommittedText(text: string) {
+    if (showIntroAnimation || isComplete || text.length === 0) return;
 
-    const typedChar = event.key;
-    const isCorrect = typedChar === expectedChar.char;
+    const result = scoreCommittedText(typingState, text, prompt);
+    if (result.attempts.length === 0) return;
 
-    // Record keystroke
-    const now = new Date().toISOString();
-    keystrokes.push({
-      character: typedChar,
-      expected: expectedChar.char,
-      correct: isCorrect,
-      timestamp: now,
-      keyDownAt: now,
-      finger: expectedChar.expectedFinger,
-    });
+    if (!isStarted) {
+      isStarted = true;
+      startTime = Date.now();
+    }
 
-    // Update metrics
-    wpmCalculator.onKeystroke(event.code, isCorrect, Date.now());
-    accuracyTracker.onKeystroke(event.code, isCorrect);
+    applyTypingResult(result);
+  }
 
-    if (isCorrect) {
-      previousStreak = currentStreak;
-      currentStreak++;
-      currentIndex++; // Only advance on correct keystroke
-    } else {
-      previousStreak = currentStreak;
-      currentStreak = 0;
-      errors.add(currentIndex);
-      errors = new Set(errors);
+  function applyTypingResult(result: TypingStepResult) {
+    const now = Date.now();
+    const timestamp = new Date(now).toISOString();
+    let correctInStep = 0;
+
+    for (const attempt of result.attempts) {
+      const unit = prompt[attempt.expectedIndex];
+      const code = unit?.code ?? 'Unknown';
+
+      keystrokes.push({
+        character: attempt.produced,
+        expected: attempt.expected,
+        correct: attempt.correct,
+        timestamp,
+        keyDownAt: timestamp,
+        finger: unit?.finger,
+      });
+
+      wpmCalculator.onKeystroke(code, attempt.correct, now);
+      accuracyTracker.onKeystroke(code, attempt.correct);
+      if (attempt.correct) correctInStep++;
+    }
+
+    previousStreak = currentStreak;
+    currentStreak =
+      result.state.currentIndex > typingState.currentIndex ? currentStreak + correctInStep : 0;
+    typingState = result.state;
+
+    for (const attempt of result.attempts) {
+      if (attempt.correct) continue;
       // Error flash
       errorFlash = true;
       setTimeout(() => { errorFlash = false; }, 160);
       // Announce error for screen readers
-      ariaLiveText = `Error: expected ${expectedChar.char}, typed ${typedChar}`;
+      ariaLiveText = `Error: expected ${attempt.expected}, typed ${attempt.produced}`;
+      break;
     }
 
-    // Check if lesson is complete
-    if (currentIndex >= lessonChars.length) {
-      completeLesson();
-    }
+    if (activityTextFinished(result.outcome)) completeLesson();
+  }
+
+  /**
+   * Student-initiated finish. The transition itself decides whether stopping is
+   * legal — it is rejected once the lesson text has been exhausted — so the
+   * button cannot record the same attempt twice.
+   */
+  function requestStop() {
+    const outcome = resolveTypingOutcome(typingState, prompt, 'user-stopped', isStarted);
+    if (outcome.kind !== 'user-stopped') return;
+    completeLesson();
   }
 
   function handleKeyUp() {
@@ -331,8 +391,7 @@
   $effect(() => {
     if (lessonId && lessonId !== _prevLessonId) {
       _prevLessonId = lessonId;
-      currentIndex = 0;
-      errors = new Set();
+      typingState = initialTypingState();
       isComplete = false;
       isStarted = false;
       showCelebration = false;
@@ -486,8 +545,7 @@
   }
 
   function restartLesson() {
-    currentIndex = 0;
-    errors = new Set();
+    typingState = initialTypingState();
     isComplete = false;
     isStarted = false;
     showCelebration = false;
@@ -680,12 +738,12 @@
         role="progressbar"
         aria-valuenow={currentIndex}
         aria-valuemin={0}
-        aria-valuemax={lessonChars.length}
+        aria-valuemax={prompt.length}
         aria-label="Typing progress"
       >
-        {#each Array(Math.ceil(lessonChars.length / 10)) as _, i}
+        {#each Array(Math.ceil(prompt.length / 10)) as _, i}
           {@const segStart = i * 10}
-          {@const segEnd   = Math.min((i + 1) * 10, lessonChars.length)}
+          {@const segEnd   = Math.min((i + 1) * 10, prompt.length)}
           {@const segDone  = Math.min(Math.max(currentIndex - segStart, 0), segEnd - segStart)}
           {@const pct      = Math.round((segDone / (segEnd - segStart)) * 100)}
           <div class="seg-track">
@@ -698,8 +756,8 @@
         {/each}
       </div>
       <div class="flex justify-between mt-2 text-xs text-on-surface-variant">
-        <span aria-label="Characters typed">{currentIndex} / {lessonChars.length} characters</span>
-        <span aria-label="Percent complete">{Math.round((currentIndex / lessonChars.length) * 100)}% complete</span>
+        <span aria-label="Characters typed">{currentIndex} / {prompt.length} characters</span>
+        <span aria-label="Percent complete">{Math.round((currentIndex / Math.max(1, prompt.length)) * 100)}% complete</span>
       </div>
     </div>
 
@@ -844,13 +902,15 @@
       {/if}
 
       <TypingInput 
-        text={lessonText} 
+        units={prompt} 
         {currentIndex} 
         {errors}
         {isRTL}
         language={lesson.language}
         class="min-h-[120px] {isRTL ? 'rtl-input' : ''}"
         onWordComplete={handleWordComplete}
+        onCommittedText={handleCommittedText}
+        onInputPolicy={getStrictInputDecision}
       />
       
       <!-- Focus hint -->
@@ -899,7 +959,7 @@
         {#if canStop}
           <button
             id="stop-finish-btn"
-            onclick={completeLesson}
+            onclick={requestStop}
             class="stop-btn font-label text-xs font-bold uppercase tracking-widest px-4 py-2
               border border-outline-variant/40 text-on-surface-variant
               hover:border-primary hover:text-primary transition-all duration-200"
@@ -929,7 +989,7 @@
       <!-- Live Finger Guide — always visible during lesson -->
       {#if isStarted && currentChar}
         <div class="live-hand-guide mt-4">
-          <HandGuide activeFinger={currentChar.expectedFinger} showLabels={true} />
+          <HandGuide activeFinger={currentChar.finger} showLabels={true} />
         </div>
       {/if}
 
