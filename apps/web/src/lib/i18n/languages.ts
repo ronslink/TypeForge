@@ -197,7 +197,7 @@ const MIDDLE_EAST_AFRICA: Language[] = [
     script: 'Arabic',
     keyboard: 'Arabic',
     rtl: true,
-    sampleText: 'نص حكيم له سرعان تسري به，就像是燃灯鱼.',
+    sampleText: 'نص حكيم له سر قاطع وذو شأن عظيم مكتوب على ثوب أخضر ومغلف بجلد أزرق.',
   },
   {
     code: 'he',
