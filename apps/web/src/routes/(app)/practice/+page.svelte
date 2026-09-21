@@ -603,14 +603,16 @@
               <p class="text-error text-sm mb-3">
                 {formatLocalizedFailureMessage(submitFailure, $t)}
               </p>
-              <button
-                type="button"
-                class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
-                disabled={isSubmitting}
-                onclick={() => void submitSession()}
-              >
-                {$t('recovery_retry_label')}
-              </button>
+              {#if submitFailure.outcome === 'verified_rejected'}
+                <button
+                  type="button"
+                  class="notched-button bg-primary-container text-on-primary-container px-5 py-2 font-label text-sm font-bold tracking-wider"
+                  disabled={isSubmitting}
+                  onclick={() => void submitSession()}
+                >
+                  {$t('recovery_retry_label')}
+                </button>
+              {/if}
             </div>
           {:else}
             <p class="text-on-surface-variant mb-6 text-sm">
