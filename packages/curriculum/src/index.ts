@@ -86,3 +86,16 @@ export {
   type AdaptiveLessonRequest,
   type AdaptiveLesson,
 } from './adaptive.js';
+
+// Language registry: the languages this product teaches, with native names,
+// scripts and RTL flags. Lives here rather than in the web app because the
+// database seed needs it too — `lessons.language_code` and
+// `keyboard_layouts.language_code` are foreign keys into `languages.code`.
+export {
+  ALL_LANGUAGES,
+  REGIONS,
+  getLanguagesByRegion,
+  getLanguageByCode,
+  type Language,
+  type Region,
+} from './languages.js';

@@ -27,6 +27,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@typeforge/layouts": "workspace:*",
     "@types/node": "^20.19.37",
     "@types/nodemailer": "^8.0.1",
     "typescript": "^5.7.3",

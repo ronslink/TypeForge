@@ -17,6 +17,10 @@
     "./testing": {
       "types": "./src/testing/index.ts",
       "default": "./src/testing/index.ts"
+    },
+    "./seed": {
+      "types": "./src/seed/index.ts",
+      "default": "./src/seed/index.ts"
     }
   },
   "scripts": {
@@ -24,6 +28,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/seed/cli.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
@@ -35,8 +40,11 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@typeforge/curriculum": "workspace:*",
+    "@typeforge/layouts": "workspace:*",
     "@types/node": "^20.17.12",
     "drizzle-kit": "^0.31.10",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^3.0.0"
   }

@@ -31,17 +31,25 @@
     },
     "db:generate": {
       "cache": false,
-      "outputs": ["packages/db/drizzle/**"]
+      "outputs": ["packages/db/drizzle/**"],
+      "env": ["DATABASE_URL"]
     },
     "db:migrate": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "db:push": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "db:studio": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
     }
   }
 }

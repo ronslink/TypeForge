@@ -110,9 +110,20 @@ credentials — the app refuses to serve requests without Clerk keys. Adding a
 script that cannot run is worse than not having one; see
 [`docs/completion-audit.md`](docs/completion-audit.md) for what it would take.
 
-There is also no seed script. Reference data (`languages`, `keyboard_layouts`,
-`lessons`) is not written to the database by anything today, which means lesson
-progress cannot be recorded — see the audit for details.
+### Seeding
+
+The lesson catalogue lives in code (`@typeforge/curriculum`), but the API resolves a
+lesson slug against the **database** when a session is submitted. Without those
+rows, `POST /sessions` cannot link a lesson and `user_progress` is never written —
+lesson completion would be tracked as nothing.
+
+```bash
+DATABASE_URL=postgresql://user:pass@host:5432/typeforge pnpm db:seed
+```
+
+It writes languages, keyboard layouts and all lessons from the catalogues, and is
+idempotent, so re-running is how you push catalogue changes. Run it after
+`pnpm db:migrate`.
 
 ## Project Structure
 

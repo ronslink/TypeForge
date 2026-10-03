@@ -157,21 +157,67 @@ actually is: Vercel's Git integration, with one deployable (the API is a SvelteK
 the web app, so it has no separate deployment). Note that `pnpm --filter <pkg> run <missing>`
 still exits 0 with "None of the selected packages has a … script" — pnpm's behaviour, not ours.
 
-### Two findings this round surfaced that need a decision
+### The curriculum now reaches the database
 
-1. **No curriculum data ever reaches the database.** Nothing in the repo inserts into `languages`,
-   `keyboard_layouts` or `lessons` — the only inserts anywhere are in the integration test. The
-   web app renders lessons from the in-code `LESSON_CATALOG`, so browsing works, but
-   `POST /sessions` resolves `lessonId` against the **database**, finds nothing, and sets
-   `internalLessonId = null`. The consequence is silent: no `user_progress` row is ever written,
-   `daily_stats.lessons_completed` stays 0, and anything depending on lesson completion (including
-   certificates) under-reports. This is a real functional gap, not a missing convenience.
+Finding 1 above is closed. `pnpm db:seed` writes the reference data the API needs.
 
-   A correct seed is its own task, not a one-line script: it must map
-   `LESSON_CATALOG[].difficulty` (numeric 1–4) onto the `lesson_difficulty` enum, order inserts so
-   `keyboard_layouts.language_code` satisfies its FK to `languages.code`, and source language
-   `name`/`nativeName` metadata that currently lives only in `apps/web/src/lib/i18n/languages.ts`
-   (outside any package the DB layer can import).
+The real catalogue is larger than the earlier estimate in this document: **298 lessons across 26
+languages**, not 136 across 10. The difference is `lesson-registry.ts` generating a per-language
+set at import time (lines ~700–745) on top of the ten hand-written language sets — every wordlist
+language has lessons.
+
+What was built:
+
+| Piece | Purpose |
+| --- | --- |
+| `packages/db/src/seed/reference-data.ts` | `seedReferenceData(db, data)` — dependency-free, idempotent upserts keyed on natural identity |
+| `packages/db/src/seed/from-catalog.ts` | Pure mapping: catalogue → rows, including the difficulty decision below |
+| `packages/db/src/seed/languages.ts` | Language rows derived from the registry, plus `en-US` |
+| `packages/db/src/seed/cli.ts` | `pnpm db:seed` |
+
+**The difficulty decision.** Three vocabularies were in play: the curriculum uses numeric
+`1`–`5` (documented "Difficulty level (1-5)"), the web app sends only three strings, and
+`lesson_difficulty` in Postgres has four values. There is no injective mapping, so level 5
+collapses into `expert`. That decision lives in exactly one exported table
+(`DIFFICULTY_BY_LEVEL`), and an unmapped level **throws** rather than defaulting — so adding a
+sixth level fails loudly instead of mislabelling new lessons as `beginner`. Revisit if difficulty
+filtering ever moves server-side; nothing reads the column today.
+
+**`en-US` is load-bearing.** `qwerty-us.json` is filed under `en-US` while every English lesson is
+filed under `en`, and `keyboard_layouts.language_code` is a foreign key — so the layouts cannot be
+seeded without an `en-US` row. This is exactly the kind of FK trap that a hand-written list would
+have hit at runtime.
+
+**The language registry moved into a package.** It now lives at
+`packages/curriculum/src/languages.ts` and `apps/web/src/lib/i18n/languages.ts` re-exports it, so
+the seed and the app cannot disagree about which languages exist. Two copies would have drifted.
+
+### A second broken-script bug, found by running the command
+
+`pnpm db:migrate`, `db:push`, `db:generate` and `db:studio` **could not see `DATABASE_URL`**.
+Turbo 2 defaults to `envMode: "strict"` and passes only declared variables, and `turbo.json`
+declared none — a turbo dry-run showed `"env": []`. Drizzle fell back to
+`postgresql://localhost:5432/typeforge` and the command failed with an unhelpful exit 1. The
+package-level script worked; the documented workspace-level one did not.
+
+Fixed by declaring `"env": ["DATABASE_URL"]` on those tasks (and adding a `db:seed` task). This was
+only visible by actually running the command — typecheck, lint and tests were all green throughout.
+
+### Migrations have now been applied to a real database
+
+First time, as far as the repository's history shows. Against a real PostgreSQL 16:
+
+- `pnpm db:migrate` applied all five migrations; `drizzle.__drizzle_migrations` records 5 rows.
+- Migration `0004`'s unique indexes exist, so the `ON CONFLICT` upserts in `POST /sessions` are
+  valid on real Postgres and not just in PGlite.
+- `pnpm db:seed` wrote **31 languages, 11 keyboard layouts, 298 lessons**; re-running left those
+  counts unchanged with zero duplicate `(language_code, slug)` pairs and zero dangling FKs.
+
+### One finding still needs a decision
+
+1. ~~**No curriculum data ever reaches the database.**~~ **Closed** — see "The curriculum now
+   reaches the database" above. The earlier text here also understated the catalogue: it is 298
+   lessons across 26 languages, and the difficulty mapping is 1–5 onto a four-value enum, not 1–4.
 
 2. **The app cannot serve a single request without Clerk credentials.**
    `hooks.server.ts` calls `requireEnv('PUBLIC_CLERK_PUBLISHABLE_KEY', …)` inside the request
@@ -202,13 +248,14 @@ still exits 0 with "None of the selected packages has a … script" — pnpm's b
 | `turbo run typecheck lint test --force` | **26/26 successful** | run locally, uncached |
 | Typecheck | 0 errors (`svelte-check`: 0 errors, 0 warnings) | same run |
 | Lint | 0 errors, **116 warnings** | same run |
-| Unit tests | **290 passing** across 24 files | per-package runs |
-| Postgres integration tests | **9 cases** over `POST /sessions` (PGlite) | §0.1 |
+| Unit tests | **291 passing** across 24 files | per-package runs |
+| Tests against a real Postgres engine | **15 cases** (PGlite): seeding, `POST /sessions`, lesson linking | §0.1 |
 | `apps/web` production build | **succeeds** | `pnpm --filter @typeforge/web run build` |
+| Migrations + seed on real PostgreSQL 16 | 5 migrations, 31 languages / 11 layouts / 298 lessons | §0.1 |
 | Error tracking | Sentry wired both sides; delivery verified by test | §0.1 |
 | `pnpm test:e2e` | **removed** — no longer advertised; see §0.1 | §0.1 |
 | `pnpm deploy:api` | **removed** — deployment is Vercel Git integration | §0.1 |
-| CI (GitHub) | green through run #102 | Actions API |
+| CI (GitHub) | green through run #103 | Actions API |
 
 Test distribution:
 
