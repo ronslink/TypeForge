@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
+    "@sentry/sveltekit": "^11.4.0",
     "@typeforge/api": "workspace:*",
     "@typeforge/curriculum": "workspace:*",
     "@typeforge/layouts": "workspace:*",

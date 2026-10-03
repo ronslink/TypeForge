@@ -1,6 +1,7 @@
-﻿import { withClerkHandler } from 'svelte-clerk/server';
+import { withClerkHandler } from 'svelte-clerk/server';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
+import * as Sentry from '@sentry/sveltekit';
 import { env as publicEnv } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
 import {
@@ -8,6 +9,39 @@ import {
   isUiLocale,
   type UiLocale,
 } from '$lib/i18n/locales';
+
+// Initialised at module scope, before `sentryHandle()` can run.
+//
+// This deliberately does not use `instrumentation.server.ts`: that file is
+// gated behind `kit.experimental.instrumentation.server` and requires adapter
+// support, whereas module-scope init here works on every adapter and still
+// happens before the first request is handled.
+Sentry.init({
+  dsn: privateEnv.SENTRY_DSN,
+  // With no DSN the SDK stays inert, so local development and CI need no
+  // configuration and nothing is sent anywhere by accident.
+  enabled: Boolean(privateEnv.SENTRY_DSN),
+  environment:
+    privateEnv.SENTRY_ENVIRONMENT ?? privateEnv.VERCEL_ENV ?? privateEnv.NODE_ENV ?? 'development',
+  ...(privateEnv.SENTRY_RELEASE ?? privateEnv.VERCEL_GIT_COMMIT_SHA
+    ? { release: privateEnv.SENTRY_RELEASE ?? privateEnv.VERCEL_GIT_COMMIT_SHA }
+    : {}),
+  // This product holds K-12 learner data and typing payloads. Sentry's defaults
+  // collect cookies, headers, HTTP bodies, bound database parameters and local
+  // variables; all of that is denied here. Stack traces, error messages and the
+  // SDK's structural metadata are still captured, which is what makes an event
+  // actionable.
+  dataCollection: {
+    userInfo: false,
+    cookies: false,
+    httpHeaders: false,
+    httpBodies: [],
+    urlQueryParams: false,
+    databaseQueryData: false,
+    stackFrameVariables: false,
+    genAI: { inputs: false, outputs: false },
+  },
+});
 
 /** Parse Accept-Language header and return the best matching supported locale */
 function detectLocale(acceptLanguage: string | null): UiLocale {
@@ -100,4 +134,12 @@ const authGuard: Handle = async ({ event, resolve }) => {
   });
 };
 
-export const handle = sequence(clerkHandler, authGuard);
+// `sentryHandle()` runs first so that tracing wraps the whole request, including
+// the Clerk handler and the auth guard. Sentry is initialised at module scope
+// above, which is what this requires.
+export const handle = sequence(Sentry.sentryHandle(), clerkHandler, authGuard);
+
+// Reports errors thrown in `handle`, `load` and server routes. The API's own
+// failures are reported separately from `routes/api/[...paths]/+server.ts`,
+// because the Hono error handler converts them into responses.
+export const handleError = Sentry.handleErrorWithSentry();

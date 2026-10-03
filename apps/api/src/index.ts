@@ -4,6 +4,7 @@
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
@@ -13,6 +14,7 @@ import { prettyJSON } from 'hono/pretty-json';
 import { authMiddleware } from './middleware/auth.js';
 import { dbMiddleware } from './middleware/regional-routing.js';
 import { rateLimits } from './middleware/ratelimit.js';
+import { reportApiError } from './error-reporter.js';
 
 // Routes
 import {
@@ -105,9 +107,23 @@ app.notFound((c) => {
   return c.json({ error: 'Not Found', code: 'NOT_FOUND' }, 404);
 });
 
-// Error handler
-app.onError((err, c) => {
+/**
+ * The production error handler.
+ *
+ * Exported so it can be tested directly: the interesting behaviour (reporting
+ * the error, and keeping server detail out of production responses) must not
+ * depend on being able to provoke a real 500 through the middleware chain.
+ */
+export function handleApiError(err: Error, c: Context) {
   console.error('API Error:', err);
+
+  // Hand the error to whatever reporter is installed (the host app wires Sentry
+  // here). Hono's onError swallows the throw into a JSON response, so without
+  // this explicit call API failures would never reach error tracking.
+  reportApiError(err, {
+    path: c.req.path,
+    method: c.req.method,
+  });
 
   const isDev = process.env.NODE_ENV === 'development';
 
@@ -120,6 +136,15 @@ app.onError((err, c) => {
     },
     500
   );
-});
+}
+
+app.onError(handleApiError);
 
 export default app;
+export {
+  setApiErrorReporter,
+  reportApiError,
+  hasApiErrorReporter,
+  type ApiErrorReporter,
+  type ApiErrorContext,
+} from './error-reporter.js';
