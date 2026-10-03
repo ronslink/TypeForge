@@ -108,6 +108,27 @@ keystrokes and K-12 data; those must not leave the process. With no `SENTRY_DSN`
 Delivery is verified, not assumed: a test drives the real SDK with a capture transport and
 asserts that an API error produces an event containing the message, path and method.
 
+### The declared audio assets now exist
+
+§3.7 below is now half-resolved. `packages/assets/src/sounds/index.ts` declared 20
+`/assets/sounds/...` URLs and **none** of the files existed; `SoundManager` had no consumer either.
+
+`scripts/generate-sounds.mjs` now synthesises all 15 sounds (5 categories × 3 themes; `custom` is
+a user-supplied slot and `silent` is the empty string, so neither is generated) and encodes them
+with `ffmpeg`/libmp3lame. They land in `apps/web/static/assets/sounds/`, which is where SvelteKit
+can actually serve them from — so the declared URLs are true rather than aspirational.
+
+The generator enforces the spec in `packages/assets/static/sounds/README.md` (44.1kHz mono,
+128/192kbps, −3dBFS peak, per-category durations) and fails if a file is out of spec. It also
+cross-checks every path declared in `sounds/index.ts` against what is on disk, so "declared but
+absent" cannot reopen quietly. Verified in real Chromium: all 15 decode through
+`decodeAudioData`, served as `audio/mpeg`, none silent. The ambient beds' loop claim was measured
+rather than assumed — the jump across the loop point is smaller than the steepest slope inside it.
+
+Two honest caveats: these are **synthesised tones, not recordings**, and **nothing plays them
+yet** — `SoundManager` still has no consumer and `user_preferences.sound_enabled` defaults to
+false, so wiring playback is a separate product decision.
+
 ### Two things to know about this work
 
 1. **A latent ambiguity is now enforced rather than hidden.** `lessons` is unique on
