@@ -113,12 +113,52 @@ sessions is honest; backfilling derived history would be inventing it.
 
 ### 6. Point the application at it
 
-- Set `DATABASE_URL` in Vercel, using the **pooled** port `25061`.
-- Add Vercel's egress to the cluster's trusted sources, or the app cannot connect:
-  serverless IPs are dynamic, so this normally means `0.0.0.0/0` (TLS plus a strong
-  password is the standard mitigation) or a proxy in front.
-- Redeploy. `apps/web/src/routes/api/[...paths]/+server.ts` builds the client from
-  `DATABASE_URL`, so no code change is required.
+**Chosen approach: front the cluster with a proxy.**
+
+DO's trusted sources are IP-based, and Vercel's serverless egress IPs are dynamic,
+so the application cannot reach the cluster directly. Instead, traffic goes through
+a proxy on a static IP that *is* in the trusted sources:
+
+```
+Vercel function ──TLS──▶ proxy (static IP, trusted) ──TLS──▶ DO managed Postgres
+                          PgBouncer, transaction mode
+```
+
+The proxy does double duty: it gives a stable source IP, and it multiplexes the
+many short-lived serverless connections onto a small number of server connections.
+That second job matters as much as the first — each function instance opens its own
+pool, and without a pooler a traffic spike exhausts the cluster's connection limit.
+
+Requirements:
+
+- **A dedicated proxy host**, not the Hetzner box. That machine just filled its root
+  filesystem and hosts unrelated production workloads; a database hop should not
+  depend on it. A small droplet with a static IP added to the cluster's trusted
+  sources is enough.
+- **TLS on both legs.** `client_tls_sslmode=require` on the proxy, and
+  `sslmode=require` on the proxy's connection to DO.
+- **`prepare: false` on the application client.** This is not optional and is now
+  the default in `packages/db/src/client.ts`. PgBouncer in transaction mode binds a
+  client connection to a server connection only for the duration of a transaction,
+  so a named prepared statement can be executed against a connection that never
+  prepared it. That fails at query time, not connect time — it looks fine until
+  production traffic arrives.
+- **A small per-instance pool.** `createDb` defaults to `max: 5`; raise it with
+  `DB_POOL_MAX` only if a workload needs it.
+- **Monitoring and a failure plan.** The proxy is a single point of failure and
+  adds a hop. Either make it redundant or accept that a proxy outage takes the
+  application down, and alert on it.
+
+Then set `DATABASE_URL` in Vercel to the **proxy's** pooled port, redeploy, and
+confirm the application connects:
+`apps/web/src/routes/api/[...paths]/+server.ts` builds the client from
+`DATABASE_URL`, so no code change is required.
+
+**Alternative worth costing before building the proxy:** Vercel Secure Compute
+provides static egress IPs. If that is available on the current plan, adding those
+IPs to the cluster's trusted sources removes the proxy, the extra hop and the extra
+single point of failure entirely. It is usually the cheaper option once the proxy
+host, its monitoring and its redundancy are counted.
 
 ### 7. Close the tunnel
 
