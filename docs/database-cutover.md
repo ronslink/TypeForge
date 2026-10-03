@@ -113,52 +113,58 @@ sessions is honest; backfilling derived history would be inventing it.
 
 ### 6. Point the application at it
 
-**Chosen approach: front the cluster with a proxy.**
+**TLS is not an alternative to a proxy.** They solve different problems, and both
+are needed:
 
-DO's trusted sources are IP-based, and Vercel's serverless egress IPs are dynamic,
-so the application cannot reach the cluster directly. Instead, traffic goes through
-a proxy on a static IP that *is* in the trusted sources:
+- **TLS** encrypts the connection. DigitalOcean requires it, so it is not optional
+  either way.
+- **A proxy, static egress IPs, or an open allowlist** solve *reachability*: DO
+  restricts connections by source IP ("trusted sources"), and Vercel's serverless
+  egress IPs are dynamic.
+
+So the only open question is how the application gets past the IP allowlist.
+
+**A detail that will otherwise bite at cutover:** postgres-js defaults to
+`ssl: false` and only enables TLS when `sslmode` appears in the connection string.
+Managed Postgres refuses an unencrypted connection, so a `DATABASE_URL` without
+`sslmode` fails with an error about encryption rather than about the missing
+parameter. `createDb` now logs a warning in that case; the value must still be set.
 
 ```
-Vercel function ──TLS──▶ proxy (static IP, trusted) ──TLS──▶ DO managed Postgres
-                          PgBouncer, transaction mode
+postgresql://<user>:<password>@<host>:25061/typeforge?sslmode=require
 ```
 
-The proxy does double duty: it gives a stable source IP, and it multiplexes the
-many short-lived serverless connections onto a small number of server connections.
-That second job matters as much as the first — each function instance opens its own
-pool, and without a pooler a traffic spike exhausts the cluster's connection limit.
+`sslmode=require` encrypts but does not verify the certificate. Verification
+(`verify-full`) needs the provider's CA supplied to the client, which the current
+`createDb(connectionString)` signature cannot express — that would be a small code
+change. Encryption without verification still defeats passive interception; treat
+`verify-full` as a worthwhile follow-up, not a blocker.
 
-Requirements:
+#### Reachability options
 
-- **A dedicated proxy host**, not the Hetzner box. That machine just filled its root
-  filesystem and hosts unrelated production workloads; a database hop should not
-  depend on it. A small droplet with a static IP added to the cluster's trusted
-  sources is enough.
-- **TLS on both legs.** `client_tls_sslmode=require` on the proxy, and
-  `sslmode=require` on the proxy's connection to DO.
-- **`prepare: false` on the application client.** This is not optional and is now
-  the default in `packages/db/src/client.ts`. PgBouncer in transaction mode binds a
-  client connection to a server connection only for the duration of a transaction,
-  so a named prepared statement can be executed against a connection that never
-  prepared it. That fails at query time, not connect time — it looks fine until
-  production traffic arrives.
-- **A small per-instance pool.** `createDb` defaults to `max: 5`; raise it with
-  `DB_POOL_MAX` only if a workload needs it.
-- **Monitoring and a failure plan.** The proxy is a single point of failure and
-  adds a hop. Either make it redundant or accept that a proxy outage takes the
-  application down, and alert on it.
+**Trusted sources are configured per cluster, not per database.** The cluster also
+serves `paykey`, so whatever is chosen here changes `paykey`'s exposure too. That
+rules out casually opening the cluster to the internet.
 
-Then set `DATABASE_URL` in Vercel to the **proxy's** pooled port, redeploy, and
-confirm the application connects:
-`apps/web/src/routes/api/[...paths]/+server.ts` builds the client from
-`DATABASE_URL`, so no code change is required.
+| Option | Mechanism | Trade-off |
+| --- | --- | --- |
+| **A. Separate DO cluster for TypeForge** | Its own cluster, so its own trusted sources and blast radius | ~$15/mo. Then the allowlist can be widened for this cluster alone, or static IPs used, without touching `paykey`. Cleanest isolation, and defensible given TypeForge will hold K-12 learner data while `paykey` handles payments |
+| **B. Vercel Secure Compute** | Static egress IPs added to this cluster's trusted sources; connect directly, TLS only | No proxy, no extra hop, no extra point of failure. Costs money and depends on plan availability. **Preferred if available** |
+| **C. Self-managed proxy** | PgBouncer on a small droplet with a static IP in trusted sources; Vercel connects to the proxy | Works without Secure Compute, and multiplexes serverless connections. Costs another host to run, patch and monitor, plus a hop and a single point of failure. Do **not** put it on the Hetzner box |
+| **D. Open the cluster to `0.0.0.0/0`** | Connect directly with TLS | Zero infrastructure, but exposes `paykey`'s database to the internet too. Only reasonable on a dedicated cluster (option A) |
 
-**Alternative worth costing before building the proxy:** Vercel Secure Compute
-provides static egress IPs. If that is available on the current plan, adding those
-IPs to the cluster's trusted sources removes the proxy, the extra hop and the extra
-single point of failure entirely. It is usually the cheaper option once the proxy
-host, its monitoring and its redundancy are counted.
+**Recommendation:** B if the plan allows it. Otherwise C on a dedicated droplet, or
+A — which is worth costing anyway, because it also removes the shared-cluster
+blast radius and gives TypeForge its own credentials and backup policy.
+
+#### Whichever is chosen
+
+- Keep the allowlist as narrow as it can be. "Open to the world" is a decision
+  about `paykey` as much as about TypeForge.
+- Use the **pooled** port (`25061`) or a pooler in front.
+- Set `DATABASE_URL` in Vercel, redeploy, and confirm the application connects.
+  `apps/web/src/routes/api/[...paths]/+server.ts` builds the client from
+  `DATABASE_URL`, so no code change is required.
 
 ### 7. Close the tunnel
 

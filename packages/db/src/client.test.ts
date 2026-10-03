@@ -8,7 +8,7 @@
  * until production traffic arrives.
  */
 import { afterEach, describe, expect, it } from 'vitest';
-import { poolerConnectionOptions } from './client.js';
+import { poolerConnectionOptions, tlsWarningFor } from './client.js';
 
 const original = process.env.DB_POOL_MAX;
 
@@ -52,5 +52,32 @@ describe('poolerConnectionOptions', () => {
     expect(options.idle_timeout).toBe(30);
     expect(options.connect_timeout).toBe(10);
     expect(poolerConnectionOptions(3).idle_timeout).toBe(20);
+  });
+});
+
+describe('tlsWarningFor', () => {
+  it('warns when a remote connection string carries no sslmode', () => {
+    const warning = tlsWarningFor('postgresql://user:pw@db.example.com:25060/typeforge');
+    expect(warning).toMatch(/no sslmode/);
+  });
+
+  it('accepts a remote connection string with sslmode=require', () => {
+    expect(
+      tlsWarningFor('postgresql://user:pw@db.example.com:25060/typeforge?sslmode=require')
+    ).toBeNull();
+  });
+
+  it('accepts sslmode when it is not the first query parameter', () => {
+    expect(
+      tlsWarningFor('postgresql://user:pw@db.example.com/db?application_name=x&sslmode=verify-full')
+    ).toBeNull();
+  });
+
+  it.each([
+    'postgresql://postgres:pw@localhost:5432/typeforge',
+    'postgresql://postgres:pw@127.0.0.1:55434/typeforge',
+    'postgresql://postgres:pw@host.docker.internal:15432/typeforge',
+  ])('exempts local databases, which have no TLS to offer (%s)', (url) => {
+    expect(tlsWarningFor(url)).toBeNull();
   });
 });

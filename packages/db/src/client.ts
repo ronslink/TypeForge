@@ -48,12 +48,50 @@ export function poolerConnectionOptions(
 }
 
 /**
+ * Detect a connection string that will be attempted without TLS.
+ *
+ * postgres-js defaults to `ssl: false` and only turns TLS on when `sslmode` is
+ * present in the connection string. Managed Postgres (DigitalOcean) *requires*
+ * TLS, so omitting it does not degrade gracefully — the connection is refused,
+ * and the error at that point is about encryption, not about the missing
+ * parameter that caused it.
+ *
+ * Local and docker-hosted databases legitimately have no TLS, so they are exempt.
+ *
+ * @returns a warning to log, or null when the string is fine.
+ */
+export function tlsWarningFor(connectionString: string): string | null {
+  const isLocal =
+    /@(localhost|127\.0\.0\.1|\[::1\]|host\.docker\.internal|postgres)[:/]/.test(connectionString);
+  if (isLocal) return null;
+  if (/[?&]sslmode=/.test(connectionString)) return null;
+
+  return (
+    'DATABASE_URL has no sslmode. postgres-js defaults to ssl:false, and managed ' +
+    'Postgres rejects unencrypted connections. Append ?sslmode=require (or ' +
+    'verify-full with the provider CA) to the connection string.'
+  );
+}
+
+/** Warn once per process rather than on every client construction. */
+let warnedAboutTls = false;
+
+function warnAboutMissingTls(connectionString: string): void {
+  if (warnedAboutTls) return;
+  const warning = tlsWarningFor(connectionString);
+  if (!warning) return;
+  warnedAboutTls = true;
+  console.warn(warning);
+}
+
+/**
  * Create a database client using a standard Postgres connection string
  *
  * @param connectionString - PostgreSQL connection string
  * @returns Typed Drizzle ORM client
  */
 export function createDb(connectionString: string): DbClient {
+  warnAboutMissingTls(connectionString);
   return drizzle(postgres(connectionString, poolerConnectionOptions(5)), { schema });
 }
 
@@ -64,6 +102,7 @@ export function createDb(connectionString: string): DbClient {
  * @returns Typed Drizzle ORM client (read-only)
  */
 export function createReadReplicaDb(connectionString: string): DbClient {
+  warnAboutMissingTls(connectionString);
   return drizzle(
     postgres(connectionString, poolerConnectionOptions(3, { idleTimeoutSeconds: 30 })),
     { schema }
