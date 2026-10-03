@@ -35,6 +35,8 @@
     "db:migrate": "turbo run db:migrate --filter=@typeforge/db",
     "db:push": "turbo run db:push --filter=@typeforge/db",
     "db:studio": "turbo run db:studio --filter=@typeforge/db",
+    "sounds:generate": "node scripts/generate-sounds.mjs",
+    "sounds:check": "node scripts/generate-sounds.mjs --check",
     "deploy:api": "turbo run deploy --filter=@typeforge/api",
     "deploy:web": "turbo run deploy --filter=@typeforge/web",
     "seo:indexnow": "node scripts/submit-indexnow.mjs"
