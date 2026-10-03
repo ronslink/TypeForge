@@ -26,10 +26,6 @@
     "test:unit": {
       "dependsOn": ["^build"]
     },
-    "test:e2e": {
-      "dependsOn": ["^build"],
-      "outputs": ["playwright-report/**"]
-    },
     "clean": {
       "cache": false
     },
@@ -46,10 +42,6 @@
     "db:studio": {
       "cache": false,
       "persistent": true
-    },
-    "deploy": {
-      "dependsOn": ["build"],
-      "cache": false
     }
   }
 }

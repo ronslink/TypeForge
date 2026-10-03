@@ -87,6 +87,33 @@ pnpm lint
 pnpm test
 ```
 
+### Deployment
+
+There is **one** deployable. The Hono API is mounted as a SvelteKit fallback
+(`apps/web/src/routes/api/[...paths]/+server.ts`), so it ships inside the web app
+rather than separately.
+
+Deploys happen through Vercel's Git integration on push. `vercel.json` at the repo
+root defines the build (`pnpm --filter @typeforge/web build`) and the `fra1`
+region. To deploy manually, use the Vercel CLI (a prerequisite listed above):
+
+```bash
+vercel deploy          # preview
+vercel deploy --prod   # production
+```
+
+### Not set up, deliberately
+
+There is no `test:e2e` script. End-to-end tests need three things this repository
+does not have in CI: Playwright browsers, a seeded database, and Clerk test
+credentials — the app refuses to serve requests without Clerk keys. Adding a
+script that cannot run is worse than not having one; see
+[`docs/completion-audit.md`](docs/completion-audit.md) for what it would take.
+
+There is also no seed script. Reference data (`languages`, `keyboard_layouts`,
+`lessons`) is not written to the database by anything today, which means lesson
+progress cannot be recorded — see the audit for details.
+
 ## Project Structure
 
 ```

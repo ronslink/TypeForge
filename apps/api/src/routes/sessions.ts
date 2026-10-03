@@ -113,19 +113,10 @@ function calculateSessionXP(payload: SessionPayload): number {
 }
 
 /**
- * Update user streak
+ * Read the user's daily streak row, if it exists.
  */
-async function updateUserStreak(
-  db: ReturnType<typeof getDb>,
-  userId: string
-): Promise<number> {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  // Get existing streak
-  const [existingStreak] = await db
+async function readDailyStreak(db: ReturnType<typeof getDb>, userId: string) {
+  const [row] = await db
     .select({
       id: streaks.id,
       currentStreak: streaks.currentStreak,
@@ -136,16 +127,54 @@ async function updateUserStreak(
     .where(and(eq(streaks.userId, userId), eq(streaks.type, 'daily')))
     .limit(1);
 
+  return row;
+}
+
+/**
+ * Update user streak
+ *
+ * `streaks` is unique on (user_id, type), so a first submission is an
+ * insert-or-lose-a-race rather than a plain insert. `onConflictDoNothing` makes
+ * the loser re-read the winner's row instead of failing the whole submission
+ * with a 23505.
+ */
+async function updateUserStreak(
+  db: ReturnType<typeof getDb>,
+  userId: string
+): Promise<number> {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  let existingStreak = await readDailyStreak(db, userId);
+
   if (!existingStreak) {
-    // Create new streak
-    await db.insert(streaks).values({
-      userId,
-      type: 'daily',
-      currentStreak: 1,
-      longestStreak: 1,
-      lastActivityAt: now,
-    });
-    return 1;
+    const [inserted] = await db
+      .insert(streaks)
+      .values({
+        userId,
+        type: 'daily',
+        currentStreak: 1,
+        longestStreak: 1,
+        lastActivityAt: now,
+      })
+      .onConflictDoNothing()
+      .returning({
+        id: streaks.id,
+        currentStreak: streaks.currentStreak,
+        longestStreak: streaks.longestStreak,
+        lastActivityAt: streaks.lastActivityAt,
+      });
+    if (inserted) return inserted.currentStreak;
+
+    // Another request created the row first; continue with what it wrote.
+    existingStreak = await readDailyStreak(db, userId);
+    if (!existingStreak) {
+      // The row disappeared between the conflicting insert and the re-read.
+      // Report a streak of one rather than failing an otherwise good session.
+      return 1;
+    }
   }
 
   const lastActivity = new Date(existingStreak.lastActivityAt);
@@ -185,6 +214,9 @@ async function updateUserStreak(
 
 /**
  * Update user XP
+ *
+ * `user_xp` is keyed by user_id, so the same insert race applies; losing it
+ * means the winner's row must be read back and the XP added to it.
  */
 async function updateUserXP(
   db: ReturnType<typeof getDb>,
@@ -193,29 +225,59 @@ async function updateUserXP(
 ): Promise<{ totalXp: number; currentLevel: number }> {
   const now = new Date();
 
-  // Get existing XP record
-  const [existingXp] = await db
-    .select({
-      totalXp: userXp.totalXp,
-      currentLevel: userXp.currentLevel,
-      xpToNextLevel: userXp.xpToNextLevel,
-    })
-    .from(userXp)
-    .where(eq(userXp.userId, userId))
-    .limit(1);
+  let existingXp = (
+    await db
+      .select({
+        totalXp: userXp.totalXp,
+        currentLevel: userXp.currentLevel,
+        xpToNextLevel: userXp.xpToNextLevel,
+      })
+      .from(userXp)
+      .where(eq(userXp.userId, userId))
+      .limit(1)
+  )[0];
 
   if (!existingXp) {
-    // Create new XP record
     const initialLevel = 1;
     const xpToNext = 100;
-    await db.insert(userXp).values({
-      userId,
-      totalXp: xpEarned,
-      currentLevel: initialLevel,
-      xpToNextLevel: xpToNext,
-      updatedAt: now,
-    });
-    return { totalXp: xpEarned, currentLevel: initialLevel };
+    const [inserted] = await db
+      .insert(userXp)
+      .values({
+        userId,
+        totalXp: xpEarned,
+        currentLevel: initialLevel,
+        xpToNextLevel: xpToNext,
+        updatedAt: now,
+      })
+      .onConflictDoNothing()
+      .returning({
+        totalXp: userXp.totalXp,
+        currentLevel: userXp.currentLevel,
+        xpToNextLevel: userXp.xpToNextLevel,
+      });
+
+    if (inserted) {
+      return { totalXp: inserted.totalXp, currentLevel: inserted.currentLevel };
+    }
+
+    // Another request created the row first; add this session's XP to it.
+    existingXp = (
+      await db
+        .select({
+          totalXp: userXp.totalXp,
+          currentLevel: userXp.currentLevel,
+          xpToNextLevel: userXp.xpToNextLevel,
+        })
+        .from(userXp)
+        .where(eq(userXp.userId, userId))
+        .limit(1)
+    )[0];
+
+    if (!existingXp) {
+      // Vanished between the conflicting insert and the re-read; the session
+      // still counts, so award the XP that started this call.
+      return { totalXp: xpEarned, currentLevel: 1 };
+    }
   }
 
   // Calculate new XP and level
@@ -399,21 +461,40 @@ app.post('/', async (c) => {
 
   const now = new Date();
 
-  // Convert payload.lessonId (slug) to internal DB UUID if necessary
+  // Convert payload.lessonId (slug) to internal DB UUID if necessary.
+  //
+  // Lesson slugs are unique per language (`lessons_language_slug_unique`), not
+  // globally, so the lookup has to consider the language. Resolving on slug
+  // alone would credit the learner against another language's lesson.
   let internalLessonId: string | null = null;
   if (payload.lessonId) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.lessonId);
     if (isUuid) {
       internalLessonId = payload.lessonId;
     } else {
-      const [dbLesson] = await db
-        .select({ id: lessons.id })
+      const candidates = await db
+        .select({ id: lessons.id, languageCode: lessons.languageCode })
         .from(lessons)
-        .where(eq(lessons.slug, payload.lessonId))
-        .limit(1);
-      
-      if (dbLesson) {
-        internalLessonId = dbLesson.id;
+        .where(eq(lessons.slug, payload.lessonId));
+
+      const matchingLanguage = candidates.find(
+        (candidate) => candidate.languageCode === payload.language
+      );
+
+      if (matchingLanguage) {
+        internalLessonId = matchingLanguage.id;
+      } else if (candidates.length === 1) {
+        // A client that sends a language the lesson is not filed under is still
+        // unambiguous when only one lesson carries that slug.
+        internalLessonId = candidates[0]!.id;
+      } else if (candidates.length > 1) {
+        // Refuse rather than guess: recording progress against the wrong
+        // language's lesson is worse than not recording it.
+        console.warn(
+          `Lesson slug '${payload.lessonId}' exists in ${candidates.length} languages ` +
+            `(${candidates.map((candidate) => candidate.languageCode).join(', ')}) and none ` +
+            `matches '${payload.language}'; not linking lesson progress`
+        );
       } else {
         console.warn(`Lesson slug '${payload.lessonId}' not found in DB lessons table`);
       }

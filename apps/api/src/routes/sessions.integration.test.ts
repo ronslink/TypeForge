@@ -12,6 +12,7 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Hono } from 'hono';
+import { eq } from 'drizzle-orm';
 import type { AuthState } from '@typeforge/auth';
 import { createTestDatabase, type TestDatabase } from '@typeforge/db/testing';
 import {
@@ -35,6 +36,8 @@ const SETUP_TIMEOUT = 120_000;
 let testDb: TestDatabase;
 let userId: string;
 let lessonId: string;
+/** The same slug as `lessonId`, but filed under a different language. */
+let germanLessonId: string;
 
 function buildApp(db: TestDatabase['db'], authUserId: string): Hono {
   const app = new Hono();
@@ -124,6 +127,18 @@ beforeAll(async () => {
     .values({ languageCode: 'en', title: 'Integration lesson', slug: 'test-lesson' })
     .returning({ id: lessons.id });
   lessonId = lesson!.id;
+
+  // Deliberately the same slug under another language. Lesson slugs are only
+  // unique per language, so this is what makes the slug lookup ambiguous if it
+  // ignores the language.
+  await testDb.db
+    .insert(languages)
+    .values({ code: 'de', name: 'German', nativeName: 'Deutsch', script: 'Latin' });
+  const [germanLesson] = await testDb.db
+    .insert(lessons)
+    .values({ languageCode: 'de', title: 'Integrationslektion', slug: 'test-lesson' })
+    .returning({ id: lessons.id });
+  germanLessonId = germanLesson!.id;
 }, SETUP_TIMEOUT);
 
 afterAll(async () => {
@@ -281,5 +296,73 @@ describe('POST /sessions (integration)', () => {
     expect(response.status).toBe(400);
     expect(((await response.json()) as { code: string }).code).toBe('VALIDATION_ERROR');
     expect(await sessionCount()).toBe(before);
+  });
+
+  it('links lesson progress to the lesson in the submitted language', async () => {
+    // 'test-lesson' exists in both 'en' and 'de'. Resolving on slug alone picks
+    // whichever row the planner returns first, so this fails if the lookup stops
+    // using the language.
+    const response = await postSession(
+      sessionPayload({ language: 'de', lessonId: 'test-lesson' })
+    );
+    expect(response.status).toBe(201);
+
+    const germanProgress = await testDb.db
+      .select({ lessonId: userProgress.lessonId })
+      .from(userProgress)
+      .where(eq(userProgress.lessonId, germanLessonId));
+    expect(germanProgress).toHaveLength(1);
+
+    const englishProgress = await testDb.db
+      .select({ lessonId: userProgress.lessonId })
+      .from(userProgress)
+      .where(eq(userProgress.lessonId, lessonId));
+    // Still only the row from the first English test, not a new German one.
+    expect(englishProgress).toHaveLength(1);
+  });
+
+  it('accepts two concurrent first sessions for a new user without failing', async () => {
+    // A brand-new user has no streak or XP row, which is precisely when the old
+    // select-then-insert raced: both requests saw nothing, both inserted, and the
+    // loser hit the unique index on (user_id, type) and returned 500.
+    const [fresh] = await testDb.db
+      .insert(users)
+      .values({
+        clerkId: 'user_concurrent_first_session',
+        email: 'concurrent@example.test',
+        homeRegion: 'EU',
+        role: 'learner',
+      })
+      .returning({ id: users.id });
+    const freshUserId = fresh!.id;
+
+    const app = buildApp(testDb.db, freshUserId);
+    const submit = (key: string) =>
+      app.request('/api/v1/sessions', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'Idempotency-Key': key },
+        body: JSON.stringify(sessionPayload({ language: 'en' })),
+      });
+
+    const [first, second] = await Promise.all([
+      submit('session:concurrent:aaaaaaaa'),
+      submit('session:concurrent:bbbbbbbb'),
+    ]);
+
+    expect([first.status, second.status]).toEqual([201, 201]);
+
+    const streakRows = await testDb.db
+      .select({ id: streaks.id, currentStreak: streaks.currentStreak })
+      .from(streaks)
+      .where(eq(streaks.userId, freshUserId));
+    expect(streakRows).toHaveLength(1);
+    expect(streakRows[0]!.currentStreak).toBe(1);
+
+    const xpRows = await testDb.db
+      .select({ totalXp: userXp.totalXp })
+      .from(userXp)
+      .where(eq(userXp.userId, freshUserId));
+    expect(xpRows).toHaveLength(1);
+    expect(xpRows[0]!.totalXp).toBeGreaterThan(0);
   });
 });

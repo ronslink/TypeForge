@@ -129,22 +129,69 @@ Two honest caveats: these are **synthesised tones, not recordings**, and **nothi
 yet** — `SoundManager` still has no consumer and `user_preferences.sound_enabled` defaults to
 false, so wiring playback is a separate product decision.
 
-### Two things to know about this work
+### P0 items 1–3 closed
 
-1. **A latent ambiguity is now enforced rather than hidden.** `lessons` is unique on
-   `(language_code, slug)`, but `apps/api/src/routes/sessions.ts` resolves `payload.lessonId` by
-   `slug` alone with `.limit(1)`. With more than one language seeded, a learner can be credited
-   against the wrong language's lesson. This was previously unconstrained; it is now a
-   constraint that makes the intent explicit. **Not yet fixed** — the lookup should include the
-   language.
+The four items left open at the end of the previous round are resolved, except where noted.
 
-2. **A concurrency race now surfaces as a 500 instead of a duplicate row.** `updateUserStreak`
-   and `updateUserXP` do select-then-insert with no upsert and no locking. Before migration
-   `0004` a concurrent first submission silently created duplicate rows; now the unique index
-   rejects the second insert with `23505`. The client's idempotency key already prevents the
-   common retry case (same key replays instead of re-executing), so this only bites two distinct
-   sessions submitted simultaneously by a brand-new user — but the correct fix is
-   `onConflictDoNothing()` plus a re-read, or an atomic upsert. **Not yet fixed.**
+**Lesson lookup is language-aware.** `sessions.ts` now resolves `payload.lessonId` by
+`(slug, language)` first, falls back to a slug match only when exactly one lesson carries that
+slug, and refuses (rather than guessing) when several languages share it and none matches. The
+regression test seeds the same slug under `en` and `de`; with the previous slug-only lookup it
+fails, which is how the test was shown to have teeth.
+
+**Streak and XP writes are race-safe.** Both inserts now use `onConflictDoNothing().returning()`
+and re-read on conflict, so losing the race adds to the winner's row instead of failing. The test
+submits two first sessions for a brand-new user concurrently; with the guard removed it reproduces
+`[201, 500]` from the unique violation, so the fix is verified rather than assumed.
+
+**Three advertised-but-broken scripts removed** (the honest half of "fix or remove"):
+
+| Removed | Why |
+| --- | --- |
+| `test:e2e` (root, `apps/web`, turbo task) | No `@playwright/test`, no config, no specs — and no way to run it in CI (see below) |
+| `deploy:api`, `deploy:web`, turbo `deploy` task | Neither app defines a `deploy` script, so `deploy:api` executed **0 tasks and exited 0** |
+| `packages/db` `seed:org` | `tsx create-org.ts` — the file does not exist and `tsx` is not a dependency |
+
+All four now fail loudly instead of silently succeeding. Deployment is documented as what it
+actually is: Vercel's Git integration, with one deployable (the API is a SvelteKit fallback inside
+the web app, so it has no separate deployment). Note that `pnpm --filter <pkg> run <missing>`
+still exits 0 with "None of the selected packages has a … script" — pnpm's behaviour, not ours.
+
+### Two findings this round surfaced that need a decision
+
+1. **No curriculum data ever reaches the database.** Nothing in the repo inserts into `languages`,
+   `keyboard_layouts` or `lessons` — the only inserts anywhere are in the integration test. The
+   web app renders lessons from the in-code `LESSON_CATALOG`, so browsing works, but
+   `POST /sessions` resolves `lessonId` against the **database**, finds nothing, and sets
+   `internalLessonId = null`. The consequence is silent: no `user_progress` row is ever written,
+   `daily_stats.lessons_completed` stays 0, and anything depending on lesson completion (including
+   certificates) under-reports. This is a real functional gap, not a missing convenience.
+
+   A correct seed is its own task, not a one-line script: it must map
+   `LESSON_CATALOG[].difficulty` (numeric 1–4) onto the `lesson_difficulty` enum, order inserts so
+   `keyboard_layouts.language_code` satisfies its FK to `languages.code`, and source language
+   `name`/`nativeName` metadata that currently lives only in `apps/web/src/lib/i18n/languages.ts`
+   (outside any package the DB layer can import).
+
+2. **The app cannot serve a single request without Clerk credentials.**
+   `hooks.server.ts` calls `requireEnv('PUBLIC_CLERK_PUBLISHABLE_KEY', …)` inside the request
+   handler, so every route — including `/` and static pages — throws without keys. That is why no
+   e2e suite exists: there is no way to boot the app in CI, and any contributor without a Clerk
+   tenant cannot run it locally either. Unblocking e2e means either supplying Clerk test
+   credentials to CI or adding an explicitly-opted-in unauthenticated mode that is impossible to
+   activate in production. Worth a decision either way.
+
+### Two things to know about the migration work
+
+1. **A latent ambiguity was enforced rather than hidden.** `lessons` is unique on
+   `(language_code, slug)`, but `apps/api/src/routes/sessions.ts` resolved `payload.lessonId` by
+   `slug` alone with `.limit(1)`. With more than one language seeded, a learner could be credited
+   against the wrong language's lesson. **(Fixed — see "P0 items 1–3 closed" above.)**
+
+2. **A concurrency race surfaced as a 500 instead of a duplicate row.** `updateUserStreak` and
+   `updateUserXP` did select-then-insert with no upsert and no locking. Before migration `0004` a
+   concurrent first submission silently created duplicate rows; afterwards the unique index
+   rejected the second insert with `23505`. **(Fixed — see above.)**
 
 ---
 
@@ -155,20 +202,20 @@ false, so wiring playback is a separate product decision.
 | `turbo run typecheck lint test --force` | **26/26 successful** | run locally, uncached |
 | Typecheck | 0 errors (`svelte-check`: 0 errors, 0 warnings) | same run |
 | Lint | 0 errors, **116 warnings** | same run |
-| Unit tests | **288 passing** across 24 files | per-package runs |
-| Postgres integration tests | **7 cases** over `POST /sessions` (PGlite) | §0.1 |
+| Unit tests | **290 passing** across 24 files | per-package runs |
+| Postgres integration tests | **9 cases** over `POST /sessions` (PGlite) | §0.1 |
 | `apps/web` production build | **succeeds** | `pnpm --filter @typeforge/web run build` |
 | Error tracking | Sentry wired both sides; delivery verified by test | §0.1 |
-| `pnpm test:e2e` | **exits 1 — "No tests found"** | §7 |
-| `pnpm deploy:api` | **"No tasks were executed"** | §7 |
-| CI (GitHub) | **#97 `3756d97`, #98 `2c3a3cc` success** | Actions API |
+| `pnpm test:e2e` | **removed** — no longer advertised; see §0.1 | §0.1 |
+| `pnpm deploy:api` | **removed** — deployment is Vercel Git integration | §0.1 |
+| CI (GitHub) | green through run #102 | Actions API |
 
 Test distribution:
 
 | Workspace | Files | Tests |
 | --- | --- | --- |
 | `@typeforge/web` | 14 | 184 |
-| `@typeforge/api` | 5 | 54 |
+| `@typeforge/api` | 5 | 56 |
 | `@typeforge/curriculum` | 1 | 26 |
 | `@typeforge/metrics` | 3 | 18 |
 | `@typeforge/layouts` | 1 | 6 |
