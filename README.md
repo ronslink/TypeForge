@@ -125,6 +125,10 @@ It writes languages, keyboard layouts and all lessons from the catalogues, and i
 idempotent, so re-running is how you push catalogue changes. Run it after
 `pnpm db:migrate`.
 
+Provisioning a database from scratch — including the managed-cluster cutover, the
+tunnel, and the checks that keep it isolated from other applications on the same
+cluster — is documented in [docs/database-cutover.md](docs/database-cutover.md).
+
 ## Project Structure
 
 ```
