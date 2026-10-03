@@ -12,6 +12,7 @@ import {
   boolean,
   smallint,
   jsonb,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -68,9 +69,9 @@ export const lessonCategories = pgTable(
     displayOrder: smallint('display_order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    langSlugUnique: { unique: true, columns: [table.languageCode, table.slug] },
-  })
+  (table) => [
+    uniqueIndex('lesson_categories_language_slug_unique').on(table.languageCode, table.slug),
+  ]
 );
 
 // Lessons table
@@ -95,9 +96,9 @@ export const lessons = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    langSlugUnique: { unique: true, columns: [table.languageCode, table.slug] },
-  })
+  (table) => [
+    uniqueIndex('lessons_language_slug_unique').on(table.languageCode, table.slug),
+  ]
 );
 
 // Exercises table

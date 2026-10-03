@@ -3,7 +3,7 @@
  * Achievements, streaks, leaderboards, and social features
  */
 
-import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, smallint, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, pgEnum, uuid, text, integer, timestamp, boolean, smallint, jsonb, uniqueIndex, primaryKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './identity.js';
 
@@ -31,9 +31,9 @@ export const userAchievements = pgTable('user_achievements', {
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   achievementId: uuid('achievement_id').notNull().references(() => achievements.id, { onDelete: 'cascade' }),
   earnedAt: timestamp('earned_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userAchievementUnique: { unique: true, columns: [table.userId, table.achievementId] },
-}));
+}, (table) => [
+  uniqueIndex('user_achievements_user_achievement_unique').on(table.userId, table.achievementId),
+]);
 
 // Streaks table
 export const streaks = pgTable('streaks', {
@@ -45,9 +45,9 @@ export const streaks = pgTable('streaks', {
   lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  userTypeUnique: { unique: true, columns: [table.userId, table.type] },
-}));
+}, (table) => [
+  uniqueIndex('streaks_user_type_unique').on(table.userId, table.type),
+]);
 
 // XP and levels table
 export const userXp = pgTable('user_xp', {
@@ -66,18 +66,18 @@ export const leaderboards = pgTable('leaderboards', {
   scopeValue: text('scope_value'), // language code, region, or org id
   data: jsonb('data').notNull(), // [{ userId, rank, wpm, accuracy, ... }]
   generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  typeScopeUnique: { unique: true, columns: [table.type, table.scope, table.scopeValue] },
-}));
+}, (table) => [
+  uniqueIndex('leaderboards_type_scope_value_unique').on(table.type, table.scope, table.scopeValue),
+]);
 
 // User follows table
 export const userFollows = pgTable('user_follows', {
   followerId: uuid('follower_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   followingId: uuid('following_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  pk: { primaryKey: true, columns: [table.followerId, table.followingId] },
-}));
+}, (table) => [
+  primaryKey({ columns: [table.followerId, table.followingId] }),
+]);
 
 // Relations
 export const achievementsRelations = relations(achievements, ({ many }) => ({

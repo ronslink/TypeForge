@@ -133,9 +133,17 @@ export const dailyStats = pgTable(
     lessonsCompleted: integer('lessons_completed').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    userDateLangUnique: { unique: true, columns: [table.userId, table.date, table.languageCode] },
-  })
+  (table) => [
+    // Expressing this as a `uniqueIndex` rather than the legacy object form is
+    // load-bearing: drizzle-kit ignores the legacy shape, so the constraint
+    // never reached the database and the `ON CONFLICT` upsert below failed with
+    // 42P10 on every session submission.
+    uniqueIndex('daily_stats_user_date_language_unique').on(
+      table.userId,
+      table.date,
+      table.languageCode
+    ),
+  ]
 );
 
 // User progress table (per lesson)
@@ -157,9 +165,9 @@ export const userProgress = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    userLessonUnique: { unique: true, columns: [table.userId, table.lessonId] },
-  })
+  (table) => [
+    uniqueIndex('user_progress_user_lesson_unique').on(table.userId, table.lessonId),
+  ]
 );
 
 // Key mastery table (per user, per key)
@@ -180,9 +188,13 @@ export const keyMastery = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    userLayoutKeyUnique: { unique: true, columns: [table.userId, table.layoutId, table.key] },
-  })
+  (table) => [
+    uniqueIndex('key_mastery_user_layout_key_unique').on(
+      table.userId,
+      table.layoutId,
+      table.key
+    ),
+  ]
 );
 
 // User placement test results table

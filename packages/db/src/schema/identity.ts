@@ -13,6 +13,7 @@ import {
   timestamp,
   smallint,
   char,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { userPlacementResults } from './sessions.js';
@@ -120,9 +121,9 @@ export const userDevices = pgTable(
     lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    userPushTokenUnique: { unique: true, columns: [table.userId, table.pushToken] },
-  })
+  (table) => [
+    uniqueIndex('user_devices_user_push_token_unique').on(table.userId, table.pushToken),
+  ]
 );
 
 // Relations

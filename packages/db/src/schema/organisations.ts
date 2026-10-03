@@ -12,6 +12,8 @@ import {
   timestamp,
   char,
   integer,
+  uniqueIndex,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { users, homeRegionEnum } from './identity.js';
@@ -76,9 +78,9 @@ export const orgMembers = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    orgUserUnique: { unique: true, columns: [table.orgId, table.userId] },
-  })
+  (table) => [
+    uniqueIndex('org_members_org_user_unique').on(table.orgId, table.userId),
+  ]
 );
 
 // Org classes table
@@ -109,9 +111,9 @@ export const classMembers = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    pk: { primaryKey: true, columns: [table.classId, table.userId] },
-  })
+  (table) => [
+    primaryKey({ columns: [table.classId, table.userId] }),
+  ]
 );
 
 // Org invitations table

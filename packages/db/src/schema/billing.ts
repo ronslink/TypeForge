@@ -14,6 +14,7 @@ import {
   jsonb,
   boolean,
   smallint,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users, organisations } from './index.js';
@@ -108,9 +109,9 @@ export const subscriptions = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    entityUnique: { unique: true, columns: [table.entityType, table.entityId] },
-  })
+  (table) => [
+    uniqueIndex('subscriptions_entity_unique').on(table.entityType, table.entityId),
+  ]
 );
 
 // Subscription seats table
@@ -128,9 +129,12 @@ export const subscriptionSeats = pgTable(
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     reassignableAt: timestamp('reassignable_at', { withTimezone: true }),
   },
-  (table) => ({
-    subUserUnique: { unique: true, columns: [table.subscriptionId, table.userId] },
-  })
+  (table) => [
+    uniqueIndex('subscription_seats_subscription_user_unique').on(
+      table.subscriptionId,
+      table.userId
+    ),
+  ]
 );
 
 // Plan prices table
