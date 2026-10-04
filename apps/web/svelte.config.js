@@ -6,7 +6,11 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({ 
-      runtime: 'nodejs20.x',
+      // Must match vercel.json and the API route's `config.runtime`. nodejs20.x is
+      // discontinued on Vercel and the deployment is rejected outright, so the
+      // build succeeds and only the upload fails — which is a confusing way to
+      // find out.
+      runtime: 'nodejs22.x',
       external: ['cloudflare:workers'],
     }),
     alias: {
